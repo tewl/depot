@@ -1,0 +1,78 @@
+{
+  "name": "depot",
+  "version": "1.0.0",
+  "description": "A place to grab code",
+  "main": "",
+  "types": "",
+  "scripts": {
+    "test": "gulp ut"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tewl/depot.git"
+  },
+  "keywords": [
+    "promise",
+    "promisify",
+    "sequence",
+    "event",
+    "eventToPromise",
+    "stream",
+    "streamToPromise",
+    "event",
+    "events",
+    "track",
+    "tracker",
+    "git",
+    "vcs",
+    "fs",
+    "file",
+    "directory",
+    "copy",
+    "move",
+    "read",
+    "write",
+    "delete",
+    "absolute",
+    "absolute path",
+    "exists",
+    "empty",
+    "contents",
+    "prune",
+    "dirName",
+    "baseName",
+    "fileName",
+    "extName",
+    "extension",
+    "writeJson",
+    "readJson",
+    "utilities"
+  ],
+  "author": "Kevin Peters <kwpeters@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tewl/depot/issues"
+  },
+  "homepage": "https://github.com/tewl/depot#readme",
+  "devDependencies": {
+    "@types/bluebird": "^3.5.20",
+    "@types/jasmine": "^2.8.6",
+    "@types/lodash": "^4.14.104",
+    "@types/node": "9.4.6",
+    "@types/semver": "5.5.0",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^4.0.2",
+    "jasmine": "^3.1.0",
+    "semver": "5.5.0",
+    "strip-json-comments": "^2.0.1",
+    "ts-node": "^5.0.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.2"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "lodash": "^4.17.5"
+  }
+}

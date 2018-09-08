@@ -57,7 +57,7 @@ describe("NodePackage", () => {
                 const pkgDir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(pkgDir)
                 .then((pkg) => {
-                    expect(pkg.config.name).toEqual("stella");
+                    expect(pkg.config.name).toEqual("depot");
                     expect(pkg.config.version).toBeTruthy();
                     expect(pkg.config.description).toBeTruthy();
                     expect(pkg.config.repository).toBeTruthy();
@@ -80,7 +80,7 @@ describe("NodePackage", () => {
                 })
                 .then((packedFile: File) => {
                     expect(packedFile).toBeTruthy();
-                    expect(packedFile.fileName).toMatch(/stella-\d+\.\d+\.\d+\.tgz/);
+                    expect(packedFile.fileName).toMatch(/depot-\d+\.\d+\.\d+\.tgz/);
                     expect(packedFile.existsSync()).toBeTruthy();
                     done();
                 });

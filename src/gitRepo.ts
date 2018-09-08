@@ -8,6 +8,7 @@ import {Url} from "./url";
 import {gitUrlToProjectName} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
+import * as BBPromise from "bluebird";
 
 
 interface IGitLogEntry
@@ -35,14 +36,15 @@ const GIT_LOG_ENTRY_REGEX = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:
  * @return A promise for a boolean indicating whether dir contains a Git
  * repository.  This promise will never reject.
  */
-export async function isGitRepoDir(dir: Directory): Promise<boolean> {
+export function isGitRepoDir(dir: Directory): Promise<boolean> {
 
-    const [dirExists, dotGitExists] = await Promise.all([
+    return BBPromise.all([
         dir.exists(),                        // The directory exists
         new Directory(dir, ".git").exists()  // The directory contains a .git directory
-    ]);
-
-    return Boolean(dirExists && dotGitExists);
+    ])
+    .then(([dirExists, dotGitExists]) => {
+        return Boolean(dirExists && dotGitExists);
+    });
 }
 
 
@@ -55,17 +57,18 @@ export class GitRepo
      * @param dir - The directory containing the repo
      * @return A Promise for the GitRepo.
      */
-    public static async fromDirectory(dir: Directory): Promise<GitRepo>
+    public static fromDirectory(dir: Directory): Promise<GitRepo>
     {
-        const isGitRepo = await isGitRepoDir(dir);
-        if (isGitRepo)
-        {
-            return new GitRepo(dir);
-        }
-        else
-        {
-            throw new Error("Path does not exist or is not a Git repo.");
-        }
+        return isGitRepoDir(dir)
+        .then((isGitRepo) => {
+            if (isGitRepo) {
+                return new GitRepo(dir);
+            }
+            else
+            {
+                throw new Error("Path does not exist or is not a Git repo.");
+            }
+        });
     }
 
 
@@ -215,15 +218,18 @@ export class GitRepo
 
 
     // TODO: Write unit tests for this method.  Make sure there is no leading or trailing whitespace.
-    public async currentCommitHash(): Promise<CommitHash>
+    public currentCommitHash(): Promise<CommitHash>
     {
-        const stdout = await spawn("git", ["rev-parse", "--verify", "HEAD"], this._dir.toString()).closePromise;
-        const hash = CommitHash.fromString(stdout);
-        if (!hash)
-        {
-            throw new Error("Failed to construct CommitHash.");
-        }
-        return hash;
+        return spawn("git", ["rev-parse", "--verify", "HEAD"], this._dir.toString())
+        .closePromise
+        .then((stdout) => {
+            const hash = CommitHash.fromString(stdout);
+            if (!hash)
+            {
+                throw new Error("Failed to construct CommitHash.");
+            }
+            return hash;
+        });
     }
 
 
@@ -402,7 +408,7 @@ export class GitRepo
         else
         {
             // The internal cache does not need to be updated.
-            updatePromise = Promise.resolve();
+            updatePromise = BBPromise.resolve();
         }
 
         return updatePromise
@@ -414,7 +420,7 @@ export class GitRepo
     }
 
 
-    public async getCurrentBranch(): Promise<GitBranch | undefined>
+    public getCurrentBranch(): Promise<GitBranch | undefined>
     {
         // When on master:
         // git symbolic-ref HEAD
@@ -428,46 +434,48 @@ export class GitRepo
         // $ git rev-parse --abbrev-ref HEAD
         // HEAD
 
-        const branchName = await spawn("git", ["rev-parse", "--abbrev-ref", "HEAD"], this._dir.toString()).closePromise;
-        if (branchName === "HEAD")
-        {
-            // The repo is in detached head state.
-            return undefined;
-        }
-
-        const branch = await GitBranch.create(this, branchName);
-
-        // All is good.
-        return branch;
+        return spawn("git", ["rev-parse", "--abbrev-ref", "HEAD"], this._dir.toString()).closePromise
+        .then((branchName) => {
+            if (branchName === "HEAD") {
+                // The repo is in detached head state.
+                return BBPromise.resolve(undefined);
+            }
+            else {
+                return GitBranch.create(this, branchName);
+            }
+        });
     }
 
 
-    public async checkoutBranch(branch: GitBranch, createIfNonexistent: boolean): Promise<void>
+    public checkoutBranch(branch: GitBranch, createIfNonexistent: boolean): Promise<void>
     {
-        if (createIfNonexistent)
-        {
+
+        return this.getBranches()
+        .then((allBranches) => {
             // If there is a branch with the same name, we should not try to
             // create it.  Instead, we should just check it out.
-            const allBranches = await this.getBranches();
             if (_.some(allBranches, {name: branch.name}))
             {
                 createIfNonexistent = false;
             }
-        }
+        })
+        .then(() => {
+            const args = [
+                "checkout",
+                ...(createIfNonexistent ? ["-b"] : []),
+                branch.name
+            ];
 
-        const args = [
-            "checkout",
-            ...(createIfNonexistent ? ["-b"] : []),
-            branch.name
-        ];
-
-        await spawn("git", args, this._dir.toString()).closePromise;
+            return spawn("git", args, this._dir.toString()).closePromise;
+        })
+        .then(() => {});
     }
 
 
-    public async checkoutCommit(commit: CommitHash): Promise<void>
+    public checkoutCommit(commit: CommitHash): Promise<void>
     {
-        await spawn("git", ["checkout", commit.toString()], this._dir.toString()).closePromise;
+        return spawn("git", ["checkout", commit.toString()], this._dir.toString()).closePromise
+        .then(() => {});
     }
 
 
@@ -481,23 +489,23 @@ export class GitRepo
     }
 
 
-    public async pushCurrentBranch(remoteName: string = "origin", setUpstream: boolean = false): Promise<void>
+    public pushCurrentBranch(remoteName: string = "origin", setUpstream: boolean = false): Promise<void>
     {
-        const curBranch = await this.getCurrentBranch();
-        if (!curBranch)
-        {
-            throw new Error("There is no current branch to push.");
-        }
+        return this.getCurrentBranch()
+        .then((curBranch) => {
+            if (!curBranch)
+            {
+                throw new Error("There is no current branch to push.");
+            }
 
-        const args = [
-            "push",
-            ...(setUpstream ? ["-u"] : []),
-            remoteName,
-            curBranch.name
-        ];
-
-        return spawn("git", args, this._dir.toString())
-        .closePromise
+            const args = [
+                "push",
+                ...(setUpstream ? ["-u"] : []),
+                remoteName,
+                curBranch.name
+            ];
+            return spawn("git", args, this._dir.toString()).closePromise;
+        })
         .then(() => {
         })
         .catch((err) => {
@@ -508,33 +516,33 @@ export class GitRepo
 
 
     // TODO: Write unit tests for the following method.
-    public async getCommitDeltas(trackingRemote: string = "origin"): Promise<{ahead: number, behind: number}>
+    public getCommitDeltas(trackingRemote: string = "origin"): Promise<{ahead: number, behind: number}>
     {
-        const branch = await this.getCurrentBranch();
-        if (!branch)
-        {
-            throw new Error("Cannot getNumCommitsAhead() when HEAD is not on a branch.");
-        }
+        return this.getCurrentBranch()
+        .then((branch) => {
+            if (!branch)
+            {
+                throw new Error("Cannot getNumCommitsAhead() when HEAD is not on a branch.");
+            }
 
-        // The names of the two branches in question.
-        const thisBranchName = branch.name;
-        const trackingBranchName = `${trackingRemote}/${thisBranchName}`;
+            // The names of the two branches in question.
+            const thisBranchName = branch.name;
+            const trackingBranchName = `${trackingRemote}/${thisBranchName}`;
 
-        const numAheadPromise = spawn(
-            "git",
-            ["rev-list", thisBranchName, "--not", trackingBranchName, "--count"],
-            this._dir.toString()
-        )
-        .closePromise;
+            const numAheadPromise = spawn(
+                "git",
+                ["rev-list", thisBranchName, "--not", trackingBranchName, "--count"],
+                this._dir.toString()
+            ).closePromise;
 
-        const numBehindPromise = spawn(
-            "git",
-            ["rev-list", trackingBranchName, "--not", thisBranchName, "--count"],
-            this._dir.toString()
-        )
-        .closePromise;
+            const numBehindPromise = spawn(
+                "git",
+                ["rev-list", trackingBranchName, "--not", thisBranchName, "--count"],
+                this._dir.toString()
+            ).closePromise;
 
-        return Promise.all([numAheadPromise, numBehindPromise])
+            return BBPromise.all([numAheadPromise, numBehindPromise]);
+        })
         .then((results) => {
             return {
                 ahead: parseInt(results[0], 10),
@@ -595,7 +603,7 @@ export class GitRepo
         }
         else
         {
-            updatePromise = Promise.resolve();
+            updatePromise = BBPromise.resolve();
         }
 
         return updatePromise

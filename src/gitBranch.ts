@@ -71,15 +71,18 @@ export class GitBranch
      * @return A Promise for the newly created GitBranch instance.  This Promise
      * will be resolved with undefined if the specified branch name is invalid.
      */
-    public static async create(repo: GitRepo, branchName: string, remoteName?: string): Promise<GitBranch>
+    public static create(repo: GitRepo, branchName: string, remoteName?: string): Promise<GitBranch>
     {
         const validator = new Validator<string>([this.isValidBranchName]);
-        if (! await validator.isValid(branchName))
-        {
-            throw new Error(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
-        }
 
-        return new GitBranch(repo, branchName, remoteName);
+        return validator.isValid(branchName)
+        .then((branchNameIsValid) => {
+            if (!branchNameIsValid) {
+                throw new Error(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
+            }
+
+            return new GitBranch(repo, branchName, remoteName);
+        });
     }
 
 
@@ -90,37 +93,39 @@ export class GitBranch
      * @param repo - The repo in which the branches are to be enumerated
      * @return A Promise for an array of branches in the specified repo
      */
-    public static async enumerateGitRepoBranches(repo: GitRepo): Promise<Array<GitBranch>>
+    public static enumerateGitRepoBranches(repo: GitRepo): Promise<Array<GitBranch>>
     {
-        const stdout = await spawn("git", ["branch", "-a"], repo.directory.toString()).closePromise;
+        return spawn("git", ["branch", "-a"], repo.directory.toString()).closePromise
+        .then((stdout) => {
+            return _.chain(stdout.split("\n"))
+            // Get rid of leading and trailing whitespace
+            .map((curLine) => curLine.trim())
+            // Replace the "* " that precedes the current working branch
+            .map((curLine) => curLine.replace(/^\*\s+/, ""))
+            // Filter out the line that looks like: remotes/origin/HEAD -> origin/master
+            .filter((curLine) => !/^[\w/]+\/HEAD\s+->\s+[\w/]+$/.test(curLine))
+            // Get rid of leading and trailing whitespace
+            .map((curLine) => curLine.trim())
+            // Create an array of GitBranch objects
+            .map((longName): GitBranch => {
+                const regexResults = GitBranch.strParserRegex.exec(longName);
+                if (!regexResults)
+                {
+                    throw new Error(`Error: Branch "${longName}" could not be parsed by enumerateGitRepoBranches().`);
+                }
 
-        return _.chain(stdout.split("\n"))
-        // Get rid of leading and trailing whitespace
-        .map((curLine) => curLine.trim())
-        // Replace the "* " that precedes the current working branch
-        .map((curLine) => curLine.replace(/^\*\s+/, ""))
-        // Filter out the line that looks like: remotes/origin/HEAD -> origin/master
-        .filter((curLine) => !/^[\w/]+\/HEAD\s+->\s+[\w/]+$/.test(curLine))
-        // Get rid of leading and trailing whitespace
-        .map((curLine) => curLine.trim())
-        // Create an array of GitBranch objects
-        .map((longName): GitBranch => {
-            const regexResults = GitBranch.strParserRegex.exec(longName);
-            if (!regexResults)
-            {
-                throw new Error(`Error: Branch "${longName}" could not be parsed by enumerateGitRepoBranches().`);
-            }
+                const remoteName = regexResults[2];
+                const branchName = regexResults[3];
 
-            const remoteName = regexResults[2];
-            const branchName = regexResults[3];
+                // Note: Because the branch names are coming from Git (and not a
+                // user) the branch names do not have to be validated as is done in
+                // GitBranch.create(), which uses user data.
 
-            // Note: Because the branch names are coming from Git (and not a
-            // user) the branch names do not have to be validated as is done in
-            // GitBranch.create(), which uses user data.
+                return new GitBranch(repo, branchName, remoteName);
+            })
+            .value();
 
-            return new GitBranch(repo, branchName, remoteName);
-        })
-        .value();
+        });
     }
 
 

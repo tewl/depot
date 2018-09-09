@@ -1,7 +1,7 @@
 import {tmpDir} from "../test/ut/spechelpers";
 import * as path from "path";
-import {File} from "../src/file";
-import {Directory, IDirectoryContents} from "../src/directory";
+import {File} from "./file";
+import {Directory, IDirectoryContents} from "./directory";
 
 
 describe("Directory", () => {
@@ -424,6 +424,65 @@ describe("Directory", () => {
                 });
             });
 
+
+        });
+
+
+        describe("files()", () => {
+
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("will read the files within a single directory", (done) => {
+                const dirA = new Directory(tmpDir, "dirA");
+                const fileA = new File(dirA, "a.txt");
+
+                const dirB = new Directory(dirA, "dirB");
+                const fileB = new File(dirB, "b.txt");
+
+                dirA.ensureExistsSync();
+                dirB.ensureExistsSync();
+                fileA.writeSync("file a contents");
+                fileB.writeSync("file b contents");
+
+                dirA.files(false)
+                .then((files) => {
+                    expect(files.length).toEqual(1);
+                    expect(files[0].fileName).toEqual("a.txt");
+                    done();
+                });
+            });
+
+
+            it("will read the files within a directory recursively", (done) => {
+                const dirA = new Directory(tmpDir, "dirA");
+                const fileA = new File(dirA, "a.txt");
+
+                const dirB = new Directory(dirA, "dirB");
+                const fileB = new File(dirB, "b.txt");
+
+                const dirC = new Directory(dirB, "dirC");
+                const fileC = new File(dirC, "c.txt");
+
+                dirA.ensureExistsSync();
+                dirB.ensureExistsSync();
+                dirC.ensureExistsSync();
+                fileA.writeSync("file a contents");
+                fileB.writeSync("file b contents");
+                fileC.writeSync("file c contents");
+
+                dirA.files(true)
+                .then((files) => {
+                    expect(files.length).toEqual(3);
+                    expect(files[0].fileName).toEqual("a.txt");
+                    expect(files[1].fileName).toEqual("b.txt");
+                    expect(files[2].fileName).toEqual("c.txt");
+                    done();
+                });
+            });
 
         });
 

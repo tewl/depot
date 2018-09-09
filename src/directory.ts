@@ -399,6 +399,39 @@ export class Directory
 
 
     /**
+     * Enumerates the files in this Directory
+     * @param recursive - If true, files in all subdirectories will be returned
+     * @return A Promise that is resolved with an array of File objects
+     * representing the files in this directory.
+     */
+    public files(recursive: boolean): Promise<Array<File>>
+    {
+        return this.contents()
+        .then((contents) => {
+            let allFiles: Array<File> = contents.files;
+
+            let subdirsPromise: Promise<Array<Array<File>>> = BBPromise.resolve([[]]);
+
+            // If we need to recurse into the subdirectories, then do it.
+            if (recursive && contents.subdirs && contents.subdirs.length > 0) {
+                const promises = _.map(contents.subdirs, (curSubdir) => {
+                    return curSubdir.files(true);
+                });
+                subdirsPromise = BBPromise.all(promises);
+            }
+
+            return subdirsPromise
+            .then((subdirResults) => {
+                const subdirFiles = _.flatten(subdirResults);
+                allFiles = _.concat(allFiles, subdirFiles);
+                return allFiles;
+            });
+
+        });
+    }
+
+
+    /**
      * Recursively removes empty subdirectories from within this directory.
      * @return A Promise that is resolved when this directory has been pruned.
      */

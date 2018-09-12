@@ -1,7 +1,7 @@
 import * as path from "path";
 import {tmpDir} from "../test/ut/spechelpers";
-import {File} from "../src/file";
-import {Directory} from "../src/directory";
+import {File} from "./file";
+import {Directory} from "./directory";
 
 
 describe("File", () => {
@@ -917,6 +917,24 @@ describe("File", () => {
                 file.writeJsonSync({foo: "bar"});
 
                 expect(file.readJsonSync<any>().foo).toEqual("bar");
+            });
+
+
+        });
+
+
+        describe("getHash()", () => {
+
+
+            it("calculates the expected hash value", (done) => {
+                const file = new File(tmpDir, "src", "file.txt");
+                file.writeSync("abc");
+
+                file.getHash()
+                .then((hash) => {
+                    expect(hash).toEqual("900150983cd24fb0d6963f7d28e17f72");
+                    done();
+                });
             });
 
 

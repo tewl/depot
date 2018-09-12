@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as crypto from "crypto";
 import * as BBPromise from "bluebird";
 import {ListenerTracker} from "./listenerTracker";
 import {promisify1, promisify3} from "./promiseHelpers";
@@ -470,6 +471,34 @@ export class File
     {
         const jsonText = JSON.stringify(data, undefined, 4);
         return this.writeSync(jsonText);
+    }
+
+
+    /**
+     * Calculates a hash of this file's contents
+     * @param algorithm - The hashing algorithm to use
+     * @return A Promise for a hexadecimal string containing the hash
+     */
+    public getHash(algorithm: string = "md5"): Promise<string>
+    {
+        return new BBPromise<string>((resolve, reject) => {
+            const input = fs.createReadStream(this._filePath);
+            const hash = crypto.createHash(algorithm);
+            hash.setEncoding("hex");
+
+            input
+            .on("error", (error) => {
+                reject(new Error(error));
+            })
+            .on("end", () => {
+                hash.end();
+                const hashValue = hash.read() as string;
+                resolve(hashValue);
+            });
+
+            input
+            .pipe(hash);
+        });
     }
 
 

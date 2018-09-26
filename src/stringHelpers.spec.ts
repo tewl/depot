@@ -1,4 +1,4 @@
-import {numInitial, outdent, trimBlankLines} from "./stringHelpers";
+import {numInitial, outdent, trimBlankLines, indent, removeWhitespace} from "./stringHelpers";
 
 
 describe("numInitial()", () => {
@@ -26,6 +26,30 @@ describe("numInitial()", () => {
 
 });
 
+
+describe("indent()", () => {
+
+    it("will indent a single line appropriately", () => {
+        expect(indent("foo", 2)).toEqual("  foo");
+    });
+
+
+    it("will indent a multiple lines appropriately", () => {
+        expect(indent("foo\nbar\nbaz", 2)).toEqual("  foo\n  bar\n  baz");
+    });
+
+
+    it("can accept an indent string rather than number of spaces", () => {
+        expect(indent("foo\nbar", "****")).toEqual("****foo\n****bar");
+    });
+
+
+    it("can optionally skip indenting the first line", () => {
+        expect(indent("foo\nbar", 2, true)).toEqual("foo\n  bar");
+    });
+
+
+});
 
 describe("outdent()", () => {
 
@@ -77,6 +101,37 @@ describe("trimBlankLines()", () => {
 
     it("returns the original string when there are no blank lines", () => {
         expect(trimBlankLines("line 1\nline 2")).toEqual("line 1\nline 2");
+    });
+
+
+});
+
+
+describe("removeWhitespace", () => {
+
+
+    it("will remove whitespace from the beginning", () => {
+        expect(removeWhitespace(" foo")).toEqual("foo");
+    });
+
+
+    it("will remove whitespace from the middle", () => {
+        expect(removeWhitespace("foo bar")).toEqual("foobar");
+    });
+
+
+    it("will remove whitespace from the end", () => {
+        expect(removeWhitespace("foo ")).toEqual("foo");
+    });
+
+
+    it("will remove multiple regions of whitespace", () => {
+        expect(removeWhitespace(" foo bar ")).toEqual("foobar");
+    });
+
+
+    it("will remove different kinds of whitespace", () => {
+        expect(removeWhitespace("\tfoo\t    \tbar\t\t")).toEqual("foobar");
     });
 
 

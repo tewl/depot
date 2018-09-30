@@ -1,8 +1,8 @@
 import {advance, partition} from "./algorithm";
 
-function link<ValueType>(left: DLNodeAny<ValueType>, right: DLNodeAny<ValueType>): void {
-    left.next = right;
-    right.prev = left;
+function link<ValueType>(prev: DLNodeAny<ValueType>, next: DLNodeAny<ValueType>): void {
+    prev.next = next;
+    next.prev = prev;
 }
 
 
@@ -52,8 +52,8 @@ class DLNodeEnd<ValueType> {
  * Class that represents a node in a doubly linked list.  The nodes form a
  * circle where there is one special "end" node that has a value of undefined.
  */
-class DLNodeValue<ValueType> {  // tslint:disable-line:max-classes-per-file
-
+class DLNodeValue<ValueType>  // tslint:disable-line:max-classes-per-file
+{
     // region Data Members
     private _prev: DLNodeAny<ValueType> | undefined;
     private _next: DLNodeAny<ValueType> | undefined;
@@ -143,6 +143,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      */
     constructor() {
         this._end = new DLNodeEnd<ValueType>();
+        link(this._end, this._end);
         this._length = 0;
     }
 
@@ -338,46 +339,21 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
 
         let nodeRet: DLNodeAny<ValueType> | undefined;
 
-        if (this._length === 0) {
-            // In this scenario, insertInFrontOf must be end().
-            if (insertInFrontOf.nodeType !== "DLNodeEnd") {
-                throw new Error("insertNode() given an invalid iterator.");
-            }
+        for (const curVal of values) {
+            const prevNode: DLNodeAny<ValueType> = insertInFrontOf.prev;
+            const nextNode: DLNodeAny<ValueType> = insertInFrontOf;
 
-            // There are no values in this List.  Adding the first value is a
-            // little special.
-            const newNode = new DLNodeValue<ValueType>(values.shift()!);
-            link(this._end, newNode);
-            link(newNode, this._end);
-            this._length += 1;
+            const newNode = new DLNodeValue(curVal);
 
-            // This is the first node that we want to return.
-            nodeRet = newNode;
-        }
-
-        const nextNode = insertInFrontOf;
-        let prevNode = nextNode.prev;
-        let newNode: DLNodeValue<ValueType>;
-
-        for (const curValue of values) {
-            // Create the new node and link with the node to the left.
-            newNode = new DLNodeValue<ValueType>(curValue);
             link(prevNode, newNode);
+            link(newNode, nextNode);
 
             this._length += 1;
 
-            // We now have a *new* previous node.
-            prevNode = newNode;
-
-            // If this is the first, item inserted, remember it so we can return
+            // If this is the first node inserted, remember it so we can return
             // it.
             nodeRet = nodeRet || newNode;
         }
-
-        // Each new node was linked with the node to its left when inserted.
-        // Now that we are done inserting them, link the last inserted node with
-        // the node to its right.
-        link(prevNode, nextNode);
 
         // Since we checked the size of the `values` array at the beginning of
         // this method, we know that nodeRet will have been set.

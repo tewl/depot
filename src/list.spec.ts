@@ -291,6 +291,26 @@ describe("List", () => {
     });
 
 
+    it("can survive being emptied and then repopulated", () => {
+        const list = List.fromArray([1, 2]);
+        list.pop();
+        list.pop();
+        expect(list.length).toEqual(0);
+
+        list.insert(list.end(), 1, 2, 3);
+        expect(list.length).toEqual(3);
+
+        const it = list.begin();
+        expect(it.value).toEqual(1);
+        it.next();
+        expect(it.value).toEqual(2);
+        it.next();
+        expect(it.value).toEqual(3);
+        it.next();
+        expect(it.equals(list.end())).toBeTruthy();
+    });
+
+
     describe("Iterator", () => {
 
 

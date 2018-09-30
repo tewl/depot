@@ -9,12 +9,14 @@ function link<ValueType>(prev: DLNodeAny<ValueType>, next: DLNodeAny<ValueType>)
 class DLNodeEnd<ValueType> {
 
     // region Data Members
-    private _prev: DLNodeValue<ValueType> | undefined;
-    private _next: DLNodeValue<ValueType> | undefined;
+    private _prev: DLNodeAny<ValueType>;
+    private _next: DLNodeAny<ValueType>;
     // endregion
 
 
     constructor() {
+        this._prev = this;
+        this._next = this;
     }
 
 
@@ -23,26 +25,26 @@ class DLNodeEnd<ValueType> {
     }
 
 
-    public get prev(): DLNodeValue<ValueType> {
+    public get prev(): DLNodeAny<ValueType> {
         if (this._prev === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a previous node.");
         }
         return this._prev;
     }
 
-    public set prev(prev: DLNodeValue<ValueType>) {
+    public set prev(prev: DLNodeAny<ValueType>) {
         this._prev = prev;
     }
 
 
-    public get next(): DLNodeValue<ValueType> {
+    public get next(): DLNodeAny<ValueType> {
         if (this._next === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a next node.");
         }
         return this._next;
     }
 
-    public set next(next: DLNodeValue<ValueType>) {
+    public set next(next: DLNodeAny<ValueType>) {
         this._next = next;
     }
 }
@@ -143,7 +145,6 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      */
     constructor() {
         this._end = new DLNodeEnd<ValueType>();
-        link(this._end, this._end);
         this._length = 0;
     }
 
@@ -214,7 +215,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
 
         // Because this List is not empty, we know for sure that the node
         // before the end node contains a value.
-        const lastValueNode: DLNodeValue<ValueType> = this._end.prev;
+        const lastValueNode = this._end.prev as DLNodeValue<ValueType>;
         const val: ValueType = lastValueNode.value;
 
         // Remove the node from the list.

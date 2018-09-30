@@ -1,4 +1,6 @@
+import * as _ from "lodash";
 import {Heap, CompareResult} from "./heap";
+import {randomizedArray} from "./random_data.spec";
 
 
 // A comparison function that compares numbers.
@@ -191,6 +193,22 @@ describe("Heap", () => {
 
     });
 
+
+    it("can sort a very large array", () => {
+        const heap = new Heap(compareNumbers);
+
+        // console.time("large heap-based sort"); // tslint:disable-line:no-console
+        _.forEach(randomizedArray, (curValue) => {
+            heap.push(curValue);
+        });
+        // console.timeEnd("large heap-based sort"); // tslint:disable-line:no-console
+        expect(heap.length).toEqual(1000);
+
+        for (let curIndex = 0; curIndex < 1000; ++curIndex) {
+            expect(heap.pop()).toEqual(999 - curIndex);
+        }
+
+    });
 
 });
 

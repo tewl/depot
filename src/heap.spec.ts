@@ -208,6 +208,19 @@ describe("Heap", () => {
             expect(heap.pop()).toEqual(999 - curIndex);
         }
 
+        //
+        // Some other ways to sort to see comparative performance.
+        //
+
+        // let arr = randomizedArray.slice();
+        // console.time("native array sort"); // tslint:disable-line:no-console
+        // arr.sort();
+        // console.timeEnd("native array sort"); // tslint:disable-line:no-console
+
+        // arr = randomizedArray.slice();
+        // console.time("lodash array sort"); // tslint:disable-line:no-console
+        // _.sortBy(arr);
+        // console.timeEnd("lodash array sort"); // tslint:disable-line:no-console
     });
 
 });

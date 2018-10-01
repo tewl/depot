@@ -401,7 +401,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
         // partition() from itFirst (inclusive) to itLast (exclusive) based on
         // curVal < pivot.  Once the range is partitioned, we will be able to
         // insert the pivot value between the two partitioned ranges.
-        let itPartition = partition(itFirst, itLast, (curVal) => curVal! < pivotValue);
+        let itPartition = partition(itFirst, itLast, (curVal) => curVal < pivotValue);
         const insertedAtBeginning = itPartition.equals(itFirst);
         const insertedAtEnd = itPartition.equals(itLast);
 

@@ -71,7 +71,7 @@ export function find<ValueType>(
 /**
  * Partitions the range [itFirst, itLast) so that all values in the range for
  * which the unary predicate pred returns true will precede all the values for
- * with it returns false.  This is not a stable partition.
+ * which it returns false.  This is not a stable partition.
  * @param itFirst - The first element in the range to be partitioned (inclusive)
  * @param itLast - The end of the range to be partitioned (exclusive)
  * @param pred - The unary predicate that will be invoked on each element

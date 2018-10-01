@@ -55,3 +55,8 @@ export function getRandomIntInclusive(minIncluded: number, maxIncluded: number):
     // Using Math.round() will give you a non-uniform distribution!
     return Math.floor(Math.random() * (maxIncluded - minIncluded + 1)) + minIncluded;
 }
+
+
+//
+// Note: There is no shuffle() here, because it is available in Lodash.
+//

@@ -476,7 +476,9 @@ export class File
 
     /**
      * Calculates a hash of this file's contents
-     * @param algorithm - The hashing algorithm to use
+     * @param algorithm - The hashing algorithm to use.  For example, "md5",
+     * "sha256", "sha512".  To see algorithms available on your platform, run
+     * `openssl list-message-digest-algorithms`.
      * @return A Promise for a hexadecimal string containing the hash
      */
     public getHash(algorithm: string = "md5"): Promise<string>

@@ -2,6 +2,7 @@ import {tmpDir} from "../test/ut/spechelpers";
 import * as path from "path";
 import {File} from "./file";
 import {Directory, IDirectoryContents} from "./directory";
+import * as _ from "lodash";
 
 
 describe("Directory", () => {
@@ -65,6 +66,36 @@ describe("Directory", () => {
                 const dir2 = new Directory(tmpDir, "bar", "dir");
 
                 expect(dir1.equals(dir2)).toBeFalsy();
+            });
+
+
+        });
+
+
+        describe("absPath()", () => {
+
+
+            it("return a string containing the absolute path", () => {
+                const absPath = tmpDir.absPath();
+                expect(absPath[0]).toEqual("/");
+                expect(_.endsWith(absPath, "/tmp")).toBeTruthy();
+            });
+
+
+        });
+
+
+        describe("absolute()", () => {
+
+
+            it("returns an absolute path version of the source", () => {
+                const absTmp = tmpDir.absolute();
+                const path = absTmp.toString();
+
+                expect(tmpDir.toString()[0]).not.toEqual("/");
+
+                expect(path[0]).toEqual("/");
+                expect(_.endsWith(path, "/tmp")).toBeTruthy();
             });
 
 
@@ -419,9 +450,54 @@ describe("Directory", () => {
                 tmpDir.contents()
                 .then((result: IDirectoryContents) => {
                     expect(result.subdirs.length).toEqual(2);
+
+                    // Put the subdirectories in a deterministic order.
+                    const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
+                    expect(subdirs[0].toString()).toEqual("tmp/dirA");
+                    expect(subdirs[1].toString()).toEqual("tmp/dirB");
+
                     expect(result.files.length).toEqual(1);
+                    expect(result.files[0].toString()).toEqual("tmp/c.txt");
                     done();
                 });
+            });
+
+
+        });
+
+
+        describe("contentsSync()", () => {
+
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("will read the files and subdirectories within a directory", () => {
+
+                const dirA = new Directory(tmpDir, "dirA");
+                const fileA = new File(dirA, "a.txt");
+
+                const dirB = new Directory(tmpDir, "dirB");
+                const fileB = new File(dirB, "b.txt");
+
+                const fileC = new File(tmpDir, "c.txt");
+
+                dirA.ensureExistsSync();
+                dirB.ensureExistsSync();
+
+                fileA.writeSync("File A");
+                fileB.writeSync("File B");
+                fileC.writeSync("File C");
+
+                const contents = tmpDir.contentsSync();
+
+                expect(contents.subdirs.length).toEqual(2);
+                expect(contents.subdirs[0].toString()).toEqual("tmp/dirA");
+                expect(contents.subdirs[1].toString()).toEqual("tmp/dirB");
+                expect(contents.files.length).toEqual(1);
+                expect(contents.files[0].toString()).toEqual("tmp/c.txt");
             });
 
 
@@ -483,41 +559,6 @@ describe("Directory", () => {
                     done();
                 });
             });
-
-        });
-
-
-        describe("contentsSync()", () => {
-
-
-            beforeEach(() => {
-                tmpDir.emptySync();
-            });
-
-
-            it("will read the files and subdirectories within a directory", () => {
-
-                const dirA = new Directory(tmpDir, "dirA");
-                const fileA = new File(dirA, "a.txt");
-
-                const dirB = new Directory(tmpDir, "dirB");
-                const fileB = new File(dirB, "b.txt");
-
-                const fileC = new File(tmpDir, "c.txt");
-
-                dirA.ensureExistsSync();
-                dirB.ensureExistsSync();
-
-                fileA.writeSync("File A");
-                fileB.writeSync("File B");
-                fileC.writeSync("File C");
-
-                const contents = tmpDir.contentsSync();
-
-                expect(contents.subdirs.length).toEqual(2);
-                expect(contents.files.length).toEqual(1);
-            });
-
 
         });
 

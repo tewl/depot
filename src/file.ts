@@ -100,6 +100,11 @@ export class File
     }
 
 
+    /**
+     * Checks to see if this File exists.
+     * @return A Promise that is always resolved.  It is resolved with a truthy
+     * fs.Stats object if it exists.  Otherwise, it is resolved with undefined.
+     */
     public exists(): Promise<fs.Stats | undefined>
     {
         return new BBPromise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
@@ -141,6 +146,12 @@ export class File
     public absPath(): string
     {
         return path.resolve(this._filePath);
+    }
+
+
+    public absolute(): File
+    {
+        return new File(this.absPath());
     }
 
 

@@ -1,4 +1,5 @@
 import * as path from "path";
+import * as _ from "lodash";
 import {tmpDir} from "../test/ut/spechelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
@@ -165,6 +166,35 @@ describe("File", () => {
 
             it("will return false for a directory with the specified path", () => {
                 expect(new File(__dirname).existsSync()).toBeFalsy();
+            });
+
+
+        });
+
+
+        describe("absPath()", () => {
+
+
+            it("will return the absolute path of the file", () => {
+                const file = new File(__filename);
+                const absPath = file.absPath();
+                expect(absPath[0]).toEqual("/");
+                expect(_.endsWith(absPath, ".spec.ts")).toBeTruthy();
+            });
+
+
+        });
+
+
+        describe("absolute()", () => {
+
+
+            it("will return a File instance that is absolute", () => {
+                const relFile = new File("../package.json");
+                expect(relFile.toString()[0]).not.toEqual("/");
+
+                const absFile = relFile.absolute();
+                expect(absFile.toString()[0]).toEqual("/");
             });
 
 

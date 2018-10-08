@@ -69,7 +69,7 @@ export class NodePackage
      */
     private constructor(pkgDir: Directory)
     {
-        this._pkgDir = pkgDir;
+        this._pkgDir = pkgDir.absolute();
     }
 
 
@@ -115,7 +115,6 @@ export class NodePackage
             {
                 return tgzFile;
             }
-
         });
     }
 
@@ -141,6 +140,11 @@ export class NodePackage
         let unpackedDir: Directory;
         let unpackedPackageDir: Directory;
 
+        // Since we will be executing commands from different directories, make
+        // the directories absolute so things don't get confusing.
+        publishDir = publishDir.absolute();
+        tmpDir = tmpDir.absolute();
+
         if (publishDir.equals(tmpDir)) {
             return BBPromise.reject("When publishing, publishDir cannot be the same as tmpDir");
         }
@@ -159,7 +163,12 @@ export class NodePackage
             // The above gunzip command should have extracted a .tar file.  Make
             // sure this assumption is true.
             extractedTarFile = new File(tmpDir, packageBaseName + ".tar");
-            return extractedTarFile.exists();
+            return extractedTarFile.exists()
+            .then((exists) => {
+                if (!exists) {
+                    throw new Error(`Extracted .tar file ${extractedTarFile.toString()} does not exist.  Aborting.`);
+                }
+            });
         })
         .then(() => {
             // We are about to unpack the tar file.  Create an empty

@@ -66,9 +66,24 @@ export class Directory
     }
 
 
+    /**
+     * Gets the absolute path of this Directory.
+     * @return The absolute path of this Directory
+     */
     public absPath(): string
     {
         return path.resolve(this._dirPath);
+    }
+
+
+    /**
+     * Makes another Directory instance that is wrapping this Directory's
+     * absolute path.
+     * @return A new Directory representing this Directory's absolute path.
+     */
+    public absolute(): Directory
+    {
+        return new Directory(this.absPath());
     }
 
 
@@ -339,23 +354,23 @@ export class Directory
      */
     public contents(): Promise<IDirectoryContents>
     {
-        const thisAbsPath = this.absPath();
+        const parentDirPath = this.toString();
 
         return readdirAsync(this._dirPath)
         .then((fsEntries) => {
             const absPaths = fsEntries.map((curEntry) => {
-                return path.join(thisAbsPath, curEntry);
+                return path.join(parentDirPath, curEntry);
             });
 
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
-            const promises = absPaths.map((curAbsPath) => {
-                return statAsync(curAbsPath)
+            const promises = absPaths.map((curPath) => {
+                return statAsync(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {
-                        contents.files.push(new File(curAbsPath));
+                        contents.files.push(new File(curPath));
                     } else if (stats.isDirectory()) {
-                        contents.subdirs.push(new Directory(curAbsPath));
+                        contents.subdirs.push(new Directory(curPath));
                     }
                 });
             });
@@ -375,10 +390,11 @@ export class Directory
      */
     public contentsSync(): IDirectoryContents
     {
-        const thisAbsPath = this.absPath();
+        const parentDirPath = this.toString();
+
         let fsEntries = fs.readdirSync(this._dirPath);
         fsEntries = fsEntries.map((curFsEntry) => {
-            return path.join(thisAbsPath, curFsEntry);
+            return path.join(parentDirPath, curFsEntry);
         });
 
         const contents: IDirectoryContents = {subdirs: [], files: []};

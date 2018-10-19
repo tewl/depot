@@ -130,9 +130,9 @@ export class GitBranch
 
 
     // region Data Members
-    private _repo: GitRepo;
-    private _remoteName: string | undefined;
-    private _name: string;
+    private readonly _repo: GitRepo;
+    private readonly _remoteName: string | undefined;
+    private readonly _name: string;
     // endregion
 
 

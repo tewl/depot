@@ -121,7 +121,7 @@ export class GitRepo
 
 
     // region Private Data Members
-    private _dir: Directory;
+    private readonly _dir: Directory;
     private _branches: Array<GitBranch> | undefined;
     private _log: Array<IGitLogEntry> | undefined;
     // endregion

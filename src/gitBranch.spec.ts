@@ -1,5 +1,5 @@
-import {GitBranch} from "../src/gitBranch";
-import {GitRepo} from "../src/gitRepo";
+import {GitBranch} from "./gitBranch";
+import {GitRepo} from "./gitRepo";
 import {Directory} from "./directory";
 
 

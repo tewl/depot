@@ -13,7 +13,7 @@ export class CommitHash
 
 
     // region Data Members
-    private _hash: string;
+    private readonly _hash: string;
     // endregion
 
 

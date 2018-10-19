@@ -1,5 +1,5 @@
-import * as pathHelpers from "../src/pathHelpers";
-import {Directory} from "../src/directory";
+import * as pathHelpers from "./pathHelpers";
+import {Directory} from "./directory";
 
 
 describe("reducePathParts()", () => {

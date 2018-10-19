@@ -433,7 +433,7 @@ describe("promiseWhile()", () => {
         promiseWhile(
             () => val.length < 5,
             () => {
-                return new BBPromise<void>((resolve: () => void, reject: (err: any) => void) => {
+                return new BBPromise<void>((resolve, reject) => {
                     setTimeout(
                         () => {
                             if (val === "aaa") {

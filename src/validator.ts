@@ -18,7 +18,7 @@ type ValidatorFunc<SubjectType> = (subject: SubjectType) => boolean | Promise<bo
 export class Validator<SubjectType>
 {
     // region Data Members
-    private _validatorFuncs: Array<ValidatorFunc<SubjectType>>;
+    private readonly _validatorFuncs: Array<ValidatorFunc<SubjectType>>;
     // endregion
 
 

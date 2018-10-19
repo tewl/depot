@@ -26,7 +26,7 @@ export class Url
 
 
     // region Data Members
-    private _url: string;
+    private readonly _url: string;
     // endregion
 
 

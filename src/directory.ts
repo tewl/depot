@@ -530,6 +530,7 @@ export class Directory
             return BBPromise.all(_.concat<any>(fileCopyPromises, dirCopyPromises));
         })
         .then(() => {
+            // Make the resolve type void.
         });
     }
 

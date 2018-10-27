@@ -18,7 +18,7 @@ export function makeNodeScriptExecutable(file: File): Promise<File> {
     })
     .then((stats) => {
         // Turn on all execute bits.
-        const newMode = stats.mode | constants.S_IXUSR | constants.S_IXGRP | constants.S_IXOTH;
+        const newMode = stats!.mode | constants.S_IXUSR | constants.S_IXGRP | constants.S_IXOTH;
         return file.chmod(newMode);
     })
     .then(() => {

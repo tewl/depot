@@ -1,4 +1,5 @@
 import * as path from "path";
+import {constants} from "fs";
 import * as _ from "lodash";
 import {tmpDir} from "../test/ut/spechelpers";
 import {File} from "./file";
@@ -169,6 +170,69 @@ describe("File", () => {
             });
 
 
+        });
+
+
+        describe("chmod()", () => {
+
+            const testFile = new File(tmpDir, "test.txt");
+            beforeEach(() => {
+                testFile.writeSync("This is a test file");
+            });
+
+
+            it("will change the mode bits to the specified value", (done) => {
+                testFile.chmod(
+                    constants.S_IRWXU |
+                    constants.S_IRGRP | constants.S_IXGRP |
+                    constants.S_IROTH | constants.S_IXOTH
+                )
+                .then((testFile) => {
+                    const afterStats = testFile.existsSync();
+                    expect(afterStats).toBeTruthy();
+                    expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                    expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                    expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                    expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                    expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                    expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                    expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                    done();
+                });
+            });
+
+
+        });
+
+
+        describe("chmodSync", () => {
+            const testFile = new File(tmpDir, "test.txt");
+            beforeEach(() => {
+                testFile.writeSync("This is a test file");
+            });
+
+
+            it("will change the mode bits to the specified value", () => {
+                testFile.chmodSync(
+                    constants.S_IRWXU |
+                    constants.S_IRGRP | constants.S_IXGRP |
+                    constants.S_IROTH | constants.S_IXOTH
+                );
+
+                const afterStats = testFile.existsSync();
+                expect(afterStats).toBeTruthy();
+                expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+            });
         });
 
 

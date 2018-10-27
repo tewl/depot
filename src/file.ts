@@ -143,6 +143,38 @@ export class File
     }
 
 
+    /**
+     * Sets the access mode bits for this file
+     * @param mode - Numeric value representing the new access modes.  See
+     * fs.constants.S_I*.
+     * @return A promise for this file (for easy chaining)
+     */
+    public chmod(mode: number): Promise<File>
+    {
+        return new BBPromise((resolve, reject) => {
+            fs.chmod(this._filePath, mode, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                resolve(this);
+            });
+        });
+    }
+
+
+    /**
+     * Sets the access mode bits for this file
+     * @param mode - Numeric value representing the new access modes.  See
+     * fs.constants.S_I*.
+     * @return A promise for this file (for easy chaining)
+     */
+    public chmodSync(mode: number): void {
+        fs.chmodSync(this._filePath, mode);
+    }
+
+
     public absPath(): string
     {
         return path.resolve(this._filePath);

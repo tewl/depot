@@ -6,6 +6,28 @@ import * as BBPromise from "bluebird";
 import * as yargs from "yargs";
 import * as inquirer from "inquirer";
 
+/*******************************************************************************
+ *  Question design considerations:
+ *
+ * - Interactively prompting the user for an argument may require multiple
+ *   questions.  When this happens, make sure all questions have the same `name`
+ *   property.  If they are different, the usage information will not be
+ *   correct.
+ *
+ * - All scripts should be able to be run non-interactively from the command
+ *   line with all arguments provided.  This is a matter of convenience for
+ *   humans and required by CI environments.  In order to preserve the ability
+ *   to specify answers on the command line, the answer to each question must be
+ *   a single string and not more complicated data structures (e.g. objects or
+ *   arrays).  For example, consider a situation where the user must specify a
+ *   database or choose all databases.  If the questions returns an array of
+ *   database names, there is no way for the user to specify all databases on
+ *   the command line.  Instead, the question's answer should be the database
+ *   name or the special string "_all".  This way, the user can specify the
+ *   special string "_all" on the command line.
+ *
+ ******************************************************************************/
+
 const argv = yargs.help(false).argv;
 
 

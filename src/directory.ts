@@ -507,9 +507,12 @@ export class Directory
      * @param copyRoot - If true, this directory name will be a subdirectory of
      * destDir.  If false, only the contents of this directory will be copied
      * into destDir.
-     * @return A promise that is resolved when copying is completed.
+     * @return A promise that is resolved with a Directory object representing
+     * the destination directory.  If copyRoot is false, this will be destDir.
+     * If copyRoot is true, this will be this Directory's counterpart
+     * subdirectory in destDir.
      */
-    public copy(destDir: Directory, copyRoot: boolean): Promise<void>
+    public copy(destDir: Directory, copyRoot: boolean): Promise<Directory>
     {
         if (copyRoot)
         {
@@ -521,6 +524,9 @@ export class Directory
             return thisDest.ensureExists()
             .then(() => {
                 return this.copy(thisDest, false);
+            })
+            .then(() => {
+                return thisDest;
             });
         }
 
@@ -538,7 +544,7 @@ export class Directory
             return BBPromise.all(_.concat<any>(fileCopyPromises, dirCopyPromises));
         })
         .then(() => {
-            // Make the resolve type void.
+            return destDir;
         });
     }
 
@@ -550,7 +556,7 @@ export class Directory
      * destDir.  If false, only the contents of this directory will be copied
      * into destDir.
      */
-    public copySync(destDir: Directory, copyRoot: boolean): void
+    public copySync(destDir: Directory, copyRoot: boolean): Directory
     {
         if (copyRoot)
         {
@@ -561,7 +567,7 @@ export class Directory
             const thisDest: Directory = new Directory(destDir, this.dirName);
             thisDest.ensureExistsSync();
             this.copySync(thisDest, false);
-            return;
+            return thisDest;
         }
 
         const contents = this.contentsSync();
@@ -574,6 +580,33 @@ export class Directory
         contents.subdirs.forEach((curSubdir) => {
             curSubdir.copySync(destDir, true);
         });
+
+        return destDir;
     }
 
+
+    /**
+     * Moves this Directory or the contents of this Directory to destDir.
+     * @param destDir - The destination directory
+     * @param moveRoot - If true, this directory name will be a subdirectory of
+     * destDir.  If false, only the contents of this directory will be copied
+     * into destDir.
+     * @return A promise that is resolved with a Directory object representing
+     * the destination directory.  If moveRoot is false, this will be destDir.
+     * If moveRoot is true, this will be this Directory's counterpart
+     * subdirectory in destDir.
+     */
+    public move(destDir: Directory, moveRoot: boolean): Promise<Directory>
+    {
+        return destDir.ensureExists()
+        .then(() => {
+            return this.copy(destDir, moveRoot);
+        })
+        .then((counterpartDestDir) => {
+            return this.delete()
+            .then(() => {
+                return counterpartDestDir;
+            });
+        });
+    }
 }

@@ -738,7 +738,10 @@ describe("Directory", () => {
                 destDir.ensureExistsSync();
 
                 srcDir.copy(destDir, true)
-                .then(() => {
+                .then((counterpartDestDir) => {
+                    // Should resolve with the counterpart of the source folder.
+                    expect(counterpartDestDir.toString()).toEqual("tmp/dest/src");
+
                     expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
                     expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "src", "dirA", "dirB").existsSync()).toBeTruthy();
@@ -782,7 +785,10 @@ describe("Directory", () => {
                 destDir.ensureExistsSync();
 
                 srcDir.copy(destDir, false)
-                .then(() => {
+                .then((counterpartDestDir) => {
+                    // Should resolve with the counterpart of the source folder.
+                    expect(counterpartDestDir.toString()).toEqual("tmp/dest");
+
                     expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
                     expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "dirA", "dirB").existsSync()).toBeTruthy();
@@ -836,7 +842,8 @@ describe("Directory", () => {
                 const destDir = new Directory(tmpDir, "dest");
                 destDir.ensureExistsSync();
 
-                srcDir.copySync(destDir, true);
+                const counterpartDestDir = srcDir.copySync(destDir, true);
+                expect(counterpartDestDir.toString()).toEqual("tmp/dest/src");
                 expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
                 expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "src", "dirA", "dirB").existsSync()).toBeTruthy();
@@ -877,7 +884,8 @@ describe("Directory", () => {
                 const destDir = new Directory(tmpDir, "dest");
                 destDir.ensureExistsSync();
 
-                srcDir.copySync(destDir, false);
+                const counterpartDestDir = srcDir.copySync(destDir, false);
+                expect(counterpartDestDir.toString()).toEqual("tmp/dest");
                 expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
                 expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "dirA", "dirB").existsSync()).toBeTruthy();
@@ -888,6 +896,112 @@ describe("Directory", () => {
 
         });
 
+
+        describe("move()", () => {
+
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("will create destDir when it does not exist", (done) => {
+                const srcDir = new Directory(tmpDir, "src");
+                srcDir.ensureExistsSync();
+                const fileA = new File(srcDir, "a.txt");
+                fileA.writeSync("test");
+
+                // dstDir does not exist.
+                const dstDir = new Directory(tmpDir, "dst");
+                expect(dstDir.existsSync()).toBeFalsy();
+
+                srcDir.move(dstDir, true)
+                .then(() => {
+                    expect(dstDir.existsSync()).toBeTruthy();
+                    done();
+                });
+            });
+
+
+            it("will move this directory itself when moveRoot is true", (done) => {
+                const srcDir = new Directory(tmpDir, "src");
+                srcDir.ensureExistsSync();
+                const fileA = new File(srcDir, "a.txt");
+                fileA.writeSync("test");
+                const dstDir = new Directory(tmpDir, "dst");
+
+                srcDir.move(dstDir, true)
+                .then((newDir) => {
+                    // The destination directory should have been created.
+                    expect(dstDir.existsSync()).toBeTruthy();
+                    // The src directory should have been moved.
+                    expect(new Directory(dstDir, "src").existsSync).toBeTruthy();
+                    expect(srcDir.existsSync()).toBeFalsy();
+                    // The file should have been moved.
+                    const dstFile = new File(dstDir, "src", "a.txt");
+                    expect(dstFile.existsSync()).toBeTruthy();
+                    expect(dstFile.readSync()).toEqual("test");
+                    // The promise should have been resolved with a directory
+                    // representing the new location.
+                    expect(newDir.toString()).toEqual("tmp/dst/src");
+                    done();
+                });
+            });
+
+
+            it("will move only contents when moveRoot is false", (done) => {
+                const srcDir = new Directory(tmpDir, "src");
+                srcDir.ensureExistsSync();
+                const fileA = new File(srcDir, "a.txt");
+                fileA.writeSync("test");
+                const dstDir = new Directory(tmpDir, "dst");
+
+                srcDir.move(dstDir, false)
+                .then((newDir) => {
+                    // The destination directory should have been created.
+                    expect(dstDir.existsSync()).toBeTruthy();
+                    // The src directory should have been deleted.
+                    expect(srcDir.existsSync()).toBeFalsy();
+                    // The file should have been moved.
+                    const dstFile = new File(dstDir, "a.txt");
+                    expect(dstFile.existsSync()).toBeTruthy();
+                    expect(dstFile.readSync()).toEqual("test");
+                    // The promise should have been resolved with a directory
+                    // representing the new location.
+                    expect(newDir.toString()).toEqual("tmp/dst");
+                    done();
+                });
+            });
+
+
+            it("will move subdirectories", (done) => {
+
+                // src
+                //   dirA
+                //     dirB
+                //       file.txt
+                // dest
+
+                const srcDir = new Directory(tmpDir, "src");
+                const srcFile = new File(srcDir, "dirA", "dirB", "file.txt");
+                srcFile.writeSync("test");
+
+                const destDir = new Directory(tmpDir, "dest");
+                srcDir.move(destDir, false)
+                .then((newDir) => {
+                    expect(newDir.toString()).toEqual("tmp/dest");
+                    const destFile = new File(destDir, "dirA", "dirB", "file.txt");
+                    expect(destFile.existsSync).toBeTruthy();
+                    expect(destFile.readSync()).toEqual("test");
+                    // src should no longer exist.
+                    expect(srcDir.existsSync()).toBeFalsy();
+                    done();
+                });
+
+            });
+
+
+        });
     });
 
 

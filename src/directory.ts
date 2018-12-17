@@ -501,6 +501,14 @@ export class Directory
     }
 
 
+    /**
+     * Copies this directory to destDir.
+     * @param destDir - The destination directory
+     * @param copyRoot - If true, this directory name will be a subdirectory of
+     * destDir.  If false, only the contents of this directory will be copied
+     * into destDir.
+     * @return A promise that is resolved when copying is completed.
+     */
     public copy(destDir: Directory, copyRoot: boolean): Promise<void>
     {
         if (copyRoot)
@@ -535,6 +543,13 @@ export class Directory
     }
 
 
+    /**
+     * Copies this directory to destDir.
+     * @param destDir - The destination directory
+     * @param copyRoot - If true, this directory name will be a subdirectory of
+     * destDir.  If false, only the contents of this directory will be copied
+     * into destDir.
+     */
     public copySync(destDir: Directory, copyRoot: boolean): void
     {
         if (copyRoot)

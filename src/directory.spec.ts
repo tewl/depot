@@ -463,6 +463,25 @@ describe("Directory", () => {
             });
 
 
+            it("will include dotfiles and dot folders", (done) => {
+
+                const dotFile = new File(tmpDir, ".dotfile");
+                const dotFolder = new Directory(tmpDir, ".dotfolder");
+
+                dotFile.writeSync("foo");
+                dotFolder.ensureExistsSync();
+
+                tmpDir.contents()
+                .then((contents: IDirectoryContents) => {
+                    expect(contents.files.length).toEqual(1);
+                    expect(contents.files[0].toString()).toEqual("tmp/.dotfile");
+                    expect(contents.subdirs.length).toEqual(1);
+                    expect(contents.subdirs[0].toString()).toEqual("tmp/.dotfolder");
+                    done();
+                });
+            });
+
+
         });
 
 
@@ -500,6 +519,22 @@ describe("Directory", () => {
                 expect(contents.files[0].toString()).toEqual("tmp/c.txt");
             });
 
+
+            it("will include dotfiles and dot folders", () => {
+
+                const dotFile = new File(tmpDir, ".dotfile");
+                const dotFolder = new Directory(tmpDir, ".dotfolder");
+
+                dotFile.writeSync("foo");
+                dotFolder.ensureExistsSync();
+
+                const contents = tmpDir.contentsSync();
+
+                expect(contents.files.length).toEqual(1);
+                expect(contents.files[0].toString()).toEqual("tmp/.dotfile");
+                expect(contents.subdirs.length).toEqual(1);
+                expect(contents.subdirs[0].toString()).toEqual("tmp/.dotfolder");
+            });
 
         });
 

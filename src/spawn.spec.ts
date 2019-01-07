@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
+import * as _ from "lodash";
 import {spawn} from "./spawn";
 import {tmpDir} from "../test/ut/specHelpers";
 
@@ -119,6 +120,19 @@ describe("spawn", () => {
             expect(err.stderr).toContain("No such file or directory");
             done();
         });
+    });
+
+
+    it("will set the specified environment variables", (done) => {
+
+        const env = _.assign({}, process.env, {xyzzy: "xyzzy-xyzzy"});
+        spawn("node", ["-e", "console.log(process.env.xyzzy);"], undefined, env)
+        .closePromise
+        .then((output) => {
+            expect(output).toEqual("xyzzy-xyzzy");
+            done();
+        });
+
     });
 
 

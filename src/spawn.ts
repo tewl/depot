@@ -32,6 +32,8 @@ export interface ISpawnResult
  *     undefined.
  *     For example:
  *     `new CombinedStream(new PrefixStream("foo"), process.stdout)`
+ * @param env - A collection of environment variables to set for the child
+ *     process.  If not specified, process.env will be used.
  * @param stderrStream - The stream to receive stderr  A NullStream if
  *     undefined. For example:
  *     `new CombinedStream(new PrefixStream(".    "), process.stderr)`
@@ -41,6 +43,7 @@ export function spawn(
     cmd: string,
     args: Array<string>,
     cwd?: string,
+    env?: {[key: string]: string},
     description?: string,
     stdoutStream?: Writable,
     stderrStream?: Writable
@@ -61,7 +64,13 @@ export function spawn(
 
     const closePromise = new BBPromise((resolve: (output: string) => void, reject: (err: {exitCode: number, stderr: string}) => void) => {
 
-        childProcess = cp.spawn(cmd, args, {cwd: cwd, stdio: [process.stdin, "pipe", "pipe"]});
+        const spawnOptions = {
+            cwd: cwd,
+            env: env,
+            stdio: [process.stdin, "pipe", "pipe"]
+        };
+
+        childProcess = cp.spawn(cmd, args, spawnOptions);
 
         const outputStream = stdoutStream || new NullStream();
 

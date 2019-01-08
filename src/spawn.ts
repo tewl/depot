@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {CollectorStream} from "./collectorStream";
 import * as cp from "child_process";
-import {Writable} from "stream";
+import WriteStream = NodeJS.WriteStream;
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
 
@@ -28,12 +28,12 @@ export interface ISpawnResult
  * @param cmd - The command to run
  * @param args - An array of arguments for cmd
  * @param cwd - The current working directory for the child process
+ * @param env - A collection of environment variables to set for the child
+ *     process.  If not specified, process.env will be used.
  * @param stdoutStream - The stream to receive stdout.  A NullStream if
  *     undefined.
  *     For example:
  *     `new CombinedStream(new PrefixStream("foo"), process.stdout)`
- * @param env - A collection of environment variables to set for the child
- *     process.  If not specified, process.env will be used.
  * @param stderrStream - The stream to receive stderr  A NullStream if
  *     undefined. For example:
  *     `new CombinedStream(new PrefixStream(".    "), process.stderr)`
@@ -45,8 +45,8 @@ export function spawn(
     cwd?: string,
     env?: {[key: string]: string},
     description?: string,
-    stdoutStream?: Writable,
-    stderrStream?: Writable
+    stdoutStream?: WriteStream,
+    stderrStream?: WriteStream
 ): ISpawnResult {
     const cmdLineRepresentation = getCommandLineRepresentation(cmd, args);
 

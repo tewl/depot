@@ -7,8 +7,8 @@ const uuidv4: () => string = require("uuid/v4");
 
 /**
  * Returns a uuid v4 string.
- * @return The generated ID
+ * @return The generated uuid
  */
-export function generateId(): string {
+export function generateUuid(): string {
     return uuidv4();
 }

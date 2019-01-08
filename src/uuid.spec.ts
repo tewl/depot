@@ -1,12 +1,20 @@
-import * as _       from "lodash";
-import {generateId} from "./serialize";
+import * as _ from "lodash";
+import {generateUuid} from "./uuid";
 
 
-describe("generateId()", () => {
+describe("generateUuid()", () => {
+
+
+    it("returns a string", () => {
+        expect(_.isString(generateUuid())).toEqual(true);
+    });
 
 
     it("returns a unique string", () => {
-        expect(_.isString(generateId())).toEqual(true);
+        const uuid1 = generateUuid();
+        const uuid2 = generateUuid();
+
+        expect(uuid1).not.toEqual(uuid2);
     });
 
 

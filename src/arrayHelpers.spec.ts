@@ -1,4 +1,4 @@
-import {anyMatchRegex} from "./arrayHelpers";
+import {anyMatchRegex, insertIf} from "./arrayHelpers";
 
 describe("anyMatchRegex()", () => {
 
@@ -18,5 +18,19 @@ describe("anyMatchRegex()", () => {
         expect(match).toEqual(undefined);
     });
 
+
+});
+
+
+describe("insertIf", () => {
+
+    it("returns an empty array when the condition is false", () => {
+        expect(insertIf(false, 1, 2, 3)).toEqual([]);
+    });
+
+
+    it("returns an empty containing the items when the condition is true", () => {
+        expect(insertIf(true, 1, 2, 3)).toEqual([1, 2, 3]);
+    });
 
 });

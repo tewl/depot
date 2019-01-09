@@ -19,7 +19,7 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
 
 
 /**
- * Returns `items` when `condition` is true and returns [] when it is false.
+ * Returns `items` when `condition` is truthy and returns [] when it is falsy.
  * This function and the array spread operator can be used together to
  * conditionally including array items in an array literal.  Inspired by
  * http://2ality.com/2017/04/conditional-literal-entries.html.
@@ -33,10 +33,10 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
  *
  * @param condition - The condition that controls whether to insert the items
  * @param items - The items that will be in the returned array if `condition` is
- * true
- * @return An array containing `items` if `condition` is true.  An empty array
- * if `condition` is false.
+ * truthy
+ * @return An array containing `items` if `condition` is truthy.  An empty array
+ * if `condition` is falsy.
  */
-export function insertIf<ItemType>(condition: boolean, ...items: Array<ItemType>): Array<ItemType> {
+export function insertIf<ItemType>(condition: any, ...items: Array<ItemType>): Array<ItemType> {
     return condition ? items : [];
 }

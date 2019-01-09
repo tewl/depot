@@ -5,6 +5,7 @@ import {Directory} from "./directory";
 import {File} from "./file";
 import {Url} from "./url";
 import {CommitHash} from "./commitHash";
+import {generateUuid} from "./uuid";
 
 
 describe("GitRepo", () => {
@@ -350,6 +351,40 @@ describe("GitRepo", () => {
                 expect(branch).toEqual(undefined);
             });
 
+
+        });
+
+
+        describe("fetch()", () => {
+
+            it("will fetch tags", async () => {
+
+                // Create to identical clones of the sample repo.
+                const dir1 = new Directory(tmpDir, "dir1");
+                await dir1.ensureExists();
+                const repo1 = await GitRepo.clone(sampleRepoDir, dir1);
+
+                const dir2 = new Directory(tmpDir, "dir2");
+                await dir2.ensureExists();
+                const repo2 = await GitRepo.clone(sampleRepoDir, dir2);
+
+                const tagName = "depot_unit_test_tag_" + generateUuid();
+
+                // Create a new tag in repo1 and push it to origin.
+                await repo1.createTag(tagName, "message");
+                await repo1.pushTag(tagName, "origin");
+
+                // In repo2, fetch.  You should now have the new tag.
+                await repo2.fetch("origin", true);
+                const tags = await repo2.tags();
+                expect(_.includes(tags, tagName)).toEqual(true);
+
+                // By default a normal "git fetch" will get the new tag, because
+                // it points to an object that is downloaded.  So technically,
+                // the fetchTags parameter only needs to be set when getting
+                // tags that point to commits that would not normally be
+                // downloaded.
+            });
 
         });
 

@@ -1,3 +1,4 @@
+import {insertIf} from "./arrayHelpers";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
@@ -582,6 +583,32 @@ export class GitRepo
                 message:    outdent(trimBlankLines(match[4]))
             };
         });
+    }
+
+
+    /**
+     * Fetches from the specified remote.
+     * @param remoteName - The remote to fetch from
+     * @param fetchTags - Set to true in order to fetch tags that point to
+     * objects that are not downloaded (see git fetch docs).
+     * @return A promise that is resolved when the command completes
+     * successfully
+     */
+    public fetch(remoteName: string = "origin", fetchTags: boolean = false): Promise<void> {
+        const args = [
+            "fetch",
+            ...insertIf(fetchTags, "--tags"),
+            remoteName
+        ];
+
+        return spawn("git", args, this._dir.toString()).closePromise
+        .then(
+            () => {},
+            (err) => {
+                console.log(`Error fetching from ${remoteName} remote: ${JSON.stringify(err)}`);
+                throw err;
+            }
+        );
     }
 
 

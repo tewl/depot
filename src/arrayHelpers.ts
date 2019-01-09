@@ -26,7 +26,9 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
  *
  * @example
  * const arr = [
- *     ...insertIf(cond, "a", "b", "c")
+ *     "always present",
+ *     ...insertIf(cond, "a", "b", "c"),
+ *     "always present"
  * ];
  *
  * @param condition - The condition that controls whether to insert the items

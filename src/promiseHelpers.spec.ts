@@ -1,7 +1,7 @@
 import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
-    retryWhile, promiseWhile, eventToPromise} from "./promiseHelpers";
+    retryWhile, promiseWhile, eventToPromise, conditionalTask} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
 import {logger, LogLevel} from "./logger";
 
@@ -200,6 +200,48 @@ describe("getTimerPromise()", () => {
             expect(Date.now()).toBeGreaterThanOrEqual(start + delayMs);
             done();
         });
+    });
+
+
+});
+
+
+describe("conditionalTask", () => {
+
+
+    it("will run the task when the condition is truthy", (done) => {
+
+        let taskWasRun = false;
+        const task = () => {
+            taskWasRun = true;
+            return BBPromise.resolve(5);
+        };
+
+        conditionalTask(true, task)
+        .then((result) => {
+            expect(result).toEqual(5);
+            expect(taskWasRun).toEqual(true);
+            done();
+        });
+
+    });
+
+
+    it("will not run the task when the condition is falsy", (done) => {
+
+        let taskWasRun = false;
+        const task = () => {
+            taskWasRun = true;
+            return BBPromise.resolve(5);
+        };
+
+        conditionalTask(false, task)
+        .then((result) => {
+            expect(result).toEqual(undefined);
+            expect(taskWasRun).toEqual(false);
+            done();
+        });
+
     });
 
 

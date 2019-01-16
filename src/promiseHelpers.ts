@@ -206,6 +206,26 @@ export function getTimerPromise<ResolveType>(
 
 
 /**
+ * Invokes a task only when a condition is true.
+ * @param condition - The condition that controls whether the task is run
+ * @param task - The task that is run when `condition` is truthy
+ * @return When `condition` is true, a promise that resolves with the result of
+ * `task`.  When `condition` is false, a promise that resolves with `undefined`.
+ */
+export function conditionalTask<ResolveType>(
+    condition: any,
+    task: Task<ResolveType>
+): Promise<ResolveType | undefined> {
+    if (condition) {
+        return task();
+    }
+    else {
+        return BBPromise.resolve(undefined);
+    }
+}
+
+
+/**
  * Adapts an EventEmitter to a Promise interface
  * @param emitter - The event emitter to listen to
  * @param resolveEventName - The event that will cause the Promise to resolve

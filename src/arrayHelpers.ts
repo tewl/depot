@@ -2,7 +2,7 @@
  * Tests the strings in `strings` and returns the first non-null match.
  * @param strings - The array of strings to search
  * @param regex - The pattern to search for
- * @returns The first match found.  null if no match was found.
+ * @returns The first match found.  undefined if no match was found.
  */
 export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExecArray | undefined {
     "use strict";

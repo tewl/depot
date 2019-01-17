@@ -217,7 +217,7 @@ describe("conditionalTask", () => {
             return BBPromise.resolve(5);
         };
 
-        conditionalTask(true, task)
+        conditionalTask(true, task, 10)
         .then((result) => {
             expect(result).toEqual(5);
             expect(taskWasRun).toEqual(true);
@@ -235,9 +235,9 @@ describe("conditionalTask", () => {
             return BBPromise.resolve(5);
         };
 
-        conditionalTask(false, task)
+        conditionalTask(false, task, 10)
         .then((result) => {
-            expect(result).toEqual(undefined);
+            expect(result).toEqual(10);
             expect(taskWasRun).toEqual(false);
             done();
         });

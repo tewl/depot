@@ -67,7 +67,7 @@ export class GitRepo
             }
             else
             {
-                throw new Error("Path does not exist or is not a Git repo.");
+                throw new Error(`${dir.toString()} does not exist or is not a Git repo.`);
             }
         });
     }

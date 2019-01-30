@@ -52,7 +52,8 @@ export function getRandomInt(minIncluded: number, maxExcluded: number): number {
  */
 export function getRandomIntInclusive(minIncluded: number, maxIncluded: number): number {
     "use strict";
-    // Using Math.round() will give you a non-uniform distribution!
+    // Using Math.floor() instead of Math.round(), because Math.round() will
+    // give you a non-uniform distribution!
     return Math.floor(Math.random() * (maxIncluded - minIncluded + 1)) + minIncluded;
 }
 

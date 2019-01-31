@@ -79,7 +79,7 @@ export class PersistentCache<T> {
             // cache and return the value to the caller.
             return keyFile.readJson<{payload: T}>()
             .then((data) => {
-                const entry = CacheEntry.deserialize(data);
+                const entry = CacheEntry.deserialize<T>(data);
                 this._memCache[key] = entry;
                 return entry.payload;
             });
@@ -132,23 +132,48 @@ function isValidFilesystemName(name: string): boolean {
 // tslint:disable-next-line:max-classes-per-file
 class CacheEntry<T> {
 
-    public static deserialize(data: {payload: any}): CacheEntry<any> {
-        return new CacheEntry(data.payload);
+    /**
+     * Creates a CacheEntry instance from its serialized form.  Templated on
+     * type "U", which represents the type of user data stored in the payload.
+     * Note, static methods cannot use the class template type "T".
+     * @param serialized - The serialized CacheEntry
+     * @return A CacheEntry instance
+     */
+    public static deserialize<U>(serialized: {payload: U}): CacheEntry<U> {
+        return new CacheEntry<U>(serialized.payload);
     }
 
-    private readonly _payload: T;
 
+    // region Instance Members
+    private readonly _payload: T;
+    // endregion
+
+
+    /**
+     * Creates a new CacheEntry instance
+     * @param payload - The user's data to be stored in this entry
+     */
     public constructor(payload: T) {
         this._payload = payload;
     }
 
 
+    /**
+     * Serializes this entry to an object that can be persisted.
+     * @return A version of this object that can be persisted and later
+     * deserialized
+     */
     public serialize(): {payload: T} {
         return {
             payload: this._payload
         };
     }
 
+
+    /**
+     * Retrieves the user data stored in this entry.
+     * @return The user data
+     */
     public get payload(): T {
         return this._payload;
     }

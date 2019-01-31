@@ -116,8 +116,35 @@ export class PersistentCache<T> {
 }
 
 
+export function getIllegalChars(): Array<string> {
+    return [
+        "<",     // illegal in: NTFS, FAT
+        ">",     // illegal in: NTFS, FAT
+        ":",     // illegal in: NTFS, FAT, OS X
+        "\"",    // illegal in: NTFS, FAT
+        "/",     // illegal in: NTFS, FAT
+        "\\",    // illegal in: NTFS, FAT
+        "|",     // illegal in: NTFS, FAT
+        "?",     // illegal in: NTFS, FAT
+        "*",     // illegal in: NTFS, FAT
+        "^"      // illegal in: FAT
+    ];
+}
+
+
+
+/**
+ * Determines whether the specified name is allowed (according to underlying
+ * filesystem)
+ * @param name - The name to be validated
+ * @return true if `name` is valid.  false otherwise.
+ */
 function isValidFilesystemName(name: string): boolean {
-    const illegalChars = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"];
+
+    // FUTURE: Could use the info in the following article to do a better job
+    //         validating names.
+    //         https://kb.acronis.com/content/39790
+    const illegalChars = getIllegalChars();
 
     for (const curIllegalChar of illegalChars) {
         if (name.indexOf(curIllegalChar) >= 0) {

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
-import {PersistentCache} from "./persistentCache";
+import {getIllegalChars, PersistentCache} from "./persistentCache";
 import {generateUuid} from "./uuid";
 import {tmpDir} from "../test/ut/specHelpers";
 import {Directory} from "./directory";
@@ -21,7 +21,7 @@ describe("PersistentCache", () => {
 
 
             it("rejects when the cache name contains an illegal character", () => {
-                const illegalChars = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"];
+                const illegalChars = getIllegalChars();
 
                 const promises = _.map(illegalChars, (curIllegalChar) => {
                     const name = "foo" + curIllegalChar + "bar";
@@ -78,7 +78,7 @@ describe("PersistentCache", () => {
 
 
             it("will reject when an illegal character appears in the key name", (done) => {
-                const illegalChars = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"];
+                const illegalChars = getIllegalChars();
 
                 PersistentCache.create<string>(generateUuid(), {dir: tmpDir.toString()})
                 .then((cache) => {

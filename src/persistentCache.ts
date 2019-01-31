@@ -116,6 +116,12 @@ export class PersistentCache<T> {
 }
 
 
+/**
+ * Helper function that returns invalid filesystem characters that cannot appear
+ * in cache or key names due to the fact they are persisted in filesystem
+ * directory names and file names.
+ * @return An array of illegal characters.
+ */
 export function getIllegalChars(): Array<string> {
     return [
         "<",     // illegal in: NTFS, FAT

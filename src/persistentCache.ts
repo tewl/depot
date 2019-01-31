@@ -9,6 +9,12 @@ export interface IPersistentCacheOptions {
 }
 
 
+/**
+ * @class
+ * @classdesc A key-value data structure that persists all data to the
+ * filesystem. Inspired by:
+ * https://github.com/LionC/persistent-cache/blob/master/index.js
+ */
 export class PersistentCache<T> {
 
 

@@ -34,9 +34,9 @@ export class PersistentCache<T> {
 
 
     // region Instance Data Members
-    private _name: string;
-    private _cacheDir: Directory;
-    private _memCache: {[key: string]: CacheEntry<T>} = {};
+    private readonly _name: string;
+    private readonly _cacheDir: Directory;
+    private readonly _memCache: {[key: string]: CacheEntry<T>} = {};
     // endregion
 
 

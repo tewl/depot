@@ -11,11 +11,6 @@ import {PathPart, reducePathParts} from "./pathHelpers";
 const unlinkAsync = promisify1<void, string>(fs.unlink);
 const statAsync   = promisify1<fs.Stats, string>(fs.stat);
 const utimesAsync = promisify3<void, string, string | number | Date, string | number | Date>(fs.utimes);
-const writeFileAsync = promisify3<
-    void,
-    fs.PathLike | number, any,
-    { encoding?: string | null; mode?: number | string; flag?: string; } | string | undefined | null
-    >(fs.writeFile);
 
 
 export class File
@@ -475,7 +470,15 @@ export class File
     {
         return this.directory.ensureExists()
         .then(() => {
-            return writeFileAsync(this._filePath, text, "utf8");
+            return new BBPromise<void>((resolve, reject) => {
+                fs.writeFile(this._filePath, text, "utf8", (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
         });
     }
 

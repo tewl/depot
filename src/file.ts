@@ -3,14 +3,13 @@ import * as path from "path";
 import * as crypto from "crypto";
 import * as BBPromise from "bluebird";
 import {ListenerTracker} from "./listenerTracker";
-import {promisify1, promisify3} from "./promiseHelpers";
+import {promisify1} from "./promiseHelpers";
 import {Directory} from "./directory";
 import {PathPart, reducePathParts} from "./pathHelpers";
 
 
 const unlinkAsync = promisify1<void, string>(fs.unlink);
 const statAsync   = promisify1<fs.Stats, string>(fs.stat);
-const utimesAsync = promisify3<void, string, string | number | Date, string | number | Date>(fs.utimes);
 
 
 export class File
@@ -674,7 +673,15 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
                 // by 1000 below and truncation happens, we are actually setting
                 // dest's timestamps *before* those of of source.
                 //
-                return utimesAsync(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000);
+                return new BBPromise<void>((resolve, reject) => {
+                    fs.utimes(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000, (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
             });
         }
     });

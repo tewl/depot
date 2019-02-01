@@ -141,11 +141,10 @@ export class Directory
     }
 
 
-    public ensureExists(): Promise<void>
+    public ensureExists(): Promise<Directory>
     {
         return this.exists()
-        .then((stats) =>
-        {
+        .then((stats) => {
             if (stats)
             {
                 return;
@@ -208,15 +207,18 @@ export class Directory
                 // Execute the directory creation functions in sequence.
                 return sequence(createFuncs, undefined);
             }
+        })
+        .then(() => {
+            return this;
         });
     }
 
 
-    public ensureExistsSync(): void
+    public ensureExistsSync(): Directory
     {
         if (this.existsSync())
         {
-            return;
+            return this;
         }
 
         const parts = this._dirPath.split(path.sep);
@@ -258,10 +260,12 @@ export class Directory
                 }
             }
         });
+
+        return this;
     }
 
 
-    public empty(): Promise<void>
+    public empty(): Promise<Directory>
     {
         return this.delete()
         .then(() => {
@@ -270,10 +274,10 @@ export class Directory
     }
 
 
-    public emptySync(): void
+    public emptySync(): Directory
     {
         this.deleteSync();
-        this.ensureExistsSync();
+        return this.ensureExistsSync();
     }
 
 

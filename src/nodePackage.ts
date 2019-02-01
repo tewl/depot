@@ -196,7 +196,8 @@ export class NodePackage
             {
                 // The caller wants us to empty the publish directory before
                 // publishing to it.  Do it now.
-                return publishDir.empty();
+                return publishDir.empty()
+                .then(() => {});   // To make resolve type undefined in all cases
             }
         })
         .then(() => {

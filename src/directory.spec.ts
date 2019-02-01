@@ -261,6 +261,16 @@ describe("Directory", () => {
             });
 
 
+            it("will resolve with the Directory instance", (done) => {
+                const dir = new Directory(tmpDir, "foo");
+                dir.ensureExists()
+                .then((resultDir) => {
+                    expect(resultDir.absPath()).toEqual(dir.absPath());
+                    done();
+                });
+            });
+
+
         });
 
 
@@ -280,6 +290,13 @@ describe("Directory", () => {
                 const dir = new Directory(dirPath);
                 dir.ensureExistsSync();
                 expect(new Directory(dirPath).existsSync()).toBeTruthy();
+            });
+
+
+            it("will return the Directory instance", () => {
+                const dir = new Directory(tmpDir, "foo");
+                const dirResult = dir.ensureExistsSync();
+                expect(dirResult.absPath()).toEqual(dir.absPath());
             });
 
 
@@ -320,6 +337,17 @@ describe("Directory", () => {
             });
 
 
+            it("resolves with the Directory instance", (done) => {
+                const dir = new Directory(tmpDir, "foo");
+                dir.ensureExistsSync();
+                dir.empty()
+                .then((resultDir) => {
+                    expect(resultDir.absPath()).toEqual(dir.absPath());
+                    done();
+                });
+            });
+
+
         });
 
 
@@ -351,6 +379,13 @@ describe("Directory", () => {
                 expect(fileC.existsSync()).toBeFalsy();
             });
 
+
+            it("returns the Directory instance", () => {
+                const dir = new Directory(tmpDir, "foo");
+                dir.ensureExistsSync();
+                const resultDir = dir.emptySync();
+                expect(resultDir.absPath()).toEqual(dir.absPath());
+            });
 
         });
 

@@ -535,7 +535,7 @@ export class File
             hash.setEncoding("hex");
 
             input
-            .on("error", (error) => {
+            .on("error", (error: any) => {
                 reject(new Error(error));
             })
             .on("end", () => {

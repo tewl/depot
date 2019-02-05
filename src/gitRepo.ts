@@ -96,7 +96,9 @@ export class GitRepo
         else
         {
             projName = src.dirName;
-            srcStr = src.toString();
+            // The path to the source repo must be made absolute, because when
+            // we execute the "git clone" command, the cwd will be `parentDir`.
+            srcStr = src.absPath();
         }
 
         const repoDir = new Directory(parentDir, projName);

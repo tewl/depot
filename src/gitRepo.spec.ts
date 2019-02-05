@@ -1,6 +1,7 @@
+import * as _ from "lodash";
+import * as BBPromise from "bluebird";
 import {GitRepo} from "./gitRepo";
 import {sampleRepoDir, sampleRepoUrl, tmpDir} from "../test/ut/specHelpers";
-import * as _ from "lodash";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {Url} from "./url";
@@ -62,6 +63,21 @@ describe("GitRepo", () => {
                 expect(repo).toBeTruthy();
                 expect(new Directory(tmpDir, "sampleGitRepo-src").existsSync()).toBeTruthy();
                 expect(new File(tmpDir, "sampleGitRepo-src", "README.md").existsSync()).toBeTruthy();
+            });
+
+
+            it("can clone from a relative path", async () => {
+                // This test is important, because when cloning from a relative
+                // directory the clone() method must use the absolute path to
+                // the source repo, because the cwd is the specified parentDir.
+
+                const originDir = new Directory(tmpDir, "origin");
+                const workingDir = new Directory(tmpDir, "working");
+                await BBPromise.all([originDir.ensureExists(), workingDir.ensureExists()]);
+
+                const originRepo  = await GitRepo.clone(sampleRepoDir, originDir);
+                const workingRepo = await GitRepo.clone(originRepo.directory, workingDir);
+                expect(workingRepo).toBeTruthy();
             });
 
 

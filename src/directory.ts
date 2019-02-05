@@ -22,6 +22,19 @@ export interface IDirectoryContents {
 
 export class Directory
 {
+
+    /**
+     * Creates a Directory representing the relative path from `from` to `to`
+     * @param from - The starting directory
+     * @param to - The ending directory
+     * @return A directory representing the relative path from `from` to `to`
+     */
+    public static relative(from: Directory, to: Directory): Directory {
+        const relPath = path.relative(from.toString(), to.toString());
+        return new Directory(relPath);
+    }
+
+
     // region Data Members
     private readonly _dirPath: string;
     // endregion

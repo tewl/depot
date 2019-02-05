@@ -8,6 +8,33 @@ import * as _ from "lodash";
 describe("Directory", () => {
 
 
+    describe("static", () => {
+
+
+        describe("relative()", () => {
+
+
+            it("will return a Directory representing the path from `from` to `to`", async () => {
+
+                const dirA = new Directory(tmpDir, "dirA");
+                const dirB = new Directory(tmpDir, "dirB");
+                const dirC = new Directory(dirB, "dirC");
+
+                expect(Directory.relative(dirA, dirB).toString()).toEqual("../dirB");
+                expect(Directory.relative(dirA, dirC).toString()).toEqual("../dirB/dirC");
+                expect(Directory.relative(dirB, dirA).toString()).toEqual("../dirA");
+                expect(Directory.relative(dirB, dirC).toString()).toEqual("dirC");
+                expect(Directory.relative(dirC, dirA).toString()).toEqual("../../dirA");
+                expect(Directory.relative(dirC, dirB).toString()).toEqual("..");
+            });
+
+
+        });
+
+
+    });
+
+
     describe("instance", () => {
 
 
@@ -1037,6 +1064,8 @@ describe("Directory", () => {
 
 
         });
+
+
     });
 
 

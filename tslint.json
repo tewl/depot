@@ -35,7 +35,10 @@
     "label-position": true,
     "max-line-length": [
       true,
-      140
+      {
+        "limit":  140,
+        "ignore-pattern": "^\\s*//"
+      }
     ],
     "member-access": true,
     "member-ordering": [

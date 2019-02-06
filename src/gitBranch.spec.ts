@@ -1,6 +1,7 @@
 import {GitBranch} from "./gitBranch";
 import {GitRepo} from "./gitRepo";
 import {Directory} from "./directory";
+import {sampleRepoDir, tmpDir} from "../test/ut/specHelpers";
 
 
 describe("GitBranch", () => {
@@ -118,6 +119,7 @@ describe("GitBranch", () => {
 
     describe("instance", () => {
 
+
         describe("name", () => {
 
 
@@ -126,6 +128,48 @@ describe("GitBranch", () => {
                 const branch = await GitBranch.create(repo, "feature/featurename", "origin");
                 expect(branch.name).toEqual("feature/featurename");
             });
+
+        });
+
+
+        describe("getTrackedBranch()", () => {
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("will resolve with the expected tracked branch", async () => {
+                const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                expect(originRepo).toBeTruthy();
+                expect(workingRepo).toBeTruthy();
+
+                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                await workingRepo.checkoutBranch(featureBranch, true);
+                await workingRepo.pushCurrentBranch("origin", true);
+
+                const tracked = await featureBranch.getTrackedBranch();
+                expect(tracked).toBeTruthy();
+                expect(tracked!.name).toEqual("a_feature_branch");
+                expect(tracked!.remoteName).toEqual("origin");
+            });
+
+
+            it("will resolve with undefined when the branch is not tracking", async () => {
+                const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                expect(originRepo).toBeTruthy();
+                expect(workingRepo).toBeTruthy();
+
+                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                await workingRepo.checkoutBranch(featureBranch, true);
+                await workingRepo.pushCurrentBranch("origin", false);  // This `false` is the key.  It is not tracking.
+
+                const tracked = await featureBranch.getTrackedBranch();
+                expect(tracked).toEqual(undefined);
+            });
+
 
         });
 

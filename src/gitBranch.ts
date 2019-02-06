@@ -1,3 +1,5 @@
+import {EOL} from "os";
+import * as BBPromise from "bluebird";
 import * as _ from "lodash";
 import {GitRepo} from "./gitRepo";
 import {spawn} from "./spawn";
@@ -166,6 +168,111 @@ export class GitBranch
     public get name(): string
     {
         return this._name;
+    }
+
+
+    // TODO: Add toString() method.
+
+
+    public getTrackedBranch(): Promise<GitBranch | undefined> {
+
+        //
+        // A full example:
+        // $ git branch -vv
+        //   bug/pouchdb_memory_leaks                   c46b312 [origin/bug/pouchdb_memory_leaks: behind 83] fix userDirectory misnaming issue
+        //   develop                                    7d3faff [origin/develop] Merge branch 'master' into develop
+        //   feature/161_cip_url_support                22d49ab [origin/feature/161_cip_url_support] Replaced validateIP() with isIP().  Removed validateIP().
+        //   feature/193_production_outages/code        24ffd6d [origin/feature/193_production_outages/code] Created script for printing user directory information.
+        //   feature/193_production_outages/experiment1 847b179 Make health endpoint throw an error.
+        //   feature/193_production_outages/experiment2 caf013e Trivial change for Azure deploy.
+        //   feature/193_production_outages/experiment3 6a17a13 Added some experimental routes to verify logging works.
+        //   feature/193_production_outages/kwp         920a38b [kwp/feature/193_production_outages/kwp: ahead 11] Improved jsdoc slightly.
+        //   feature/tags                               f843792 [origin/feature/tags] Merge branch 'develop' into feature/tags
+        //   master                                     bc8b8d9 [origin/master: behind 123] Merge branch 'feature/urlfavorites' into 'develop'
+        //   todo/convert_func_tests_to_jasmine         adc7351 [origin/todo/convert_func_tests_to_jasmine] Gave anonymous functions names.
+        //   todo/new_toad_ver                          b51065a [origin/todo/new_toad_ver] Merge branch 'develop' into todo/new_toad_ver
+        //   todo/remove_whitelists                     212b05b [origin/todo/remove_whitelists] Merge branch 'develop' into todo/remove_whitelists
+        // * todo/ts_support                            d5674cd [origin/todo/ts_support] Removed unneeded import.
+        //   todo/update_opensso_mock                   b00c134 [kwp/todo/update_opensso_mock] Updated opensso-mock to latest version that has shebang line.
+        //
+
+        // TODO: Make sure this GitBranch instance is a local branch.
+
+        return spawn("git", ["branch", "-vv"], this._repo.directory.toString()).closePromise
+        .then((output) => {
+            const outputLines = output.split(EOL);
+
+            // The last column for lines matching the specified local branch.
+            const lastCols = _.reduce<string, Array<string>>(
+                outputLines,
+                (acc, curLine) => {
+                    // A regex for matching lines output from "git branch -vv"
+                    // - an optional "*" (indicating the current branch)
+                    // - whitespace
+                    // - characters making up the local branch name (group 1)
+                    // - whitespace
+                    // - 7 characters making up the commit hash (group 2)
+                    // - whitespace
+                    // - the remainder of the line (group 3)
+                    const matches = /^[*]?\s+([\w/.-]+)\s+([0-9a-fA-F]{7})\s+(.*)$/.exec(curLine);
+                    if (matches && matches[1] === this.name) {
+                        acc.push(matches[3]);
+                    }
+                    return acc;
+                },
+                []
+            );
+
+            if (lastCols.length === 0) {
+                return BBPromise.resolve(undefined);
+            }
+            else if (lastCols.length > 1) {
+                // We should never get more than 1 matching line.
+                return BBPromise.reject(new Error(`Unexpectedly got multiple results for ${this.name}.`));
+            }
+
+            const lastCol = lastCols[0];
+
+            // A regex to pull apart the items in the last column
+            // - an optional part in square brackets (group 1)
+            //   - "["
+            //   - name of the remote branch (group 2)
+            //   - an optional ":"
+            //   - some optional text describing whether the branch is ahead and/or behind (group 3)
+            //   - "]"
+            // - optional whitespace
+            // - commit message (group 4)
+            const lastColRegex = /^(\[([\w/.-]+):?(.*)\])?\s*(.*)$/;
+            let matches = lastColRegex.exec(lastCol);
+
+            if (matches) {
+                const remoteBranchStr = matches[2];
+                if (remoteBranchStr === undefined) {
+                    return BBPromise.resolve(undefined);
+                }
+
+                // A regex to pull apart the remote branch string
+                // - A non-greedy bunch of stuff = remote name (group 1)
+                // - "/"
+                // - A bunch of stuff = remote branch name (group 2)
+                const remoteBranchRegex = /^(.*?)\/(.*)$/;
+                matches = remoteBranchRegex.exec(remoteBranchStr);
+                if (matches) {
+                    return GitBranch.create(this.repo, matches[2], matches[1]);
+                }
+                else {
+                    return BBPromise.reject(new Error(`Could not parse remote branch string ${remoteBranchStr}.`));
+                }
+
+            }
+            else {
+                // The specified branch is not tracking a remote branch.
+                return BBPromise.resolve(undefined);
+            }
+
+        });
+
+
     }
 
 }

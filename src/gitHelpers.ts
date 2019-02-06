@@ -1,7 +1,20 @@
+import {Directory} from "./directory";
+
 
 // A regular expression to match valid Git repo URLs.
 // match[1]: project name
 const gitUrlRegexp = /.*\/(.*)\.git$/;
+
+
+/**
+ * Determines whether `gitUrl` is a valid Git repo URL
+ * @param gitUrl - The string to test
+ * @return true if valid; false otherwise
+ */
+export function isGitUrl(gitUrl: string): boolean
+{
+    return !!gitUrl.match(gitUrlRegexp);
+}
 
 
 /**
@@ -19,4 +32,14 @@ export function gitUrlToProjectName(gitUrl: string): string
     }
 
     return match[1];
+}
+
+
+/**
+ * Gets the project name from a directory path
+ * @param dir - The directory path
+ * @return The project name
+ */
+export function dirToProjectName(dir: Directory): string {
+    return dir.dirName;
 }

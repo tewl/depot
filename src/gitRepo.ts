@@ -6,7 +6,7 @@ import {GitBranch} from "./gitBranch";
 import * as _ from "lodash";
 import {outdent, trimBlankLines} from "./stringHelpers";
 import {Url} from "./url";
-import {gitUrlToProjectName} from "./gitHelpers";
+import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import * as BBPromise from "bluebird";
@@ -281,7 +281,10 @@ export class GitRepo
             if (remoteNames.length > 0)
             {
                 const remoteUrl = remotes[remoteNames[0]];
-                return gitUrlToProjectName(remoteUrl);
+
+                if (isGitUrl(remoteUrl)) {
+                    return gitUrlToProjectName(remoteUrl);
+                }
             }
         })
         .then((projName) => {

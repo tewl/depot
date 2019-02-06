@@ -73,8 +73,6 @@ export class GitRepo
     }
 
 
-    // TODO: Allow the caller to specify the directory name that will be used
-    // instead of the project name.
     /**
      * Clones a Git repo at the specified location.
      * @param src - The source to clone the repo from

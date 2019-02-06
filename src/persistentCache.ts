@@ -48,6 +48,26 @@ export class PersistentCache<T> {
     }
 
 
+    public static createSync<T>(name: string, options?: IPersistentCacheOptions): PersistentCache<T> {
+        if (!isValidFilesystemName(name)) {
+            throw new Error("Illegal cache name");
+        }
+
+        options = _.defaults({}, options, {dir: process.cwd()});
+
+        const rootDir = new Directory(options.dir!);
+
+        if (!rootDir.existsSync()) {
+            throw new Error(`Directory "${options.dir!}" does not exist.`);
+        }
+
+        // Create the directory for the cache being created.
+        const cacheDir = new Directory(rootDir, name);
+        cacheDir.ensureExistsSync();
+        return new PersistentCache<T>(name, cacheDir);
+    }
+
+
     // region Instance Data Members
     private readonly _name: string;
     private readonly _cacheDir: Directory;

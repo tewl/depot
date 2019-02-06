@@ -36,18 +36,18 @@ describe("PersistentCache", () => {
             });
 
 
-            it("creates a PersistentCache instance", (done) => {
-                PersistentCache.create(generateUuid(), {dir: tmpDir.toString()})
-                .then((cache) => {
-                    expect(cache).toBeTruthy();
+            it("rejects when the specified directory does not exist", (done) => {
+                PersistentCache.create(generateUuid(), {dir: generateUuid()})
+                .catch(() => {
                     done();
                 });
             });
 
 
-            it("rejects when the specified directory does not exist", (done) => {
-                PersistentCache.create(generateUuid(), {dir: generateUuid()})
-                .catch(() => {
+            it("creates a PersistentCache instance", (done) => {
+                PersistentCache.create(generateUuid(), {dir: tmpDir.toString()})
+                .then((cache) => {
+                    expect(cache).toBeTruthy();
                     done();
                 });
             });
@@ -64,6 +64,49 @@ describe("PersistentCache", () => {
                 });
             });
 
+
+        });
+
+
+        describe("createSync", () => {
+
+
+            it("throws when the cache name contains an illegal character", () => {
+                const illegalChars = getIllegalChars();
+
+                for (const curIllegalChar of illegalChars) {
+                    const name = "foo" + curIllegalChar + "bar";
+                    expect(() => {
+                        PersistentCache.createSync<string>(name, {dir: tmpDir.toString()});
+                    }).toThrowError(/Illegal cache name/i);
+                }
+            });
+
+
+            it("throws when the specified directory does not exist", () => {
+                const cacheName = generateUuid();
+                const dataDir = generateUuid();   // Does not exist
+
+                expect(() => {
+                    PersistentCache.createSync(cacheName, {dir: dataDir});
+                }).toThrowError(/Directory ".+" does not exist./);
+            });
+
+
+            it("creates a PersistentCache instance", () => {
+                const cacheName = generateUuid();
+                const cache = PersistentCache.createSync(cacheName, {dir: tmpDir.toString()});
+                expect(cache).toBeTruthy();
+            });
+
+
+            it("puts files in the requested directory", () => {
+                const cacheName = generateUuid();
+                const cache = PersistentCache.createSync(cacheName, {dir: tmpDir.toString()});
+                expect(cache).toBeTruthy();
+                const expectedDir = new Directory(tmpDir, cacheName);
+                expect(expectedDir.existsSync()).toBeTruthy();
+            });
 
         });
 

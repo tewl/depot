@@ -80,16 +80,18 @@ export class GitRepo
      * @param src - The source to clone the repo from
      * @param parentDir - The parent directory where the repo will be placed.
      * The repo will be cloned into a subdirectory named after the project.
+     * @param dirName - The name of the directory to place the cloned repository
+     * into.  If not specified, the project's name will be used.
      * @return A promise for the cloned Git repo.
      */
-    public static clone(src: Url | Directory, parentDir: Directory): Promise<GitRepo>
+    public static clone(src: Url | Directory, parentDir: Directory, dirName?: string): Promise<GitRepo>
     {
-        let projName: string;
+        let repoDirName: string;
         let srcStr: string;
 
         if (src instanceof Url)
         {
-            projName = gitUrlToProjectName(src.toString());
+            repoDirName = dirName || gitUrlToProjectName(src.toString());
             const protocols = src.getProtocols();
             srcStr = protocols.length < 2 ?
                 src.toString() :
@@ -97,13 +99,13 @@ export class GitRepo
         }
         else
         {
-            projName = src.dirName;
+            repoDirName = dirName || src.dirName;
             // The path to the source repo must be made absolute, because when
             // we execute the "git clone" command, the cwd will be `parentDir`.
             srcStr = src.absPath();
         }
 
-        const repoDir = new Directory(parentDir, projName);
+        const repoDir = new Directory(parentDir, repoDirName);
 
         return parentDir.exists()
         .then((parentDirExists) => {
@@ -115,7 +117,7 @@ export class GitRepo
         .then(() => {
             return spawn(
                 "git",
-                ["clone", srcStr, projName],
+                ["clone", srcStr, repoDirName],
                 parentDir.toString())
             .closePromise;
         })

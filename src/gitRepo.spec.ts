@@ -81,6 +81,19 @@ describe("GitRepo", () => {
             });
 
 
+            it("can clone a repo into a specific directory", async () => {
+                // Create one clone in the "sample-origin" directory.
+                const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "sample-origin");
+                // Create another clone in the "sample-working" directory.
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "sample-working");
+
+                expect(originRepo).toBeTruthy();
+                expect(workingRepo).toBeTruthy();
+
+                expect(new Directory(tmpDir, "sample-origin").existsSync()).toBeTruthy();
+                expect(new Directory(tmpDir, "sample-working").existsSync()).toBeTruthy();
+            });
+
         });
 
 

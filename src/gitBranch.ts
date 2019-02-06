@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import {GitRepo} from "./gitRepo";
 import {spawn} from "./spawn";
 import {Validator} from "./validator";
+import {insertIf} from "./arrayHelpers";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -171,7 +172,14 @@ export class GitBranch
     }
 
 
-    // TODO: Add toString() method.
+    public toString(): string
+    {
+        const parts: Array<string> = [
+            ...insertIf<string>(this.isRemote(), this._remoteName!),
+            this._name
+        ];
+        return parts.join("/");
+    }
 
 
     public isLocal(): boolean

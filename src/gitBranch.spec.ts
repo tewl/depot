@@ -132,6 +132,26 @@ describe("GitBranch", () => {
         });
 
 
+        describe("toString()", () => {
+
+
+            it("returns the expected string for a local branch", async () => {
+                const repo = await GitRepo.fromDirectory(sampleRepoDir);
+                const branch = await GitBranch.create(repo, "master");
+                expect(branch.toString()).toEqual("master");
+            });
+
+
+            it("returns the expected string for a remote branch", async () => {
+                const repo = await GitRepo.fromDirectory(sampleRepoDir);
+                const branch = await GitBranch.create(repo, "master", "origin");
+                expect(branch.toString()).toEqual("origin/master");
+            });
+
+
+        });
+
+
         describe("isLocal()", () => {
 
 

@@ -174,6 +174,18 @@ export class GitBranch
     // TODO: Add toString() method.
 
 
+    public isLocal(): boolean
+    {
+        return this.remoteName === undefined;
+    }
+
+
+    public isRemote(): boolean
+    {
+        return !this.isLocal();
+    }
+
+
     public getTrackedBranch(): Promise<GitBranch | undefined> {
 
         //

@@ -132,6 +132,58 @@ describe("GitBranch", () => {
         });
 
 
+        describe("isLocal()", () => {
+
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("returns true when the branch is local", async () => {
+                const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
+                const curBranch = await workingRepo.getCurrentBranch();
+                expect(curBranch).toBeTruthy();
+                expect(curBranch!.isLocal()).toEqual(true);
+            });
+
+
+            it("return false when the branch is remote", async () => {
+                const repo = await GitRepo.fromDirectory(sampleRepoDir);
+                const branch = await GitBranch.create(repo, "master", "origin");
+                expect(branch.isLocal()).toEqual(false);
+            });
+
+
+        });
+
+
+        describe("isRemote()", () => {
+
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+            });
+
+
+            it("returns false when the branch is local", async () => {
+                const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
+                const curBranch = await workingRepo.getCurrentBranch();
+                expect(curBranch).toBeTruthy();
+                expect(curBranch!.isRemote()).toEqual(false);
+            });
+
+
+            it("return true when the branch is remote", async () => {
+                const repo = await GitRepo.fromDirectory(sampleRepoDir);
+                const branch = await GitBranch.create(repo, "master", "origin");
+                expect(branch.isRemote()).toEqual(true);
+            });
+
+
+        });
+
+
         describe("getTrackedBranch()", () => {
 
             beforeEach(() => {
@@ -170,6 +222,21 @@ describe("GitBranch", () => {
                 expect(tracked).toEqual(undefined);
             });
 
+
+            it("returns a branch that is a remote branch", async () => {
+                const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                expect(originRepo).toBeTruthy();
+                expect(workingRepo).toBeTruthy();
+
+                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                await workingRepo.checkoutBranch(featureBranch, true);
+                await workingRepo.pushCurrentBranch("origin", true);
+
+                const tracked = await featureBranch.getTrackedBranch();
+                expect(tracked).toBeTruthy();
+                expect(tracked!.isRemote()).toEqual(true);
+            });
 
         });
 

@@ -1035,6 +1035,21 @@ describe("File", () => {
         });
 
 
+        describe("getHashSync()", () => {
+
+
+            it("calculates the expected hash value", () => {
+                const file = new File(tmpDir, "src", "file.txt");
+                file.writeSync("abc");
+
+                const hash = file.getHashSync();
+                expect(hash).toEqual("900150983cd24fb0d6963f7d28e17f72");
+            });
+
+
+        });
+
+
         describe("read()", () => {
 
 

@@ -550,6 +550,21 @@ export class File
 
 
     /**
+     * Calculates a hash of this file's contents
+     * @param algorithm - The hashing algorithm to use.  For example, "md5",
+     * "sha256", "sha512".  To see algorithms available on your platform, run
+     * `openssl list-message-digest-algorithms`.
+     * @return A hexadecimal string containing the hash
+     */
+    public getHashSync(algorithm: string = "md5"): string {
+        const fileData = fs.readFileSync(this._filePath);
+        const hash = crypto.createHash(algorithm);
+        hash.update(fileData);
+        return hash.digest("hex");
+    }
+
+
+    /**
      * Reads the contents of this file as a string.  Rejects if this file does
      * not exist.
      * @return A Promise for the text contents of this file

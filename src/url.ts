@@ -11,13 +11,6 @@ const urlProtocolRegex = /^([a-zA-Z0-9_+]+?):\/\//;
 
 export class Url
 {
-    public static is(obj: any): obj is Url {
-        return _.isFunction(obj.toString) &&
-            _.isFunction(obj.getProtocols) &&
-            _.isFunction(obj.replaceProtocol);
-    }
-
-
     public static fromString(urlStr: string): Url | undefined
     {
         // TODO: Verify that urlStr is a valid URL.

@@ -60,6 +60,7 @@
     "@types/jasmine": "2.8.15",
     "@types/lodash": "4.14.104",
     "@types/node": "9.4.6",
+    "@types/request-promise": "4.1.42",
     "@types/semver": "5.5.0",
     "@types/yargs": "12.0.1",
     "del": "3.0.0",
@@ -77,6 +78,8 @@
     "bluebird": "3.5.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.5",
+    "request": "2.88.0",
+    "request-promise": "4.1.1",
     "setprototypeof": "1.1.1",
     "uuid": "3.3.2",
     "yargs": "12.0.2"

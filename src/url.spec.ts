@@ -55,6 +55,31 @@ describe("Url", () => {
 
         });
 
+
+        describe("join()", () => {
+
+
+            it("will join a URL when the first part does not end with a slash", () => {
+                const url1 = Url.fromString("http://www.foo.com/foo");
+                expect(url1).toBeTruthy();
+                const url2 = url1!.join("bar");
+                expect(url2).toBeTruthy();
+                expect(url2!.toString()).toEqual("http://www.foo.com/foo/bar");
+            });
+
+
+            it("will join a URL when the first part does end with a slash", () => {
+                const url1 = Url.fromString("http://www.foo.com/foo/");
+                expect(url1).toBeTruthy();
+                const url2 = url1!.join("/bar");
+                expect(url2).toBeTruthy();
+                expect(url2!.toString()).toEqual("http://www.foo.com/foo/bar");
+            });
+
+
+        });
+
+
     });
 
 

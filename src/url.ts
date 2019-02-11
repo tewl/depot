@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
 
 
 //
@@ -56,6 +57,12 @@ export class Url
 
         const urlStr = this._url.replace(urlProtocolRegex, newProtocol);
         return new Url(urlStr);
+    }
+
+
+    public join(...parts: Array<string>): Url | undefined {
+        const newUrlStr = urlJoin(this.toString(), ...parts);
+        return Url.fromString(newUrlStr);
     }
 }
 

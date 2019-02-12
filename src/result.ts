@@ -1,11 +1,20 @@
-interface IFailureResult {
+export interface IFailureResult<ErrorType> {
     succeeded: false;
-    error: string;
+    error: ErrorType;
 }
 
-interface ISucceededResult<T> {
+export interface ISuccessResult<SuccessType> {
     succeeded: true;
-    value: T;
+    value: SuccessType;
 }
 
-export type Result<T> = ISucceededResult<T> | IFailureResult;
+export type Result<SuccessType, ErrorType> = ISuccessResult<SuccessType> | IFailureResult<ErrorType>;
+
+
+export function failureResult<ErrorType>(err: ErrorType): IFailureResult<ErrorType> {
+    return {succeeded: false, error: err};
+}
+
+export function successResult<SuccessType>(val: SuccessType): ISuccessResult<SuccessType> {
+    return {succeeded: true, value: val};
+}

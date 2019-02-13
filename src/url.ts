@@ -2,14 +2,6 @@ import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
 import * as URLParse from "url-parse";
 
 
-//
-// A regex that captures the protocol part of a URL (everything up to the
-// "://").
-// results[1] - The string of all protocols.
-//
-const urlProtocolRegex = /^([a-zA-Z0-9_+]+?):\/\//;
-
-
 export class Url
 {
     public static fromString(urlStr: string): Url | undefined
@@ -44,13 +36,16 @@ export class Url
 
     public getProtocols(): Array<string>
     {
-        const results = urlProtocolRegex.exec(this._parsed.href);
-        if (!results)
-        {
+        const protocolStr = this._parsed.protocol;
+        const withoutColon = protocolStr.replace(/:$/, "");
+
+        if (withoutColon === "") {
+            // No protocol specified.
             return [];
         }
 
-        return results[1].split("+");
+        const protocols = withoutColon.split("+");
+        return protocols;
     }
 
 

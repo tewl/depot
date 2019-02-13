@@ -80,6 +80,65 @@ describe("Url", () => {
         });
 
 
+        describe("host", () => {
+
+            it("returns the expected value", () => {
+                const url = Url.fromString("http://localhost:3030/foo/bar");
+                expect(url).toBeTruthy();
+                expect(url!.host).toEqual("localhost:3030");
+
+            });
+
+        });
+
+
+        describe("hostname", () => {
+
+            it("returns the expected value", () => {
+                const url = Url.fromString("http://localhost:3030/foo/bar");
+                expect(url).toBeTruthy();
+                expect(url!.hostname).toEqual("localhost");
+            });
+
+        });
+
+
+        fdescribe("port", () => {
+
+
+            it("returns undefined when no port is specified", () => {
+                const url = Url.fromString("http://localhost/foo/bar");
+                expect(url).toBeTruthy();
+                expect(url!.port).toEqual(undefined);
+            });
+
+
+            it("returns the expected numeric value", () => {
+                const url = Url.fromString("http://localhost:3030/foo/bar");
+                expect(url).toBeTruthy();
+                expect(url!.port).toEqual(3030);
+            });
+
+
+            it("assigns a new port number", () => {
+                const url = Url.fromString("http://localhost:3030/foo/bar");
+                expect(url).toBeTruthy();
+                url!.port = 3040;
+                expect(url!.toString()).toEqual("http://localhost:3040/foo/bar");
+            });
+
+
+            it("can clear a port number", () => {
+                const url = Url.fromString("http://localhost:3030/foo/bar");
+                expect(url).toBeTruthy();
+                url!.port = undefined;
+                expect(url!.toString()).toEqual("http://localhost/foo/bar");
+            });
+
+
+        });
+
+
     });
 
 

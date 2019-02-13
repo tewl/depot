@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
 import * as URLParse from "url-parse";
 
@@ -31,6 +32,17 @@ export class Url
     public toString(): string
     {
         return this._parsed.href;
+    }
+
+
+    /**
+     * Creates a duplicate instance of this Url
+     * @return The new instance
+     */
+    public clone(): Url {
+        const newInstParsed = _.cloneDeep(this._parsed);
+        const newInst = new Url(newInstParsed);
+        return newInst;
     }
 
 

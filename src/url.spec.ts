@@ -7,6 +7,24 @@ describe("Url", () => {
     describe("instance", () => {
 
 
+        describe("clone()", () => {
+
+
+            it("will create a *copy* of the Url instance", () => {
+
+                const url1 = Url.fromString("http://localhost:3030")!;
+                const url2 = url1.clone();
+
+                url2.port = 3031;
+                expect(url2.port).toEqual(3031);
+                // The original should not be modified.
+                expect(url1.port).toEqual(3030);
+            });
+
+
+        });
+
+
         describe("getProtocols()", () => {
 
 

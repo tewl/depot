@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
 import * as URLParse from "url-parse";
 
@@ -16,7 +15,8 @@ export class Url
     public static fromString(urlStr: string): Url | undefined
     {
         try {
-            const inst = new Url(urlStr);
+            const parsed = new URLParse(urlStr);
+            const inst = new Url(parsed);
             return inst;
         }
         catch (err) {
@@ -30,9 +30,9 @@ export class Url
     // endregion
 
 
-    private constructor(url: string)
+    private constructor(parsed: URLParse)
     {
-        this._parsed = new URLParse(url);
+        this._parsed = parsed;
     }
 
 
@@ -54,15 +54,20 @@ export class Url
     }
 
 
+    /**
+     * Gets a new Url instance with a modified protocol.
+     * @param newProtocol - The new instance's protocol
+     * @return The new Url instance
+     */
     public replaceProtocol(newProtocol: string): Url
     {
-        if (!_.endsWith(newProtocol, "://"))
-        {
-            newProtocol = newProtocol + "://";
-        }
+        // FUTURE: Deprecate this method in favor of cloning and mutating the URL
+        //   by setting a `protocol` property similar to how the port property can
+        //   be assigned to.
 
-        const urlStr = this._parsed.href.replace(urlProtocolRegex, newProtocol);
-        return new Url(urlStr);
+        const newInst = Url.fromString(this.toString())!;
+        newInst._parsed.set("protocol", newProtocol);
+        return newInst;
     }
 
 
@@ -100,6 +105,7 @@ export class Url
             return parseInt(portStr, 10);
         }
     }
+
 
     public set port(val: number | undefined) {
         this._parsed.set("port", val);

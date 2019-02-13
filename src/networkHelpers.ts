@@ -1,8 +1,11 @@
 import * as os from "os";
 
 
-// Returns an object in which the keys are the names of the network interfaces
-// and the values are the IPv4 addresses (as strings).
+/**
+ * Enumerates the external IPv4 addresses
+ * @return An object in which the keys are the names of the network interfaces
+ * and the values are the IPv4 addresses (as strings)
+ */
 export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: string} {
 
     const foundInterfaces: {[networkInterfaceName: string]: string} = {};

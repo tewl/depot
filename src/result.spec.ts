@@ -11,7 +11,7 @@ import {Result} from "./result";
 
 function failingOperation(): Result<void, number> {
     return {
-        succeeded: false,
+        success: false,
         error:     3
     };
 }
@@ -19,7 +19,7 @@ function failingOperation(): Result<void, number> {
 
 function successfulOperation(): Result<number, Error> {
     return {
-        succeeded: true,
+        success: true,
         value:     5
     };
 }
@@ -30,7 +30,7 @@ describe("Result", () => {
 
     it("will have the expected fields upon failure", () => {
         const result = failingOperation();
-        if (result.succeeded) {
+        if (result.success) {
             fail("The operation should not have succeeded");
             return;
         }
@@ -41,7 +41,7 @@ describe("Result", () => {
 
     it("will have the expected fields upon success", () => {
         const result = successfulOperation();
-        if (!result.succeeded) {
+        if (!result.success) {
             fail("The operation should have succeeded.");
             return;
         }

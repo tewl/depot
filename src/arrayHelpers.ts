@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 /**
  * Tests the strings in `strings` and returns the first non-null match.
  * @param strings - The array of strings to search
@@ -39,4 +41,27 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
  */
 export function insertIf<ItemType>(condition: any, ...items: Array<ItemType>): Array<ItemType> {
     return condition ? items : [];
+}
+
+
+export function permutations<T>(vals: Array<T>): Array<Array<T>> {
+    if (vals.length === 0) {
+        return [];
+    }
+
+    if (vals.length === 1) {
+        return [vals];
+    }
+
+    let allPermutations: Array<Array<T>> = [];
+
+    // To calculate the permutations, calculate the permutations where each
+    // element is the first element.
+    for (let curIndex = 0; curIndex < vals.length; ++curIndex) {
+        const rest = _.filter(vals, (val, index) => index !== curIndex);
+        const restPermutations = permutations(rest);
+        allPermutations = allPermutations.concat(_.map(restPermutations, (curRestPermutation) => [vals[curIndex], ...curRestPermutation]));
+    }
+
+    return allPermutations;
 }

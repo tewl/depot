@@ -1,4 +1,4 @@
-import {Result} from "./result";
+import {Result, failureResult} from "./result";
 
 
 //
@@ -8,16 +8,15 @@ import {Result} from "./result";
 // compiler issues the expected errors.
 //
 
+type FailureIds = "ERROR_1" | "ERROR_2" | "ERROR_3";
 
-function failingOperation(): Result<void, number> {
-    return {
-        success: false,
-        error:     3
-    };
+
+function failingOperation(): Result<void, FailureIds> {
+    return failureResult<FailureIds>("ERROR_1", "Error 1");
 }
 
 
-function successfulOperation(): Result<number, Error> {
+function successfulOperation(): Result<number, FailureIds> {
     return {
         success: true,
         value:     5
@@ -35,7 +34,7 @@ describe("Result", () => {
             return;
         }
 
-        expect(result.error).toEqual(3);
+        expect(result.errorId).toEqual("ERROR_1");
     });
 
 

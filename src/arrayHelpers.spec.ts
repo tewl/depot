@@ -36,7 +36,7 @@ describe("insertIf", () => {
 });
 
 
-fdescribe("permutations()", () => {
+describe("permutations()", () => {
 
 
     it("returns expected results for a zero length array", () => {

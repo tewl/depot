@@ -1,21 +1,19 @@
 import * as _ from "lodash";
 
 
-interface IFractionParts {
-    whole: number;
-    num:   number;
-    den:   number;
-}
-
-
+// Regular expressions used to parse fraction strings.
 const justWhole = /^(\d+)$/;
 const justFrac  = /^(\d+)\/(\d+)$/;
 const allParts  = /^(\d+) (\d+)\/(\d+)$/;
 
 
+// A regular expression for a number that may be negative and always has a
+// fractional part.
+const numRegex = /^(-?)(\d+)\.(\d+)$/;
+
+
 export class Fraction
 {
-
     public static fromParts(whole: number, num: number, den: number): Fraction; // tslint:disable-line:unified-signatures
     public static fromParts(num: number, den: number): Fraction;                // tslint:disable-line:unified-signatures
     public static fromParts(whole: number): Fraction;
@@ -23,89 +21,108 @@ export class Fraction
                             second?: number,
                             third?: number): Fraction
     {
-        let fracParts: IFractionParts;
+        let whole: number;
+        let num: number;
+        let den: number;
 
         if (second === undefined && third === undefined)
         {
             // 1 number provided.  It's the whole part.
-            const whole = first;
-            if (!_.isSafeInteger(whole))
-            {
-                throw new Error(
-                    `The value ${whole} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-            fracParts = {whole, num: 0, den: 1};
+            whole = first;
+            num = 0;
+            den = 1;
         }
         else if (second !== undefined && third === undefined)
         {
             // 2 numbers provided.  They are num and den.
-            const num = first;
-            const den = second;
-            if (den === 0)
-            {
-                throw new Error(
-                    "The denominator of a fraction cannot be zero.");
-            }
-            if (!_.isSafeInteger(num))
-            {
-                throw new Error(
-                    `The value ${num} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-            if (!_.isSafeInteger(den))
-            {
-                throw new Error(
-                    `The value ${den} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-
-            fracParts = {whole: 0, num, den};
+            whole = 0;
+            num = first;
+            den = second;
         }
         else
         {
             // 3 numbers provided.
-            const whole = first;
-            const num   = second!;
-            const den   = third!;
-            if (den === 0)
-            {
-                throw new Error(
-                    "The denominator of a fraction cannot be zero.");
-            }
-            if (!_.isSafeInteger(whole))
-            {
-                throw new Error(
-                    `The value ${whole} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-            if (!_.isSafeInteger(num))
-            {
-                throw new Error(
-                    `The value ${num} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-            if (!_.isSafeInteger(den))
-            {
-                throw new Error(
-                    `The value ${den} cannot be used when creating Fraction instances.  Only integers can be used.`);
-            }
-            fracParts = {whole, num, den};
+            whole = first;
+            num   = second!;
+            den   = third!;
         }
 
-        return new Fraction(fracParts);
+        //
+        // Make sure all values are integers.
+        //
+        if (!_.isSafeInteger(whole))
+        {
+            throw new Error(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+        }
+        if (!_.isSafeInteger(num))
+        {
+            throw new Error(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+        }
+        if (!_.isSafeInteger(den))
+        {
+            throw new Error(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+        }
+
+        //
+        // Make sure the denominator is valid.
+        //
+        if (den === 0)
+        {
+            throw new Error(`The denominator of a Fraction cannot be zero: whole=${whole}, num=${num}, den=${den}`);
+        }
+        if (den < 0) {
+            throw new Error(`The denominator of a Fraction cannot be negative: whole=${whole}, num=${num}, den=${den}`);
+        }
+
+        //
+        // Make sure the negativity of the value makes sense.
+        //
+        let isPositive: boolean;
+        if (whole === 0) {
+            // The numerator is allowed to be positive or negative.
+            isPositive = num >= 0;
+        }
+        else {
+            // When there is a whole component, the numerator can only be
+            // positive.
+            if (num < 0) {
+                throw new Error(`Fractions with a whole part cannot have a negative numerator: whole=${whole}, num=${num}, den=${den}`);
+            }
+            isPositive = whole >= 0;
+        }
+
+        whole = Math.abs(whole);
+        num   = Math.abs(num);
+        den   = Math.abs(den);
+
+        num = den * whole + num;
+        if (!isPositive) {
+            num = num * -1;
+        }
+        return new Fraction(num, den);
     }
 
 
     public static fromString(str: string): Fraction
     {
+        let negativeAdjuster = 1;   // If positive, multiply by 1
+        if (str[0] === "-") {
+            negativeAdjuster = -1;  // If negative, will multiply by -1
+            str = str.slice(1);
+        }
+
         let matches: RegExpExecArray | null;
         matches = justWhole.exec(str);
         if (matches)
         {
-            const whole = parseInt(matches[1], 10);
+            const whole = parseInt(matches[1], 10) * negativeAdjuster;
             return Fraction.fromParts(whole);
         }
 
         matches = justFrac.exec(str);
         if (matches)
         {
-            const num = parseInt(matches[1], 10);
+            const num = parseInt(matches[1], 10) * negativeAdjuster;
             const den = parseInt(matches[2], 10);
             return Fraction.fromParts(num, den);
         }
@@ -113,7 +130,7 @@ export class Fraction
         matches = allParts.exec(str);
         if (matches)
         {
-            const whole = parseInt(matches[1], 10);
+            const whole = parseInt(matches[1], 10) * negativeAdjuster;
             const num   = parseInt(matches[2], 10);
             const den   = parseInt(matches[3], 10);
             return Fraction.fromParts(whole, num, den);
@@ -124,143 +141,209 @@ export class Fraction
     }
 
 
-    private readonly _val: IFractionParts;
-
-
-    private constructor(fracParts: IFractionParts)
+    public static fromNumber(num: number): Fraction
     {
-        this._val = fracParts;
+        if (_.isSafeInteger(num)) {
+            return new Fraction(num, 1);
+        }
+
+        const numStr = "" + num;
+        const negativeAdjuster = num < 0 ? -1 : 1;
+        const whole = Math.floor(Math.abs(num)) * negativeAdjuster;
+
+        const match = numRegex.exec(numStr);
+        if (!match) {
+            throw new Error("Error converting from number to Fraction.");
+        }
+        const fracStr = match[3];
+        const denominator = Math.pow(10, fracStr.length);
+        const numerator   = whole * denominator + parseInt(fracStr, 10) * negativeAdjuster;
+        return new Fraction(numerator, denominator);
     }
 
 
-    public get parts(): IFractionParts
+    public static compare(a: Fraction, b: Fraction): number
     {
-        return {whole: this._val.whole, num: this._val.num, den: this._val.den};
+        const crossA = a._num * b._den;
+        const crossB = a._den * b._num;
+
+        if (crossA < crossB) {
+            return -1;
+        }
+        else if (crossB < crossA) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    // region Instance Data Members
+    private readonly _num: number;
+    private readonly _den: number;
+    // endregion
+
+
+    private constructor(num: number, den: number)
+    {
+        this._num = num;
+        this._den = den;
     }
 
 
-    public get isProper(): boolean
+    public toString(improper: boolean = false): string
     {
-        return this._val.num < this._val.den;
-    }
-
-
-    public get isImproper(): boolean
-    {
-        return this._val.num >= this._val.den;
-    }
-
-
-    public toString(): string
-    {
-        if (this._val.whole === 0 && this._val.num === 0)
-        {
+        if (this._num === 0) {
             return "0";
         }
-        else
-        {
-            let str = this._val.whole === 0 ? "" : "" + this._val.whole;
-            if (this._val.num !== 0)
-            {
-                // Insert a space if there was a whole part.
-                if (this._val.whole)
-                {
-                    str += " ";
-                }
-                str += this._val.num + "/" + this._val.den;
-            }
-            return str;
+        else if (improper) {
+            return `${this._num}/${this._den}`;
         }
-    }
-
-
-    // TODO: Implement this.
-    // public equals(other: Fraction): boolean {}
-
-
-    public reduce(): Fraction
-    {
-        const gcd = greatestCommonDivisor(this._val.num, this._val.den);
-        return new Fraction(
-            {
-                whole: this._val.whole,
-                num:   this._val.num / gcd,
-                den:   this._val.den / gcd
+        else {
+            const whole = this.wholePart();
+            if (whole === 0) {
+                return `${this._num}/${this._den}`;
             }
-        );
-    }
-
-
-    public makeProper(): Fraction
-    {
-        const additionalWholes = Math.floor(this._val.num / this._val.den);
-        const remainder = this._val.num % this._val.den;
-
-        return new Fraction({
-            whole: this._val.whole + additionalWholes,
-            num:   remainder,
-            den:   this._val.den
-        });
+            else {
+                // The `whole` variable will contain the sign.
+                const remainder = Math.abs(this._num) % this._den;
+                const str = remainder === 0 ? `${whole}` : `${whole} ${remainder}/${this._den}`;
+                return str;
+            }
+        }
     }
 
 
     /**
-     * Returns the improper form of this fraction, if it can be made improper
-     * @return The improper form of this fraction, if it can be made improper
+     * Returns the whole part of this fraction
+     * @return The whole part of this fraction.  If this fraction is negative
+     * and the whole part is non-zero, the returned value will be negative.
      */
-    public makeImproper(): Fraction
+    public wholePart(): number
     {
-        return new Fraction(
-            {
-                whole: 0,
-                num: this._val.den * this._val.whole + this._val.num,
-                den: this._val.den
-            }
-        );
+        let whole: number = Math.floor(Math.abs(this._num) / this._den);
+
+        // Make the sign correct.  Btw, we are checking for whole !== 0 because
+        // 0 * -1 is -0 and we want just plain 0.
+        if ((this._num < 0) && (whole !== 0)) {
+            whole = whole * -1;
+        }
+        return whole;
     }
 
 
-    public simplify(): Fraction
+    /**
+     * Return the fractional part of this fraction
+     * @return The fractional part of this fraction.  If this fraction
+     */
+    public fractionalPart(): Fraction
     {
-        return this.reduce().makeProper();
+        let num = this._num % this._den;
+        // The following assignment seems unnecessary, but it is needed to
+        // prevent num from being -0.
+        num = num || 0;
+        return new Fraction(num, this._den);
+    }
+
+
+    public changeDenominator(newDenominator: number): Fraction
+    {
+        if ((newDenominator <= 0) || !_.isSafeInteger(newDenominator)) {
+            throw new Error("When changing the denominator, the new value must be a positive integer.");
+        }
+
+        const reduced = this.reduce();
+        if (newDenominator % reduced._den) {
+            throw new Error(`Cannot change fraction denominator to ${newDenominator} without modifying value.`);
+        }
+
+        const scale = newDenominator / reduced._den;
+        return new Fraction(reduced._num * scale, reduced._den * scale);
+    }
+
+
+    public reciprocal(): Fraction
+    {
+        if (this._num === 0) {
+            throw new Error("Cannot create a reciprocal that would result in a denominator value of 0.");
+        }
+        return new Fraction(this._den, this._num);
+    }
+
+
+    public reduce(): Fraction
+    {
+        const gcd = greatestCommonDivisor(this._num, this._den);
+        return new Fraction(this._num / gcd, this._den / gcd);
     }
 
 
     public add(other: Fraction): Fraction
     {
-        const lcm      = leastCommonMultiple(this._val.den, other._val.den);
-        const thisNum  = this._val.num * lcm / this._val.den;
-        const otherNum = other._val.num * lcm / other._val.den;
+        const lcm = leastCommonMultiple(this._den, other._den);
 
-        const result = Fraction.fromParts(
-            this._val.whole + other._val.whole,
-            thisNum + otherNum,
-            lcm).makeProper();
+        const thisScale = lcm  / this._den;
+        const thisNum = this._num * thisScale;
+
+        const otherScale = lcm / other._den;
+        const otherNum = other._num * otherScale;
+
+        return new Fraction(thisNum + otherNum, lcm);
+    }
+
+
+    public subtract(other: Fraction): Fraction
+    {
+        const lcm = leastCommonMultiple(this._den, other._den);
+
+        const thisScale = lcm  / this._den;
+        const thisNum = this._num * thisScale;
+
+        const otherScale = lcm / other._den;
+        const otherNum = other._num * otherScale;
+
+        return new Fraction(thisNum - otherNum, lcm);
+    }
+
+
+    public multiply(other: Fraction): Fraction
+    {
+        const num = this._num * other._num;
+        const den = this._den * other._den;
+        const product = new Fraction(num, den);
+        const result = product.reduce();
         return result;
     }
 
 
-    // TODO: Implement this.
-    // public subtract(other: Fraction): Fraction;
-    // public subtract(other: number): Fraction;
+    public divide(other: number): Fraction;
+    public divide(other: Fraction): Fraction;
+    public divide(other: number | Fraction): Fraction
+    {
+        let fracOther: Fraction;
 
+        if (typeof other === "number") {
+            if (!_.isSafeInteger(other)) {
+                throw new Error("Can only divide by integers.");
+            }
+            fracOther = Fraction.fromParts(other, 1);
+        }
+        else {
+            fracOther = other;
+        }
 
-    // TODO: Implement this.
-    // public multiply(other: Fraction): Fraction;
-    // public multiply(other: number): Fraction;
+        const result = this.multiply(fracOther.reciprocal());
+        return result;
+    }
 
-
-    // TODO: Implement this.
-    // public divide(other: Fraction): Fraction;
-    // public divide(other: number): Fraction;
 
 
     // TODO: toNumber()
 }
 
 
-export function greatestCommonDivisor(a: number, b: number): number {
-
+export function greatestCommonDivisor(a: number, b: number): number
+{
     if (a === 0 && b === 0) {
         throw new Error("Cannot calculate greatest common divosor of 0.");
     }
@@ -289,7 +372,8 @@ export function greatestCommonDivisor(a: number, b: number): number {
 }
 
 
-export function leastCommonMultiple(a: number, b: number): number {
+export function leastCommonMultiple(a: number, b: number): number
+{
     if (a === 0 || b === 0) {
         return 0;
     }

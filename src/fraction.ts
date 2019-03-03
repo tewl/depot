@@ -178,6 +178,7 @@ export class Fraction
         }
     }
 
+
     // region Instance Data Members
     private readonly _num: number;
     private readonly _den: number;
@@ -278,38 +279,47 @@ export class Fraction
     }
 
 
-    public add(other: Fraction): Fraction
+    public add(other: Fraction): Fraction;
+    public add(other: number): Fraction;
+    public add(other: Fraction | number): Fraction
     {
-        const lcm = leastCommonMultiple(this._den, other._den);
+        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
         const thisNum = this._num * thisScale;
 
-        const otherScale = lcm / other._den;
-        const otherNum = other._num * otherScale;
+        const otherScale = lcm / otherFrac._den;
+        const otherNum = otherFrac._num * otherScale;
 
         return new Fraction(thisNum + otherNum, lcm);
     }
 
 
-    public subtract(other: Fraction): Fraction
+    public subtract(other: Fraction): Fraction;
+    public subtract(other: number): Fraction;
+    public subtract(other: Fraction | number): Fraction
     {
-        const lcm = leastCommonMultiple(this._den, other._den);
+        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
         const thisNum = this._num * thisScale;
 
-        const otherScale = lcm / other._den;
-        const otherNum = other._num * otherScale;
+        const otherScale = lcm / otherFrac._den;
+        const otherNum = otherFrac._num * otherScale;
 
         return new Fraction(thisNum - otherNum, lcm);
     }
 
 
-    public multiply(other: Fraction): Fraction
+    public multiply(other: Fraction): Fraction;
+    public multiply(other: number): Fraction;
+    public multiply(other: Fraction | number): Fraction
     {
-        const num = this._num * other._num;
-        const den = this._den * other._den;
+        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const num = this._num * otherFrac._num;
+        const den = this._den * otherFrac._den;
         const product = new Fraction(num, den);
         const result = product.reduce();
         return result;
@@ -320,25 +330,17 @@ export class Fraction
     public divide(other: Fraction): Fraction;
     public divide(other: number | Fraction): Fraction
     {
-        let fracOther: Fraction;
-
-        if (typeof other === "number") {
-            if (!_.isSafeInteger(other)) {
-                throw new Error("Can only divide by integers.");
-            }
-            fracOther = Fraction.fromParts(other, 1);
-        }
-        else {
-            fracOther = other;
-        }
-
+        const fracOther = typeof other === "number" ? Fraction.fromNumber(other) : other;
         const result = this.multiply(fracOther.reciprocal());
         return result;
     }
 
 
+    public toNumber(): number {
+        return this._num / this._den;
+    }
 
-    // TODO: toNumber()
+
 }
 
 

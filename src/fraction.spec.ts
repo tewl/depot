@@ -403,13 +403,6 @@ describe("Fraction", () => {
             });
 
 
-            it("will throw when dividing by a non-integer", () => {
-                expect(() => {
-                    Fraction.fromString("3/4").divide(1.1);
-                }).toThrow();
-            });
-
-
             it("returns the expected value", () => {
                 expect(Fraction.fromString("0/1").divide(Fraction.fromString("1/1")).toString()).toEqual("0");
                 expect(Fraction.fromString("1/1").divide(Fraction.fromString("1/2")).toString()).toEqual("2");

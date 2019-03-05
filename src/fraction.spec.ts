@@ -167,6 +167,12 @@ describe("Fraction", () => {
             });
 
 
+            it("will compare Fractions and numbers", () => {
+                expect(Fraction.compare(Fraction.fromString("1 1/16"), 1)).toEqual(1);
+                expect(Fraction.compare(1, Fraction.fromString("1 1/16"))).toEqual(-1);
+            });
+
+
         });
 
 
@@ -321,6 +327,87 @@ describe("Fraction", () => {
                 expect(Fraction.fromParts(-14, 8).reduce().toString()).toEqual("-1 3/4");
                 expect(Fraction.fromParts(0, 8).reduce().toString()).toEqual("0");
                 expect(Fraction.fromParts(-0, 8).reduce().toString()).toEqual("0");
+            });
+
+
+        });
+
+
+        describe("equals()", () => {
+
+
+            it("returns true when the values are equal", () => {
+                expect(Fraction.fromParts(0, 1).equals(0)).toEqual(true);
+                expect(Fraction.fromParts(0, 1).equals(Fraction.fromParts(0, 3))).toEqual(true);
+
+                expect(Fraction.fromParts(1, 1, 2).equals(1.5)).toEqual(true);
+                expect(Fraction.fromParts(1, 1, 2).equals(Fraction.fromParts(1, 2, 4))).toEqual(true);
+
+                expect(Fraction.fromParts(-1, 1, 2).equals(-1.5)).toEqual(true);
+                expect(Fraction.fromParts(-1, 1, 2).equals(Fraction.fromParts(-1, 2, 4))).toEqual(true);
+            });
+
+
+            it("returns false when the values are not equal", () => {
+                expect(Fraction.fromParts(0, 1).equals(1)).toEqual(false);
+                expect(Fraction.fromParts(0, 1).equals(Fraction.fromParts(2, 2))).toEqual(false);
+
+                expect(Fraction.fromParts(1, 1).equals(-1)).toEqual(false);
+                expect(Fraction.fromParts(1, 1).equals(Fraction.fromParts(-2, 2))).toEqual(false);
+            });
+
+
+        });
+
+
+        describe("isLessThan()", () => {
+
+
+            it("returns true when this value is less", () => {
+                expect(Fraction.fromParts(0, 1).isLessThan(1.5)).toEqual(true);
+                expect(Fraction.fromParts(0, 1).isLessThan(Fraction.fromParts(1, 1, 2))).toEqual(true);
+
+                expect(Fraction.fromParts(1, 1).isLessThan(1.5)).toEqual(true);
+                expect(Fraction.fromParts(1, 1).isLessThan(Fraction.fromParts(1, 1, 2))).toEqual(true);
+
+                expect(Fraction.fromParts(-1, 1).isLessThan(0)).toEqual(true);
+                expect(Fraction.fromParts(-1, 1).isLessThan(Fraction.fromParts(0, 2))).toEqual(true);
+            });
+
+
+            it("returns false when this value is greater", () => {
+                expect(Fraction.fromParts(0, 1).isLessThan(-0.5)).toEqual(false);
+                expect(Fraction.fromParts(0, 1).isLessThan(Fraction.fromParts(-1, 2))).toEqual(false);
+
+                expect(Fraction.fromParts(1).isLessThan(0)).toEqual(false);
+                expect(Fraction.fromParts(1, 1).isLessThan(Fraction.fromParts(0, 2))).toEqual(false);
+            });
+
+
+        });
+
+
+        describe("isGreaterThan()", () => {
+
+
+            it("returns true when this value is greater", () => {
+                expect(Fraction.fromParts(0, 1).isGreaterThan(-1.5)).toEqual(true);
+                expect(Fraction.fromParts(0, 1).isGreaterThan(Fraction.fromParts(-1, 1, 2))).toEqual(true);
+
+                expect(Fraction.fromParts(1, 1).isGreaterThan(0)).toEqual(true);
+                expect(Fraction.fromParts(1, 1).isGreaterThan(Fraction.fromParts(0, 2))).toEqual(true);
+
+                expect(Fraction.fromParts(-1, 1).isGreaterThan(-2)).toEqual(true);
+                expect(Fraction.fromParts(-1, 1).isGreaterThan(Fraction.fromParts(-4, 2))).toEqual(true);
+            });
+
+
+            it("returns false when this value is less", () => {
+                expect(Fraction.fromParts(0, 1).isGreaterThan(0.5)).toEqual(false);
+                expect(Fraction.fromParts(0, 1).isGreaterThan(Fraction.fromParts(1, 2))).toEqual(false);
+
+                expect(Fraction.fromParts(-1).isGreaterThan(0)).toEqual(false);
+                expect(Fraction.fromParts(-1, 1).isGreaterThan(Fraction.fromParts(0, 2))).toEqual(false);
             });
 
 

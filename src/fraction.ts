@@ -162,10 +162,26 @@ export class Fraction
     }
 
 
-    public static compare(a: Fraction, b: Fraction): number
+    public static compare(a: Fraction | number, b: Fraction | number): number
     {
-        const crossA = a._num * b._den;
-        const crossB = a._den * b._num;
+        // If both are numbers, do it quick and easy.
+        if (typeof a === "number" && typeof b === "number") {
+            if (a < b) {
+                return -1;
+            }
+            else if (b < a) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+
+        const fracA = toFraction(a);
+        const fracB = toFraction(b);
+
+        const crossA = fracA._num * fracB._den;
+        const crossB = fracA._den * fracB._num;
 
         if (crossA < crossB) {
             return -1;
@@ -279,11 +295,52 @@ export class Fraction
     }
 
 
+    public equals(other: number): boolean;
+    public equals(other: Fraction): boolean;
+    public equals(other: Fraction | number): boolean
+    {
+        const compareResult = Fraction.compare(this, other);
+        return compareResult === 0;
+    }
+
+
+    public isLessThan(other: number): boolean;
+    public isLessThan(other: Fraction): boolean;
+    public isLessThan(other: Fraction | number): boolean
+    {
+        const compareResult = Fraction.compare(this, other);
+        return compareResult < 0;
+    }
+
+
+    public isLessThanOrEqualTo(other: number | Fraction): boolean
+    {
+        const compareResult = Fraction.compare(this, other);
+        return compareResult <= 0;
+    }
+
+
+    public isGreaterThan(other: number): boolean;
+    public isGreaterThan(other: Fraction): boolean;
+    public isGreaterThan(other: Fraction | number): boolean
+    {
+        const compareResult = Fraction.compare(this, other);
+        return compareResult > 0;
+    }
+
+
+    public isGreaterThanOrEqualTo(other: number | Fraction): boolean
+    {
+        const compareResult = Fraction.compare(this, other);
+        return compareResult >= 0;
+    }
+
+
     public add(other: Fraction): Fraction;
     public add(other: number): Fraction;
     public add(other: Fraction | number): Fraction
     {
-        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const otherFrac = toFraction(other);
         const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
@@ -300,7 +357,7 @@ export class Fraction
     public subtract(other: number): Fraction;
     public subtract(other: Fraction | number): Fraction
     {
-        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const otherFrac = toFraction(other);
         const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
@@ -317,7 +374,7 @@ export class Fraction
     public multiply(other: number): Fraction;
     public multiply(other: Fraction | number): Fraction
     {
-        const otherFrac = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const otherFrac = toFraction(other);
         const num = this._num * otherFrac._num;
         const den = this._den * otherFrac._den;
         const product = new Fraction(num, den);
@@ -330,7 +387,7 @@ export class Fraction
     public divide(other: Fraction): Fraction;
     public divide(other: number | Fraction): Fraction
     {
-        const fracOther = typeof other === "number" ? Fraction.fromNumber(other) : other;
+        const fracOther = toFraction(other);
         const result = this.multiply(fracOther.reciprocal());
         return result;
     }
@@ -341,6 +398,20 @@ export class Fraction
     }
 
 
+}
+
+
+export function toFraction(val: number | Fraction | string): Fraction
+{
+    if (typeof val === "number") {
+        return Fraction.fromNumber(val);
+    }
+    else if (typeof val === "string") {
+        return Fraction.fromString(val);
+    }
+    else {
+        return val;
+    }
 }
 
 

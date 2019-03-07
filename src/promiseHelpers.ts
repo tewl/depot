@@ -212,7 +212,8 @@ export function getTimerPromise<ResolveType>(
  * @param falseResolveValue - The value the returned promise will resolve with
  * when `condition` is falsy.
  * @return When `condition` is true, a promise that resolves with the result of
- * `task`.  When `condition` is false, a promise that resolves with `undefined`.
+ * `task`.  When `condition` is false, a promise that resolves with
+ * `falseResolveValue`.
  */
 export function conditionalTask<ResolveType>(
     condition: any,

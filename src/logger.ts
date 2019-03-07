@@ -35,8 +35,8 @@ const levelLabels: Array<string> = [
 Object.freeze(levelLabels);
 
 
-export class Logger {
-
+export class Logger
+{
     // region Private Data Members
     private readonly _logLevelStack: Array<LogLevel> = [];
     private readonly _defaultLogLevel: LogLevel      = LogLevel.WARN_2;
@@ -44,7 +44,8 @@ export class Logger {
     // endregion
 
 
-    public constructor() {
+    public constructor()
+    {
         const nodeEnv = _.toLower(_.get(process.env, "NODE_ENV", ""));
 
         // When not in production mode, register a listener that writes to the
@@ -57,7 +58,8 @@ export class Logger {
     /**
      * Resets the logging level to its default state.
      */
-    public reset(): void {
+    public reset(): void
+    {
         this._logLevelStack.length = 0;
     }
 
@@ -67,7 +69,8 @@ export class Logger {
      * its previous state, call pop().
      * @param newLogLevel - The new state of this logger
      */
-    public pushLogLevel(newLogLevel: LogLevel): void {
+    public pushLogLevel(newLogLevel: LogLevel): void
+    {
         this._logLevelStack.push(newLogLevel);
     }
 
@@ -75,7 +78,8 @@ export class Logger {
     /**
      * Restores this logger's state to the previous state.
      */
-    public pop(): void {
+    public pop(): void
+    {
         if (this._logLevelStack.length > 0) {
             this._logLevelStack.pop();
         }
@@ -87,7 +91,8 @@ export class Logger {
      * higher or equal severity will be logged.
      * @returns {LogLevel} The current severity level
      */
-    public getCurrentLevel(): LogLevel {
+    public getCurrentLevel(): LogLevel
+    {
         if (this._logLevelStack.length > 0) {
             return this._logLevelStack[this._logLevelStack.length - 1];
         } else {
@@ -147,8 +152,8 @@ export class Logger {
      * @param {string} msg - The message to log
      * @returns {boolean} Whether the message was logged.
      */
-    private log(level: LogLevel, msg: string): boolean {
-
+    private log(level: LogLevel, msg: string): boolean
+    {
         const curLogLevel: LogLevel = this.getCurrentLevel();
 
         if (level > curLogLevel) {
@@ -182,8 +187,8 @@ export const logger: Logger = new Logger();
 // Helper methods
 ////////////////////////////////////////////////////////////////////////////////
 
-function getTimestamp(): string {
-    "use strict";
+function getTimestamp(): string
+{
     return new Date().toISOString();
 }
 

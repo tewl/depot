@@ -38,9 +38,9 @@ Object.freeze(levelLabels);
 export class Logger {
 
     // region Private Data Members
-    private _logLevelStack: Array<LogLevel> = [];
-    private _defaultLogLevel: LogLevel = LogLevel.WARN_2;
-    private _listeners: Array<LogListener>;
+    private readonly _logLevelStack: Array<LogLevel> = [];
+    private readonly _defaultLogLevel: LogLevel      = LogLevel.WARN_2;
+    private readonly _listeners: Array<LogListener>  = [];
     // endregion
 
 
@@ -49,21 +49,16 @@ export class Logger {
 
         // When not in production mode, register a listener that writes to the
         // console.
-        this._listeners = nodeEnv === "production" ?
-                          [] :
-                          [(msg) => { console.log(msg); }];
+        if (nodeEnv !== "production") {
+            this._listeners.push((msg) => { console.log(msg); });
+        }
     }
 
     /**
-     * Resets this logger to its default state.
+     * Resets the logging level to its default state.
      */
     public reset(): void {
-
-        if (this._logLevelStack === undefined) {
-            this._logLevelStack = [];
-        } else {
-            this._logLevelStack.length = 0;
-        }
+        this._logLevelStack.length = 0;
     }
 
 

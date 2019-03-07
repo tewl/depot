@@ -1,3 +1,9 @@
+import * as _ from "lodash";
+
+
+type LogListener = (logMessage: string) => void;
+
+
 /**
  * Levels controlling what log messages are written to stdout.
  */
@@ -34,11 +40,18 @@ export class Logger {
     // region Private Data Members
     private _logLevelStack: Array<LogLevel> = [];
     private _defaultLogLevel: LogLevel = LogLevel.WARN_2;
+    private _listeners: Array<LogListener>;
     // endregion
 
 
     public constructor() {
-        Object.seal(this);
+        const nodeEnv = _.toLower(_.get(process.env, "NODE_ENV", ""));
+
+        // When not in production mode, register a listener that writes to the
+        // console.
+        this._listeners = nodeEnv === "production" ?
+                          [] :
+                          [(msg) => { console.log(msg); }];
     }
 
     /**
@@ -148,7 +161,10 @@ export class Logger {
         }
 
         if (msg.length > 0) {
-            console.log(getTimestamp() + " (" + levelLabels[level] + ") " + msg);
+            const logMessage = getTimestamp() + " (" + levelLabels[level] + ") " + msg;
+            _.forEach(this._listeners, (curListener) => {
+                curListener(logMessage);
+            });
         }
 
         return true;

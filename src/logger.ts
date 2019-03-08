@@ -1,7 +1,8 @@
 import * as _ from "lodash";
 
 
-type LogListener = (logMessage: string) => void;
+type LogListenerFunc    = (logMessage: string) => void;
+type RemoveListenerFunc = () => void;
 
 
 /**
@@ -38,22 +39,32 @@ Object.freeze(levelLabels);
 export class Logger
 {
     // region Private Data Members
-    private readonly _logLevelStack: Array<LogLevel> = [];
-    private readonly _defaultLogLevel: LogLevel      = LogLevel.WARN_2;
-    private readonly _listeners: Array<LogListener>  = [];
+    private readonly _logLevelStack: Array<LogLevel>    = [];
+    private readonly _defaultLogLevel: LogLevel         = LogLevel.WARN_2;
+    private readonly _listeners: Array<LogListenerFunc> = [];
     // endregion
 
 
     public constructor()
     {
-        const nodeEnv = _.toLower(_.get(process.env, "NODE_ENV", ""));
-
-        // When not in production mode, register a listener that writes to the
-        // console.
-        if (nodeEnv !== "production") {
-            this._listeners.push((msg) => { console.log(msg); });
-        }
     }
+
+
+    public addListener(listener: LogListenerFunc): RemoveListenerFunc
+    {
+        this._listeners.push(listener);
+
+        return () => {
+            _.pull(this._listeners, listener);
+        };
+    }
+
+
+    public numListeners(): number
+    {
+        return this._listeners.length;
+    }
+
 
     /**
      * Resets the logging level to its default state.
@@ -181,6 +192,7 @@ Object.freeze(Logger.prototype);
  * @type {Logger}
  */
 export const logger: Logger = new Logger();
+logger.addListener((msg) => { console.log(msg); });
 
 
 ////////////////////////////////////////////////////////////////////////////////

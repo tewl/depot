@@ -1,4 +1,4 @@
-import {logger, LogLevel} from "./logger";
+import {logger, LogLevel, Logger} from "./logger";
 
 
 describe("logger", () => {
@@ -37,6 +37,64 @@ describe("logger", () => {
 
     it("Logging a message with the same priority should return true.", () => {
         expect(logger.warn("")).toBeTruthy();
+    });
+
+
+    describe("addListener()", () => {
+
+
+        it("will add the new listener", () => {
+            const initialListenerCount = logger.numListeners();
+            logger.addListener(() => {});
+            expect(logger.numListeners()).toEqual(initialListenerCount + 1);
+        });
+
+
+        it("will add the new listener and it will be used", () => {
+            // We don't want any output while running the unit tests, so we need
+            // to create a logger that doesn't have the default console logger.
+            const logger = new Logger();
+            let invocationCounter = 0;
+            let loggedMessage = "";
+            const myListener = (msg: string) => {
+                invocationCounter++;
+                loggedMessage = msg;
+            };
+            logger.addListener(myListener);
+            const wasLogged = logger.error("test message");
+            expect(wasLogged).toBeTruthy();
+            expect(invocationCounter).toEqual(1);
+            expect(loggedMessage).toMatch(/test message/);
+        });
+
+
+        it("will return a function that can be called to remove the listener", () => {
+            // We don't want any output while running the unit tests, so we need
+            // to create a logger that doesn't have the default console logger.
+            const logger = new Logger();
+            let invocationCounter = 0;
+            let lastMessageLogged = "";
+            const myListener = (msg: string) => {
+                invocationCounter++;
+                lastMessageLogged = msg;
+            };
+            const initialListenerCount = logger.numListeners();
+
+            const stopListening = logger.addListener(myListener);
+            expect(logger.numListeners()).toEqual(initialListenerCount + 1);
+            logger.error("message 1");
+            expect(invocationCounter).toEqual(1);
+            expect(lastMessageLogged).toMatch(/message 1/);
+            stopListening();
+
+            // myListener will not be invoked any more.
+            expect(logger.numListeners()).toEqual(initialListenerCount);
+            logger.error("message 2");
+            expect(lastMessageLogged).toMatch(/message 1/);
+            expect(invocationCounter).toEqual(1);
+        });
+
+
     });
 
 

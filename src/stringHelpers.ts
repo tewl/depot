@@ -1,6 +1,12 @@
 import * as _ from "lodash";
 
 
+/**
+ * Counts the number of times padStr occurs at the beginning of str.
+ * @param str - The string to inspect
+ * @param padStr - The substring to count occurrences of
+ * @return The number of times padStr occurs at the beginning of str
+ */
 export function numInitial(str: string, padStr: string): number
 {
     if (padStr === "")
@@ -63,6 +69,13 @@ export function indent(
     }
 }
 
+
+/**
+ * Creates a new string where lines are no longer indented
+ * @param str - The indented string
+ * @param padStr - The string that has been used to indent lines in str
+ * @return A new version of str without the indentations
+ */
 export function outdent(str: string, padStr: string = " "): string
 {
     const lines = str.split("\n");
@@ -75,6 +88,11 @@ export function outdent(str: string, padStr: string = " "): string
 }
 
 
+/**
+ * Creates a new version of str where without leading and trailing blank lines
+ * @param str - The original string
+ * @return A version of str without leading and trailing blank lines
+ */
 export function trimBlankLines(str: string): string
 {
     const BLANK_LINE_REGEX = /^\s*$/;

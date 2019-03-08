@@ -3,7 +3,6 @@ import {EventEmitter} from "events";
 import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
 import * as BBPromise from "bluebird";
-import {logger} from "./logger";
 
 
 export type CallBackType<ResultType> = (err: any, result?: ResultType) => void;
@@ -371,10 +370,10 @@ function retryWhileImpl<ResolveType>(
                 (err: any): void => {
                     // The promise was rejected.
                     if (attemptsSoFar >= maxNumAttempts) {
-                        logger.error("Retry operation failed after " + maxNumAttempts + " attempts.");
+                        // logger.error("Retry operation failed after " + maxNumAttempts + " attempts.");
                         reject(err);
                     } else if (!whilePredicate(err)) {
-                        logger.error("Stopped retrying operation because while predicate returned false." + err);
+                        // logger.error("Stopped retrying operation because while predicate returned false." + err);
                         reject(err);
                     } else {
                         const backoffBaseMs: number = Math.pow(2, attemptsSoFar - 1) * BACKOFF_MULTIPLIER;
@@ -390,7 +389,7 @@ function retryWhileImpl<ResolveType>(
                         const randomMs: number = _.random(-1 * randomHalfRange, randomHalfRange);
                         const delayMs: number = backoffBaseMs + randomMs;
 
-                        logger.info("Failed. Queuing next attempt in " + backoffBaseMs + " + " + randomMs + " (" + delayMs + ") ms\n");
+                        // logger.info("Failed. Queuing next attempt in " + backoffBaseMs + " + " + randomMs + " (" + delayMs + ") ms\n");
                         const timerPromise: Promise<void> = getTimerPromise(delayMs, undefined);
                         resolve(
                             timerPromise

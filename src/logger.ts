@@ -1,8 +1,8 @@
 import * as _ from "lodash";
 
 
-type LogListenerFunc    = (logMessage: string) => void;
-type RemoveListenerFunc = () => void;
+export type LogListenerFunc    = (logMessage: string) => void;
+export type RemoveListenerFunc = () => void;
 
 
 /**
@@ -185,14 +185,6 @@ export class Logger
 
 }
 Object.freeze(Logger.prototype);
-
-
-/**
- * The one-and-only exported instance (singleton).
- * @type {Logger}
- */
-export const logger: Logger = new Logger();
-logger.addListener((msg) => { console.log(msg); });
 
 
 ////////////////////////////////////////////////////////////////////////////////

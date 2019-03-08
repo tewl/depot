@@ -1,16 +1,12 @@
-import {logger, LogLevel, Logger} from "./logger";
+import {LogLevel, Logger} from "./logger";
 
 
 describe("logger", () => {
 
+    let logger: Logger;
 
     beforeEach(() => {
-        logger.reset();
-    });
-
-
-    afterEach(() => {
-        logger.reset();
+        logger = new Logger();
     });
 
 
@@ -51,9 +47,6 @@ describe("logger", () => {
 
 
         it("will add the new listener and it will be used", () => {
-            // We don't want any output while running the unit tests, so we need
-            // to create a logger that doesn't have the default console logger.
-            const logger = new Logger();
             let invocationCounter = 0;
             let loggedMessage = "";
             const myListener = (msg: string) => {
@@ -69,9 +62,6 @@ describe("logger", () => {
 
 
         it("will return a function that can be called to remove the listener", () => {
-            // We don't want any output while running the unit tests, so we need
-            // to create a logger that doesn't have the default console logger.
-            const logger = new Logger();
             let invocationCounter = 0;
             let lastMessageLogged = "";
             const myListener = (msg: string) => {

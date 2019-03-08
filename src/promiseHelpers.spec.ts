@@ -3,7 +3,6 @@ import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
-import {logger, LogLevel} from "./logger";
 
 
 describe("promisifyN()", () => {
@@ -345,8 +344,6 @@ describe("retry()", () => {
 
 
     it("should reject if the given function never succeeds", (done) => {
-        logger.pushLogLevel(LogLevel.OFF_0);
-
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(5, "bar", "rejected");
 
         retry(theFunc, 3)
@@ -356,7 +353,6 @@ describe("retry()", () => {
             },
             (err: any) => {
                 expect(err).toEqual("rejected");
-                logger.pop();
                 done();
             }
         );
@@ -401,7 +397,6 @@ describe("retryWhile()", () => {
 
 
     it("will reject immediately if the while predicate says to stop trying", (done) => {
-        logger.pushLogLevel(LogLevel.OFF_0);
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(5, "bar", "rejected");
 
         retryWhile(theFunc, () => false, 1000)
@@ -411,7 +406,6 @@ describe("retryWhile()", () => {
             },
             (err: any) => {
                 expect(err).toEqual("rejected");
-                logger.pop();
                 done();
             }
         );

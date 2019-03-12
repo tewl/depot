@@ -1,3 +1,4 @@
+import {inspect} from "util";
 import * as _ from "lodash";
 
 
@@ -112,47 +113,77 @@ export class Logger
 
     }
 
+
     /**
      * Logs a message with severity level ERROR_1.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public error(msg: string): boolean { return this.log(LogLevel.ERROR_1, msg); }
+    public error(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.ERROR_1, msg, ...optionalParams);
+    }
+
 
     /**
      * Logs a message with severity level WARN_2.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public warn(msg: string): boolean { return this.log(LogLevel.WARN_2, msg); }
+    public warn(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.WARN_2, msg, ...optionalParams);
+    }
+
 
     /**
      * Logs a message with severity level INFO_3.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public info(msg: string): boolean { return this.log(LogLevel.INFO_3, msg); }
+    public info(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.INFO_3, msg, ...optionalParams);
+    }
+
 
     /**
      * Logs a message with severity level VERBOSE_4.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public verbose(msg: string): boolean { return this.log(LogLevel.VERBOSE_4, msg); }
+    public verbose(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.VERBOSE_4, msg, ...optionalParams);
+    }
+
 
     /**
      * Logs a message with severity level DEBUG_5.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public debug(msg: string): boolean { return this.log(LogLevel.DEBUG_5, msg); }
+    public debug(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.DEBUG_5, msg, ...optionalParams);
+    }
+
 
     /**
      * Logs a message with severity level SILLY_6.
      * @param msg - The message to be logged
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
-    public silly(msg: string): boolean { return this.log(LogLevel.SILLY_6, msg); }
+    public silly(msg: string, ...optionalParams: Array<any>): boolean
+    {
+        return this.log(LogLevel.SILLY_6, msg, ...optionalParams);
+    }
 
 
     // region Private Methods
@@ -161,14 +192,20 @@ export class Logger
      * Helper method that implements logging logic
      * @param {LogLevel} level - The severity level of the logged message
      * @param {string} msg - The message to log
+     * @param optionalParams - Additional values to be logged
      * @returns {boolean} Whether the message was logged.
      */
-    private log(level: LogLevel, msg: string): boolean
+    private log(level: LogLevel, msg: string, ...optionalParams: Array<any>): boolean
     {
         const curLogLevel: LogLevel = this.getCurrentLevel();
 
         if (level > curLogLevel) {
             return false;
+        }
+
+        const optStr = _.map(optionalParams, (curParam) => inspect(curParam)).join(" ");
+        if (optStr.length > 0) {
+            msg += " " + optStr;
         }
 
         if (msg.length > 0) {

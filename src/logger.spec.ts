@@ -1,4 +1,4 @@
-import {LogLevel, Logger} from "./logger";
+import {Logger, LogLevel} from "./logger";
 
 
 describe("logger", () => {
@@ -109,6 +109,45 @@ describe("logger", () => {
             logger.pushLogLevel(LogLevel.INFO_3);
             logger.pop();
             expect(logger.getCurrentLevel()).toEqual(LogLevel.VERBOSE_4);
+        });
+
+
+    });
+
+
+    describe("logging methods", () => {
+
+
+        it("log additional parameters", () => {
+            let logMsg: string = "";
+            logger.pushLogLevel(LogLevel.SILLY_6);
+            logger.addListener((msg: string): void => {
+                logMsg = msg;
+            });
+
+            let wasLogged = logger.error("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(ERROR\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
+
+            wasLogged = logger.warn("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(WARN\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
+
+            wasLogged = logger.info("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(INFO\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
+
+            wasLogged = logger.verbose("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(VERBOSE\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
+
+            wasLogged = logger.debug("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(DEBUG\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
+
+            wasLogged = logger.silly("Message goes here.", {foo: "bar", baz: "quux"}, [1, 2, 3], /foo/);
+            expect(wasLogged).toEqual(true);
+            expect(logMsg).toMatch(/.*\(SILLY\) Message goes here. { foo: 'bar', baz: 'quux' } \[ 1, 2, 3 ] \/foo\//);
         });
 
 

@@ -21,17 +21,17 @@ describe("logger", () => {
     });
 
 
-    it("logging a message with lower severity should return false.", () => {
+    it("logging a message with lower severity returns false.", () => {
         expect(logger.verbose("test")).toBeFalsy();
     });
 
 
-    it("Logging a message with higher priority should return true.", () => {
+    it("Logging a message with higher priority returns true.", () => {
         expect(logger.error("")).toBeTruthy();
     });
 
 
-    it("Logging a message with the same priority should return true.", () => {
+    it("Logging a message with the same priority returns true.", () => {
         expect(logger.warn("")).toBeTruthy();
     });
 
@@ -91,7 +91,7 @@ describe("logger", () => {
     describe("reset()", () => {
 
 
-        it("should set the current level to WARN_2", () => {
+        it("sets the current level to WARN_2", () => {
             logger.pushLogLevel(LogLevel.VERBOSE_4);
             logger.reset();
             expect(logger.getCurrentLevel()).toEqual(LogLevel.WARN_2);
@@ -104,7 +104,7 @@ describe("logger", () => {
     describe("pop()", () => {
 
 
-        it("will restore the previous logging level.", () => {
+        it("restores the previous logging level.", () => {
             logger.pushLogLevel(LogLevel.VERBOSE_4);
             logger.pushLogLevel(LogLevel.INFO_3);
             logger.pop();

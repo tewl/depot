@@ -366,8 +366,9 @@ export class Directory
 
     /**
      * Reads the contents of this directory.
-     * @return The contents of the directory, separated into a list of files and a
-     * list of subdirectories.  All paths returned are absolute paths.
+     * @return The contents of the directory, separated into a list of files and
+     * a list of subdirectories.  All returned paths are relative to this
+     * directory.
      */
     public contents(): Promise<IDirectoryContents>
     {
@@ -375,13 +376,13 @@ export class Directory
 
         return readdirAsync(this._dirPath)
         .then((fsEntries) => {
-            const absPaths = fsEntries.map((curEntry) => {
+            const fsEntryPaths = fsEntries.map((curEntry) => {
                 return path.join(parentDirPath, curEntry);
             });
 
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
-            const promises = absPaths.map((curPath) => {
+            const promises = fsEntryPaths.map((curPath) => {
                 return statAsync(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {

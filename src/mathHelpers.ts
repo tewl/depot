@@ -1,4 +1,4 @@
-const factorialCache: Array<number> = []
+const factorialCache: Array<number> = [];
 
 export function factorial(val: number): number
 {

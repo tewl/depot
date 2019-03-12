@@ -113,42 +113,42 @@ export class Logger
     }
 
     /**
-     * Logs a message with severity level ERROR_0.
+     * Logs a message with severity level ERROR_1.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
     public error(msg: string): boolean { return this.log(LogLevel.ERROR_1, msg); }
 
     /**
-     * Logs a message with severity level WARN_1.
+     * Logs a message with severity level WARN_2.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
     public warn(msg: string): boolean { return this.log(LogLevel.WARN_2, msg); }
 
     /**
-     * Logs a message with severity level INFO_2.
+     * Logs a message with severity level INFO_3.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
     public info(msg: string): boolean { return this.log(LogLevel.INFO_3, msg); }
 
     /**
-     * Logs a message with severity level VERBOSE_3.
+     * Logs a message with severity level VERBOSE_4.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
     public verbose(msg: string): boolean { return this.log(LogLevel.VERBOSE_4, msg); }
 
     /**
-     * Logs a message with severity level DEBUG_4.
+     * Logs a message with severity level DEBUG_5.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */
     public debug(msg: string): boolean { return this.log(LogLevel.DEBUG_5, msg); }
 
     /**
-     * Logs a message with severity level SILLY_5.
+     * Logs a message with severity level SILLY_6.
      * @param msg - The message to be logged
      * @returns {boolean} Whether the message was logged given current logger settings.
      */

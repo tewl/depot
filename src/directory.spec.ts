@@ -544,6 +544,46 @@ describe("Directory", () => {
             });
 
 
+            it("will read files and subdirectories recursively", (done) => {
+
+                const dirA = new Directory(tmpDir, "dirA");
+                const dirA2 = new Directory(dirA, "dirA2");
+                const fileA = new File(dirA, "a.txt");
+
+                const dirB = new Directory(tmpDir, "dirB");
+                const fileB = new File(dirB, "b.txt");
+
+                const fileC = new File(tmpDir, "c.txt");
+
+                dirA.ensureExistsSync();
+                dirA2.ensureExistsSync();
+                dirB.ensureExistsSync();
+
+                fileA.writeSync("File A");
+                fileB.writeSync("File B");
+                fileC.writeSync("File C");
+
+                tmpDir.contents(true)
+                .then((result: IDirectoryContents) => {
+                    expect(result.subdirs.length).toEqual(3);
+
+                    // Put the subdirectories in a deterministic order.
+                    const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
+                    expect(subdirs[0].toString()).toEqual("tmp/dirA");
+                    expect(subdirs[1].toString()).toEqual("tmp/dirA/dirA2");
+                    expect(subdirs[2].toString()).toEqual("tmp/dirB");
+
+                    expect(result.files.length).toEqual(3);
+                    // Put the files in a deterministic order.
+                    const files = _.sortBy(result.files, (curFile) => curFile.absPath());
+                    expect(files[0].toString()).toEqual("tmp/c.txt");
+                    expect(files[1].toString()).toEqual("tmp/dirA/a.txt");
+                    expect(files[2].toString()).toEqual("tmp/dirB/b.txt");
+                    done();
+                });
+            });
+
+
         });
 
 
@@ -598,64 +638,44 @@ describe("Directory", () => {
                 expect(contents.subdirs[0].toString()).toEqual("tmp/.dotfolder");
             });
 
-        });
 
+            it("will read files and subdirectories recursively", () => {
 
-        describe("files()", () => {
-
-
-            beforeEach(() => {
-                tmpDir.emptySync();
-            });
-
-
-            it("will read the files within a single directory", (done) => {
                 const dirA = new Directory(tmpDir, "dirA");
+                const dirA2 = new Directory(dirA, "dirA2");
                 const fileA = new File(dirA, "a.txt");
 
-                const dirB = new Directory(dirA, "dirB");
+                const dirB = new Directory(tmpDir, "dirB");
                 const fileB = new File(dirB, "b.txt");
 
-                dirA.ensureExistsSync();
-                dirB.ensureExistsSync();
-                fileA.writeSync("file a contents");
-                fileB.writeSync("file b contents");
-
-                dirA.files(false)
-                .then((files) => {
-                    expect(files.length).toEqual(1);
-                    expect(files[0].fileName).toEqual("a.txt");
-                    done();
-                });
-            });
-
-
-            it("will read the files within a directory recursively", (done) => {
-                const dirA = new Directory(tmpDir, "dirA");
-                const fileA = new File(dirA, "a.txt");
-
-                const dirB = new Directory(dirA, "dirB");
-                const fileB = new File(dirB, "b.txt");
-
-                const dirC = new Directory(dirB, "dirC");
-                const fileC = new File(dirC, "c.txt");
+                const fileC = new File(tmpDir, "c.txt");
 
                 dirA.ensureExistsSync();
+                dirA2.ensureExistsSync();
                 dirB.ensureExistsSync();
-                dirC.ensureExistsSync();
-                fileA.writeSync("file a contents");
-                fileB.writeSync("file b contents");
-                fileC.writeSync("file c contents");
 
-                dirA.files(true)
-                .then((files) => {
-                    expect(files.length).toEqual(3);
-                    expect(files[0].fileName).toEqual("a.txt");
-                    expect(files[1].fileName).toEqual("b.txt");
-                    expect(files[2].fileName).toEqual("c.txt");
-                    done();
-                });
+                fileA.writeSync("File A");
+                fileB.writeSync("File B");
+                fileC.writeSync("File C");
+
+                const result = tmpDir.contentsSync(true);
+                expect(result.subdirs.length).toEqual(3);
+
+                // Put the subdirectories in a deterministic order.
+                const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
+                expect(subdirs[0].toString()).toEqual("tmp/dirA");
+                expect(subdirs[1].toString()).toEqual("tmp/dirA/dirA2");
+                expect(subdirs[2].toString()).toEqual("tmp/dirB");
+
+                expect(result.files.length).toEqual(3);
+                // Put the files in a deterministic order.
+                const files = _.sortBy(result.files, (curFile) => curFile.absPath());
+                expect(files[0].toString()).toEqual("tmp/c.txt");
+                expect(files[1].toString()).toEqual("tmp/dirA/a.txt");
+                expect(files[2].toString()).toEqual("tmp/dirB/b.txt");
+
             });
+
 
         });
 

@@ -366,11 +366,12 @@ export class Directory
 
     /**
      * Reads the contents of this directory.
+     * @param recursive - Whether to find subdirectories and files recursively
      * @return The contents of the directory, separated into a list of files and
      * a list of subdirectories.  All returned paths are relative to this
      * directory.
      */
-    public contents(): Promise<IDirectoryContents>
+    public contents(recursive: boolean = false): Promise<IDirectoryContents>
     {
         const parentDirPath = this.toString();
 
@@ -397,16 +398,35 @@ export class Directory
             .then(() => {
                 return contents;
             });
+        })
+        .then((contents: IDirectoryContents) => {
+            if (!recursive) {
+                return contents;
+            }
+
+            // Get the contents of each subdirectory.
+            return BBPromise.all<IDirectoryContents>(_.map(contents.subdirs, (curSubdir) => curSubdir.contents(true)))
+            .then((subdirContents: Array<IDirectoryContents>) => {
+                // Put the contents of each subdirectory into the returned
+                // `contents` object.
+                for (const curContents of subdirContents) {
+                    contents.subdirs = _.concat(contents.subdirs, curContents.subdirs);
+                    contents.files = _.concat(contents.files, curContents.files);
+                }
+
+                return contents;
+            });
         });
     }
 
 
     /**
      * Reads the contents of this directory.
+     * @param recursive - Whether to find subdirectories and files recursively
      * @return The contents of the directory, separated into a list of files and a
      * list of subdirectories.  All paths returned are absolute paths.
      */
-    public contentsSync(): IDirectoryContents
+    public contentsSync(recursive: boolean = false): IDirectoryContents
     {
         const parentDirPath = this.toString();
 
@@ -428,40 +448,15 @@ export class Directory
             }
         });
 
-        return contents;
-    }
-
-
-    /**
-     * Enumerates the files in this Directory
-     * @param recursive - If true, files in all subdirectories will be returned
-     * @return A Promise that is resolved with an array of File objects
-     * representing the files in this directory.
-     */
-    public files(recursive: boolean): Promise<Array<File>>
-    {
-        return this.contents()
-        .then((contents) => {
-            let allFiles: Array<File> = contents.files;
-
-            let subdirsPromise: Promise<Array<Array<File>>> = BBPromise.resolve([[]]);
-
-            // If we need to recurse into the subdirectories, then do it.
-            if (recursive && contents.subdirs && contents.subdirs.length > 0) {
-                const promises = _.map(contents.subdirs, (curSubdir) => {
-                    return curSubdir.files(true);
-                });
-                subdirsPromise = BBPromise.all(promises);
-            }
-
-            return subdirsPromise
-            .then((subdirResults) => {
-                const subdirFiles = _.flatten(subdirResults);
-                allFiles = _.concat(allFiles, subdirFiles);
-                return allFiles;
+        if (recursive) {
+            contents.subdirs.forEach((curSubdir) => {
+                const subdirContents = curSubdir.contentsSync(true);
+                contents.subdirs = _.concat(contents.subdirs, subdirContents.subdirs);
+                contents.files   = _.concat(contents.files,   subdirContents.files);
             });
+        }
 
-        });
+        return contents;
     }
 
 

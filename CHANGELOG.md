@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Added logger ability to log additional parameters.
 
+### Changed
+- Enhanced `selectAvailableTcpPort()` to discard invalid port numbers.
+
 
 ## [v2.0.0] 2019-03-12
 ### Added

@@ -87,6 +87,9 @@ export function getAvailableTcpPort(): Promise<number>
  */
 export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promise<number>
 {
+    // Remove any preferred ports that we know cannot be used.
+    preferredPorts = _.remove(preferredPorts, (curPort) => curPort === 0);
+
     return _.reduce<number, Promise<number>>(
         [...preferredPorts, 0],
         (acc, curPort) => {

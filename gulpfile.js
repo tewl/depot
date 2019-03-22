@@ -8,6 +8,7 @@ const del = require("del");
 const _ = require("lodash");
 const spawn = require("./src/spawn").spawn;
 const Deferred = require("./src/deferred").Deferred;
+const toGulpError = require("./src/gulpHelpers").toGulpError;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,30 +118,30 @@ function runUnitTests() {
 
 gulp.task("build", () => {
 
-    let errorsEncountered = false;
+    let firstError;
 
     return clean()
     .then(() => {
         return runTslint(true);
     })
-    .catch(() => {
-        errorsEncountered = true;
+    .catch((err) => {
+        firstError = firstError || err;
     })
     .then(() => {
         return runUnitTests();
     })
-    .catch(() => {
-        errorsEncountered = true;
+    .catch((err) => {
+        firstError = firstError || err;
     })
     .then(() => {
         return compileTypeScript();
     })
-    .catch(() => {
-        errorsEncountered = true;
+    .catch((err) => {
+        firstError = firstError || err;
     })
     .then(() => {
-        if (errorsEncountered) {
-            throw "Errors encountered.";
+        if (firstError) {
+            throw toGulpError(firstError);
         }
     });
 

@@ -201,6 +201,43 @@ describe("TaskQueue", () => {
     });
 
 
+    it("will not emit a drained event if the last task's fulfillment handler enqueues more work", (done) => {
+
+        // Setup a TaskQueue and a means to tell whether the "drained" event has
+        // been emitted.
+        const queue = new TaskQueue(1);
+        let numDrainedEvents = 0;
+        queue.on(TaskQueue.EVENT_DRAINED, () => {
+            numDrainedEvents++;
+        });
+
+        const task1 = createTimerTask(200, undefined);
+        const task2 = createTimerTask(200, undefined);
+
+        queue.push(task1)
+        .then(() => {
+            // When queued work is done (as it is here), the client should
+            // always be given the opportunity to enqueue more work.  In this
+            // case, the queue is never "drained".
+            expect(numDrainedEvents).toEqual(0);
+            return queue.push(task2);
+        })
+        .then(() => {
+            // When queued work is done (as it is here), the client should
+            // always be given the opportunity to enqueue more work.  In this
+            // case, the queue is never "drained".
+            expect(numDrainedEvents).toEqual(0);
+
+            // In this case, we are not enqueuing more work.
+        })
+        .then(() => {
+            expect(numDrainedEvents).toEqual(1);
+            done();
+        });
+
+    });
+
+
     it("drain() will return a Promise that is fulfilled when the TaskQueue is emptied", (done) => {
         const queue = new TaskQueue(1);
         let numDrainedEvents: number = 0;

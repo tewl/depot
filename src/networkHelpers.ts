@@ -98,3 +98,49 @@ export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promis
         BBPromise.reject(undefined)
     );
 }
+
+
+export interface IPortConfig
+{
+    requiredPort?: number;
+    preferredPort?: number;
+}
+
+
+/**
+ * Determines a TCP port that a server can run at.
+ * @param portConfig - Object describing the port requirements/preferences
+ * @return A promise that resolves with an available TCP port number.  The
+ * promise rejects if the caller specified a required port number that is
+ * not available.
+ */
+export function determinePort(portConfig?: IPortConfig): Promise<number>
+{
+    portConfig = portConfig || {};
+
+    return BBPromise.resolve()
+    .then(() => {
+        if (!(portConfig!.requiredPort)) {
+            // There is no required port.  Yield 0.
+            return 0;
+        }
+
+        // There is a required port.  If it is available, use it.  Otherwise
+        // reject.
+        return isTcpPortAvailable(portConfig!.requiredPort!)
+        .then((isAvailable) => {
+            if (isAvailable) { return portConfig!.requiredPort; }
+            throw new Error(`Required port ${portConfig!.requiredPort} is not available.`);
+        });
+    })
+    .then((port) => {
+        // If we have decided on a port, use it.
+        if (port) {
+            return port;
+        }
+
+        // If the client specified a preferred port, try to use that.
+        // If not available, select a random one.
+        return selectAvailableTcpPort(portConfig!.preferredPort || 0);
+    });
+}

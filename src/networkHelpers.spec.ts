@@ -1,7 +1,37 @@
 import * as net from "net";
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
-import {getExternalIpv4Addresses, isTcpPortAvailable, getAvailableTcpPort, selectAvailableTcpPort} from "./networkHelpers";
+import {
+    getExternalIpv4Addresses, isTcpPortAvailable, getAvailableTcpPort,
+    selectAvailableTcpPort, determinePort} from "./networkHelpers";
+
+
+interface IServerInfo {
+    server: net.Server;
+    port: number;
+}
+
+// A helper function to start a server.
+function startServerAtFirstAvailablePort(): Promise<IServerInfo> {
+    return new BBPromise<IServerInfo>((resolve, reject) => {
+        const server = net.createServer();
+        server.unref();    // So the server will not prevent the process from exiting
+        server.on("error", reject);
+        server.listen({port: 0}, () => {
+            const {port} = server.address();
+            resolve({server, port});
+        });
+    });
+}
+
+// A helper function to shutdown a running server.
+function shutdownServer(server: net.Server): Promise<void> {
+    return new BBPromise((resolve) => {
+        server.close(() => {
+            resolve();
+        });
+    });
+}
 
 
 describe("getExternalIpv4Addresses()", () => {
@@ -59,33 +89,6 @@ describe("getAvailableTcpPort()", () => {
 
 describe("selectAvailableTcpPort()", () => {
 
-    interface IServerInfo {
-        server: net.Server;
-        port: number;
-    }
-
-    // A helper function to start a server.
-    function startServerAtFirstAvailablePort(): Promise<IServerInfo> {
-        return new BBPromise<IServerInfo>((resolve, reject) => {
-            const server = net.createServer();
-            server.unref();
-            server.on("error", reject);
-            server.listen({port: 0}, () => {
-                const {port} = server.address();
-                resolve({server, port});
-            });
-        });
-    }
-
-    // A helper function to shutdown a running server.
-    function shutdownServer(server: net.Server): Promise<void> {
-        return new BBPromise((resolve) => {
-            server.close(() => {
-                resolve();
-            });
-        });
-    }
-
 
     it("will select a preferred port when it is not in use", async () => {
         const serverInfo1 = await startServerAtFirstAvailablePort();
@@ -121,6 +124,53 @@ describe("selectAvailableTcpPort()", () => {
 
         await BBPromise.all([shutdownServer(serverInfo1.server),
                              shutdownServer(serverInfo2.server)]);
+    });
+
+
+});
+
+
+describe("determinePort()", () => {
+
+
+    it("rejects when a required port is specified and it is not available", async () => {
+        const server = await startServerAtFirstAvailablePort();
+
+        try {
+            await determinePort({requiredPort: server.port});
+            fail("The above line should have rejected.");
+        }
+        catch (err) {
+            expect(err.message).toMatch(/Required port .* is not available./);
+        }
+    });
+
+
+    it("resolves with a required port when it is available", async () => {
+        const availablePort = await selectAvailableTcpPort();
+        const port = await determinePort({requiredPort: availablePort});
+        expect(port).toEqual(availablePort);
+    });
+
+
+    it("resolves with the preferred port when it is available", async () => {
+        const availablePort = await selectAvailableTcpPort();
+        const port = await determinePort({preferredPort: availablePort});
+        expect(port).toEqual(availablePort);
+    });
+
+
+    it("resolves with a free port when the preferred one is not available", async () => {
+        const server = await startServerAtFirstAvailablePort();
+
+        try {
+            const port = await determinePort({preferredPort: server.port});
+            expect(port).not.toEqual(server.port);
+            expect(port).toBeGreaterThan(0);
+        }
+        catch (err) {
+            fail("The promise should not have rejected.");
+        }
     });
 
 

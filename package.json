@@ -60,7 +60,6 @@
     "@types/jasmine": "2.8.15",
     "@types/lodash": "4.14.104",
     "@types/node": "9.4.6",
-    "@types/request-promise": "4.1.42",
     "@types/semver": "5.5.0",
     "@types/url-join": "4.0.0",
     "@types/url-parse": "1.4.3",
@@ -77,6 +76,8 @@
     "typescript": "2.9.2"
   },
   "dependencies": {
+    "@types/express": "4.16.1",
+    "@types/request-promise": "4.1.42",
     "bluebird": "3.5.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.5",

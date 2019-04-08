@@ -1,5 +1,7 @@
 import * as request from "request-promise";
 
+export type RequestType = typeof request;   // Does this work?
+
 /*
  * Note:
  * The request-promise library is a `devDependency`, because this library does

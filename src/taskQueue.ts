@@ -151,14 +151,19 @@ export class TaskQueue extends EventEmitter
             this._isProcessingLastFulfillment = false;
         }
 
-        if (this._tasks.length === 0) {
+        if (this._tasks.length === 0 && this._numRunning === 0) {
             // The queue of tasks is empty.  Assume that we are running the last
             // fulfillment handler and wait one more tick to see if any new
             // tasks get enqueued.  If the last fulfillment handler enqueues a
             // new task, this_isProcessingLastFulfillment will be set to false.
             this._isProcessingLastFulfillment = true;
-            process.nextTick(() => {
+            // console.log("Looks like we might be done.  Waiting 1 tick.");
+
+            BBPromise.resolve()
+            .then(() => {
                 if (this._isProcessingLastFulfillment) {
+                    // console.log(`We are done and _numRunning is ${this._numRunning}`);
+
                     // We waited one more tick and no new tasks have been
                     // enqueued.  It is safe to say that this queue is now
                     // drained.

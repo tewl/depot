@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Added logger ability to log additional parameters.
 
+### Fixed
+- Fixed a bug in `TaskQueue` in which the drained event was being fired before
+  fulfillment handlers were given a chance to enqueue more work.
+
 ### Changed
 - Enhanced `selectAvailableTcpPort()` to discard invalid port numbers.
 

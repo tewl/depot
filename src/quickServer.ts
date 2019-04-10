@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import * as http from "http";
+import * as net from "net";
 import * as express from "express";
 import {getExternalIpv4Addresses} from "./networkHelpers";
 import {RequestType} from "./requestHelpers";
@@ -21,6 +22,7 @@ export class QuickServer
     private readonly _port: number;
     private readonly _expressApp: express.Express;
     private          _server:  http.Server | undefined;
+    private          _connections: {[remoteAddrAndPort: string]: net.Socket} = {};
     // endregion
 
 
@@ -48,6 +50,16 @@ export class QuickServer
     public get express(): express.Express
     {
         return this._expressApp;
+    }
+
+
+    /**
+     * Gets the wrapped HTTP server.  undefined is returned if there is no
+     * server (i.e. listen() has not been called).
+     */
+    public get server(): http.Server | undefined
+    {
+        return this._server;
     }
 
 
@@ -113,6 +125,14 @@ export class QuickServer
                     this._server!.unref();
                 }
 
+                this._server!.on("connection", (conn) => {
+                    const key = `${conn.remoteAddress}:${conn.remotePort}`;
+                    this._connections[key] = conn;
+                    conn.on("close", () => {
+                        delete this._connections[key];
+                    });
+                });
+
                 // The server is now running.
                 resolve();
             });
@@ -121,13 +141,17 @@ export class QuickServer
 
 
     /**
-     * Closes this server from listening on its port.  No new connection will be
-     * accepted, but existing ones will remain open until they close naturally.
+     * Stops this server from listening on its port.  No new connection will be
+     * accepted. , but existing ones will remain open until they close naturally.
+     *
+     * @param force - If false, existing connections will remain and the
+     *     returned promise will not resolve until they close naturally.  If
+     *     true, existing connections will be destroyed.
      *
      * @return A promise that resolves when all existing connection have closed
      * naturally.
      */
-    public close(): Promise<void>
+    public close(force: boolean = false): Promise<void>
     {
         // If this server is already stopped, just resolve.
         if (!this._server) {
@@ -137,8 +161,17 @@ export class QuickServer
         return new BBPromise((resolve) => {
             this._server!.close(() => {
                 this._server = undefined;
+                this._connections = {};
                 resolve();
             });
+
+            // If the caller wants to force this server to close, forcibly
+            // destroy all existing connections.
+            if (force) {
+                _.forOwn(this._connections, (curConn) => {
+                    curConn.destroy();
+                });
+            }
         });
     }
 

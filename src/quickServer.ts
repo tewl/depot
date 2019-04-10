@@ -141,8 +141,7 @@ export class QuickServer
 
 
     /**
-     * Stops this server from listening on its port.  No new connection will be
-     * accepted. , but existing ones will remain open until they close naturally.
+     * Stops this server from listening.  No new connection will be accepted.
      *
      * @param force - If false, existing connections will remain and the
      *     returned promise will not resolve until they close naturally.  If

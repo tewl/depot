@@ -99,7 +99,7 @@ export class QuickServer
      *     to exit if this is the only active server.
      * @return A promise that resolves when this server has started
      */
-    public start(referenced: boolean = true): Promise<void>
+    public listen(referenced: boolean = true): Promise<void>
     {
         // If this server is already started, just resolve.
         if (this._server) {
@@ -121,11 +121,13 @@ export class QuickServer
 
 
     /**
-     * Stops this server from listening on its port
+     * Closes this server from listening on its port.  No new connection will be
+     * accepted, but existing ones will remain open until they close naturally.
      *
-     * @return A promise that resolves when this server has closed
+     * @return A promise that resolves when all existing connection have closed
+     * naturally.
      */
-    public stop(): Promise<void>
+    public close(): Promise<void>
     {
         // If this server is already stopped, just resolve.
         if (!this._server) {

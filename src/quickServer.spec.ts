@@ -36,7 +36,7 @@ describe("QuickServer", () => {
 
         it("can add routes that can be accessed", async () => {
             const server = await DerivedServer.create();
-            await server.start(false);
+            await server.listen(false);
             const res = await server.request.get("/derived");
             expect(res).toEqual("derived");
             expect(numDerivedHandlerInvocations).toEqual(1);

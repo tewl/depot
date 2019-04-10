@@ -39,9 +39,6 @@ export class QuickServer
     {
         this._port       = port;
         this._expressApp = expressApp;
-
-        // A hook for derived classes to add their routes.
-        this.addRoutes();
     }
 
 
@@ -142,21 +139,5 @@ export class QuickServer
             });
         });
     }
-
-
-    /**
-     * A template method for derived classes to mount their own routes.  When
-     * this method is called, derived classes should add routes using
-     * `this.express`.
-     *
-     * @example
-     * this.express.get("/derived", (req, res) => {
-     *     res.status(200).send("derived");
-     * });
-     */
-    protected addRoutes(): void
-    {
-    }
-
 
 }

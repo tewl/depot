@@ -14,24 +14,23 @@ describe("QuickServer", () => {
         class DerivedServer extends QuickServer
         {
 
+
             public static create(portConfig?: IPortConfig): Promise<DerivedServer>
             {
                 return determinePort(portConfig)
                 .then((port) => {
                     const expressApp = express();
                     // expressApp.use(bodyParser.json({limit: "1mb"}));
+                    expressApp.get("/derived", (req, res) => {
+                        numDerivedHandlerInvocations++;
+                        res.status(200).send("derived");
+                    });
+
                     return new DerivedServer(port, expressApp);
                 });
             }
 
 
-            protected addRoutes(): void
-            {
-                this.express.get("/derived", (req, res) => {
-                    numDerivedHandlerInvocations++;
-                    res.status(200).send("derived");
-                });
-            }
         }
 
 

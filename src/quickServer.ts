@@ -23,6 +23,12 @@ export class QuickServer
     private readonly _expressApp: express.Express;
     private          _server:  http.Server | undefined;
     private          _connections: {[remoteAddrAndPort: string]: net.Socket} = {};
+
+    // undefined: The server is not listening/running, so it is neither
+    //            referenced nor unreferenced.
+    // true:      The server is referenced.
+    // false:     The server is not referenced.
+    private          _isReferenced: undefined | boolean;
     // endregion
 
 
@@ -94,6 +100,12 @@ export class QuickServer
     }
 
 
+    public get isReferenced(): undefined | boolean
+    {
+        return this._isReferenced;
+    }
+
+
     /**
      * A request-promise object that can be used to make requests to this
      * server.
@@ -124,7 +136,11 @@ export class QuickServer
                 if (!referenced) {
                     this._server!.unref();
                 }
+                this._isReferenced = referenced;
 
+                // Start tracking the active connections to this server.
+                // This is needed in case we have to destroy them when closing
+                // this server.
                 this._server!.on("connection", (conn) => {
                     const key = `${conn.remoteAddress}:${conn.remotePort}`;
                     this._connections[key] = conn;
@@ -160,6 +176,7 @@ export class QuickServer
         return new BBPromise((resolve) => {
             this._server!.close(() => {
                 this._server = undefined;
+                this._isReferenced = undefined;
                 this._connections = {};
                 resolve();
             });

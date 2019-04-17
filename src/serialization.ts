@@ -47,6 +47,15 @@ export interface ISerializable
 export interface ISerializableStatic
 {
     type: string;
+
+    /**
+     * Deserializes the specified object
+     * @param serialized - The object to be deserialized
+     * @param deserializedSoFar - Other objects that have been deserialized
+     * @return An object containing the deserialized object and any
+     * functions representing additional work that needs to be done to finish
+     * deserializing the object.
+     */
     deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult;
 }
 
@@ -63,6 +72,11 @@ export class SerializationRegistry
     }
 
 
+    /**
+     * Registers a serializable class with this registry.
+     * @param serializableClass - The class to be registered
+     * @return A function that should be called to unregister the class
+     */
     public register(serializableClass: ISerializableStatic): () => void
     {
         if (_.includes(this._registered, serializableClass)) {
@@ -71,6 +85,7 @@ export class SerializationRegistry
 
         this._registered.push(serializableClass);
 
+        // Return a function that will be used to unregister.
         return () => {
             // Remove all registrations of the class that was registered.
             _.pull(this._registered, serializableClass);
@@ -78,6 +93,15 @@ export class SerializationRegistry
     }
 
 
+    /**
+     * Fully deserializes the specified objects, performing any necessary
+     * additional work needed.
+     * @param serialized - Array of serialized objects to be deserialized
+     * @return An array or the corresponding deserialized objects.  The length
+     *   and order of this array will match that of `serialized`.
+     *   This method will throw if any of the serialized objects is of an
+     *   unregistered type.
+     */
     public deserialize(serialized: Array<ISerialized>): Array<ISerializable>
     {
         const bizObjects: Array<ISerializable> = [];

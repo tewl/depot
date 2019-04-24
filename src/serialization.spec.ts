@@ -2,11 +2,16 @@ import * as _ from "lodash";
 import {Directory} from "./directory";
 import {PersistentCache} from "./persistentCache";
 import {
-    PersistentCacheSerializationRegistry,
     ISerializable,
     ISerializableMap,
     IDeserializeResult,
-    ISerialized, ISerializeResult, idString, WorkFunc, createId
+    ISerialized,
+    ISerializeResult,
+    idString,
+    WorkFunc,
+    createId,
+    SerializationRegistry,
+    PersistentCacheStore
 } from "./serialization";
 
 
@@ -298,9 +303,12 @@ describe("PersistentCacheSerializationRegistry", async () => {
 
             // An IIFE to save the data.
             await (async () => {
+                const registry = new SerializationRegistry();
+                registry.register(Person);
+                registry.register(Model);
+
                 const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
-                const registry = new PersistentCacheSerializationRegistry();
-                // TODO: Separate the registry from the serializers.
+                const store = await PersistentCacheStore.create(registry, cache);
 
                 const aerys = Person.create("Aerys", "Targaryen");
                 const rhaella = Person.create("Rhaella", "Targaryen");
@@ -317,27 +325,29 @@ describe("PersistentCacheSerializationRegistry", async () => {
                 const model = Model.create();
                 model.rootPerson = john;
 
-                await registry.serialize(cache, model);
+                await store.save(model);
             })();
 
             // An IIFE to load the data.
             await (async () => {
-                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
-                const registry = new PersistentCacheSerializationRegistry();
+                const registry = new SerializationRegistry();
                 registry.register(Person);
                 registry.register(Model);
 
-                const modelIds = await registry.getIds(cache, /^model/);
+                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
+                const store = await PersistentCacheStore.create(registry, cache);
+
+                const modelIds = await store.getIds(/^model/);
                 if (modelIds.length === 0) {
                     fail("Unable to find model in persistent cache.");
                 }
                 const modelId = modelIds[0];
 
-                const deserializeResult = await registry.deserialize<Model>(cache, modelId);
+                const loadResult = await store.load<Model>(modelId);
                 // There should have been 6 objects created in total:
                 // the model, John, Lyanna, Rhaegar, Rhaella, Aerys.
-                expect(Object.keys(deserializeResult.allDeserialized).length).toEqual(6);
-                const model: Model = deserializeResult.deserialized;
+                expect(Object.keys(loadResult.allDeserialized).length).toEqual(6);
+                const model: Model = loadResult.deserialized;
                 expect(model.rootPerson!.firstName).toEqual("John");
                 expect(model.rootPerson!.mother!.firstName).toEqual("Lyanna");
                 expect(model.rootPerson!.father!.firstName).toEqual("Rhaegar");

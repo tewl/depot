@@ -1,6 +1,8 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {promiseWhile, sequence} from "./promiseHelpers";
+import {PersistentCache} from "./persistentCache";
+import {generateUuid} from "./uuid";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +57,10 @@ export interface ISerializableStatic
 {
     type: string;
 
+    // TODO: Remove the deserializedSoFar parameter from the following
+    //   signature.  We can just add that parameter to the completion function
+    //   signature since that is where most classes will want to use it anyway.
+
     /**
      * Deserializes the specified object
      * @param serialized - The object to be deserialized
@@ -80,106 +86,117 @@ export interface ISerializable
     serialize(): ISerializeResult;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Registry Interfaces
-////////////////////////////////////////////////////////////////////////////////
-
-export interface IRegistryDeserializeResult<T extends ISerializable>
-{
-    // The requested deserialized object.
-    deserialized: T;
-    // All of the objects that were deserialized.
-    allDeserialized: ISerializableMap;
-}
-
-export interface ISerializationRegistry
-{
-
-    /**
-     * Gets the number of registered classes.
-     */
-    numRegisteredClasses: number;
-
-    /**
-     * Registers a serializable class with this registry.
-     * @param serializableClass - The class to be registered
-     * @return A function that can be called to unregister the class.  This
-     *   method will throw an Error if the specified class has already been
-     *   registered.
-     */
-    register(serializableClass: ISerializableStatic): () => void;
-
-    // TODO: Clean up the following.
-
-    // When asking a serialization registry to deserialize an object:
-    // - we will have just an id, not a serialized form of the object (for
-    //   example, an id of "myAppModelRoot").
-    // - we should get back the requested object as well as a map of all
-    //   deserialized objects.
-    // deserialize(id: string): Promise<IRegistryDeserializeResult>;
-
-    // serialize(obj: ISerializable): Promise<void>;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
-// Registry Implementations
+// SerializationRegistry
 ////////////////////////////////////////////////////////////////////////////////
-
-import {PersistentCache} from "./persistentCache";
-import {generateUuid} from "./uuid";
-
 
 // tslint:disable-next-line: max-classes-per-file
-export class PersistentCacheSerializationRegistry implements ISerializationRegistry
+export class SerializationRegistry
 {
-
     // region Instance Data Members
-    private readonly _registeredClasses: Array<ISerializableStatic> = [];
+
+    // A map of registered classes.  The key is the type string and the value is
+    // the class.
+    private readonly _registeredClasses: {[type: string]: ISerializableStatic};
+
     // endregion
 
 
     public constructor()
     {
+        this._registeredClasses = {};
     }
 
-
-    // region ISerializationRegistry
 
     public get numRegisteredClasses(): number
     {
-        return this._registeredClasses.length;
+        return _.keys(this._registeredClasses).length;
     }
 
+
+    /**
+     * Registers a class as one whose instances can be serialized and
+     * deserialized
+     * @param serializableClass - The class to register
+     * @return A function that can be called to unregister
+     */
     public register(serializableClass: ISerializableStatic): () => void
     {
-        if (_.includes(this._registeredClasses, serializableClass)) {
-            throw new Error("Serializable class already registered");
+        if (this._registeredClasses[serializableClass.type] !== undefined) {
+            throw new Error(`Serializable class already registered for type "${serializableClass.type}".`);
         }
 
-        this._registeredClasses.push(serializableClass);
+        this._registeredClasses[serializableClass.type] = serializableClass;
 
         // Return a function that can be used to unregister.
         return () => {
-            // Remove all registrations of the registered class.
-            _.pull(this._registeredClasses, serializableClass);
+            // Remove the class from the container of registered classes.
+            delete this._registeredClasses[serializableClass.type];
         };
     }
 
 
-    // TODO: Get rid of the persistentCache parameter below once it is passed
-    //   into the c'tor.
-    public async getIds(persistentCache: PersistentCache<ISerialized>, regexp: RegExp): Promise<Array<idString>>
+    /**
+     * Gets the class that has been registered for the specified type
+     * @param type - The type string
+     * @return The class associated with the specified type string
+     */
+    public getClass(type: string): undefined | ISerializableStatic
     {
-        const ids = await persistentCache.keys();
-        return _.filter(ids, (curId) => regexp.test(curId));
+        return this._registeredClasses[type];
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Store Interfaces
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: Define the following more specifically.  Possibly add generic type to this class to define specific stow type
+type IStow = object;
+
+export interface IStoreGetResult
+{
+    serialized: ISerialized;
+    stow: IStow;
+}
+
+
+export interface IStorePutResult
+{
+    stow: IStow;
+}
+
+
+// TODO: Rename this to something like "ILoadResult"
+export interface IRegistryDeserializeResult<T extends ISerializable>
+{
+    // The requested deserialized object.
+    deserialized: T;
+
+    // TODO: Rename this to something like "allObjects"
+    // All of the objects that were deserialized.
+    allDeserialized: ISerializableMap;
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export abstract class AStore
+{
+    // region Data Members
+    protected readonly _registry: SerializationRegistry;
+    // endregion
+
+
+    protected constructor(registry: SerializationRegistry)
+    {
+        this._registry = registry;
     }
 
+    public abstract getIds(regexp?: RegExp): Promise<Array<idString>>;
 
-    public async deserialize<T extends ISerializable>(
-        persistentCache: PersistentCache<ISerialized>,
-        id: string
-    ): Promise<IRegistryDeserializeResult<T>>
+
+    public async load<T extends ISerializable>(id: idString): Promise<IRegistryDeserializeResult<T>>
     {
         // An object that keeps track of all objects deserialized so far.
         // The key is the id and the value is the deserialized result.
@@ -189,7 +206,7 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
         const completionFuncs: Array<WorkFunc> = [];
 
         // First pass:  Recursively deserialize all objects.
-        const deserialized = await this.doFirstPassDeserialize(id, deserializedSoFar, completionFuncs, persistentCache);
+        const deserialized = await this.doFirstPassDeserialize(id, deserializedSoFar, completionFuncs);
 
         // Second pass:  Run all completion functions so that each object can
         // set its references to other objects.
@@ -206,7 +223,8 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
         };
     }
 
-    public async serialize(persistentCache: PersistentCache<ISerialized>, obj: ISerializable): Promise<void>
+
+    public async save(obj: ISerializable): Promise<void>
     {
         const alreadySerialized: ISerializableMap = {};
         const needToSerialize: Array<ISerializable> = [obj];
@@ -216,37 +234,43 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
             async () => {
                 const curObj = needToSerialize.shift()!;
 
+                // FUTURE: As a sanity check, we should make sure the
+                //   curObj.constructor.type has been registered with
+                //   this._registry.  Even though we don't need the registry to
+                //   save the object, we will need it when loading it.  This
+                //   could catch errors where a new type of object is created
+                //   and is used in the object graph, but the developer forgets
+                //   to register it, resulting in a saved file that cannot be
+                //   loaded.
+
                 // Check to see if the object has already been serialized.  If
                 // so, do nothing.
                 if (alreadySerialized[curObj.id] !== undefined) {
                     return;
                 }
 
-                // TODO: Replace the following curObj.serialize() call with one
-                //   to a helper method that will perform pre- and post
-                //   processing.  For example:
-                //     - after calling curObj.serialized():
-                //       - transform serialized form into store-specific form
-                //         - id --> _id
-                //         - curObj stowed props --> store-specific properties
-                //       - write the document
-                //       - stow new _rev back onto curObj
                 const serializeResult = curObj.serialize();
-                const putPromise = persistentCache.put(curObj.id, serializeResult.serialized);
+
+                const putPromise = this.put(serializeResult.serialized);
 
                 // If other objects need to be serialized, queue them up.
                 while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0) {
                     needToSerialize.push(serializeResult.othersToSerialize.shift()!);
                 }
 
-                await putPromise;
+                const putResult = await putPromise;
+
+                // MUST: Put the contents of putResult.stow back onto the object.
 
             }
         );
 
 
     }
-    // endregion
+
+    protected abstract get(id: idString): Promise<IStoreGetResult>;
+
+    protected abstract put(serialized: ISerialized): Promise<IStorePutResult>;
 
 
     /**
@@ -259,14 +283,12 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
      * @param deserializedSoFar - A map of all objects deserialized thus far
      * @param completionFuncs - Additional work that needs to be done to set
      *   inter-object cross references.
-     * @param persistentCache - The store data is being read from
-     * @return description
+     * @return The results of the first pass deserialization
      */
     private async doFirstPassDeserialize(
         id: string,
         deserializedSoFar: ISerializableMap,
-        completionFuncs: Array<WorkFunc>,
-        persistentCache: PersistentCache<ISerialized>
+        completionFuncs: Array<WorkFunc>
     ): Promise<ISerializable>
     {
         // If the id being requested already appears in the dictionary of object
@@ -276,22 +298,15 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
             return deserializedSoFar[id];
         }
 
-        const serialized: ISerialized = await persistentCache.get(id);
+        // TODO: Apply the stowed data that is returned from the following get().
+        const getResult: IStoreGetResult = await this.get(id);
+        const serialized = getResult.serialized;
 
-        const foundClass = _.find(this._registeredClasses, (curRegisteredClass) => curRegisteredClass.type === serialized.type);
+        const foundClass = this._registry.getClass(serialized.type);
         if (!foundClass) {
             throw new Error(`No class registered for type "${serialized.type}".`);
         }
 
-        // TODO: Replace the following foundClass.deserialize() call with one to
-        //   another helper method that will perform necessary pre- and
-        //   post-processing (e.g.:
-        //     - before calling through to foundClass.deserialize:
-        //       - transform stored document into pre-deserialize form
-        //         - _id --> id
-        //     - after calling through to foundClass.deserialize:
-        //       - stow store-specific properties on object
-        //         - _rev
         const deserializeResult = foundClass.deserialize(serialized, deserializedSoFar);
 
         // The object that will eventually be returned.
@@ -316,7 +331,7 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
             // references that point to the same object.
             const tasks = _.map(deserializeResult.neededIds, (curNeededId) => {
                 return async () => {
-                    return this.doFirstPassDeserialize(curNeededId, deserializedSoFar, completionFuncs, persistentCache);
+                    return this.doFirstPassDeserialize(curNeededId, deserializedSoFar, completionFuncs);
                 };
             });
 
@@ -329,4 +344,80 @@ export class PersistentCacheSerializationRegistry implements ISerializationRegis
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Store Implementations
+////////////////////////////////////////////////////////////////////////////////
 
+
+// tslint:disable-next-line: max-classes-per-file
+export class PersistentCacheStore extends AStore
+{
+    public static create(registry: SerializationRegistry, persistentCache: PersistentCache<ISerialized>): Promise<PersistentCacheStore>
+    {
+        const instance = new PersistentCacheStore(registry, persistentCache);
+        return BBPromise.resolve(instance);
+    }
+
+
+    // region Data Members
+    private _pcache: PersistentCache<ISerialized>;
+    // endregion
+
+
+    private constructor(registry: SerializationRegistry, pcache: PersistentCache<ISerialized>)
+    {
+        super(registry);
+        this._pcache = pcache;
+    }
+
+
+    public async getIds(regexp?: RegExp): Promise<Array<idString>>
+    {
+        let ids: Array<idString> = await this._pcache.keys();
+        if (regexp === undefined) {
+            return ids;
+        }
+
+        // A regular express has been specified, so filter for the ids that
+        // match.
+        ids = _.filter(ids, (curId) => regexp.test(curId));
+        return ids;
+    }
+
+
+    protected async get(id: idString): Promise<IStoreGetResult>
+    {
+        // Read the specified data from the backing store.
+        const serialized = await this._pcache.get(id);
+
+        // Transform the backing store's representation into an ISerialized.
+        // For example, for PouchDB we should move `_id` to `id`.
+        // This is not needed for PersistentCache, because it stores the data as
+        // an ISerialized.
+
+        // There is no stowed data for PersistentCache.
+        const stow = {};
+
+        return {serialized, stow};
+    }
+
+
+    protected async put(serialized: ISerialized): Promise<IStorePutResult>
+    {
+        // Transform `serialized` into the backing store's representation.
+        // For example, for PouchDB we should:
+        //   - move `id` to `_id`
+        //   - move needed stowed properties into the backing store's
+        //     representation
+        // This is not needed for PersistentCache, because it stores the data as
+        // an ISerialized.
+
+        // Write the data to the backing store.
+        await this._pcache.put(serialized.id, serialized);
+
+        // Return data that needs to be stowed on the object for future use.
+        // For example, for PouchDB, we need the updated _rev to be stowed.
+        // This is not needed for PersistentCache.
+        return {stow: {}};
+    }
+}

@@ -196,7 +196,7 @@ export interface IStorePutResult<StowType>
 
 
 // TODO: Rename this to something like "ILoadResult"
-export interface IRegistryDeserializeResult<T extends ISerializable>
+export interface ILoadResult<T extends ISerializable>
 {
     // The requested deserialized object.
     deserialized: T;
@@ -221,7 +221,7 @@ export abstract class AStore<StowType>
     public abstract getIds(regexp?: RegExp): Promise<Array<idString>>;
 
 
-    public async load<T extends ISerializable>(id: idString): Promise<IRegistryDeserializeResult<T>>
+    public async load<T extends ISerializable>(id: idString): Promise<ILoadResult<T>>
     {
         // An object that keeps track of all objects deserialized so far.
         // The key is the id and the value is the deserialized result.

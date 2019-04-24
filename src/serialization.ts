@@ -195,7 +195,6 @@ export interface IStorePutResult<StowType>
 }
 
 
-// TODO: Rename this to something like "ILoadResult"
 export interface ILoadResult<T extends ISerializable>
 {
     // The requested deserialized object.

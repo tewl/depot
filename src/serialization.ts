@@ -105,14 +105,17 @@ export function isISerializable(obj: any): obj is ISerializable
 }
 
 
-export interface ISerializableWithStow extends ISerializable
+export interface ISerializableWithStow<StowType> extends ISerializable
 {
-    __stow: object;
+    __stow: StowType;
 }
 
-export function isISerializableWithStow(obj: any): obj is ISerializableWithStow
+export function isISerializableWithStow<StowType>(obj: any): obj is ISerializableWithStow<StowType>
 {
     return isISerializable(obj) &&
+           // The following is pretty bogus.  Just because __stow is not
+           // undefined does not mean that it is StowType.  Fix this in the
+           // future.
            (obj as any).__stow !== undefined;
 }
 
@@ -275,9 +278,7 @@ export abstract class AStore<StowType>
                 }
 
                 const serializeResult = curObj.serialize();
-                const stow = isISerializableWithStow(obj) ?
-                             (obj.__stow as any) as StowType :
-                             undefined;
+                const stow: undefined | StowType = isISerializableWithStow<StowType>(obj) ? obj.__stow : undefined;
 
                 const putPromise = this.put(serializeResult.serialized, stow);
 
@@ -289,7 +290,9 @@ export abstract class AStore<StowType>
                 // Wait for the put() to complete.
                 const putResult = await putPromise;
 
-                // MUST: Update the stowed properties on obj.
+                // Assign the stowed data back to the original object.
+                const objWithStow = curObj as ISerializableWithStow<StowType>;
+                objWithStow.__stow = putResult.stow;
             }
         );
 
@@ -332,7 +335,6 @@ export abstract class AStore<StowType>
             return deserializedSoFar[id];
         }
 
-        // MUST: Apply the stowed data that is returned from the following get().
         const getResult: IStoreGetResult<StowType> = await this.get(id);
         const serialized = getResult.serialized;
 
@@ -347,15 +349,20 @@ export abstract class AStore<StowType>
         const deserialized: ISerializable = deserializeResult.deserializedObj;
         // Add the object to the map of objects that we have deserialized.
         deserializedSoFar[deserialized.id] = deserialized;
+
+        // Now that we have the real object, apply the stow data.
+        const objWithStow = deserialized as ISerializableWithStow<StowType>;
+        objWithStow.__stow = getResult.stow;
+
         // If needed, update the list of completion functions that need to be run.
         while (deserializeResult.completionFuncs && deserializeResult.completionFuncs.length > 0) {
             const completionFunc = deserializeResult.completionFuncs.shift()!;
             completionFuncs.push(completionFunc);
         }
 
-        // If the deserialized objects has returned references to other objects
-        // that need to be deserialized, recurse and do a first pass
-        // deserialization on those objects as well.
+        // If the deserialized object has returned IDs of other objects that
+        // need to be deserialized, recurse and do a first pass deserialization
+        // on those objects as well.
         if (deserializeResult.neededIds) {
 
             // Create tasks that will do a first pass deserialization on the

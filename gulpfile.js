@@ -57,12 +57,13 @@ gulp.task("tslint", function ()
 
 function runTslint(emitError)
 {
+    console.log("Running TSLint...");
+
     "use strict";
     let tslintArgs = [
         "--project", "./tsconfig.json",
         "--format", "stylish"
     ];
-
 
     // Add the globs defining source files to the list of arguments.
     tslintArgs = tslintArgs.concat(getSrcGlobs(true));
@@ -92,6 +93,8 @@ gulp.task("ut", () => {
 function runUnitTests() {
     const Jasmine = require("jasmine");
     const runJasmine = require("./src/jasmineHelpers").runJasmine;
+
+    console.log("Running unit tests...");
 
     const jasmine = new Jasmine({});
     jasmine.loadConfig(
@@ -154,6 +157,8 @@ gulp.task("build", () => {
 function compileTypeScript() {
     const ts         = require("gulp-typescript");
     const sourcemaps = require("gulp-sourcemaps");
+
+    console.log("Compiling TypeScript...");
 
     // The gulp-typescript package interacts correctly with gulp if you
     // return this outer steam from your task function.  I, however, prefer

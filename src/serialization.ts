@@ -183,13 +183,15 @@ export class SerializationRegistry
 // Store Interfaces
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: Define the following more specifically.  Possibly add generic type to this class to define specific stow type
-type IStow = object;
-
-export interface IStoreGetResult
+export interface IStoreGetResult<StowType>
 {
     serialized: ISerialized;
-    stow: IStow;
+    stow: StowType;
+}
+
+export interface IStorePutResult<StowType>
+{
+    stow: StowType;
 }
 
 
@@ -205,7 +207,7 @@ export interface IRegistryDeserializeResult<T extends ISerializable>
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export abstract class AStore
+export abstract class AStore<StowType>
 {
     // region Data Members
     protected readonly _registry: SerializationRegistry;
@@ -265,7 +267,8 @@ export abstract class AStore
                 //   could catch errors where a new type of object is created
                 //   and is used in the object graph, but the developer forgets
                 //   to register it, resulting in a saved file that cannot be
-                //   loaded.
+                //   loaded.  There should be a unit test to make sure save()
+                //   rejects when one of the objects is not registered.
 
                 // Check to see if the object has already been serialized.  If
                 // so, do nothing.
@@ -274,8 +277,11 @@ export abstract class AStore
                 }
 
                 const serializeResult = curObj.serialize();
+                const stow = isISerializableWithStow(obj) ?
+                             (obj.__stow as any) as StowType :
+                             undefined;
 
-                const putPromise = this.put(curObj, serializeResult.serialized);
+                const putPromise = this.put(serializeResult.serialized, stow);
 
                 // If other objects need to be serialized, queue them up.
                 while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0) {
@@ -283,24 +289,25 @@ export abstract class AStore
                 }
 
                 // Wait for the put() to complete.
-                await putPromise;
+                const putResult = await putPromise;
+
+                // MUST: Update the stowed properties on obj.
             }
         );
 
 
     }
 
-    protected abstract get(id: idString): Promise<IStoreGetResult>;
+    protected abstract get(id: idString): Promise<IStoreGetResult<StowType>>;
 
     /**
      * Writes the specified object to the backing store and updates obj's stowed
      * properties.
-     * @param obj - The object that is being stored.  Provided so that stowed
-     *   properties can be assigned.
-     * @param serialized - The serialized form of `obj`.
+     * @param serialized - The serialized form the object to be stored.
+     * @param stow - The stowed properties associated with the original object
      * @return description
      */
-    protected abstract put(obj: ISerializable, serialized: ISerialized): Promise<void>;
+    protected abstract put(serialized: ISerialized, stow: undefined | StowType): Promise<IStorePutResult<StowType>>;
 
 
     /**
@@ -328,8 +335,8 @@ export abstract class AStore
             return deserializedSoFar[id];
         }
 
-        // TODO: Apply the stowed data that is returned from the following get().
-        const getResult: IStoreGetResult = await this.get(id);
+        // MUST: Apply the stowed data that is returned from the following get().
+        const getResult: IStoreGetResult<StowType> = await this.get(id);
         const serialized = getResult.serialized;
 
         const foundClass = this._registry.getClass(serialized.type);
@@ -378,10 +385,16 @@ export abstract class AStore
 // Store Implementations
 ////////////////////////////////////////////////////////////////////////////////
 
+// tslint:disable-next-line:no-empty-interface
+interface IPersistentCacheStow
+{
+}
+
 
 // tslint:disable-next-line: max-classes-per-file
-export class PersistentCacheStore extends AStore
+export class PersistentCacheStore extends AStore<IPersistentCacheStow>
 {
+
     public static create(registry: SerializationRegistry, persistentCache: PersistentCache<ISerialized>): Promise<PersistentCacheStore>
     {
         const instance = new PersistentCacheStore(registry, persistentCache);
@@ -415,7 +428,7 @@ export class PersistentCacheStore extends AStore
     }
 
 
-    protected async get(id: idString): Promise<IStoreGetResult>
+    protected async get(id: idString): Promise<IStoreGetResult<IPersistentCacheStow>>
     {
         // Read the specified data from the backing store.
         const serialized = await this._pcache.get(id);
@@ -426,13 +439,11 @@ export class PersistentCacheStore extends AStore
         // an ISerialized.
 
         // There is no stowed data for PersistentCache.
-        const stow = {};
-
-        return {serialized, stow};
+        return {serialized, stow: {}};
     }
 
 
-    protected async put(obj: ISerializable, serialized: ISerialized): Promise<void>
+    protected async put(serialized: ISerialized /*, stow: undefined*/): Promise<IStorePutResult<IPersistentCacheStow>>
     {
         // Transform `serialized` into the backing store's representation.
         // For example, for PouchDB we should:
@@ -445,8 +456,10 @@ export class PersistentCacheStore extends AStore
         // Write the data to the backing store.
         await this._pcache.put(serialized.id, serialized);
 
-        // MUST: Update the stowed properties on obj.
-        //  For example, for PouchDB, we need the updated _rev to be stowed.
-        //  This is not needed for PersistentCache.
+        // Return the new stow data that should be placed on the original
+        // object. For example, for PouchDB, we need the updated _rev to be
+        // stowed. This is not needed for PersistentCache.
+
+        return {stow: {}};
     }
 }

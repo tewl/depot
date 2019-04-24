@@ -1,239 +1,349 @@
 import * as _ from "lodash";
+import {Directory} from "./directory";
+import {PersistentCache} from "./persistentCache";
 import {
-    SerializationRegistry,
+    PersistentCacheSerializationRegistry,
     ISerializable,
-    ISerialized,
     ISerializableMap,
     IDeserializeResult,
-    ISerializeResult, IndeterminateSyncWork
+    ISerialized, ISerializeResult, idString, WorkFunc, createId
 } from "./serialization";
 
 
-interface ISerializedBizObjMock1 extends ISerialized
+////////////////////////////////////////////////////////////////////////////////
+// Model
+////////////////////////////////////////////////////////////////////////////////
+
+interface IModelSerialized1 extends ISerialized
 {
-    data:   string;
-    prevId: string | undefined;
-    nextId: string | undefined;
-}
-function isSerializedBizObjMock1(serialized: ISerialized): serialized is ISerializedBizObjMock1
-{
-    const ser = serialized as any;
-    return ser.type === BizObjMock.type &&
-           ser.schema === "1" &&
-           _.isString(ser.data) &&
-           (_.isString(ser.prevId) || _.isUndefined(ser.prevId)) &&
-           (_.isString(ser.nextId) || _.isUndefined(ser.nextId));
+    schema: "1";
+    rootPerson: undefined | string;
 }
 
-
-class BizObjMock implements ISerializable
+function isIModelSerialized1(serialized: ISerialized): serialized is IModelSerialized1
 {
-    public static readonly type: string = "BizObjMock";
+    const suspect = serialized as IModelSerialized1;
 
+    return serialized.type === Model.type &&
+           serialized.schema === "1" &&
+           (_.isUndefined(suspect.rootPerson) || _.isString(suspect.rootPerson));
+}
 
-    public static deserialize(
-        serialized: ISerialized,
-        deserializedSoFar: ISerializableMap
-    ): IDeserializeResult
+export class Model implements ISerializable
+{
+    // region ISerializableStatic
+
+    public static get type(): "model"
     {
-        if (!isSerializedBizObjMock1(serialized)) {
-            throw new Error("Unsupported BizObjMock schema.");
+        return "model";
+    }
+
+    public static deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult
+    {
+        if (!isIModelSerialized1(serialized)) {
+            throw new Error(`Unsupported serialized Model: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
-        const deserialized = new BizObjMock(serialized.id, serialized.data);
-        const additionalWork: Array<IndeterminateSyncWork<boolean>> = [];
+        const deserialized = new Model(serialized.id);
+        const neededIds: Array<idString> = [];
+        const additionalWork: Array<WorkFunc> = [];
 
-        // If the biz object had a prev reference, queue some additional work to
-        // set it.
-        if (serialized.prevId) {
+        if (serialized.rootPerson) {
+            neededIds.push(serialized.rootPerson);
             additionalWork.push(() => {
-                deserialized.prev = deserializedSoFar[serialized.prevId!] as BizObjMock;
-                return !!deserialized.prev;
-            });
-        }
-
-        // If the biz object had a next reference, queue some additional work to
-        // set it.
-        if (serialized.nextId) {
-            additionalWork.push(() => {
-                deserialized.next = deserializedSoFar[serialized.nextId!] as BizObjMock;
-                return !!deserialized.next;
+                deserialized.rootPerson = deserializedSoFar[serialized.rootPerson!] as Person;
             });
         }
 
         return {
             deserializedObj: deserialized,
-            additionalWork: additionalWork
+            neededIds:       neededIds,
+            completionFuncs: additionalWork
         };
     }
 
+    // endregion
 
-    // region Instance Data
-    private readonly _id: string;
-    private readonly _data: string;
-    private          _prev: undefined | BizObjMock;
-    private          _next: undefined | BizObjMock;
+    public static create(): Model
+    {
+        return new Model(createId("model"));
+    }
+
+    // region Data Members
+    private readonly _id: idString;
+    private          _rootPerson: undefined | Person;
+
+    // endregion
+
+    private constructor(id: idString)
+    {
+        this._id         = id;
+    }
+
+    public get rootPerson(): undefined | Person
+    {
+        return this._rootPerson;
+    }
+
+    public set rootPerson(value: undefined | Person)
+    {
+        this._rootPerson = value;
+    }
+
+
+    // region ISerializable
+    public get id(): string
+    {
+        return this._id;
+    }
+
+    public serialize(): ISerializeResult
+    {
+        const othersToSerialize: Array<ISerializable> = [];
+
+        const serialized: IModelSerialized1 = {
+            type: (this.constructor as any).type,
+            id:   this._id,
+            schema: "1",
+            rootPerson: undefined
+        };
+
+        if (this._rootPerson) {
+            serialized.rootPerson = this._rootPerson.id;
+            othersToSerialize.push(this._rootPerson);
+        }
+
+        return {serialized, othersToSerialize};
+    }
     // endregion
 
 
-    public constructor(id: string, data: string)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Person
+////////////////////////////////////////////////////////////////////////////////
+
+interface IPersonSerialized1 extends ISerialized
+{
+    schema: "1";
+    firstName: string;
+    lastName: string;
+    mother: undefined | idString;
+    father: undefined | idString;
+}
+
+function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSerialized1
+{
+    const suspect = serialized as IPersonSerialized1;
+
+    return serialized.type === Person.type &&
+           serialized.schema === "1" &&
+           _.isString(suspect.firstName) &&
+           _.isString(suspect.lastName) &&
+           (_.isUndefined(suspect.mother) || _.isString(suspect.mother)) &&
+           (_.isUndefined(suspect.father) || _.isString(suspect.father));
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class Person implements ISerializable
+{
+
+    // region ISerializableStatic
+
+    public static get type(): "person"
     {
-        this._id   = id;
-        this._data = data;
+        return "person";
     }
 
+
+    public static deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult
+    {
+        if (!isIPersonSerialized1(serialized)) {
+            throw new Error(`Unsupported serialized Person: ${JSON.stringify(serialized, undefined, 4)}`);
+        }
+
+        const deserialized = new Person(serialized.id, serialized.firstName, serialized.lastName);
+        const neededIds: Array<idString> = [];
+        const additionalWork: Array<WorkFunc> = [];
+
+        if (serialized.mother) {
+            neededIds.push(serialized.mother);
+            additionalWork.push(() => {
+                deserialized.mother = deserializedSoFar[serialized.mother!] as Person;
+            });
+        }
+
+        if (serialized.father) {
+            neededIds.push(serialized.father);
+            additionalWork.push(() => {
+                deserialized.father = deserializedSoFar[serialized.father!] as Person;
+            });
+        }
+
+        return {
+            deserializedObj: deserialized,
+            neededIds:       neededIds,
+            completionFuncs: additionalWork
+        };
+    }
+
+    // endregion
+
+    public static create(firstName: string, lastName: string): Person
+    {
+        return new Person(createId("person"), firstName, lastName);
+    }
+
+
+    // region Data Members
+    private readonly _id:        idString;
+    private readonly _firstName: string;
+    private readonly _lastName:  string;
+    private          _mother:    undefined | Person;
+    private          _father:    undefined | Person;
+    // endregion
+
+    private constructor(id: idString, firstName: string, lastName: string)
+    {
+        this._id = id;
+        this._firstName = firstName;
+        this._lastName = lastName;
+    }
+
+    public get firstName(): string
+    {
+        return this._firstName;
+    }
+
+    public get lastName(): string
+    {
+        return this._lastName;
+    }
+
+    public get mother(): undefined | Person
+    {
+        return this._mother;
+    }
+
+    public set mother(value: undefined | Person)
+    {
+        this._mother = value;
+    }
+
+    public get father(): undefined | Person
+    {
+        return this._father;
+    }
+
+    public set father(value: undefined | Person)
+    {
+        this._father = value;
+    }
+
+
+    // region ISerializable
 
     public get id(): string
     {
         return this._id;
     }
 
-
-    public get data(): string
-    {
-        return this._data;
-    }
-
-
-    public get prev(): BizObjMock | undefined
-    {
-        return this._prev;
-    }
-
-
-    public set prev(obj: BizObjMock | undefined)
-    {
-        this._prev = obj;
-    }
-
-
-    public get next(): BizObjMock | undefined
-    {
-        return this._next;
-    }
-
-
-    public set next(obj: BizObjMock | undefined)
-    {
-        this._next = obj;
-    }
-
-
     public serialize(): ISerializeResult
     {
-        const serialized: ISerializedBizObjMock1 = {
-            type:   (this.constructor as any).type,
-            id:     this._id,
-            schema: "1",
-            data:   this._data,
-            prevId: undefined,
-            nextId: undefined
-        };
-
         const othersToSerialize: Array<ISerializable> = [];
 
-        if (this._prev) {
-            serialized.prevId = this._prev.id;
-            othersToSerialize.push(this._prev);
+        const serialized: IPersonSerialized1 = {
+            type: (this.constructor as any).type,
+            id:   this._id,
+            schema: "1",
+            firstName: this._firstName,
+            lastName: this._lastName,
+            mother: undefined,
+            father: undefined
+        };
+
+        if (this._mother) {
+            serialized.mother = this._mother.id;
+            othersToSerialize.push(this._mother);
         }
 
-        if (this._next) {
-            serialized.nextId = this._next.id;
-            othersToSerialize.push(this._next);
+        if (this._father) {
+            serialized.father = this._father.id;
+            othersToSerialize.push(this._father);
         }
-
 
         return {serialized, othersToSerialize};
     }
 
+    // endregion
+
 }
 
 
-describe("SerializationRegistry", () => {
+////////////////////////////////////////////////////////////////////////////////
 
-    describe("static", () => {
+describe("PersistentCacheSerializationRegistry", async () => {
 
+    const tmpDir = new Directory(__dirname, "..", "tmp");
 
-        describe("deserialize()", () => {
-
-
-            it("will deserialize", async () => {
-                const registry = new SerializationRegistry();
-                registry.register(BizObjMock);
-
-                const bizObj = new BizObjMock("123", "data");
-                const serializeResult = bizObj.serialize();
-
-                const newInstances = registry.deserialize([serializeResult.serialized]);
-                expect(newInstances.length).toEqual(1);
-                const newInstance = newInstances[0] as BizObjMock;
-                expect(newInstance.id).toEqual("123");
-                expect(newInstance.data).toEqual("data");
-            });
-
-
-            it("can deserialize two objects that have references to each other", async () => {
-                // Create the registry.
-                const registry = new SerializationRegistry();
-                registry.register(BizObjMock);
-
-                // Create two objects that hold references to each other.
-                const obj1 = new BizObjMock("1", "data 1");
-                const obj2 = new BizObjMock("2", "data 2");
-                obj1.next = obj2;
-                obj2.prev = obj1;
-
-                const serialized1 = obj1.serialize().serialized;
-                const serialized2 = obj2.serialize().serialized;
-
-                const newBizObjects = registry.deserialize([serialized1, serialized2]);
-                expect(newBizObjects.length).toEqual(2);
-
-                const new1 = newBizObjects[0] as BizObjMock;
-                const new2 = newBizObjects[1] as BizObjMock;
-
-                expect(new1.id).toEqual("1");
-                expect(new1.data).toEqual("data 1");
-                expect(new1.prev).toEqual(undefined);
-                expect(new1.next).toEqual(new2);
-
-                expect(new2.id).toEqual("2");
-                expect(new2.data).toEqual("data 2");
-                expect(new2.prev).toEqual(new1);
-                expect(new2.next).toEqual(undefined);
-
-
-            });
-
-
-        });
-
-
+    beforeEach(() => {
+        tmpDir.emptySync();
     });
-
 
     describe("instance", () => {
 
 
-        describe("register()", () => {
+        it("can save data and then load it", async () => {
 
+            // An IIFE to save the data.
+            await (async () => {
+                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
+                const registry = new PersistentCacheSerializationRegistry();
+                // TODO: Separate the registry from the serializers.
 
-            it("accepts registrations", () => {
-                const registry = new SerializationRegistry();
-                registry.register(BizObjMock);
-                expect(registry.numRegisteredClasses).toEqual(1);
-            });
+                const aerys = Person.create("Aerys", "Targaryen");
+                const rhaella = Person.create("Rhaella", "Targaryen");
 
+                const rhaegar = Person.create("Rhaegar", "Targaryen");
+                rhaegar.father = aerys;
+                rhaegar.mother = rhaella;
+                const lyanna = Person.create("Lyanna", "Stark");
 
-            it("returns a function that unregisters", () => {
-                const registry = new SerializationRegistry();
-                const unregisterMock = registry.register(BizObjMock);
-                expect(_.isFunction(unregisterMock)).toEqual(true);
-                expect(registry.numRegisteredClasses).toEqual(1);
-                unregisterMock();
-                expect(registry.numRegisteredClasses).toEqual(0);
-            });
+                const john = Person.create("John", "Snow");
+                john.father = rhaegar;
+                john.mother = lyanna;
 
+                const model = Model.create();
+                model.rootPerson = john;
+
+                await registry.serialize(cache, model);
+            })();
+
+            // An IIFE to load the data.
+            await (async () => {
+                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
+                const registry = new PersistentCacheSerializationRegistry();
+                registry.register(Person);
+                registry.register(Model);
+
+                const modelIds = await registry.getIds(cache, /^model/);
+                if (modelIds.length === 0) {
+                    fail("Unable to find model in persistent cache.");
+                }
+                const modelId = modelIds[0];
+
+                const deserializeResult = await registry.deserialize<Model>(cache, modelId);
+                // There should have been 6 objects created in total:
+                // the model, John, Lyanna, Rhaegar, Rhaella, Aerys.
+                expect(Object.keys(deserializeResult.allDeserialized).length).toEqual(6);
+                const model: Model = deserializeResult.deserialized;
+                expect(model.rootPerson!.firstName).toEqual("John");
+                expect(model.rootPerson!.mother!.firstName).toEqual("Lyanna");
+                expect(model.rootPerson!.father!.firstName).toEqual("Rhaegar");
+                expect(model.rootPerson!.father!.mother!.firstName).toEqual("Rhaella");
+                expect(model.rootPerson!.father!.father!.firstName).toEqual("Aerys");
+            })();
 
         });
 
@@ -242,3 +352,6 @@ describe("SerializationRegistry", () => {
 
 
 });
+
+
+

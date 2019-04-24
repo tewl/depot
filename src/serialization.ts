@@ -201,9 +201,8 @@ export interface IRegistryDeserializeResult<T extends ISerializable>
     // The requested deserialized object.
     deserialized: T;
 
-    // TODO: Rename this to something like "allObjects"
     // All of the objects that were deserialized.
-    allDeserialized: ISerializableMap;
+    allObjects: ISerializableMap;
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -245,7 +244,7 @@ export abstract class AStore<StowType>
 
         return {
             deserialized: deserialized as T,
-            allDeserialized: deserializedSoFar
+            allObjects: deserializedSoFar
         };
     }
 
@@ -294,7 +293,6 @@ export abstract class AStore<StowType>
                 // MUST: Update the stowed properties on obj.
             }
         );
-
 
     }
 

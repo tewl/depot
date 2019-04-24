@@ -97,6 +97,26 @@ export interface ISerializable
 }
 
 
+export function isISerializable(obj: any): obj is ISerializable
+{
+    return _.isString(obj.id) &&
+           _.isFunction(obj.serialize) &&
+           _.isFunction(obj.constructor.deserialize);
+}
+
+
+export interface ISerializableWithStow extends ISerializable
+{
+    __stow: object;
+}
+
+export function isISerializableWithStow(obj: any): obj is ISerializableWithStow
+{
+    return isISerializable(obj) &&
+           (obj as any).__stow !== undefined;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // SerializationRegistry
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,12 +189,6 @@ type IStow = object;
 export interface IStoreGetResult
 {
     serialized: ISerialized;
-    stow: IStow;
-}
-
-
-export interface IStorePutResult
-{
     stow: IStow;
 }
 
@@ -261,17 +275,15 @@ export abstract class AStore
 
                 const serializeResult = curObj.serialize();
 
-                const putPromise = this.put(serializeResult.serialized);
+                const putPromise = this.put(curObj, serializeResult.serialized);
 
                 // If other objects need to be serialized, queue them up.
                 while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0) {
                     needToSerialize.push(serializeResult.othersToSerialize.shift()!);
                 }
 
-                const putResult = await putPromise;
-
-                // MUST: Put the contents of putResult.stow back onto the object.
-
+                // Wait for the put() to complete.
+                await putPromise;
             }
         );
 
@@ -280,7 +292,15 @@ export abstract class AStore
 
     protected abstract get(id: idString): Promise<IStoreGetResult>;
 
-    protected abstract put(serialized: ISerialized): Promise<IStorePutResult>;
+    /**
+     * Writes the specified object to the backing store and updates obj's stowed
+     * properties.
+     * @param obj - The object that is being stored.  Provided so that stowed
+     *   properties can be assigned.
+     * @param serialized - The serialized form of `obj`.
+     * @return description
+     */
+    protected abstract put(obj: ISerializable, serialized: ISerialized): Promise<void>;
 
 
     /**
@@ -412,7 +432,7 @@ export class PersistentCacheStore extends AStore
     }
 
 
-    protected async put(serialized: ISerialized): Promise<IStorePutResult>
+    protected async put(obj: ISerializable, serialized: ISerialized): Promise<void>
     {
         // Transform `serialized` into the backing store's representation.
         // For example, for PouchDB we should:
@@ -425,9 +445,8 @@ export class PersistentCacheStore extends AStore
         // Write the data to the backing store.
         await this._pcache.put(serialized.id, serialized);
 
-        // Return data that needs to be stowed on the object for future use.
-        // For example, for PouchDB, we need the updated _rev to be stowed.
-        // This is not needed for PersistentCache.
-        return {stow: {}};
+        // MUST: Update the stowed properties on obj.
+        //  For example, for PouchDB, we need the updated _rev to be stowed.
+        //  This is not needed for PersistentCache.
     }
 }

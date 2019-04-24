@@ -108,7 +108,10 @@ function runUnitTests() {
         }
     );
 
-    return runJasmine(jasmine);
+    return runJasmine(jasmine)
+    .catch((err) => {
+        throw toGulpError(err);
+    });
 }
 
 

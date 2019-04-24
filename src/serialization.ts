@@ -27,7 +27,15 @@ export interface ISerializableMap
 }
 
 
-export type WorkFunc = () => Promise<void> | void;
+/**
+ * A function type describing future work that needs to be done to complete an
+ * object's deserialization.
+ * @param objects - All objects that have been deserialized, including all
+ *   returned from the initial `deserialize()` invocation.
+ * @return void if the deserialization is complete or a promise that resolves
+ *   when it is complete
+ */
+export type DeserializePhase2Func = (objects: ISerializableMap) => Promise<void> | void;
 
 export type idString = string;
 
@@ -47,9 +55,14 @@ export interface ISerialized
 
 export interface IDeserializeResult
 {
+    // The result of the first phase of deserialization.
     deserializedObj: ISerializable;
+    // Other objects that need to be deserialized so that this object can
+    // reestablish its references.
     neededIds?: Array<idString>;
-    completionFuncs?: Array<WorkFunc>;
+    // Functions that need to be run to finish this object's deserialization
+    // (once the objects corresponding to `neededIds` are available).
+    completionFuncs?: Array<DeserializePhase2Func>;
 }
 
 
@@ -57,19 +70,16 @@ export interface ISerializableStatic
 {
     type: string;
 
-    // TODO: Remove the deserializedSoFar parameter from the following
-    //   signature.  We can just add that parameter to the completion function
-    //   signature since that is where most classes will want to use it anyway.
-
     /**
-     * Deserializes the specified object
+     * Performs the first phase of deserialization and returns information and
+     * functions needed to complete the deserialization
      * @param serialized - The object to be deserialized
-     * @param deserializedSoFar - Other objects that have been deserialized
-     * @return An object containing the deserialized object and any
+     * @return An object containing the deserialized object, the IDs of other
+     * objects that are needed in order to complete the deserialization, and any
      * functions representing additional work that needs to be done to finish
-     * deserializing the object.
+     * deserialization (e.g. establishing references to other objects).
      */
-    deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult;
+    deserialize(serialized: ISerialized): IDeserializeResult;
 }
 
 
@@ -203,7 +213,7 @@ export abstract class AStore
         const deserializedSoFar: ISerializableMap = {};
         // An array of completion functions that need to be run when the first
         // pass has completed.
-        const completionFuncs: Array<WorkFunc> = [];
+        const completionFuncs: Array<DeserializePhase2Func> = [];
 
         // First pass:  Recursively deserialize all objects.
         const deserialized = await this.doFirstPassDeserialize(id, deserializedSoFar, completionFuncs);
@@ -213,7 +223,7 @@ export abstract class AStore
         const promises = _.map(completionFuncs, (curCompletionFunc) => {
             // Wrap the return value from each completion function in a promise
             // in the event the function returns void instead of Promise<void>.
-            return BBPromise.resolve(curCompletionFunc());
+            return BBPromise.resolve(curCompletionFunc(deserializedSoFar));
         });
         await BBPromise.all(promises);
 
@@ -288,7 +298,7 @@ export abstract class AStore
     private async doFirstPassDeserialize(
         id: string,
         deserializedSoFar: ISerializableMap,
-        completionFuncs: Array<WorkFunc>
+        completionFuncs: Array<DeserializePhase2Func>
     ): Promise<ISerializable>
     {
         // If the id being requested already appears in the dictionary of object
@@ -307,7 +317,7 @@ export abstract class AStore
             throw new Error(`No class registered for type "${serialized.type}".`);
         }
 
-        const deserializeResult = foundClass.deserialize(serialized, deserializedSoFar);
+        const deserializeResult = foundClass.deserialize(serialized);
 
         // The object that will eventually be returned.
         const deserialized: ISerializable = deserializeResult.deserializedObj;

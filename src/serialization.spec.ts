@@ -8,7 +8,7 @@ import {
     ISerialized,
     ISerializeResult,
     idString,
-    WorkFunc,
+    DeserializePhase2Func,
     createId,
     SerializationRegistry,
     PersistentCacheStore
@@ -43,20 +43,20 @@ export class Model implements ISerializable
         return "model";
     }
 
-    public static deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult
+    public static deserialize(serialized: ISerialized): IDeserializeResult
     {
         if (!isIModelSerialized1(serialized)) {
             throw new Error(`Unsupported serialized Model: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
-        const deserialized = new Model(serialized.id);
-        const neededIds: Array<idString> = [];
-        const additionalWork: Array<WorkFunc> = [];
+        const deserialized                                 = new Model(serialized.id);
+        const neededIds: Array<idString>                   = [];
+        const additionalWork: Array<DeserializePhase2Func> = [];
 
         if (serialized.rootPerson) {
             neededIds.push(serialized.rootPerson);
-            additionalWork.push(() => {
-                deserialized.rootPerson = deserializedSoFar[serialized.rootPerson!] as Person;
+            additionalWork.push((objects: ISerializableMap) => {
+                deserialized.rootPerson = objects[serialized.rootPerson!] as Person;
             });
         }
 
@@ -162,27 +162,27 @@ export class Person implements ISerializable
     }
 
 
-    public static deserialize(serialized: ISerialized, deserializedSoFar: ISerializableMap): IDeserializeResult
+    public static deserialize(serialized: ISerialized): IDeserializeResult
     {
         if (!isIPersonSerialized1(serialized)) {
             throw new Error(`Unsupported serialized Person: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
-        const deserialized = new Person(serialized.id, serialized.firstName, serialized.lastName);
-        const neededIds: Array<idString> = [];
-        const additionalWork: Array<WorkFunc> = [];
+        const deserialized                                 = new Person(serialized.id, serialized.firstName, serialized.lastName);
+        const neededIds: Array<idString>                   = [];
+        const additionalWork: Array<DeserializePhase2Func> = [];
 
         if (serialized.mother) {
             neededIds.push(serialized.mother);
-            additionalWork.push(() => {
-                deserialized.mother = deserializedSoFar[serialized.mother!] as Person;
+            additionalWork.push((objects: ISerializableMap) => {
+                deserialized.mother = objects[serialized.mother!] as Person;
             });
         }
 
         if (serialized.father) {
             neededIds.push(serialized.father);
-            additionalWork.push(() => {
-                deserialized.father = deserializedSoFar[serialized.father!] as Person;
+            additionalWork.push((objects) => {
+                deserialized.father = objects[serialized.father!] as Person;
             });
         }
 
@@ -288,7 +288,7 @@ export class Person implements ISerializable
 
 ////////////////////////////////////////////////////////////////////////////////
 
-describe("PersistentCacheSerializationRegistry", async () => {
+describe("PersistentCacheStore", async () => {
 
     const tmpDir = new Directory(__dirname, "..", "tmp");
 

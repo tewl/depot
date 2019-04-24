@@ -347,7 +347,7 @@ describe("PersistentCacheStore", async () => {
                 // There should have been 6 objects created in total:
                 // the model, John, Lyanna, Rhaegar, Rhaella, Aerys.
                 expect(Object.keys(loadResult.allObjects).length).toEqual(6);
-                const model: Model = loadResult.deserialized;
+                const model: Model = loadResult.obj;
                 expect(model.rootPerson!.firstName).toEqual("John");
                 expect(model.rootPerson!.mother!.firstName).toEqual("Lyanna");
                 expect(model.rootPerson!.father!.firstName).toEqual("Rhaegar");

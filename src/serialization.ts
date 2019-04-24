@@ -199,7 +199,7 @@ export interface IStorePutResult<StowType>
 export interface ILoadResult<T extends ISerializable>
 {
     // The requested deserialized object.
-    deserialized: T;
+    obj: T;
 
     // All of the objects that were deserialized.
     allObjects: ISerializableMap;
@@ -243,7 +243,7 @@ export abstract class AStore<StowType>
         await BBPromise.all(promises);
 
         return {
-            deserialized: deserialized as T,
+            obj: deserialized as T,
             allObjects: deserializedSoFar
         };
     }

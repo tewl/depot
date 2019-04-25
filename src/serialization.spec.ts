@@ -7,7 +7,7 @@ import {
     IDeserializeResult,
     ISerialized,
     ISerializeResult,
-    idString,
+    IdString,
     DeserializePhase2Func,
     createId,
     SerializationRegistry,
@@ -19,11 +19,13 @@ import {
 // Model
 ////////////////////////////////////////////////////////////////////////////////
 
+
 interface IModelSerialized1 extends ISerialized
 {
     schema: "1";
     rootPerson: undefined | string;
 }
+
 
 function isIModelSerialized1(serialized: ISerialized): serialized is IModelSerialized1
 {
@@ -34,7 +36,8 @@ function isIModelSerialized1(serialized: ISerialized): serialized is IModelSeria
            (_.isUndefined(suspect.rootPerson) || _.isString(suspect.rootPerson));
 }
 
-export class Model implements ISerializable
+
+class Model implements ISerializable
 {
     // region ISerializableStatic
 
@@ -43,6 +46,7 @@ export class Model implements ISerializable
         return "model";
     }
 
+
     public static deserialize(serialized: ISerialized): IDeserializeResult
     {
         if (!isIModelSerialized1(serialized)) {
@@ -50,7 +54,7 @@ export class Model implements ISerializable
         }
 
         const deserialized                                 = new Model(serialized.id);
-        const neededIds: Array<idString>                   = [];
+        const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
         if (serialized.rootPerson) {
@@ -69,26 +73,48 @@ export class Model implements ISerializable
 
     // endregion
 
-    public static create(): Model
+
+    /**
+     * Creates a new Model.
+     * Because the two-pass deserialization requires objects to exist after the
+     * first pass before references to other objects are established in the
+     * second pass, constructors need to be able to create instances without
+     * their needed cross references.  If it is undesirable to allow an instance
+     * to be created without its cross references, the class should make the
+     * constructor private and provide a static create() method such as this
+     * one.  Then, the create() method can require clients to specify the
+     * required cross references while still allowing the constructor to create
+     * instances without them (to appease the two-pass deserialization process).
+     *
+     * @param rootPerson - The person at the root of this Model.
+     * @return The newly created Model instance
+     */
+    public static create(rootPerson: Person): Model
     {
-        return new Model(createId("model"));
+        const instance = new Model(createId("model"));
+        instance.rootPerson = rootPerson;
+        return instance;
     }
 
+
     // region Data Members
-    private readonly _id: idString;
+    private readonly _id: IdString;
     private          _rootPerson: undefined | Person;
 
     // endregion
 
-    private constructor(id: idString)
+
+    private constructor(id: IdString)
     {
         this._id         = id;
     }
+
 
     public get rootPerson(): undefined | Person
     {
         return this._rootPerson;
     }
+
 
     public set rootPerson(value: undefined | Person)
     {
@@ -134,8 +160,8 @@ interface IPersonSerialized1 extends ISerialized
     schema: "1";
     firstName: string;
     lastName: string;
-    mother: undefined | idString;
-    father: undefined | idString;
+    mother: undefined | IdString;
+    father: undefined | IdString;
 }
 
 function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSerialized1
@@ -149,6 +175,7 @@ function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSer
            (_.isUndefined(suspect.mother) || _.isString(suspect.mother)) &&
            (_.isUndefined(suspect.father) || _.isString(suspect.father));
 }
+
 
 // tslint:disable-next-line:max-classes-per-file
 export class Person implements ISerializable
@@ -169,7 +196,7 @@ export class Person implements ISerializable
         }
 
         const deserialized                                 = new Person(serialized.id, serialized.firstName, serialized.lastName);
-        const neededIds: Array<idString>                   = [];
+        const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
         if (serialized.mother) {
@@ -202,14 +229,14 @@ export class Person implements ISerializable
 
 
     // region Data Members
-    private readonly _id:        idString;
+    private readonly _id:        IdString;
     private readonly _firstName: string;
     private readonly _lastName:  string;
     private          _mother:    undefined | Person;
     private          _father:    undefined | Person;
     // endregion
 
-    private constructor(id: idString, firstName: string, lastName: string)
+    private constructor(id: IdString, firstName: string, lastName: string)
     {
         this._id = id;
         this._firstName = firstName;
@@ -287,6 +314,9 @@ export class Person implements ISerializable
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Tests
+////////////////////////////////////////////////////////////////////////////////
+
 
 describe("PersistentCacheStore", async () => {
 
@@ -322,9 +352,7 @@ describe("PersistentCacheStore", async () => {
                 john.father = rhaegar;
                 john.mother = lyanna;
 
-                const model = Model.create();
-                model.rootPerson = john;
-
+                const model = Model.create(john);
                 await store.save(model);
             })();
 

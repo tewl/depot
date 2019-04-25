@@ -37,7 +37,7 @@ export interface ISerializableMap
  */
 export type DeserializePhase2Func = (objects: ISerializableMap) => Promise<void> | void;
 
-export type idString = string;
+export type IdString = string;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ export type idString = string;
 export interface ISerialized
 {
     type:   string;
-    id:     idString;
+    id:     IdString;
     schema: string;
 }
 
@@ -59,7 +59,7 @@ export interface IDeserializeResult
     deserializedObj: ISerializable;
     // Other objects that need to be deserialized so that this object can
     // reestablish its references.
-    neededIds?: Array<idString>;
+    neededIds?: Array<IdString>;
     // Functions that need to be run to finish this object's deserialization
     // (once the objects corresponding to `neededIds` are available).
     completionFuncs?: Array<DeserializePhase2Func>;
@@ -246,10 +246,10 @@ export abstract class AStore<StowType>
         this._registry = registry;
     }
 
-    public abstract getIds(regexp?: RegExp): Promise<Array<idString>>;
+    public abstract getIds(regexp?: RegExp): Promise<Array<IdString>>;
 
 
-    public async load<T extends ISerializable>(id: idString): Promise<ILoadResult<T>>
+    public async load<T extends ISerializable>(id: IdString): Promise<ILoadResult<T>>
     {
         // An object that keeps track of all objects deserialized so far.
         // The key is the id and the value is the deserialized result.
@@ -332,7 +332,7 @@ export abstract class AStore<StowType>
      *   serialized form of the object and the stowed data that should be
      *   applied to the object once the serialized form is deserialized.
      */
-    protected abstract get(id: idString): Promise<IStoreGetResult<StowType>>;
+    protected abstract get(id: IdString): Promise<IStoreGetResult<StowType>>;
 
 
     /**
@@ -462,9 +462,9 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     }
 
 
-    public async getIds(regexp?: RegExp): Promise<Array<idString>>
+    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
     {
-        let ids: Array<idString> = await this._pcache.keys();
+        let ids: Array<IdString> = await this._pcache.keys();
         if (regexp === undefined) {
             return ids;
         }
@@ -476,7 +476,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     }
 
 
-    protected async get(id: idString): Promise<IStoreGetResult<IPersistentCacheStow>>
+    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>>
     {
         // Read the specified data from the backing store.
         const serialized = await this._pcache.get(id);

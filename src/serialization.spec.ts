@@ -332,13 +332,15 @@ describe("PersistentCacheStore", async () => {
 
         it("can save data and then load it", async () => {
 
+            const registry = new SerializationRegistry();
+            registry.register(Person);
+            registry.register(Model);
+
+            const cacheName = "test";
+
             // An IIFE to save the data.
             await (async () => {
-                const registry = new SerializationRegistry();
-                registry.register(Person);
-                registry.register(Model);
-
-                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
+                const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
                 const store = await PersistentCacheStore.create(registry, cache);
 
                 const aerys = Person.create("Aerys", "Targaryen");
@@ -359,11 +361,7 @@ describe("PersistentCacheStore", async () => {
 
             // An IIFE to load the data.
             await (async () => {
-                const registry = new SerializationRegistry();
-                registry.register(Person);
-                registry.register(Model);
-
-                const cache = await PersistentCache.create<ISerialized>("test", {dir: tmpDir.toString()});
+                const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
                 const store = await PersistentCacheStore.create(registry, cache);
 
                 const modelIds = await store.getIds(/^model/);

@@ -287,15 +287,14 @@ export abstract class AStore<StowType>
             async () => {
                 const curObj = needToSerialize.shift()!;
 
-                // TODO: As a sanity check, we should make sure the
-                //   curObj.constructor.type has been registered with
-                //   this._registry.  Even though we don't need the registry to
-                //   save the object, we will need it when loading it.  This
-                //   could catch errors where a new type of object is created
-                //   and is used in the object graph, but the developer forgets
-                //   to register it, resulting in a saved file that cannot be
-                //   loaded.  There should be a unit test to make sure save()
-                //   rejects when one of the objects is not registered.
+                // Note: We could perform a sanity check here to make sure that
+                // the object being serialized is registered with
+                // `this._registry` so that it could eventually be deserialized
+                // (registration is only needed for the deserialization
+                // process).  I have decided, however, not to perform this
+                // check, because it would be artificially limiting.  There
+                // could, for example, be a tool that only saved models and
+                // never tried to read them.
 
                 // Check to see if the object has already been serialized.  If
                 // so, do nothing.

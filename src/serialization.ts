@@ -512,6 +512,91 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
 }
 
 
-// TODO: Create MemoryStore
+////////////////////////////////////////////////////////////////////////////////
+// MemoryStore
+////////////////////////////////////////////////////////////////////////////////
+
+
+// tslint:disable-next-line:no-empty-interface
+interface IMemoryStow
+{
+    // Intentionally left empty.
+    // MemoryStore does not require any stowed data.
+}
+
+
+// tslint:disable-next-line: max-classes-per-file
+export class MemoryStore extends AStore<IMemoryStow>
+{
+
+    public static create(registry: SerializationRegistry): Promise<MemoryStore>
+    {
+        const instance = new MemoryStore(registry);
+        return BBPromise.resolve(instance);
+    }
+
+
+    // region Data Members
+    private readonly _store: {[id: string]: ISerialized};
+    // endregion
+
+
+    private constructor(registry: SerializationRegistry)
+    {
+        super(registry);
+        this._store = {};
+    }
+
+
+    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
+    {
+        let ids: Array<IdString> = _.keys(this._store);
+        if (regexp === undefined) {
+            return ids;
+        }
+
+        // A regular express has been specified, so filter for the ids that
+        // match.
+        ids = _.filter(ids, (curId) => regexp.test(curId));
+        return ids;
+    }
+
+
+    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>>
+    {
+        // Read the specified data from the backing store.
+        const serialized = this._store[id];
+
+        // Transform the backing store's representation into an ISerialized.
+        // For example, for PouchDB we should move `_id` to `id`.
+        // This is not needed for MemoryStore, because it stores the data as
+        // an ISerialized.
+
+        // There is no stowed data for PersistentCache.
+        return {serialized, stow: {}};
+    }
+
+
+    protected async put(serialized: ISerialized /*, stow: undefined*/): Promise<IStorePutResult<IPersistentCacheStow>>
+    {
+        // Transform `serialized` into the backing store's representation.
+        // For example, for PouchDB we should:
+        //   - move `id` to `_id`
+        //   - move needed stowed properties into the backing store's
+        //     representation
+        // This is not needed for MemoryStore, because it stores the data as
+        // an ISerialized.
+
+        // Write the data to the backing store.
+        this._store[serialized.id] = serialized;
+
+        // Return the new stow data that should be placed on the original
+        // object. For example, for PouchDB, we need the updated _rev to be
+        // stowed. This is not needed for MemoryStore.
+
+        return {stow: {}};
+    }
+}
+
 
 // TODO: Create PouchDbStore

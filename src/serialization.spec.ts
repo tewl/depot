@@ -399,7 +399,7 @@ describe("MemoryStore", async () => {
     describe("instance", () => {
 
 
-        fit("can save data and then load it", async () => {
+        it("can save data and then load it", async () => {
 
             const registry = new SerializationRegistry();
             registry.register(Person);

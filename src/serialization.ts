@@ -113,9 +113,9 @@ export interface ISerializableWithStow<StowType> extends ISerializable
 export function isISerializableWithStow<StowType>(obj: any): obj is ISerializableWithStow<StowType>
 {
     return isISerializable(obj) &&
-           // The following is pretty bogus.  Just because __stow is not
-           // undefined does not mean that it is StowType.  Fix this in the
-           // future.
+           // FUTURE: The following is pretty bogus.  Just because __stow is not
+           //   undefined does not mean that it is of type StowType.  Fix this
+           //   in the future.
            (obj as any).__stow !== undefined;
 }
 
@@ -467,3 +467,8 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
         return {stow: {}};
     }
 }
+
+
+// TODO: Create MemoryStore
+
+// TODO: Create PouchDbStore

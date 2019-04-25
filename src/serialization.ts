@@ -186,14 +186,28 @@ export class SerializationRegistry
 // Store Interfaces
 ////////////////////////////////////////////////////////////////////////////////
 
+
 export interface IStoreGetResult<StowType>
 {
+    /**
+     * The serialized form of the saved data.
+     */
     serialized: ISerialized;
+
+    /**
+     * The stowed data that should be applied to the object once `serialized`
+     * has been deserialized.
+     */
     stow: StowType;
 }
 
+
 export interface IStorePutResult<StowType>
 {
+    /**
+     * The new stow data that must be applied to the original object following
+     * this put() operation.
+     */
     stow: StowType;
 }
 
@@ -206,6 +220,18 @@ export interface ILoadResult<T extends ISerializable>
     // All of the objects that were deserialized.
     allObjects: ISerializableMap;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// AStore
+//
+// Abstract base class for backing stores .  Knows how to follow graphs of
+// objects when serializing and deserializing and how to manage stowed data.
+// Defines abstract methods that derived classes must implement to read and
+// write data in a manner that is specific to each backing store.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 // tslint:disable-next-line: max-classes-per-file
 export abstract class AStore<StowType>
@@ -261,7 +287,7 @@ export abstract class AStore<StowType>
             async () => {
                 const curObj = needToSerialize.shift()!;
 
-                // FUTURE: As a sanity check, we should make sure the
+                // TODO: As a sanity check, we should make sure the
                 //   curObj.constructor.type has been registered with
                 //   this._registry.  Even though we don't need the registry to
                 //   save the object, we will need it when loading it.  This
@@ -298,14 +324,23 @@ export abstract class AStore<StowType>
 
     }
 
-    protected abstract get(id: idString): Promise<IStoreGetResult<StowType>>;
 
     /**
-     * Writes the specified object to the backing store and updates obj's stowed
-     * properties.
-     * @param serialized - The serialized form the object to be stored.
-     * @param stow - The stowed properties associated with the original object
-     * @return description
+     * Reads the specified object from the backing store.
+     * @param id - The ID of the object to read
+     * @return When successfully read, the returned promise resolves with the
+     *   serialized form of the object and the stowed data that should be
+     *   applied to the object once the serialized form is deserialized.
+     */
+    protected abstract get(id: idString): Promise<IStoreGetResult<StowType>>;
+
+
+    /**
+     * Writes the specified object to the backing store.
+     * @param serialized - The serialized form of the object to be stored.
+     * @param stow - The stowed properties from the original object
+     * @return When successfully written, the returned promise resolves with the
+     *   object's new stowed data.
      */
     protected abstract put(serialized: ISerialized, stow: undefined | StowType): Promise<IStorePutResult<StowType>>;
 
@@ -315,12 +350,18 @@ export abstract class AStore<StowType>
      * the specified object.  In the first pass, each object is responsible for
      * instantiating itself and setting its state.  If any references to other
      * objects exist, one or more completion functions should be returned that
-     * set those references.
-     * @param id - The id of the object to deserialize
-     * @param deserializedSoFar - A map of all objects deserialized thus far
-     * @param completionFuncs - Additional work that needs to be done to set
-     *   inter-object cross references.
-     * @return The results of the first pass deserialization
+     * will be run during the second pass.  The completion functions should set
+     * references to other objects during this second phase, since that is when
+     * all objects are guaranteed to exist.
+     * @param id - The id of the object to perform first pass deserialization on
+     * @param deserializedSoFar - A map of all objects deserialized thus far.
+     *   Used to detect whether an object has already undergone first pass
+     *   deserialization.
+     * @param completionFuncs - Additional work that needs to be done (during
+     *   the second pass) to set inter-object cross references.
+     * @return The results of the first pass deserialization, which is an
+     *   ISerializable that has its owned state set, but has not yet set
+     *   references to other objects.
      */
     private async doFirstPassDeserialize(
         id: string,
@@ -386,12 +427,15 @@ export abstract class AStore<StowType>
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Store Implementations
+// PersistentCacheStore
 ////////////////////////////////////////////////////////////////////////////////
+
 
 // tslint:disable-next-line:no-empty-interface
 interface IPersistentCacheStow
 {
+    // Intentionally left empty.
+    // PersistentCache does not require any stowed data.
 }
 
 

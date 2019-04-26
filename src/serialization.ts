@@ -303,7 +303,7 @@ export abstract class AStore<StowType>
                 }
 
                 const serializeResult = curObj.serialize();
-                const stow: undefined | StowType = isISerializableWithStow<StowType>(obj) ? obj.__stow : undefined;
+                const stow: undefined | StowType = isISerializableWithStow<StowType>(curObj) ? curObj.__stow : undefined;
 
                 const putPromise = this.put(serializeResult.serialized, stow);
 
@@ -481,7 +481,6 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
         const serialized = await this._pcache.get(id);
 
         // Transform the backing store's representation into an ISerialized.
-        // For example, for PouchDB we should move `_id` to `id`.
         // This is not needed for PersistentCache, because it stores the data as
         // an ISerialized.
 
@@ -490,13 +489,9 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     }
 
 
-    protected async put(serialized: ISerialized /*, stow: undefined*/): Promise<IStorePutResult<IPersistentCacheStow>>
+    protected async put(serialized: ISerialized, stow: undefined | IPersistentCacheStow): Promise<IStorePutResult<IPersistentCacheStow>>
     {
         // Transform `serialized` into the backing store's representation.
-        // For example, for PouchDB we should:
-        //   - move `id` to `_id`
-        //   - move needed stowed properties into the backing store's
-        //     representation
         // This is not needed for PersistentCache, because it stores the data as
         // an ISerialized.
 
@@ -504,9 +499,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
         await this._pcache.put(serialized.id, serialized);
 
         // Return the new stow data that should be placed on the original
-        // object. For example, for PouchDB, we need the updated _rev to be
-        // stowed. This is not needed for PersistentCache.
-
+        // object. This is not needed for PersistentCache.
         return {stow: {}};
     }
 }
@@ -562,28 +555,23 @@ export class MemoryStore extends AStore<IMemoryStow>
     }
 
 
-    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>>
+    protected async get(id: IdString): Promise<IStoreGetResult<IMemoryStow>>
     {
         // Read the specified data from the backing store.
         const serialized = this._store[id];
 
         // Transform the backing store's representation into an ISerialized.
-        // For example, for PouchDB we should move `_id` to `id`.
         // This is not needed for MemoryStore, because it stores the data as
         // an ISerialized.
 
-        // There is no stowed data for PersistentCache.
+        // There is no stowed data for MemoryStore.
         return {serialized, stow: {}};
     }
 
 
-    protected async put(serialized: ISerialized /*, stow: undefined*/): Promise<IStorePutResult<IPersistentCacheStow>>
+    protected async put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>>
     {
         // Transform `serialized` into the backing store's representation.
-        // For example, for PouchDB we should:
-        //   - move `id` to `_id`
-        //   - move needed stowed properties into the backing store's
-        //     representation
         // This is not needed for MemoryStore, because it stores the data as
         // an ISerialized.
 
@@ -591,12 +579,118 @@ export class MemoryStore extends AStore<IMemoryStow>
         this._store[serialized.id] = serialized;
 
         // Return the new stow data that should be placed on the original
-        // object. For example, for PouchDB, we need the updated _rev to be
-        // stowed. This is not needed for MemoryStore.
-
+        // object. This is not needed for MemoryStore.
         return {stow: {}};
     }
 }
 
 
-// TODO: Create PouchDbStore
+////////////////////////////////////////////////////////////////////////////////
+// PouchDbStore
+////////////////////////////////////////////////////////////////////////////////
+import * as PouchDB from "pouchdb";
+
+// tslint:disable-next-line:no-empty-interface
+interface IPouchDbStow
+{
+    _rev: string;
+}
+
+
+// tslint:disable-next-line: max-classes-per-file
+export class PouchDbStore extends AStore<IPouchDbStow>
+{
+
+    public static create(registry: SerializationRegistry, pouchDb: PouchDB.Database): Promise<PouchDbStore>
+    {
+        const instance = new PouchDbStore(registry, pouchDb);
+        return BBPromise.resolve(instance);
+    }
+
+
+    // region Data Members
+    private readonly _db: PouchDB.Database;
+    // endregion
+
+
+    private constructor(registry: SerializationRegistry, pouchDb: PouchDB.Database)
+    {
+        super(registry);
+        this._db = pouchDb;
+    }
+
+
+    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
+    {
+        const allDocsResponse = await this._db.allDocs();
+
+        let ids: Array<string> = _.map(allDocsResponse.rows, (curRow) => curRow.id);
+
+        if (regexp === undefined) {
+            return ids;
+        }
+
+        // A regular express has been specified, so filter for the ids that
+        // match.
+        ids = _.filter(ids, (curId) => regexp.test(curId));
+        return ids;
+    }
+
+
+    protected async get(id: IdString): Promise<IStoreGetResult<IPouchDbStow>>
+    {
+        // Read the specified data from the backing store.
+        const dbRepresentation = await this._db.get(id);
+
+        // Transform the backing store's representation into an ISerialized.
+        const serialized = _.mapKeys(dbRepresentation, (value, key) => {
+            if (key === "_id") {
+                return "id";
+            }
+            else {
+                return key;
+            }
+        });
+
+        return {
+            serialized: serialized as ISerialized,
+            stow:       {_rev: dbRepresentation._rev}
+        };
+    }
+
+
+    protected async put(serialized: ISerialized, stow: undefined | IPouchDbStow): Promise<IStorePutResult<IPouchDbStow>>
+    {
+        // Transform `serialized` into the backing store's representation.
+        // For PouchDB, this means:
+        //   - move `id` to `_id`
+        //   - move needed stowed properties into the backing store's
+        //     representation
+        const doc = _.mapKeys(serialized, (value, key) => {
+            if (key === "id") {
+                return "_id";
+            }
+            else {
+                return key;
+            }
+        });
+
+        // Copy needed properties from the stowed datat onto the backing store
+        // representation.
+        if (stow) {
+            _.assign(doc, stow);
+        }
+
+
+        // Write the document to the db.
+        const putResult = await this._db.put(doc);
+
+        // Return the new stow data so that it can be applied to the original
+        // object.
+        return {
+            stow: {
+                _rev: putResult.rev
+            }
+        };
+    }
+}

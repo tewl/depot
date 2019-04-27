@@ -1,15 +1,18 @@
+import {Directory} from "./directory";
 import {SerializationRegistry} from "./serializationRegistry";
+import {PersistentCache} from "./persistentCache";
+import {PersistentCacheStore} from "./persistentCacheStore";
+import {ISerialized} from "./serialization";
 import {Model, Person} from "./serializationObjects.spec";
-import {MemoryStore} from "./serialization";
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Tests
-////////////////////////////////////////////////////////////////////////////////
+describe("PersistentCacheStore", async () => {
 
+    const tmpDir = new Directory(__dirname, "..", "tmp");
 
-describe("MemoryStore", async () => {
-
+    beforeEach(() => {
+        tmpDir.emptySync();
+    });
 
     describe("instance", () => {
 
@@ -19,10 +22,14 @@ describe("MemoryStore", async () => {
             const registry = new SerializationRegistry();
             registry.register(Person);
             registry.register(Model);
-            const store = await MemoryStore.create(registry);
+
+            const cacheName = "test";
 
             // An IIFE to save the data.
             await (async () => {
+                const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
+                const store = await PersistentCacheStore.create(registry, cache);
+
                 const aerys = Person.create("Aerys", "Targaryen");
                 const rhaella = Person.create("Rhaella", "Targaryen");
 
@@ -41,9 +48,12 @@ describe("MemoryStore", async () => {
 
             // An IIFE to load the data.
             await (async () => {
+                const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
+                const store = await PersistentCacheStore.create(registry, cache);
+
                 const modelIds = await store.getIds(/^model/);
                 if (modelIds.length === 0) {
-                    fail("Unable to find model in MemoryStore.");
+                    fail("Unable to find model in persistent cache.");
                 }
                 const modelId = modelIds[0];
 

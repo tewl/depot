@@ -1,8 +1,8 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {promiseWhile, sequence} from "./promiseHelpers";
-import {PersistentCache} from "./persistentCache";
 import {generateUuid} from "./uuid";
+import {SerializationRegistry} from "./serializationRegistry";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,68 +117,6 @@ export function isISerializableWithStow<StowType>(obj: any): obj is ISerializabl
            //   undefined does not mean that it is of type StowType.  Fix this
            //   in the future.
            (obj as any).__stow !== undefined;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// SerializationRegistry
-////////////////////////////////////////////////////////////////////////////////
-
-// tslint:disable-next-line: max-classes-per-file
-export class SerializationRegistry
-{
-    // region Instance Data Members
-
-    // A map of registered classes.  The key is the type string and the value is
-    // the class.
-    private readonly _registeredClasses: {[type: string]: ISerializableStatic};
-
-    // endregion
-
-
-    public constructor()
-    {
-        this._registeredClasses = {};
-    }
-
-
-    public get numRegisteredClasses(): number
-    {
-        return _.keys(this._registeredClasses).length;
-    }
-
-
-    /**
-     * Registers a class as one whose instances can be serialized and
-     * deserialized
-     * @param serializableClass - The class to register
-     * @return A function that can be called to unregister
-     */
-    public register(serializableClass: ISerializableStatic): () => void
-    {
-        if (this._registeredClasses[serializableClass.type] !== undefined) {
-            throw new Error(`Serializable class already registered for type "${serializableClass.type}".`);
-        }
-
-        this._registeredClasses[serializableClass.type] = serializableClass;
-
-        // Return a function that can be used to unregister.
-        return () => {
-            // Remove the class from the container of registered classes.
-            delete this._registeredClasses[serializableClass.type];
-        };
-    }
-
-
-    /**
-     * Gets the class that has been registered for the specified type
-     * @param type - The type string
-     * @return The class associated with the specified type string
-     */
-    public getClass(type: string): undefined | ISerializableStatic
-    {
-        return this._registeredClasses[type];
-    }
 }
 
 
@@ -321,11 +259,14 @@ export abstract class AStore<StowType>
             }
         );
 
+        // TODO: Provide an option that will delete documents from the backing
+        //   store that do not appear in `alreadySerialized`.
+
     }
 
 
     /**
-     * Reads the specified object from the backing store.
+     * Template method that reads the specified object from the backing store
      * @param id - The ID of the object to read
      * @return When successfully read, the returned promise resolves with the
      *   serialized form of the object and the stowed data that should be
@@ -335,7 +276,7 @@ export abstract class AStore<StowType>
 
 
     /**
-     * Writes the specified object to the backing store.
+     * Template method that writes the specified object to the backing store
      * @param serialized - The serialized form of the object to be stored.
      * @param stow - The stowed properties from the original object
      * @return When successfully written, the returned promise resolves with the
@@ -426,86 +367,6 @@ export abstract class AStore<StowType>
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// PersistentCacheStore
-////////////////////////////////////////////////////////////////////////////////
-
-
-// tslint:disable-next-line:no-empty-interface
-interface IPersistentCacheStow
-{
-    // Intentionally left empty.
-    // PersistentCache does not require any stowed data.
-}
-
-
-// tslint:disable-next-line: max-classes-per-file
-export class PersistentCacheStore extends AStore<IPersistentCacheStow>
-{
-
-    public static create(registry: SerializationRegistry, persistentCache: PersistentCache<ISerialized>): Promise<PersistentCacheStore>
-    {
-        const instance = new PersistentCacheStore(registry, persistentCache);
-        return BBPromise.resolve(instance);
-    }
-
-
-    // region Data Members
-    private _pcache: PersistentCache<ISerialized>;
-    // endregion
-
-
-    private constructor(registry: SerializationRegistry, pcache: PersistentCache<ISerialized>)
-    {
-        super(registry);
-        this._pcache = pcache;
-    }
-
-
-    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
-    {
-        let ids: Array<IdString> = await this._pcache.keys();
-        if (regexp === undefined) {
-            return ids;
-        }
-
-        // A regular express has been specified, so filter for the ids that
-        // match.
-        ids = _.filter(ids, (curId) => regexp.test(curId));
-        return ids;
-    }
-
-
-    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>>
-    {
-        // Read the specified data from the backing store.
-        const serialized = await this._pcache.get(id);
-
-        // Transform the backing store's representation into an ISerialized.
-        // This is not needed for PersistentCache, because it stores the data as
-        // an ISerialized.
-
-        // There is no stowed data for PersistentCache.
-        return {serialized, stow: {}};
-    }
-
-
-    protected async put(serialized: ISerialized, stow: undefined | IPersistentCacheStow): Promise<IStorePutResult<IPersistentCacheStow>>
-    {
-        // Transform `serialized` into the backing store's representation.
-        // This is not needed for PersistentCache, because it stores the data as
-        // an ISerialized.
-
-        // Write the data to the backing store.
-        await this._pcache.put(serialized.id, serialized);
-
-        // Return the new stow data that should be placed on the original
-        // object. This is not needed for PersistentCache.
-        return {stow: {}};
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // MemoryStore
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -581,116 +442,5 @@ export class MemoryStore extends AStore<IMemoryStow>
         // Return the new stow data that should be placed on the original
         // object. This is not needed for MemoryStore.
         return {stow: {}};
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// PouchDbStore
-////////////////////////////////////////////////////////////////////////////////
-import * as PouchDB from "pouchdb";
-
-// tslint:disable-next-line:no-empty-interface
-interface IPouchDbStow
-{
-    _rev: string;
-}
-
-
-// tslint:disable-next-line: max-classes-per-file
-export class PouchDbStore extends AStore<IPouchDbStow>
-{
-
-    public static create(registry: SerializationRegistry, pouchDb: PouchDB.Database): Promise<PouchDbStore>
-    {
-        const instance = new PouchDbStore(registry, pouchDb);
-        return BBPromise.resolve(instance);
-    }
-
-
-    // region Data Members
-    private readonly _db: PouchDB.Database;
-    // endregion
-
-
-    private constructor(registry: SerializationRegistry, pouchDb: PouchDB.Database)
-    {
-        super(registry);
-        this._db = pouchDb;
-    }
-
-
-    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
-    {
-        const allDocsResponse = await this._db.allDocs();
-
-        let ids: Array<string> = _.map(allDocsResponse.rows, (curRow) => curRow.id);
-
-        if (regexp === undefined) {
-            return ids;
-        }
-
-        // A regular express has been specified, so filter for the ids that
-        // match.
-        ids = _.filter(ids, (curId) => regexp.test(curId));
-        return ids;
-    }
-
-
-    protected async get(id: IdString): Promise<IStoreGetResult<IPouchDbStow>>
-    {
-        // Read the specified data from the backing store.
-        const dbRepresentation = await this._db.get(id);
-
-        // Transform the backing store's representation into an ISerialized.
-        const serialized = _.mapKeys(dbRepresentation, (value, key) => {
-            if (key === "_id") {
-                return "id";
-            }
-            else {
-                return key;
-            }
-        });
-
-        return {
-            serialized: serialized as ISerialized,
-            stow:       {_rev: dbRepresentation._rev}
-        };
-    }
-
-
-    protected async put(serialized: ISerialized, stow: undefined | IPouchDbStow): Promise<IStorePutResult<IPouchDbStow>>
-    {
-        // Transform `serialized` into the backing store's representation.
-        // For PouchDB, this means:
-        //   - move `id` to `_id`
-        //   - move needed stowed properties into the backing store's
-        //     representation
-        const doc = _.mapKeys(serialized, (value, key) => {
-            if (key === "id") {
-                return "_id";
-            }
-            else {
-                return key;
-            }
-        });
-
-        // Copy needed properties from the stowed datat onto the backing store
-        // representation.
-        if (stow) {
-            _.assign(doc, stow);
-        }
-
-
-        // Write the document to the db.
-        const putResult = await this._db.put(doc);
-
-        // Return the new stow data so that it can be applied to the original
-        // object.
-        return {
-            stow: {
-                _rev: putResult.rev
-            }
-        };
     }
 }

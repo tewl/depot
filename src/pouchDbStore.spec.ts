@@ -1,17 +1,21 @@
+import {Directory} from "./directory";
 import {SerializationRegistry} from "./serializationRegistry";
+import * as PouchDB from "pouchdb";
+import * as path from "path";
+import {PouchDbStore} from "./pouchDbStore";
 import {Model, Person} from "./serializationObjects.spec";
-import {MemoryStore} from "./serialization";
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Tests
-////////////////////////////////////////////////////////////////////////////////
-
-
-describe("MemoryStore", async () => {
+describe("PouchDbStore", async () => {
 
 
     describe("instance", () => {
+
+        const tmpDir = new Directory(__dirname, "..", "tmp").absolute();
+
+        beforeEach(() => {
+            tmpDir.emptySync();
+        });
 
 
         it("can save data and then load it", async () => {
@@ -19,7 +23,11 @@ describe("MemoryStore", async () => {
             const registry = new SerializationRegistry();
             registry.register(Person);
             registry.register(Model);
-            const store = await MemoryStore.create(registry);
+
+            // TODO: Make the following into a PouchDBUtil.
+            const PouchDbTmpDir = PouchDB.defaults({prefix: tmpDir.toString() + path.sep});
+            const db = new PouchDbTmpDir("Unit Test DB");
+            const store = await PouchDbStore.create(registry, db);
 
             // An IIFE to save the data.
             await (async () => {
@@ -43,7 +51,7 @@ describe("MemoryStore", async () => {
             await (async () => {
                 const modelIds = await store.getIds(/^model/);
                 if (modelIds.length === 0) {
-                    fail("Unable to find model in MemoryStore.");
+                    fail("Unable to find model in PouchDbStore.");
                 }
                 const modelId = modelIds[0];
 

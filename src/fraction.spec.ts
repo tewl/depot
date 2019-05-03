@@ -496,9 +496,10 @@ describe("Fraction", () => {
                 expect(Fraction.fromString("-1/1").divide(Fraction.fromString("1/2")).toString()).toEqual("-2");
                 expect(Fraction.fromString("1/1").divide(Fraction.fromString("-1/2")).toString()).toEqual("-2");
 
-                // TODO: Repeat the above tests with an integer divisor.
                 expect(Fraction.fromString("0/1").divide(1).toString()).toEqual("0");
                 expect(Fraction.fromString("1").divide(2).toString()).toEqual("1/2");
+                expect(Fraction.fromString("1").divide(-2).toString()).toEqual("-1/2");
+                expect(Fraction.fromString("-1").divide(2).toString()).toEqual("-1/2");
             });
 
 

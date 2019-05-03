@@ -205,6 +205,13 @@ export class Fraction
     {
         this._num = num;
         this._den = den;
+
+        // Don't let the denominator be negative.  If it is, then flip the sign
+        // of both the numerator and denominator.
+        if (this._den < 0) {
+            this._den = this._den * -1;
+            this._num = this._num * -1;
+        }
     }
 
 

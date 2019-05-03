@@ -78,10 +78,12 @@
   },
   "dependencies": {
     "@types/express": "4.16.1",
+    "@types/pouchdb": "6.3.3",
     "@types/request-promise": "4.1.42",
     "bluebird": "3.5.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.5",
+    "pouchdb": "7.0.0",
     "request": "2.88.0",
     "request-promise": "4.1.1",
     "setprototypeof": "1.1.1",

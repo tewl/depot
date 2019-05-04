@@ -1086,6 +1086,108 @@ describe("Directory", () => {
         });
 
 
+        describe("walk()", () => {
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+
+                // Create the following directory structure under tmpDir.
+                // tmpDir
+                // ├── dirA
+                // │   ├── dirAA
+                // │   │   ├── aa1.txt
+                // │   │   └── aa2.txt
+                // │   └── dirAB
+                // │       ├── ab1.txt
+                // │       └── ab2.txt
+                // ├── dirB
+                // │   ├── b1.txt
+                // │   └── b2.txt
+                // ├── root1.txt
+                // └── root2.txt
+
+                // Create the directories.
+                const dirA  = new Directory(tmpDir, "dirA").ensureExistsSync();
+                const dirAA = new Directory(dirA, "dirAA").ensureExistsSync();
+                const dirAB = new Directory(dirA, "dirAB").ensureExistsSync();
+                const dirB  = new Directory(tmpDir, "dirB").ensureExistsSync();
+
+                // Create the files.
+                const root1 = new File(tmpDir, "root1.txt");
+                root1.writeSync("root1");
+                const root2 = new File(tmpDir, "root2.txt");
+                root2.writeSync("root2");
+                const aa1 = new File(dirAA, "aa1.txt");
+                aa1.writeSync("aa1");
+                const aa2 = new File(dirAA, "aa2.txt");
+                aa2.writeSync("aa2");
+                const ab1 = new File(dirAB, "ab1.txt");
+                ab1.writeSync("ab1");
+                const ab2 = new File(dirAB, "ab2.txt");
+                ab2.writeSync("ab2");
+                const b1 = new File(dirB, "b1.txt");
+                b1.writeSync("b1");
+                const b2 = new File(dirB, "b2.txt");
+                b2.writeSync("b2");
+            });
+
+
+            it("will invoke the specified callback for every file and directory", async () => {
+                const encountered: Array<string> = [];
+
+                const handler = (item: Directory | File) => {
+                    encountered.push(item.toString());
+                    return true;   // Always recurse into directories
+                };
+
+                await tmpDir.walk(handler);
+
+                expect(encountered.length).toEqual(12);
+                expect(encountered).toContain("tmp/dirA");
+                expect(encountered).toContain("tmp/dirA/dirAA");
+                expect(encountered).toContain("tmp/dirA/dirAA/aa1.txt");
+                expect(encountered).toContain("tmp/dirA/dirAA/aa2.txt");
+                expect(encountered).toContain("tmp/dirA/dirAB");
+                expect(encountered).toContain("tmp/dirA/dirAB/ab1.txt");
+                expect(encountered).toContain("tmp/dirA/dirAB/ab2.txt");
+                expect(encountered).toContain("tmp/dirB");
+                expect(encountered).toContain("tmp/dirB/b1.txt");
+                expect(encountered).toContain("tmp/dirB/b2.txt");
+                expect(encountered).toContain("tmp/root1.txt");
+                expect(encountered).toContain("tmp/root2.txt");
+            });
+
+
+            it("will not recurse into a directory when `false` is returned", async () => {
+                const encountered: Array<string> = [];
+
+                const handler = (item: Directory | File) => {
+                    encountered.push(item.toString());
+                    // Do not recurse into dirAA.
+                    return !/dirAA$/.test(item.toString());
+                };
+
+                await tmpDir.walk(handler);
+
+                expect(encountered.length).toEqual(10);
+                expect(encountered).toContain("tmp/dirA");
+                expect(encountered).toContain("tmp/dirA/dirAA");
+                // dirAA's files will be skipped.
+                expect(encountered).toContain("tmp/dirA/dirAB");
+                expect(encountered).toContain("tmp/dirA/dirAB/ab1.txt");
+                expect(encountered).toContain("tmp/dirA/dirAB/ab2.txt");
+                expect(encountered).toContain("tmp/dirB");
+                expect(encountered).toContain("tmp/dirB/b1.txt");
+                expect(encountered).toContain("tmp/dirB/b2.txt");
+                expect(encountered).toContain("tmp/root1.txt");
+                expect(encountered).toContain("tmp/root2.txt");
+            });
+
+
+
+        });
+
+
     });
 
 

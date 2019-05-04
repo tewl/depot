@@ -20,6 +20,9 @@ export interface IDirectoryContents {
 }
 
 
+export type WalkCallback = (item: Directory | File) => boolean | Promise<boolean>;
+
+
 export class Directory
 {
 
@@ -621,5 +624,35 @@ export class Directory
                 return counterpartDestDir;
             });
         });
+    }
+
+
+    /**
+     * Walks this Directory in a depth-first manner.
+     * @param cb - A callback function that will be called for each subdirectory
+     *   and file encountered.  It is invoked with one argument: (item).  When
+     *   item is a Directory, the function returns a boolean indicating whether
+     *   to recurse into the directory.  When item is a File, the returned value
+     *   is ignored.
+     * @return A promise that is resolved when the directory tree has been
+     *   completely walked.
+     */
+    public async walk(cb: WalkCallback): Promise<void>
+    {
+        const thisDirectoryContents = await this.contents(false);
+
+        // Invoke the callback for all files concurrently.
+        const filePromises: Array<Promise<boolean>> = _.map(thisDirectoryContents.files, (curFile: File) => {
+            return BBPromise.resolve(cb(curFile));
+        });
+        await BBPromise.all(filePromises);
+
+        // Process each of the subdirectories one at a time.
+        for (const curSubDir of thisDirectoryContents.subdirs) {
+            const shouldRecurse = await BBPromise.resolve(cb(curSubDir));
+            if (shouldRecurse) {
+                await curSubDir.walk(cb);
+            }
+        }
     }
 }

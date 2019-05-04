@@ -1092,7 +1092,7 @@ describe("Directory", () => {
                 tmpDir.emptySync();
 
                 // Create the following directory structure under tmpDir.
-                // tmpDir
+                // tmp
                 // ├── dirA
                 // │   ├── dirAA
                 // │   │   ├── aa1.txt

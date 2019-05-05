@@ -11,7 +11,7 @@ const unlinkAsync = promisify1<void, string>(fs.unlink);
 const rmdirAsync = promisify1<void, string>(fs.rmdir);
 const readdirAsync = promisify1<Array<string>, string>(fs.readdir);
 const mkdirAsync = promisify1<void, string>(fs.mkdir);
-const statAsync  = promisify1<fs.Stats, string>(fs.stat);
+const lstatAsync  = promisify1<fs.Stats, string>(fs.lstat);
 
 
 export interface IDirectoryContents {
@@ -387,13 +387,14 @@ export class Directory
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
             const promises = fsEntryPaths.map((curPath) => {
-                return statAsync(curPath)
+                return lstatAsync(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {
                         contents.files.push(new File(curPath));
                     } else if (stats.isDirectory()) {
                         contents.subdirs.push(new Directory(curPath));
                     }
+                    // Note: We are ignoring symbolic links here.
                 });
             });
 
@@ -440,7 +441,7 @@ export class Directory
 
         const contents: IDirectoryContents = {subdirs: [], files: []};
         fsEntries.forEach((curFsEntry) => {
-            const stats = fs.statSync(curFsEntry);
+            const stats = fs.lstatSync(curFsEntry);
             if (stats.isFile())
             {
                 contents.files.push(new File(curFsEntry));
@@ -449,6 +450,7 @@ export class Directory
             {
                 contents.subdirs.push(new Directory(curFsEntry));
             }
+            // Note: We are ignoring symbolic links here.
         });
 
         if (recursive) {

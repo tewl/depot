@@ -16,7 +16,6 @@ describe("QuickServer", () => {
         class DerivedServer extends QuickServer
         {
 
-
             public static create(portConfig?: IPortConfig): Promise<DerivedServer>
             {
                 return determinePort(portConfig)
@@ -31,7 +30,6 @@ describe("QuickServer", () => {
                     return new DerivedServer(port, expressApp);
                 });
             }
-
 
         }
 

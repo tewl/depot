@@ -2,14 +2,16 @@ import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import * as http from "http";
 import * as net from "net";
-import * as express from "express";
 import {getExternalIpv4Addresses} from "./networkHelpers";
 import {RequestType} from "./requestHelpers";
 import * as request from "request-promise";
 
 
+type RequestListener = (request: http.IncomingMessage, response: http.ServerResponse) => void;
+
+
 /**
- * A wrapper around an Express application that simplifies configuration and
+ * A wrapper around a http/https server that simplifies configuration and
  * programmatic control.
  *
  * See this classes unit test file for an example of how to create a derived
@@ -20,8 +22,8 @@ export class QuickServer
 
     // region Instance Members
     private readonly _port: number;
-    private readonly _expressApp: express.Express;
-    private          _server:  http.Server | undefined;
+    private readonly _requestListener: RequestListener;
+    private          _server: http.Server | undefined;
     private          _connections: {[remoteAddrAndPort: string]: net.Socket} = {};
 
     // undefined: The server is not listening/running, so it is neither
@@ -36,26 +38,18 @@ export class QuickServer
      * Constructs a new server instance.
      * This constructor is private, because `create()` should be used instead.
      *
-     * @param port - The port number the Express will run on (once `start()` is
-     * called)
-     * @param expressApp - The wrapped Express app
+     * @param port - The port number the server will run on (once `start()` is
+     *   called)
+     * @param requestListener - The request listener (This can be an Express
+     *   app)
      */
     protected constructor(
         port: number,
-        expressApp: express.Express
+        requestListener: RequestListener
     )
     {
         this._port       = port;
-        this._expressApp = expressApp;
-    }
-
-
-    /**
-     * Gets the wrapped Express app instance
-     */
-    public get express(): express.Express
-    {
-        return this._expressApp;
+        this._requestListener = requestListener;
     }
 
 
@@ -131,7 +125,9 @@ export class QuickServer
         }
 
         return new BBPromise((resolve) => {
-            this._server = this._expressApp.listen(this._port, () => {
+
+            this._server = http.createServer(this._requestListener);
+            this._server.listen(this._port, () => {
 
                 if (!referenced) {
                     this._server!.unref();
@@ -152,6 +148,7 @@ export class QuickServer
                 // The server is now running.
                 resolve();
             });
+
         });
     }
 

@@ -107,7 +107,6 @@ function runUnitTests() {
             ],
             "stopSpecOnExpectationFailure": false,
             "random": false
-
         }
     );
 

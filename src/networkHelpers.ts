@@ -31,6 +31,18 @@ export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: str
 
 
 /**
+ * Gets the first externally exposed IPv4 address
+ * @return The first externally exposed IPv4 address
+ */
+export function getFirstExternalIpv4Address(): string
+{
+    const addresses = getExternalIpv4Addresses();
+    const address = _.first(_.values(addresses))!;
+    return address;
+}
+
+
+/**
  * Helper function that will determine if the specified port is available.
  * @param port - The port to test.  Specify 0 if you want to find the first
  * available port.

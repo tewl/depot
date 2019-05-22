@@ -1,14 +1,21 @@
+import * as http from "http";
+import * as https from "https";
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
-import * as http from "http";
 import * as net from "net";
-import {getExternalIpv4Addresses} from "./networkHelpers";
+import {getFirstExternalIpv4Address} from "./networkHelpers";
 import {RequestType} from "./requestHelpers";
 import * as request from "request-promise";
 
 
 type RequestListener = (request: http.IncomingMessage, response: http.ServerResponse) => void;
 
+
+export interface ISslConfig {
+    key:          Buffer | string;
+    cert:         Buffer | string;
+    isSelfSigned: boolean;
+}
 
 /**
  * A wrapper around a http/https server that simplifies configuration and
@@ -21,10 +28,11 @@ export class QuickServer
 {
 
     // region Instance Members
-    private readonly _port: number;
+    private readonly _port:            number;
+    private readonly _sslConfig:       undefined | ISslConfig;
     private readonly _requestListener: RequestListener;
-    private          _server: http.Server | undefined;
-    private          _connections: {[remoteAddrAndPort: string]: net.Socket} = {};
+    private          _server:          undefined | http.Server | https.Server;
+    private          _connections:     {[remoteAddrAndPort: string]: net.Socket} = {};
 
     // undefined: The server is not listening/running, so it is neither
     //            referenced nor unreferenced.
@@ -40,15 +48,20 @@ export class QuickServer
      *
      * @param port - The port number the server will run on (once `start()` is
      *   called)
+     * @param sslConfig - `undefined` if a http server is desired.  If a https
+     *   server is desired, this parameter must be given, specifying the private
+     *   key and certificate.
      * @param requestListener - The request listener (This can be an Express
      *   app)
      */
     protected constructor(
         port: number,
+        sslConfig: undefined | ISslConfig,
         requestListener: RequestListener
     )
     {
-        this._port       = port;
+        this._port            = port;
+        this._sslConfig       = sslConfig;
         this._requestListener = requestListener;
     }
 
@@ -57,7 +70,7 @@ export class QuickServer
      * Gets the wrapped HTTP server.  undefined is returned if there is no
      * server (i.e. listen() has not been called).
      */
-    public get server(): http.Server | undefined
+    public get server(): undefined | http.Server | https.Server
     {
         return this._server;
     }
@@ -78,9 +91,7 @@ export class QuickServer
      */
     public get ipAddress(): string
     {
-        const addresses = getExternalIpv4Addresses();
-        const address = _.first(_.values(addresses))!;
-        return address;
+        return getFirstExternalIpv4Address();
     }
 
 
@@ -90,7 +101,8 @@ export class QuickServer
     public get url(): string
     {
         const ipAddress = this.ipAddress;
-        return `http://${ipAddress}:${this._port}`;
+        const protocol = this._sslConfig ? "https" : "http";
+        return `${protocol}://${ipAddress}:${this._port}`;
     }
 
 
@@ -106,7 +118,20 @@ export class QuickServer
      */
     public get request(): RequestType
     {
-        return request.defaults({baseUrl: this.url, json: true});
+        const requestOptions: request.RequestPromiseOptions = {
+            baseUrl: this.url,
+            json:    true
+        };
+
+        // If this server is using a self-signed certificate, clients will not
+        // be able to walk the certificate chain back to a root CA.  Typically,
+        // this would cause a "self signed certificate" error.  To get around
+        // this, we will not require this authorization.
+        if (this._sslConfig && this._sslConfig.isSelfSigned) {
+            requestOptions.rejectUnauthorized = false;
+        }
+
+        return request.defaults(requestOptions);
     }
 
 
@@ -126,7 +151,13 @@ export class QuickServer
 
         return new BBPromise((resolve) => {
 
-            this._server = http.createServer(this._requestListener);
+            if (this._sslConfig) {
+                this._server = https.createServer(this._sslConfig, this._requestListener);
+            }
+            else {
+                this._server = http.createServer(this._requestListener);
+            }
+
             this._server.listen(this._port, () => {
 
                 if (!referenced) {

@@ -112,10 +112,6 @@ describe("Fraction", () => {
                 expect(Fraction.fromString("-3 3/2").toString()).toEqual("-4 1/2");
             });
 
-
-
-
-
         });
 
 

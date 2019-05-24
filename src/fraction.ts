@@ -7,11 +7,6 @@ const justFrac  = /^(\d+)\/(\d+)$/;
 const allParts  = /^(\d+) (\d+)\/(\d+)$/;
 
 
-// A regular expression for a number that may be negative and always has a
-// fractional part.
-const numRegex = /^(-?)(\d+)\.(\d+)$/;
-
-
 export class Fraction
 {
     public static fromParts(whole: number, num: number, den: number): Fraction; // tslint:disable-line:unified-signatures
@@ -146,6 +141,10 @@ export class Fraction
         if (_.isSafeInteger(num)) {
             return new Fraction(num, 1);
         }
+
+        // A regular expression for a number that may be negative and always has
+        // a fractional part.
+        const numRegex = /^(-?)(\d+)\.(\d+)$/;
 
         const numStr = "" + num;
         const negativeAdjuster = num < 0 ? -1 : 1;

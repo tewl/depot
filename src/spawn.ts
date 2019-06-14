@@ -62,7 +62,8 @@ export function spawn(
     const stderrCollector = new CollectorStream();
     let childProcess: cp.ChildProcess;
 
-    const closePromise = new BBPromise((resolve: (output: string) => void, reject: (err: {exitCode: number, stderr: string}) => void) => {
+    const closePromise = new BBPromise((resolve: (output: string) => void,
+                                        reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
 
         const spawnOptions = {
             cwd: cwd,
@@ -100,7 +101,7 @@ export function spawn(
                     {
                         console.log(`Child process failed: ${cmdLineRepresentation}`);
                     }
-                    reject({exitCode: exitCode, stderr: stderrCollector.collected});
+                    reject({exitCode: exitCode, stderr: stderrCollector.collected, stdout: stdoutCollector.collected});
                 }
             });
         });

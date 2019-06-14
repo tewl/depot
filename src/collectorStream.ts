@@ -13,7 +13,7 @@ export class CollectorStream extends Transform
     constructor()
     {
         super();
-        this._collected = new Buffer("");
+        this._collected = Buffer.from("");
         this._flushedDeferred = new Deferred<void>();
     }
 

@@ -135,7 +135,7 @@ export type Task<ResolveType> = () => Promise<ResolveType>;
  * should throw an exception if it wishes to terminate the sequence and reject
  * the returned promise.
  * @param initialValue - The value that will be passed into the first function.
- * @returns {Promise<any>} A promise that will be resolved with the return value
+ * @returns A promise that will be resolved with the return value
  * of the last function.
  */
 export function sequence(
@@ -285,7 +285,7 @@ export function streamToPromise(stream: Writable): Promise<void> {
  * rejecting the returned Promise.  This argument should always be greater than
  * or equal to 1.  If it is not, theFunc will be tried only once.
  *
- * @returns {Promise} A Promise that will be resolved immediately (with the same
+ * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
  * returned by theFunc rejects, it will be retried up to maxNumAttempts
  * invocations.  If the Promise returned by the last invocation of theFunc
@@ -317,7 +317,7 @@ export function retry<ResolveType>(
  * rejecting the returned Promise.  This argument should always be greater than
  * or equal to 1.  If it is not, theFunc will be tried only once.
  *
- * @returns {Promise} A Promise that will be resolved immediately (with the same
+ * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
  * returned by theFunc rejects, it will be retried up to maxNumAttempts
  * invocations.  If the Promise returned by the last invocation of theFunc
@@ -335,7 +335,6 @@ export function retryWhile<ResolveType>(
 /**
  * The value that will be multiplied by successively higher powers of 2 when
  * calculating delay time during exponential backoff.
- * @type {number}
  */
 const BACKOFF_MULTIPLIER: number = 20;
 
@@ -347,7 +346,7 @@ const BACKOFF_MULTIPLIER: number = 20;
  * @param whilePredicate - Predicate that determines whether to retry
  * @param maxNumAttempts - Maximum number of invocations of theFunc
  * @param attemptsSoFar - Number of theFunc invocations so far
- * @returns {Promise} The Promise returned to the client
+ * @returns The Promise returned to the client
  */
 function retryWhileImpl<ResolveType>(
     theFunc:         () => Promise<ResolveType>,
@@ -411,7 +410,7 @@ function retryWhileImpl<ResolveType>(
  * body.  Iteration will stop when this function returns false.
  * @param body - A promise returning function that will be invoked for each
  * iteration.  This function is responsible for making predicate eventually return false.
- * @returns {Promise<void>} A Promise that is resolved when all iterations have
+ * @returns A Promise that is resolved when all iterations have
  * successfully completed or will be rejected when body returns a rejected promise.
  */
 export function promiseWhile(predicate: () => boolean, body: Task<void>): Promise<void> {

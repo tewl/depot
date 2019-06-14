@@ -2,7 +2,6 @@ import {EventEmitter} from "events";
 
 
 /**
- * @class
  * @classdesc This class was created to help track the listeners that have been
  * registered with an EventEmitter.  Most of the time this is not needed,
  * because you can simply call emitter.removeAllListeners().  In old versions of

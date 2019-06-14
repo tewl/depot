@@ -598,7 +598,7 @@ export class File
 
     /**
      * Reads JSON data from this file.  Rejects if this file does not exist.
-     * @return {Promise<T>} A promise for the parsed data contained in this file
+     * @return A promise for the parsed data contained in this file
      */
     public readJson<T>(): Promise<T>
     {
@@ -611,7 +611,7 @@ export class File
 
     /**
      * Reads JSON data from this file.  Throws if this file does not exist.
-     * @return {T} The parsed data contained in this file
+     * @return The parsed data contained in this file
      */
     public readJsonSync<T>(): T
     {

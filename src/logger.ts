@@ -23,7 +23,6 @@ Object.freeze(LogLevel);
 
 /**
  * Labels used to identify the severity of each log message
- * @type {string[]}
  */
 const levelLabels: Array<string> = [
     "OFF",
@@ -101,7 +100,7 @@ export class Logger
     /**
      * Gets the current severity level for this logger.  All messages with a
      * higher or equal severity will be logged.
-     * @returns {LogLevel} The current severity level
+     * @returns The current severity level
      */
     public getCurrentLevel(): LogLevel
     {
@@ -118,7 +117,7 @@ export class Logger
      * Logs a message with severity level ERROR_1.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public error(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -130,7 +129,7 @@ export class Logger
      * Logs a message with severity level WARN_2.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public warn(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -142,7 +141,7 @@ export class Logger
      * Logs a message with severity level INFO_3.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public info(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -154,7 +153,7 @@ export class Logger
      * Logs a message with severity level VERBOSE_4.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public verbose(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -166,7 +165,7 @@ export class Logger
      * Logs a message with severity level DEBUG_5.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public debug(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -178,7 +177,7 @@ export class Logger
      * Logs a message with severity level SILLY_6.
      * @param msg - The message to be logged
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged given current logger settings.
+     * @returns Whether the message was logged given current logger settings.
      */
     public silly(msg: string, ...optionalParams: Array<any>): boolean
     {
@@ -190,10 +189,10 @@ export class Logger
 
     /**
      * Helper method that implements logging logic
-     * @param {LogLevel} level - The severity level of the logged message
-     * @param {string} msg - The message to log
+     * @param level - The severity level of the logged message
+     * @param msg - The message to log
      * @param optionalParams - Additional values to be logged
-     * @returns {boolean} Whether the message was logged.
+     * @returns Whether the message was logged.
      */
     private log(level: LogLevel, msg: string, ...optionalParams: Array<any>): boolean
     {

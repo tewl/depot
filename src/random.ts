@@ -11,7 +11,7 @@
 
 /**
  * Returns a random (floating point) number between 0 (included) and 1 (excluded)
- * @returns {number} The generated random floating point number
+ * @returns The generated random floating point number
  */
 export function getRandom(): number {
     "use strict";
@@ -23,7 +23,7 @@ export function getRandom(): number {
  * Returns a random (floating point) number.
  * @param minIncluded - The minimum possible value
  * @param maxExcluded - The maximum value
- * @returns {number} The generated random floating point number
+ * @returns The generated random floating point number
  */
 export function getRandomFloat(minIncluded: number, maxExcluded: number): number {
     "use strict";
@@ -35,7 +35,7 @@ export function getRandomFloat(minIncluded: number, maxExcluded: number): number
  * Returns a random integer between minIncluded and maxExcluded
  * @param minIncluded - The minimum possible value
  * @param maxExcluded - The maximum possible value
- * @returns {number} The generated random integer
+ * @returns The generated random integer
  */
 export function getRandomInt(minIncluded: number, maxExcluded: number): number {
     "use strict";
@@ -48,7 +48,7 @@ export function getRandomInt(minIncluded: number, maxExcluded: number): number {
  * Returns a random integer between minIncluded and maxIncluded
  * @param minIncluded - The minimum possible value
  * @param maxIncluded - The maximum possible value
- * @returns {number} The generated random integer
+ * @returns The generated random integer
  */
 export function getRandomIntInclusive(minIncluded: number, maxIncluded: number): number {
     "use strict";

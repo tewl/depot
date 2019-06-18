@@ -133,8 +133,8 @@ export class SemVer
      * Compares this version with other and determines whether the this version
      * is less, greater or equal to other.
      * @param other - The other version to compare to
-     * @return {-1 | 0 | 1} -1 if this version is less than other. 1 if this
-     * version is greater than other.  0 if this version equals other.
+     * @return -1 if this version is less than other. 1 if this version is
+     * greater than other.  0 if this version equals other.
      */
     public compare(other: SemVer): -1 | 0 | 1
     {

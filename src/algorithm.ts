@@ -22,7 +22,7 @@ export function advance<ValueType>(it: Iterator<ValueType>, offset: number): voi
  * Calculates the distance between two (ordered) iterators.
  * @param itA - The lower Iterator
  * @param itB - The upper Iterator
- * @returns {number} The distance from itA to itB
+ * @returns The distance from itA to itB
  */
 export function distance<ValueType>(itA: Iterator<ValueType>, itB: Iterator<ValueType>): number {
     "use strict";
@@ -44,9 +44,9 @@ export function distance<ValueType>(itA: Iterator<ValueType>, itB: Iterator<Valu
  * @param itBegin - The beginning of the range to search (inclusive)
  * @param itEnd - The end of the range to search (exclusive)
  * @param value - The value to search for
- * @returns {Iterator<ValueType>} - If successful, an Iterator pointing to the
- * first element in [itBegin, itEnd) whose value equals value.  If a matching
- * element was not found, itEnd is returned.
+ * @returns If successful, an Iterator pointing to the first element in
+ * [itBegin, itEnd) whose value equals value.  If a matching element was not
+ * found, itEnd is returned.
  */
 export function find<ValueType>(
     itBegin: Iterator<ValueType>,
@@ -75,8 +75,8 @@ export function find<ValueType>(
  * @param itFirst - The first element in the range to be partitioned (inclusive)
  * @param itLast - The end of the range to be partitioned (exclusive)
  * @param pred - The unary predicate that will be invoked on each element
- * @returns {Iterator<ValueType>} An Iterator pointing to the beginning of the
- * range of false yielding elements.
+ * @returns An Iterator pointing to the beginning of the range of false yielding
+ * elements.
  */
 export function partition<ValueType>(
     itFirst: Iterator<ValueType>,

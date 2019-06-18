@@ -650,7 +650,6 @@ export class GitRepo
 
     /**
      * Helper method that retrieves Git log entries
-     * @private
      * @method
      * @return A promise for an array of structures describing each commit.
      */

@@ -29,7 +29,6 @@ export class GitBranch
 
     /**
      * Validates the specified branch name
-     * @static
      * @method
      * @param branchName - The name to validate
      * @return A promise for a boolean that will indicate whether branchName is
@@ -66,7 +65,6 @@ export class GitBranch
 
     /**
      * Creates a GitBranch
-     * @static
      * @method
      * @param repo - The repo associated with the branch
      * @param branchName - The name of the branch
@@ -91,7 +89,6 @@ export class GitBranch
 
     /**
      * Enumerates the branches that exist within the specified repo.
-     * @static
      * @method
      * @param repo - The repo in which the branches are to be enumerated
      * @return A Promise for an array of branches in the specified repo

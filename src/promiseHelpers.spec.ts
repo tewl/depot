@@ -367,13 +367,13 @@ describe("retry()", () => {
  * the function is called, it will return a rejected promise.  After that, it
  * will return resolved promises.
  *
- * @param {number} numFailures - The number of times the returned function
+ * @param numFailures - The number of times the returned function
  * should return a rejected promise.
  *
- * @param {T} resolveValue - The value that the returned promise will be
+ * @param resolveValue - The value that the returned promise will be
  * resolved with
  *
- * @param {U} rejectValue - The value that the returned promise will reject with
+ * @param rejectValue - The value that the returned promise will reject with
  *
  * @returns A function that will return a rejected promise the first n times it
  * is called.

@@ -62,7 +62,6 @@ export class NodePackage
      * be called by clients.  Instead, use one of the static methods to create
      * instances.
      *
-     * @class
      * @classdesc A class that represents a Node.js package.
      *
      * @param pkgDir - The directory containing the Node.js package

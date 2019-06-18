@@ -116,7 +116,8 @@ export class GitRepo
             return spawn(
                 "git",
                 ["clone", srcStr, repoDirName],
-                parentDir.toString())
+                {cwd: parentDir.toString()}
+            )
             .closePromise;
         })
         .then(() => {
@@ -173,7 +174,7 @@ export class GitRepo
      */
     public files(): Promise<Array<File>>
     {
-        return spawn("git", ["ls-files"], this._dir.toString())
+        return spawn("git", ["ls-files"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             const relativeFilePaths = stdout.split("\n");
@@ -188,7 +189,7 @@ export class GitRepo
     // correct preceding path.
     public modifiedFiles(): Promise<Array<File>>
     {
-        return spawn("git", ["ls-files", "-m"], this._dir.toString())
+        return spawn("git", ["ls-files", "-m"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             if (stdout === "")
@@ -207,7 +208,7 @@ export class GitRepo
     // correct preceding path.
     public untrackedFiles(): Promise<Array<File>>
     {
-        return spawn("git", ["ls-files",  "--others",  "--exclude-standard"], this._dir.toString())
+        return spawn("git", ["ls-files",  "--others",  "--exclude-standard"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             if (stdout === "")
@@ -225,7 +226,7 @@ export class GitRepo
     // TODO: Write unit tests for this method.  Make sure there is no leading or trailing whitespace.
     public currentCommitHash(): Promise<CommitHash>
     {
-        return spawn("git", ["rev-parse", "--verify", "HEAD"], this._dir.toString())
+        return spawn("git", ["rev-parse", "--verify", "HEAD"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             const hash = CommitHash.fromString(stdout);
@@ -245,7 +246,7 @@ export class GitRepo
      */
     public remotes(): Promise<{[name: string]: string}>
     {
-        return spawn("git", ["remote", "-vv"], this._dir.toString())
+        return spawn("git", ["remote", "-vv"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
 
@@ -314,7 +315,7 @@ export class GitRepo
 
     public tags(): Promise<Array<string>>
     {
-        return spawn("git", ["tag"], this._dir.toString())
+        return spawn("git", ["tag"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             if (stdout.length === 0)
@@ -347,7 +348,7 @@ export class GitRepo
         args = _.concat(args, "-a", tagName);
         args = _.concat(args, "-m", message);
 
-        return spawn("git", args, this._dir.toString())
+        return spawn("git", args, {cwd: this._dir.toString()})
         .closePromise
         .then(() => {
             return this;
@@ -357,7 +358,7 @@ export class GitRepo
 
     public deleteTag(tagName: string): Promise<GitRepo>
     {
-        return spawn("git", ["tag", "--delete", tagName], this._dir.toString())
+        return spawn("git", ["tag", "--delete", tagName], {cwd: this._dir.toString()})
         .closePromise
         .catch((err) => {
             if (err.stderr.includes("not found"))
@@ -386,7 +387,7 @@ export class GitRepo
 
         args = _.concat(args, remoteName, tagName);
 
-        return spawn("git", args, this._dir.toString())
+        return spawn("git", args, {cwd: this._dir.toString()})
         .closePromise
         .then(() => {
             return this;
@@ -442,7 +443,7 @@ export class GitRepo
         // $ git rev-parse --abbrev-ref HEAD
         // HEAD
 
-        return spawn("git", ["rev-parse", "--abbrev-ref", "HEAD"], this._dir.toString()).closePromise
+        return spawn("git", ["rev-parse", "--abbrev-ref", "HEAD"], {cwd: this._dir.toString()}).closePromise
         .then((branchName) => {
             if (branchName === "HEAD") {
                 // The repo is in detached head state.
@@ -474,7 +475,7 @@ export class GitRepo
                 branch.name
             ];
 
-            return spawn("git", args, this._dir.toString()).closePromise;
+            return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
         .then(() => {});
     }
@@ -482,14 +483,14 @@ export class GitRepo
 
     public checkoutCommit(commit: CommitHash): Promise<void>
     {
-        return spawn("git", ["checkout", commit.toString()], this._dir.toString()).closePromise
+        return spawn("git", ["checkout", commit.toString()], {cwd: this._dir.toString()}).closePromise
         .then(() => {});
     }
 
 
     public stageAll(): Promise<GitRepo>
     {
-        return spawn("git", ["add", "."], this._dir.toString())
+        return spawn("git", ["add", "."], {cwd: this._dir.toString()})
         .closePromise
         .then(() => {
             return this;
@@ -512,7 +513,7 @@ export class GitRepo
                 remoteName,
                 curBranch.name
             ];
-            return spawn("git", args, this._dir.toString()).closePromise;
+            return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
         .then(() => {
         })
@@ -540,13 +541,13 @@ export class GitRepo
             const numAheadPromise = spawn(
                 "git",
                 ["rev-list", thisBranchName, "--not", trackingBranchName, "--count"],
-                this._dir.toString()
+                {cwd: this._dir.toString()}
             ).closePromise;
 
             const numBehindPromise = spawn(
                 "git",
                 ["rev-list", trackingBranchName, "--not", thisBranchName, "--count"],
-                this._dir.toString()
+                {cwd: this._dir.toString()}
             ).closePromise;
 
             return BBPromise.all([numAheadPromise, numBehindPromise]);
@@ -567,15 +568,15 @@ export class GitRepo
     // TODO: Add unit tests for this method.
     public commit(msg: string = ""): Promise<IGitLogEntry>
     {
-        return spawn("git", ["commit", "-m", msg], this._dir.toString())
+        return spawn("git", ["commit", "-m", msg], {cwd: this._dir.toString()})
         .closePromise
         .then(() => {
             // Get the commit hash
-            return spawn("git", ["rev-parse", "HEAD"], this._dir.toString()).closePromise;
+            return spawn("git", ["rev-parse", "HEAD"], {cwd: this._dir.toString()}).closePromise;
         })
         .then((stdout) => {
             const commitHash = _.trim(stdout);
-            return spawn("git", ["show", commitHash], this._dir.toString()).closePromise;
+            return spawn("git", ["show", commitHash], {cwd: this._dir.toString()}).closePromise;
         })
         .then((stdout) => {
             const match = GIT_LOG_ENTRY_REGEX.exec(stdout);
@@ -608,7 +609,7 @@ export class GitRepo
             remoteName
         ];
 
-        return spawn("git", args, this._dir.toString()).closePromise
+        return spawn("git", args, {cwd: this._dir.toString()}).closePromise
         .then(
             () => {},
             (err) => {
@@ -655,7 +656,7 @@ export class GitRepo
      */
     private getLogEntries(): Promise<Array<IGitLogEntry>>
     {
-        return spawn("git", ["log"], this._dir.toString())
+        return spawn("git", ["log"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
             const entries: Array<IGitLogEntry> = [];

@@ -27,9 +27,7 @@ export interface ISpawnResult
  *     the child process starts
  * @param cmd - The command to run
  * @param args - An array of arguments for cmd
- * @param cwd - The current working directory for the child process
- * @param env - A collection of environment variables to set for the child
- *     process.  If not specified, process.env will be used.
+ * @param options - Spawn options.  See child_process.spawn for more info.
  * @param stdoutStream - The stream to receive stdout.  A NullStream if
  *     undefined.
  *     For example:
@@ -42,8 +40,7 @@ export interface ISpawnResult
 export function spawn(
     cmd: string,
     args: Array<string>,
-    cwd?: string,
-    env?: {[key: string]: string},
+    options?: cp.SpawnOptions,
     description?: string,
     stdoutStream?: WriteStream,
     stderrStream?: WriteStream
@@ -65,11 +62,10 @@ export function spawn(
     const closePromise = new BBPromise((resolve: (output: string) => void,
                                         reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
 
-        const spawnOptions = {
-            cwd: cwd,
-            env: env,
-            stdio: [process.stdin, "pipe", "pipe"]
-        };
+        const spawnOptions: cp.SpawnOptions = _.defaults(
+            {},
+            options,
+            {stdio: [process.stdin, "pipe", "pipe"]});
 
         childProcess = cp.spawn(cmd, args, spawnOptions);
 

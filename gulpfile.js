@@ -68,8 +68,8 @@ function runTslint(emitError)
     // Add the globs defining source files to the list of arguments.
     tslintArgs = tslintArgs.concat(getSrcGlobs(true));
 
-    return spawn("./node_modules/.bin/tslint", tslintArgs, __dirname,
-                 undefined, undefined, process.stdout, process.stderr)
+    return spawn("./node_modules/.bin/tslint", tslintArgs, {cwd: __dirname},
+                 undefined, process.stdout, process.stderr)
     .closePromise
     .catch((err) => {
         // If we're supposed to emit an error, then go ahead and rethrow it.

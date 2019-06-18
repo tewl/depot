@@ -14,7 +14,7 @@ describe("spawn", () => {
 
     it("will run the specified command", (done) => {
         const testFilePath = path.join(tmpDir.absPath(), "foo.txt");
-        spawn("touch", ["foo.txt"], tmpDir.absPath()).closePromise
+        spawn("touch", ["foo.txt"], {cwd: tmpDir.absPath()}).closePromise
         .then(() => {
             const stats = fs.statSync(testFilePath);
             expect(stats.isFile()).toBeTruthy();
@@ -24,9 +24,9 @@ describe("spawn", () => {
 
 
     it("will resolve with the stdout text", (done) => {
-        spawn("touch", ["foo.txt"], tmpDir.absPath()).closePromise
+        spawn("touch", ["foo.txt"], {cwd: tmpDir.absPath()}).closePromise
         .then(() => {
-            return spawn("ls", [], tmpDir.absPath()).closePromise;
+            return spawn("ls", [], {cwd: tmpDir.absPath()}).closePromise;
         })
         .then((output) => {
             expect(output).toContain("foo.txt");
@@ -36,7 +36,7 @@ describe("spawn", () => {
 
 
     it("provides access to the underlying child process", (done) => {
-        const spawnResult = spawn("sleep", ["10"], tmpDir.absPath());
+        const spawnResult = spawn("sleep", ["10"], {cwd: tmpDir.absPath()});
         spawnResult.childProcess.kill();
         spawnResult.closePromise
         .then(() => {
@@ -113,7 +113,7 @@ describe("spawn", () => {
 
     it("provides the exit code and stderr when the command fails", (done) => {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
-        spawn("cat", [nonExistantFilePath], ".").closePromise
+        spawn("cat", [nonExistantFilePath]).closePromise
         .catch((err) => {
             expect(err).toBeTruthy();
             expect(err.exitCode).not.toEqual(0);
@@ -126,7 +126,7 @@ describe("spawn", () => {
     it("will set the specified environment variables", (done) => {
 
         const env = _.assign({}, process.env, {xyzzy: "xyzzy-xyzzy"});
-        spawn("node", ["-e", "console.log(process.env.xyzzy);"], undefined, env)
+        spawn("node", ["-e", "console.log(process.env.xyzzy);"], {env: env})
         .closePromise
         .then((output) => {
             expect(output).toEqual("xyzzy-xyzzy");

@@ -98,7 +98,7 @@ export class GitBranch
      */
     public static enumerateGitRepoBranches(repo: GitRepo): Promise<Array<GitBranch>>
     {
-        return spawn("git", ["branch", "-a"], repo.directory.toString()).closePromise
+        return spawn("git", ["branch", "-a"], {cwd: repo.directory.toString()}).closePromise
         .then((stdout) => {
             return _.chain(stdout.split("\n"))
             // Get rid of leading and trailing whitespace
@@ -218,7 +218,7 @@ export class GitBranch
 
         // TODO: Make sure this GitBranch instance is a local branch.
 
-        return spawn("git", ["branch", "-vv"], this._repo.directory.toString()).closePromise
+        return spawn("git", ["branch", "-vv"], {cwd: this._repo.directory.toString()}).closePromise
         .then((output) => {
             const outputLines = output.split(EOL);
 

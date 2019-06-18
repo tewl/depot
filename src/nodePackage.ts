@@ -101,7 +101,7 @@ export class NodePackage
      */
     public pack(outDir?: Directory): Promise<File>
     {
-        return spawn("npm", ["pack"], this._pkgDir.toString())
+        return spawn("npm", ["pack"], {cwd: this._pkgDir.toString()})
         .closePromise
         .then((stdout: string) => {
             return new File(this._pkgDir, stdout);
@@ -156,7 +156,7 @@ export class NodePackage
             // Running the following gunzip command will extract the .tgz file
             // to a .tar file with the same basename.  The original .tgz file is
             // deleted.
-            return spawn("gunzip", ["--force", tgzFile.fileName], tmpDir.toString())
+            return spawn("gunzip", ["--force", tgzFile.fileName], {cwd: tmpDir.toString()})
             .closePromise;
         })
         .then(() => {
@@ -177,7 +177,7 @@ export class NodePackage
             return unpackedDir.empty();  // Creates (if needed) and empties this directory.
         })
         .then(() => {
-            return spawn("tar", ["-x", "-C", unpackedDir.toString(), "-f", extractedTarFile.toString()], tmpDir.toString())
+            return spawn("tar", ["-x", "-C", unpackedDir.toString(), "-f", extractedTarFile.toString()], {cwd: tmpDir.toString()})
             .closePromise;
         })
         .then(() => {

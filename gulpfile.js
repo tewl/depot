@@ -154,6 +154,9 @@ gulp.task("build", () => {
 
 
 function compileTypeScript() {
+    // TODO: Change this to just spawn a child process running tsc.
+    //   - Remove unneeded gulp packages
+
     const ts         = require("gulp-typescript");
     const sourcemaps = require("gulp-sourcemaps");
 

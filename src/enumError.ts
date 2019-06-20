@@ -1,6 +1,3 @@
-// A polyfill for es2015 Object.setPrototypeOf().
-// tslint:disable-next-line:no-require-imports
-import setPrototypeOf = require("setprototypeof");
 import {numericEnumValToString} from "./enumHelpers";
 
 
@@ -22,7 +19,7 @@ class EnumError<T> extends Error
         // Unfortunately, there is a weird issue related to extending Error and
         // targeting ES5.  See: http://bit.ly/2wDu0XP
         super(`Error ${errorNum} (${numericEnumValToString(enumObject, errorNum)})`);
-        setPrototypeOf(this, EnumError.prototype);
+        Object.setPrototypeOf(this, EnumError.prototype);
 
         this.errorNum = errorNum;
     }
@@ -44,7 +41,7 @@ export let getEnumErrorClass = <T>(enumObject: T) => {
         public constructor(errorNum: T[keyof T])
         {
             super(enumObject, errorNum);
-            setPrototypeOf(this, SpecificEnumError.prototype);
+            Object.setPrototypeOf(this, SpecificEnumError.prototype);
         }
     };
 };

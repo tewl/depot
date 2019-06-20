@@ -17,7 +17,7 @@ export function promptToContinue<T>(
     defaultToConfirm: boolean,
     resolveValue: T
 ): Promise<T> {
-    const questionConfirmation = {
+    const questionConfirmation: inquirer.Question = {
         type: "confirm",
         name: "confirm",
         default: defaultToConfirm,

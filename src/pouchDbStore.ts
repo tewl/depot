@@ -64,7 +64,7 @@ export class PouchDbStore extends AStore<IPouchDbStow>
         });
 
         return {
-            serialized: serialized as ISerialized,
+            serialized: serialized as unknown as ISerialized,
             stow:       {_rev: dbRepresentation._rev}
         };
     }

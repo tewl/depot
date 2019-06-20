@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {CollectorStream} from "./collectorStream";
 import * as cp from "child_process";
-import WriteStream = NodeJS.WriteStream;
+import * as stream from "stream";
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
 
@@ -42,8 +42,8 @@ export function spawn(
     args: Array<string>,
     options?: cp.SpawnOptions,
     description?: string,
-    stdoutStream?: WriteStream,
-    stderrStream?: WriteStream
+    stdoutStream?: stream.Writable,
+    stderrStream?: stream.Writable
 ): ISpawnResult {
     const cmdLineRepresentation = getCommandLineRepresentation(cmd, args);
 

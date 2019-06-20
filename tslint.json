@@ -18,6 +18,7 @@
     "array-type": [true, "generic"],
     "arrow-return-shorthand": true,
     "ban": false,
+    "callable-types": false,
     "class-name": true,
     "comment-format": [
       true,
@@ -26,6 +27,7 @@
     "curly": true,
     "eofline": true,
     "forin": true,
+    "import-spacing": false,
     "indent": [
       true,
       "spaces"
@@ -44,18 +46,18 @@
     "member-ordering": [
       true,
       {"order": [
-        "public-static-field",
-        "protected-static-field",
         "private-static-field",
-        "public-static-method",
-        "protected-static-method",
         "private-static-method",
+        "protected-static-field",
+        "protected-static-method",
+        "public-static-field",
+        "public-static-method",
         "private-instance-field",
         "protected-instance-field",
         "public-instance-field",
-        "public-constructor",
         "private-constructor",
         "protected-constructor",
+        "public-constructor",
         "public-instance-method",
         "protected-instance-method",
         "private-instance-method"
@@ -75,6 +77,7 @@
       "trace"
     ],
     "no-construct": true,
+    "no-parameter-properties": true,
     "no-debugger": true,
     "no-duplicate-super": true,
     "no-duplicate-variable": true,
@@ -93,7 +96,6 @@
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
     "no-unused-expression": true,
-    "no-use-before-declare": false,
     "no-var-keyword": true,
     "no-var-requires": true,
     "object-literal-shorthand": false,

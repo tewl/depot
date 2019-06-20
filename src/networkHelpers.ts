@@ -56,7 +56,10 @@ function isAvailable(port: number): Promise<number>
         server.unref();
         server.on("error", reject);
         server.listen({port}, () => {
-            const {port} = server.address();
+            // address() will return a string when listening on a pipe or UNIX
+            // domain socket, but we are not doing that and will always get an
+            // AddressInfo.
+            const {port} = server.address() as net.AddressInfo;
             server.close(() => {
                 resolve(port);
             });

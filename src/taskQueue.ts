@@ -28,7 +28,16 @@ export class TaskQueue extends EventEmitter
     // endregion
 
 
-    public constructor(numConcurrent: number | undefined, pauseWhenDrained?: boolean)
+    /**
+     * Creates a new TaskQueue instance.
+     * @param numConcurrent - The maximum number of tasks that can be run
+     *   concurrently.
+     * @param pauseWhenDrained - Whether task execution should automatically
+     *   stop when this queue is emptied.  New tasks added to the queue will not
+     *   run automatically.
+     * @return The new TaskQueue instance
+     */
+    public constructor(numConcurrent: number | undefined, pauseWhenDrained: boolean = false)
     {
         super();
 

@@ -436,3 +436,59 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
         setTimeout(loop, 0);
     });
 }
+
+
+/**
+ * Maps an array of Promises to a new same sized array of Promises.  The new
+ * array of Promises will settle starting at index 0 and continue through the
+ * array sequentially.
+ * @param inputPromises - The array of Promises to transform
+ * @returns A new array of Promises that will settle sequentially,
+ * starting at index 0.
+ */
+export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Promise<any>> {
+    "use strict";
+
+    const outputPromises: Array<Promise<any>> = [];
+
+    _.forEach(inputPromises, (curInputPromise) => {
+        const previousPromise: Promise<any> = outputPromises.length > 0 ?
+                                              outputPromises[outputPromises.length - 1] :
+                                              BBPromise.resolve();
+
+        const promise: Promise<any> = delaySettle(curInputPromise, previousPromise);
+        outputPromises.push(promise);
+    });
+
+    return outputPromises;
+}
+
+
+/**
+ * Returns a promise that wraps thePromise, but will be resolved or rejected
+ * after the resolution or rejection of waitFor.
+ * @param thePromise - the Promise to be wrapped/delayed
+ * @param waitFor - The Promise that must be settled before the returned promise
+ * will settle.
+ * @returns A Promise wrapping thePromise, but will be settled after waitFor is
+ * settled
+ */
+export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitFor: Promise<any>): Promise<ResolveType> {
+    "use strict";
+
+    return thePromise
+    .then((result: ResolveType) => {
+        // Whether waitFor resolved or rejected, we should resolve
+        // with the original resolved value.
+        return waitFor
+        .then(() => result )
+        .catch(() => result );
+    })
+    .catch((err: any) => {
+        // Whether waitFor resolved or rejected, we should reject with the
+        // original error.
+        return waitFor
+        .then(() => { throw err; })
+        .catch(() => { throw err; });
+    });
+}

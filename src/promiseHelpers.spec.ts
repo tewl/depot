@@ -1,7 +1,8 @@
 import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
-    retryWhile, promiseWhile, eventToPromise, conditionalTask} from "./promiseHelpers";
+    retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
+    delaySettle} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
 
 
@@ -472,7 +473,8 @@ describe("promiseWhile()", () => {
                 return new BBPromise<void>((resolve, reject) => {
                     setTimeout(
                         () => {
-                            if (val === "aaa") {
+                            if (val === "aaa")
+                            {
                                 reject("xyzzy");
                                 return;
                             }
@@ -487,6 +489,282 @@ describe("promiseWhile()", () => {
         )
         .catch((err) => {
             expect(err).toEqual("xyzzy");
+            done();
+        });
+    });
+
+
+});
+
+
+describe("sequentialSettle()", () => {
+
+
+    it("will return an array of promises that settle in index order", (done) => {
+
+        const settledFlags = [false, false, false];
+
+        let promises: Array<Promise<any>> = [
+            getTimerPromise<number>(400, 1),
+            getTimerPromise<number>(200, 2),
+            getTimerPromise<number>(100, 3)
+        ];
+
+        promises = sequentialSettle(promises);
+        promises[0].then(() => { settledFlags[0] = true; });
+        promises[1].then(() => { settledFlags[1] = true; });
+        promises[2].then(() => { settledFlags[2] = true; });
+
+        promises[0]
+        .then(() => {
+            expect(settledFlags[1]).toBeFalsy();
+            expect(settledFlags[2]).toBeFalsy();
+        });
+
+        promises[1]
+        .then(() => {
+            expect(settledFlags[0]).toBeTruthy();
+            expect(settledFlags[2]).toBeFalsy();
+        });
+
+        promises[2]
+        .then(() => {
+            expect(settledFlags[0]).toBeTruthy();
+            expect(settledFlags[1]).toBeTruthy();
+            done();
+        });
+    });
+
+
+});
+
+
+
+describe("delaySettle()", () => {
+
+
+    it("should delay a resolved Promise until the specified Promise is resolved", (done) => {
+
+        // The order in which these promises will settle:  p2, p1, p2Delayed
+        const p1 = getTimerPromise(400, 1);
+        const p2 = getTimerPromise(100, 2);
+        const p2Delayed = delaySettle(p2, p1);
+
+        let p1State        = "pending";
+        let p2State        = "pending";
+        let p2DelayedState = "pending";
+
+        p1.then(() => { p1State = "resolved"; });
+        p2.then(() => { p2State = "resolved"; });
+        p2Delayed.then(() => { p2DelayedState = "resolved"; });
+
+        p2.then(() => {
+            expect(p1State).toEqual("pending");
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p1.then(() => {
+            expect(p2State).toEqual("resolved");
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p2Delayed.then(() => {
+            expect(p1State).toEqual("resolved");
+            expect(p2State).toEqual("resolved");
+            done();
+        });
+    });
+
+
+    it("should delay a resolved Promise until the specified Promise is rejected", (done) => {
+
+        // Expected settle order: p2 (resolved with 2), p1 (rejected), p2Delayed (resolved with 2).
+        const p1 = getTimerPromise(400, 1)
+        .then(() => {
+            throw new Error("rejected");
+        });
+        const p2 = getTimerPromise(100, 2);
+        const p2Delayed = delaySettle(p2, p1);
+
+        let p1State        = "pending";
+        let p2State        = "pending";
+        let p2DelayedState = "pending";
+
+        p1.then(
+            () => { p1State = "resolved"; },
+            () => { p1State = "rejected"; }
+        );
+
+        p2.then(
+            () => { p2State = "resolved"; },
+            () => { p2State = "rejected"; }
+        );
+
+        p2Delayed.then(
+            () => { p2DelayedState = "resolved"; },
+            () => { p2DelayedState = "rejected"; }
+        );
+
+        p2
+        .then(() => {
+            expect(p1State).toEqual("pending");
+            expect(p2DelayedState).toEqual("pending");
+        })
+        .catch(() => {
+            fail("p2 should not have rejected.");
+        });
+
+        p1
+        .then(() => {
+            fail("p1 should not have resolved.");
+        })
+        .catch(() => {
+            expect(p2State).toEqual("resolved");
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p2Delayed
+        .then(() => {
+            expect(p1State).toEqual("rejected");
+            expect(p2State).toEqual("resolved");
+            done();
+        })
+        .catch(() => {
+            fail("p2Delayed should not have rejected.");
+        });
+    });
+
+
+    it("should delay a rejected Promise until the specified Promise is resolved", (done) => {
+        // Expected settle order: p2 (rejected), p1 (resolved), p2Delayed (rejected).
+        const p1 = getTimerPromise(400, 1);
+        const p2 = getTimerPromise(100, 2)
+        .then(() => {
+            throw new Error("rejected");
+        });
+        const p2Delayed = delaySettle(p2, p1);
+
+        let p1State = "pending";
+        let p2State = "pending";
+        let p2DelayedState = "pending";
+
+        p1.then(
+            () => { p1State = "resolved"; },
+            () => { p1State = "rejected"; }
+        );
+        p2.then(
+            () => { p2State = "resolved"; },
+            () => { p2State = "rejected"; }
+        );
+        p2Delayed.then(
+            () => { p2DelayedState = "resolved"; },
+            () => { p2DelayedState = "rejected"; }
+        );
+
+        p2
+        .then(() => {
+            fail("p2 should never resolve");
+        })
+        .catch(() => {
+            // p1 is not settled
+            expect(p1State).toEqual("pending");
+
+            // p2Delayed is not settled
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p1
+        .then(() => {
+            // p2 is rejected
+            expect(p2State).toEqual("rejected");
+
+            // p2Delayed is not settled
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p2Delayed
+        .then(() => {
+            fail("p2Delayed should not resolve");
+        })
+        .catch(() => {
+            // p1 is resolved
+            expect(p1State).toEqual("resolved");
+
+            // p2 is rejected
+            expect(p2State).toEqual("rejected");
+
+            done();
+        });
+    });
+
+
+    it("should delay a rejected Promise until the specified Promise is rejected", (done) => {
+
+        // Expected settle order: p2 (rejected), p1 (rejected), p2Delayed (rejected)
+        const p1: Promise<number> = getTimerPromise(400, 1)
+        .then(() => {
+            throw new Error("rejected");
+        });
+        const p2: Promise<number> = getTimerPromise(100, 2)
+        .then(() => {
+            throw new Error("rejected");
+        });
+        const p2Delayed: Promise<number> = delaySettle(p2, p1);
+
+        let p1State        = "pending";
+        let p2State        = "pending";
+        let p2DelayedState = "pending";
+
+        p1.then(
+            () => { p1State = "resolved"; },
+            () => { p1State = "rejected"; }
+        );
+
+        p2.then(
+            () => { p2State = "resolved"; },
+            () => { p2State = "rejected"; }
+        );
+
+        p2Delayed.then(
+            () => { p2DelayedState = "resolved"; },
+            () => { p2DelayedState = "rejected"; }
+        );
+
+        p2
+        .then(() => {
+            fail("p2 should never resolve");
+        })
+        .catch(() => {
+            // p1 is not settled
+            expect(p1State).toEqual("pending");
+
+            // p2 is not settled
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p1
+        .then(() => {
+            fail("p1 should never resolve.");
+        })
+        .catch(() => {
+            // p2 is rejected
+            expect(p2State).toEqual("rejected");
+
+            // p2Delayed is not settled
+            expect(p2DelayedState).toEqual("pending");
+        });
+
+        p2Delayed
+        .then(() => {
+            fail("p2Delayed should not resolve");
+        })
+        .catch(() => {
+            // p1 is rejected
+            expect(p1State).toEqual("rejected");
+
+            // p2 is rejected
+            expect(p2State).toEqual("rejected");
+
             done();
         });
     });

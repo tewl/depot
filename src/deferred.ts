@@ -24,3 +24,22 @@ export class Deferred<ResolveType>
         Object.freeze(this);
     }
 }
+
+
+/**
+ * Connects a (source) Promise to a Deferred (sink).
+ * @param thePromise - The promise that will serve as input to `theDeferred`
+ * @param theDeferred - The Deferred that will sink the output from `thePromise`
+ * @return description
+ */
+export function connectPromiseToDeferred<ResolveType>(
+    thePromise: Promise<ResolveType>,
+    theDeferred: Deferred<ResolveType>
+): void
+{
+    thePromise
+    .then(
+        (result: ResolveType) => { theDeferred.resolve(result); },
+        (err) => { theDeferred.reject(err); }
+    );
+}

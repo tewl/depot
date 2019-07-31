@@ -468,8 +468,8 @@ describe("promiseWhile()", () => {
     it("the returned promise will reject with the same error the body function rejects with", (done) => {
         let val: string = "";
         promiseWhile(
-            () => val.length < 5,
-            () => {
+            (): boolean => val.length < 5,
+            (): Promise<void> => {
                 return new BBPromise<void>((resolve, reject) => {
                     setTimeout(
                         () => {

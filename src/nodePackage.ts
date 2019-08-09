@@ -11,7 +11,10 @@ export interface IPackageJson
     name: string;
     version: string;
     description: string;
+    main: string;
     repository: {type: string, url: string};
+    devDependencies: {[packageName: string]: string};
+    dependencies: {[packageName: string]: string};
 }
 
 

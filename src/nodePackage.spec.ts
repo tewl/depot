@@ -69,6 +69,33 @@ describe("NodePackage", () => {
         });
 
 
+        describe("lockedDependencies", () => {
+
+
+            it("returns properties from package-lock.json", async () => {
+                const pkgDir = new Directory(__dirname, "..");
+                const pkg = await NodePackage.fromDirectory(pkgDir);
+                const lockedDeps = pkg.lockedDependencies;
+
+                expect(lockedDeps!.name).toEqual("depot");
+                expect(lockedDeps!.dependencies).toBeTruthy();
+            });
+
+
+            it("return undefined when the package directory does not contain package-lock.json", async () => {
+                // First create an empty directory that contains only a package.json.
+                tmpDir.emptySync();
+                const packageJson = new File(__dirname, "..", "package.json");
+                packageJson.copySync(tmpDir);
+
+                const pkg = await NodePackage.fromDirectory(tmpDir);
+                expect(pkg.lockedDependencies).toEqual(undefined);
+            });
+
+
+        });
+
+
         describe("pack()", () => {
 
 

@@ -89,7 +89,7 @@ export function outdent(str: string, padStr: string = " "): string
 
 
 /**
- * Creates a new version of str where without leading and trailing blank lines
+ * Creates a new version of str without leading and trailing blank lines
  * @param str - The original string
  * @return A version of str without leading and trailing blank lines
  */

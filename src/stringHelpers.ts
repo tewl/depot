@@ -88,6 +88,9 @@ export function outdent(str: string, padStr: string = " "): string
 }
 
 
+const blankLineRegex = /^\s*$/;
+
+
 /**
  * Creates a new version of str without leading and trailing blank lines
  * @param str - The original string
@@ -95,21 +98,28 @@ export function outdent(str: string, padStr: string = " "): string
  */
 export function trimBlankLines(str: string): string
 {
-    const BLANK_LINE_REGEX = /^\s*$/;
     const lines = str.split("\n");
 
     while ((lines.length > 0) &&
-          BLANK_LINE_REGEX.test(lines[0]))
+          blankLineRegex.test(lines[0]))
     {
         lines.shift();
     }
 
     while ((lines.length > 0) &&
-          BLANK_LINE_REGEX.test(_.last(lines)!))
+          blankLineRegex.test(_.last(lines)!))
     {
         lines.pop();
     }
 
+    return lines.join("\n");
+}
+
+
+export function removeBlankLines(str: string): string
+{
+    let lines = str.split("\n");
+    lines = _.filter(lines, (curLine) => !blankLineRegex.test(curLine));
     return lines.join("\n");
 }
 

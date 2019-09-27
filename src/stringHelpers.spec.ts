@@ -1,4 +1,7 @@
-import {numInitial, outdent, trimBlankLines, indent, removeWhitespace} from "./stringHelpers";
+import {
+    numInitial, outdent, trimBlankLines, indent, removeWhitespace,
+    removeBlankLines
+} from "./stringHelpers";
 
 
 describe("numInitial()", () => {
@@ -101,6 +104,45 @@ describe("trimBlankLines()", () => {
 
     it("returns the original string when there are no blank lines", () => {
         expect(trimBlankLines("line 1\nline 2")).toEqual("line 1\nline 2");
+    });
+
+
+});
+
+
+describe("removeBlankLines()", () => {
+
+
+    it("removes blank lines from the middle of a string", () => {
+        const orig = [
+            "line 1",
+            "",
+            "line 2"
+        ].join("\n");
+
+        expect(removeBlankLines(orig)).toEqual("line 1\nline 2");
+    });
+
+
+    it("removes blank lines from the beginning of a string", () => {
+        const orig = [
+            "",
+            "line 1",
+            "line 2"
+        ].join("\n");
+
+        expect(removeBlankLines(orig)).toEqual("line 1\nline 2");
+    });
+
+
+    it("removes blank lines from the end of a string", () => {
+        const orig = [
+            "line 1",
+            "line 2",
+            ""
+        ].join("\n");
+
+        expect(removeBlankLines(orig)).toEqual("line 1\nline 2");
     });
 
 

@@ -75,16 +75,21 @@ export function indent(
  * Creates a new string where lines are no longer indented
  * @param str - The indented string
  * @param padStr - The string that has been used to indent lines in str
+ * @param greedy - If `true`, as many occurrences of `padStr` will be removed as
+ *     possible.  If `false`, only one occurrence will be removed.
  * @return A new version of str without the indentations
  */
-export function outdent(str: string, padStr: string = " "): string
+export function outdent(str: string, padStr: string = " ", greedy: boolean = true): string
 {
-    // TODO: This method will is too greedy.  A user should be able to remove
-    //   some indentation without removing all of it.
-
     const lines = str.split(piNewline);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
-    const numToRemove = _.min(initOccurrences);
+    let numToRemove = _.min(initOccurrences);
+    if (!greedy) {
+        // We should not be greedy, so only remove (at most) 1 occurrence of
+        // `padStr`.
+        numToRemove = _.min([numToRemove, 1]);
+    }
+
     const numCharsToRemove = padStr.length * numToRemove!;
 
     const resultLines = _.map(lines, (curLine) => curLine.slice(numCharsToRemove));

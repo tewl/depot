@@ -99,6 +99,21 @@ describe("outdent()", () => {
     });
 
 
+    it("only 1 occurrence will be removed when `greedy` is false", () => {
+        const input = [
+            "    line 1",
+            "    line 2",
+            "    line 3"
+        ].join("\n");
+        const expected = [
+            "  line 1",
+            "  line 2",
+            "  line 3"
+        ].join("\n");
+        expect(outdent(input, "  ", false)).toEqual(expected);
+    });
+
+
 });
 
 

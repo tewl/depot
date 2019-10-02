@@ -10,6 +10,7 @@ import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import * as BBPromise from "bluebird";
+import {piNewline} from "./regexpHelpers";
 
 
 interface IGitLogEntry
@@ -177,7 +178,7 @@ export class GitRepo
         return spawn("git", ["ls-files"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
-            const relativeFilePaths = stdout.split("\n");
+            const relativeFilePaths = stdout.split(piNewline);
             return _.map(relativeFilePaths, (curRelFilePath) => {
                 return new File(this._dir, curRelFilePath);
             });
@@ -196,7 +197,7 @@ export class GitRepo
             {
                 return [];
             }
-            const relativeFilePaths = stdout.split("\n");
+            const relativeFilePaths = stdout.split(piNewline);
             return _.map(relativeFilePaths, (curRelativeFilePath) => {
                 return new File(this._dir, curRelativeFilePath);
             });
@@ -215,7 +216,7 @@ export class GitRepo
             {
                 return [];
             }
-            const relativeFilePaths = stdout.split("\n");
+            const relativeFilePaths = stdout.split(piNewline);
             return _.map(relativeFilePaths, (curRelativePath) => {
                 return new File(this._dir, curRelativePath);
             });
@@ -250,7 +251,7 @@ export class GitRepo
         .closePromise
         .then((stdout) => {
 
-            const lines = stdout.split("\n");
+            const lines = stdout.split(piNewline);
             const remotes: {[name: string]: string} = {};
             lines.forEach((curLine) => {
                 const match = curLine.match(/^(\w+)\s+(.*)\s+\(\w+\)$/);
@@ -323,7 +324,7 @@ export class GitRepo
                 return [];
             }
 
-            return stdout.split("\n");
+            return stdout.split(piNewline);
         });
     }
 

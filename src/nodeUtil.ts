@@ -1,4 +1,5 @@
 import {constants} from "fs";
+import {EOL} from "os";
 import {File} from "./file";
 
 
@@ -7,7 +8,7 @@ const NODEJS_SHEBANG = "#!/usr/bin/env node";
 export function makeNodeScriptExecutable(file: File): Promise<File> {
     return file.read()
     .then((text) => {
-        const newText = NODEJS_SHEBANG + "\n" + text;
+        const newText = NODEJS_SHEBANG + EOL + text;
         return file.write(newText);
     })
     .then(() => {

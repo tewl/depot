@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import {tmpDir} from "../test/ut/specHelpers";
 import {File} from "./file";
 import {makeNodeScriptExecutable} from "./nodeUtil";
+import {piNewline} from "./regexpHelpers";
 
 
 describe("makeNodeScriptExecutable()", () => {
@@ -20,7 +21,7 @@ describe("makeNodeScriptExecutable()", () => {
         makeNodeScriptExecutable(scriptFile)
         .then((scriptFile) => {
             const text = scriptFile.readSync();
-            const lines = text.split("\n");
+            const lines = text.split(piNewline);
             expect(lines.length).toEqual(2);
             expect(_.startsWith(lines[0], "#!")).toEqual(true);
             expect(_.startsWith(lines[1], "console.log")).toEqual(true);

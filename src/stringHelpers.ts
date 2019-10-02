@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import {piNewline} from "./regexpHelpers";
 
 
 /**
@@ -78,12 +79,16 @@ export function indent(
  */
 export function outdent(str: string, padStr: string = " "): string
 {
-    const lines = str.split("\n");
+    // TODO: This method will is too greedy.  A user should be able to remove
+    //   some indentation without removing all of it.
+
+    const lines = str.split(piNewline);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
     const numToRemove = _.min(initOccurrences);
     const numCharsToRemove = padStr.length * numToRemove!;
 
     const resultLines = _.map(lines, (curLine) => curLine.slice(numCharsToRemove));
+    // Join the lines back together again.
     return resultLines.join("\n");
 }
 
@@ -98,7 +103,7 @@ const blankLineRegex = /^\s*$/;
  */
 export function trimBlankLines(str: string): string
 {
-    const lines = str.split("\n");
+    const lines = str.split(piNewline);
 
     while ((lines.length > 0) &&
           blankLineRegex.test(lines[0]))
@@ -118,7 +123,7 @@ export function trimBlankLines(str: string): string
 
 export function removeBlankLines(str: string): string
 {
-    let lines = str.split("\n");
+    let lines = str.split(piNewline);
     lines = _.filter(lines, (curLine) => !blankLineRegex.test(curLine));
     return lines.join("\n");
 }

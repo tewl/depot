@@ -5,6 +5,7 @@ import {GitRepo} from "./gitRepo";
 import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
+import {piNewline} from "./regexpHelpers";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -97,7 +98,7 @@ export class GitBranch
     {
         return spawn("git", ["branch", "-a"], {cwd: repo.directory.toString()}).closePromise
         .then((stdout) => {
-            return _.chain(stdout.split("\n"))
+            return _.chain(stdout.split(piNewline))
             // Get rid of leading and trailing whitespace
             .map((curLine) => curLine.trim())
             // Replace the "* " that precedes the current working branch

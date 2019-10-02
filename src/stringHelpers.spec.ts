@@ -68,7 +68,10 @@ describe("outdent()", () => {
             "    line 2",
             "    line 3"
         ];
-        expect(outdent(lines.join("\n"))).toEqual("line 1\nline 2\nline 3");
+        expect(outdent(lines.join("\n"))).toEqual([
+            "line 1",
+            "line 2",
+            "line 3"].join("\n"));
     });
 
 
@@ -78,7 +81,36 @@ describe("outdent()", () => {
             "   line 2",
             "  line 3"
         ];
-        expect(outdent(lines.join("\n"))).toEqual("  line 1\n line 2\nline 3");
+        expect(outdent(lines.join("\n"))).toEqual([
+            "  line 1",
+            " line 2",
+            "line 3"].join("\n"));
+    });
+
+
+    it("will not modify the lines when one line does not have the specified indent", () => {
+        const lines = [
+            "  line 1",
+            "  line 2",
+            "line 3"
+        ];
+        const inputStr = lines.join("\n");
+        expect(outdent(inputStr)).toEqual(inputStr);
+    });
+
+
+    it("only 1 occurrence will be removed when `greedy` is false", () => {
+        const input = [
+            "    line 1",
+            "    line 2",
+            "    line 3"
+        ].join("\n");
+        const expected = [
+            "  line 1",
+            "  line 2",
+            "  line 3"
+        ].join("\n");
+        expect(outdent(input, "  ", false)).toEqual(expected);
     });
 
 

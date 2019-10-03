@@ -32,14 +32,15 @@ interface IGitLogEntry
 //
 const GIT_LOG_ENTRY_REGEX = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:\s*(.*?)$\s((?:(?:^\s*$\n?)|(?:^\s+(?:.*)$\s?))+)/gm;
 
+
 /**
  * Determines whether dir is a directory containing a Git repository.
  * @param dir - The directory to inspect
  * @return A promise for a boolean indicating whether dir contains a Git
  * repository.  This promise will never reject.
  */
-export function isGitRepoDir(dir: Directory): Promise<boolean> {
-
+export function isGitRepoDir(dir: Directory): Promise<boolean>
+{
     return BBPromise.all([
         dir.exists(),                        // The directory exists
         new Directory(dir, ".git").exists()  // The directory contains a .git directory
@@ -50,6 +51,9 @@ export function isGitRepoDir(dir: Directory): Promise<boolean> {
 }
 
 
+/**
+ * Represents a Git repository within the local filesystem.
+ */
 export class GitRepo
 {
 
@@ -314,6 +318,11 @@ export class GitRepo
     }
 
 
+    /**
+     * Gets all the tags present in this repo.
+     * @return A Promise for an array of tag names.  An empty array is returned
+     * when there are no tags.
+     */
     public tags(): Promise<Array<string>>
     {
         return spawn("git", ["tag"], {cwd: this._dir.toString()})
@@ -329,6 +338,11 @@ export class GitRepo
     }
 
 
+    /**
+     * Determines whether `tagName` is a tag that exists in this repo.
+     * @param tagName - The tag to search for
+     * @return A Promise for a boolean indicating whether `tagName` exists.
+     */
     public hasTag(tagName: string): Promise<boolean>
     {
         return this.tags()
@@ -338,6 +352,16 @@ export class GitRepo
     }
 
 
+    /**
+     * Adds an annotated (heavy) tag or moves an existing one to this repo's
+     * current commit.
+     * @param tagName - The name of the tag to create/move
+     * @param message - The message associated with the annotated tag
+     * @param force - false when your intention is to create a new tag; true
+     * when your intention is to move an existing tag.
+     * @return A Promise for this GitRepo instance (so that other calls may be
+     * chained).
+     */
     public createTag(tagName: string, message: string = "", force: boolean = false): Promise<GitRepo>
     {
         let args = ["tag"];
@@ -357,6 +381,12 @@ export class GitRepo
     }
 
 
+    /**
+     * Deletes the specified tag.
+     * @param tagName - The name of the tag to delete
+     * @return A Promise for this GitRepo instance (so that other calls may be
+     * chained).
+     */
     public deleteTag(tagName: string): Promise<GitRepo>
     {
         return spawn("git", ["tag", "--delete", tagName], {cwd: this._dir.toString()})
@@ -378,7 +408,20 @@ export class GitRepo
     }
 
 
-    public pushTag(tagName: string, remoteName: string, force: boolean = false): Promise<GitRepo>
+    /**
+     * Pushes a tag to a remote
+     * @param tagName - The name of the tag to push
+     * @param remoteName - The remote to push the tag to
+     * @param force - false if your intention is to not affect any existing
+     * tags; true if your intention is to move an existing tag.
+     * @return A Promise for this GitRepo instance (so that other calls may be
+     * chained).
+     */
+    public pushTag(
+        tagName: string,
+        remoteName: string,
+        force: boolean = false
+    ): Promise<GitRepo>
     {
         let args = ["push"];
 
@@ -396,6 +439,12 @@ export class GitRepo
     }
 
 
+    /**
+     * Gets a list of branches in this repo.
+     * @param forceUpdate - false to use a cached list of branches (if
+     * available); true to retrieve the latest list of branches.
+     * @return A Promise for the branches found
+     */
     public getBranches(forceUpdate: boolean = false): Promise<Array<GitBranch>>
     {
         if (forceUpdate)
@@ -430,6 +479,11 @@ export class GitRepo
     }
 
 
+    /**
+     * Gets the current working branch (if there is one)
+     * @return A Promise for the current working branch or undefined (when
+     * working in a detached head state).
+     */
     public getCurrentBranch(): Promise<GitBranch | undefined>
     {
         // When on master:
@@ -457,9 +511,15 @@ export class GitRepo
     }
 
 
+    /**
+     * Switches to the specified branch (possibly creating it)
+     * @param branch - The branch to switch to
+     * @param createIfNonexistent - true to create the branch if it does not
+     * exist; false if your intention is to checkout an existing branch
+     * @return A Promise that resolves when the branch is checked out.
+     */
     public checkoutBranch(branch: GitBranch, createIfNonexistent: boolean): Promise<void>
     {
-
         return this.getBranches()
         .then((allBranches) => {
             // If there is a branch with the same name, we should not try to
@@ -482,6 +542,11 @@ export class GitRepo
     }
 
 
+    /**
+     * Checks out the specified commit
+     * @param commit - The commit to checkout
+     * @return A Promise that resolves when the commit is checked out.
+     */
     public checkoutCommit(commit: CommitHash): Promise<void>
     {
         return spawn("git", ["checkout", commit.toString()], {cwd: this._dir.toString()}).closePromise
@@ -489,6 +554,11 @@ export class GitRepo
     }
 
 
+    /**
+     * Stages all modified files that are not being ignored (via .gitignore)
+     * @return A Promise for this GitRepo instance (so that other calls may be
+     * chained).
+     */
     public stageAll(): Promise<GitRepo>
     {
         return spawn("git", ["add", "."], {cwd: this._dir.toString()})
@@ -499,6 +569,14 @@ export class GitRepo
     }
 
 
+    /**
+     * Pushes the current branch to a remote
+     * @param remoteName - The remote to push to
+     * @param setUpstream - true to set the remote's branch as the upstream
+     * branch
+     * @return A Promise that is resolved when the push has completed.  The
+     * promise will reject when working in a detached head state.
+     */
     public pushCurrentBranch(remoteName: string = "origin", setUpstream: boolean = false): Promise<void>
     {
         return this.getCurrentBranch()
@@ -525,9 +603,15 @@ export class GitRepo
     }
 
 
-    // TODO: Write unit tests for the following method.
+    /**
+     * Gets the number of commits ahead and behind the current branch is
+     * @param trackingRemote - The remote containing the tracking branch
+     * @return A Promise for an object containing the result
+     */
     public getCommitDeltas(trackingRemote: string = "origin"): Promise<{ahead: number, behind: number}>
     {
+        // TODO: Write unit tests for this method.
+
         return this.getCurrentBranch()
         .then((branch) => {
             if (!branch)
@@ -566,9 +650,15 @@ export class GitRepo
     // git diff --name-only --cached
 
 
-    // TODO: Add unit tests for this method.
+    /**
+     * Commits staged files
+     * @param msg - The commit message
+     * @return A Promise for the newly created Git log entry
+     */
     public commit(msg: string = ""): Promise<IGitLogEntry>
     {
+        // TODO: Add unit tests for this method.
+
         return spawn("git", ["commit", "-m", msg], {cwd: this._dir.toString()})
         .closePromise
         .then(() => {
@@ -603,7 +693,8 @@ export class GitRepo
      * @return A promise that is resolved when the command completes
      * successfully
      */
-    public fetch(remoteName: string = "origin", fetchTags: boolean = false): Promise<void> {
+    public fetch(remoteName: string = "origin", fetchTags: boolean = false): Promise<void>
+    {
         const args = [
             "fetch",
             ...insertIf(fetchTags, "--tags"),
@@ -621,6 +712,12 @@ export class GitRepo
     }
 
 
+    /**
+     * Gets this repo's commit log
+     * @param forceUpdate - true to get a current snapshot of this repos log;
+     * false if a previously cached log can be used (more performant)
+     * @return A Promise for an array of Git log entries
+     */
     public getLog(forceUpdate?: boolean): Promise<Array<IGitLogEntry>>
     {
         if (forceUpdate)

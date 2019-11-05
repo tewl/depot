@@ -82,7 +82,7 @@
     "@types/request-promise": "4.1.42",
     "bluebird": "3.5.5",
     "inquirer": "6.2.0",
-    "lodash": "4.17.13",
+    "lodash": "4.17.15",
     "pouchdb": "7.0.0",
     "request": "2.88.0",
     "request-promise": "4.1.1",

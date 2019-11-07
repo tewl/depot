@@ -39,7 +39,7 @@
       true,
       {
         "limit":  140,
-        "ignore-pattern": "^\\s*//"
+        "ignore-pattern": "^\\s*(//)|(it\\()"
       }
     ],
     "member-access": true,

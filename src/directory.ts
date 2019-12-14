@@ -32,9 +32,24 @@ export class Directory
      * @param to - The ending directory
      * @return A directory representing the relative path from `from` to `to`
      */
-    public static relative(from: Directory, to: Directory): Directory {
+    public static relative(from: Directory, to: Directory): Directory
+    {
         const relPath = path.relative(from.toString(), to.toString());
         return new Directory(relPath);
+    }
+
+
+    /**
+     * Calculates the parts of the relative path from `from` to `to`.
+     * @param from - The starting point
+     * @param to - The ending point
+     * @return An array of strings representing the path segments needed to get
+     * from `from` to `to`.
+     */
+    public static relativeParts(from: Directory, to: Directory): Array<string>
+    {
+        const relPath = path.relative(from.toString(), to.toString());
+        return relPath.split(path.sep);
     }
 
 

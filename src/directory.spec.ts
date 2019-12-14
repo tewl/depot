@@ -32,6 +32,20 @@ describe("Directory", () => {
         });
 
 
+        describe("relativeParts()", () => {
+
+
+            it("returns the expected array of path parts", () => {
+
+                const dirA = new Directory("dirA");
+                const dirB = new Directory(dirA, "b", "c");
+                expect(Directory.relativeParts(dirA, dirB)).toEqual(["b", "c"]);
+            });
+
+
+        });
+
+
     });
 
 

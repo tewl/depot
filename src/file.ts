@@ -14,6 +14,27 @@ const statAsync   = promisify1<fs.Stats, string>(fs.stat);
 
 export class File
 {
+    public static relative(from: Directory, to: File): File
+    {
+        const relPath = path.relative(from.toString(), to.toString());
+        return new File(relPath);
+    }
+
+
+    /**
+     * Calculates the parts of the relative path from `from` to `to`.
+     * @param from - The starting point
+     * @param to - The ending point
+     * @return An array of strings representing the path segments needed to get
+     * from `from` to `to`.
+     */
+    public static relativeParts(from: Directory, to: File): Array<string>
+    {
+        const relPath = path.relative(from.toString(), to.toString());
+        return relPath.split(path.sep);
+    }
+
+
     // region Data Members
     private readonly _filePath: string;
     // endregion

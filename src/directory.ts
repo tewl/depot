@@ -386,8 +386,9 @@ export class Directory
      * Reads the contents of this directory.
      * @param recursive - Whether to find subdirectories and files recursively
      * @return The contents of the directory, separated into a list of files and
-     * a list of subdirectories.  All returned paths are relative to this
-     * directory.
+     * a list of subdirectories.  The relative/absolute nature of the returned
+     * File and Directory objects will be determined by the relative/absolute
+     * nature of this Directory object.
      */
     public contents(recursive: boolean = false): Promise<IDirectoryContents>
     {

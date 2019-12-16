@@ -1,8 +1,9 @@
 import * as _ from "lodash";
+import * as BBPromise from "bluebird";
 import { tmpDir } from "../test/ut/specHelpers";
 import { File } from "./file";
 import { Directory } from "./directory";
-import { diffDirectories } from "./diffDirectories";
+import { diffDirectories, ActionPriority, DiffDirFileItemActionType } from "./diffDirectories";
 
 
 describe("diffDirectories()", async () => {
@@ -93,7 +94,6 @@ describe("diffDirectories()", async () => {
     });
 
 
-
     describe("", () => {
 
         let leftDir:  Directory;
@@ -132,6 +132,180 @@ describe("diffDirectories()", async () => {
 
     });
 
+
+    fdescribe("", () => {
+
+        let leftDir:  Directory;
+        let rightDir: Directory;
+
+        let leftOnlyFile:  File;
+        let bothFileLeft:  File;
+        let bothFileRight: File;
+        let rightOnlyFile: File;
+
+        beforeEach(() => {
+            tmpDir.emptySync();
+
+            leftDir  = new Directory(tmpDir, "left");
+            rightDir = new Directory(tmpDir, "right");
+
+            // A left-only file.
+            leftOnlyFile = new File(leftDir, "leftOnly.txt");
+            leftOnlyFile.writeSync("leftOnly");
+
+            // A file that is in both left and right.
+            bothFileLeft = new File(leftDir, "both.txt");
+            bothFileLeft.writeSync("both - left");
+            bothFileRight = new File(rightDir, "both.txt");
+            bothFileRight.writeSync("both - right");
+
+            // A right-only file.
+            rightOnlyFile = new File(rightDir, "rightOnly.txt");
+            rightOnlyFile.writeSync("rightOnly");
+
+        });
+
+
+        it("prioritizes actions appropriately when doing a left-to-right sync", async () => {
+            const result = await diffDirectories(leftDir, rightDir, ActionPriority.L_TO_R);
+
+            expect(result.length).toEqual(3);
+
+            expect(result[0].relativeFilePath).toEqual("both.txt");
+            expect(result[0].actions.length).toEqual(2);
+            expect(result[0].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(result[0].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+
+            expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
+            expect(result[1].actions.length).toEqual(2);
+            expect(result[1].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(result[1].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+
+            expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
+            expect(result[2].actions.length).toEqual(2);
+            expect(result[2].actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
+            expect(result[2].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+        });
+
+
+        it("performs actions appropriately when doing a left-to-right sync", async () => {
+            const result = await diffDirectories(leftDir, rightDir, ActionPriority.L_TO_R);
+
+            expect(result.length).toEqual(3);
+            const promises = _.map(result, (curDiffDirFileItem) => {
+                // Execute the first action for each file item.
+                return curDiffDirFileItem.actions[0].execute();
+            });
+
+            await BBPromise.all(promises);
+
+            // Check the state of the left directory.  It should be unchanged.
+            expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");
+            expect(new File(leftDir, "both.txt").readSync()).toEqual("both - left");
+            expect(new File(leftDir, "rightOnly.txt").existsSync()).toEqual(undefined);
+
+            // Check the state of the resulting right directory.
+            expect(new File(rightDir, "leftOnly.txt").readSync()).toEqual("leftOnly");    // copied
+            expect(new File(rightDir, "both.txt").readSync()).toEqual("both - left");     // copied
+            expect(new File(rightDir, "rightOnly.txt").existsSync()).toEqual(undefined);  // deleted
+        });
+
+
+        it("prioritizes actions appropriately when doing a right-to-left sync", async () => {
+            const result = await diffDirectories(leftDir, rightDir, ActionPriority.R_TO_L);
+
+            expect(result.length).toEqual(3);
+
+            expect(result[0].relativeFilePath).toEqual("both.txt");
+            expect(result[0].actions.length).toEqual(2);
+            expect(result[0].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(result[0].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+
+            expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
+            expect(result[1].actions.length).toEqual(2);
+            expect(result[1].actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
+            expect(result[1].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+
+            expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
+            expect(result[2].actions.length).toEqual(2);
+            expect(result[2].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(result[2].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+        });
+
+
+        it("performs actions appropriately when doing a right-to-left sync", async () => {
+            const result = await diffDirectories(leftDir, rightDir, ActionPriority.R_TO_L);
+
+            expect(result.length).toEqual(3);
+            const promises = _.map(result, (curDiffDirFileItem) => {
+                // Execute the first action for each file item.
+                return curDiffDirFileItem.actions[0].execute();
+            });
+
+            await BBPromise.all(promises);
+
+            // Check the state of the left directory.
+            expect(new File(leftDir, "leftOnly.txt").existsSync()).toEqual(undefined);   // deleted
+            expect(new File(leftDir, "both.txt").readSync()).toEqual("both - right");    // copied
+            expect(new File(leftDir, "rightOnly.txt").readSync()).toEqual("rightOnly");  // copied
+
+            // Check the state of the resulting right directory.  It should be unchanged.
+            expect(new File(rightDir, "leftOnly.txt").existsSync()).toEqual(undefined);
+            expect(new File(rightDir, "both.txt").readSync()).toEqual("both - right");
+            expect(new File(rightDir, "rightOnly.txt").readSync()).toEqual("rightOnly");
+        });
+
+
+        it("prioritizes keeping files when no sync direction is specified", async () => {
+            const result = await diffDirectories(leftDir, rightDir, undefined);
+
+            expect(result.length).toEqual(3);
+
+            expect(result[0].relativeFilePath).toEqual("both.txt");
+            expect(result[0].actions.length).toEqual(4);
+            expect(result[0].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(result[0].actions[1].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(result[0].actions[2].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[0].actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
+
+            expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
+            expect(result[1].actions.length).toEqual(3);
+            expect(result[1].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(result[1].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[1].actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
+
+            expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
+            expect(result[2].actions.length).toEqual(3);
+            expect(result[2].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(result[2].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[2].actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
+        });
+
+
+        it("performs actions appropriately when doing a sync with no preferred direction",  async () => {
+            const result = await diffDirectories(leftDir, rightDir, undefined);
+
+            expect(result.length).toEqual(3);
+            const promises = _.map(result, (curDiffDirFileItem) => {
+                // Execute the first action for each file item.
+                return curDiffDirFileItem.actions[0].execute();
+            });
+
+            await BBPromise.all(promises);
+
+            // Check the state of the left directory.
+            expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");    // unchanged
+            expect(new File(leftDir, "both.txt").readSync()).toEqual("both - left");     // unchanged
+            expect(new File(leftDir, "rightOnly.txt").readSync()).toEqual("rightOnly");  // copied
+
+            // Check the state of the resulting right directory.
+            expect(new File(rightDir, "leftOnly.txt").readSync()).toEqual("leftOnly");   // copied
+            expect(new File(rightDir, "both.txt").readSync()).toEqual("both - left");    // copied
+            expect(new File(rightDir, "rightOnly.txt").readSync()).toEqual("rightOnly"); // unchanged
+        });
+
+
+    });
 
 
 });

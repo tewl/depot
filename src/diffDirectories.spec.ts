@@ -115,8 +115,14 @@ describe("diffDirectories()", async () => {
         });
 
 
+        it("omits identical files by default",  async () => {
+            const diffDirFiles = await diffDirectories(leftDir, rightDir /*, false */);
+            expect(diffDirFiles.length).toEqual(0);
+        });
+
+
         it("will return an item with no actions for identical files",  async () => {
-            const diffDirFiles = await diffDirectories(leftDir, rightDir);
+            const diffDirFiles = await diffDirectories(leftDir, rightDir, undefined, true);
             expect(diffDirFiles.length).toEqual(1);
             expect(diffDirFiles[0].isInBoth).toEqual(true);
             expect(diffDirFiles[0].bothExistAndIdentical).toEqual(true);

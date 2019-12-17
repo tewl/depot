@@ -339,13 +339,17 @@ export class DiffDirFileItem
  * @param rightDir - The right directory to be compared
  * @param actionPriority - The action being performed so that the actions
  *     associated with each result can be prioritized.
+ * @param includeIdentical - Whether to include files that are identical in both
+ *     `leftDir` and `rightDir` in the returned resuls.  If true, identical
+ *     files will be included with a 0-length array of actions.
  * @return An array of items representing the differences found between
  *     `leftDir` and `rightDir`.
  */
 export function diffDirectories(
     leftDir: Directory,
     rightDir: Directory,
-    actionPriority?: ActionPriority
+    actionPriority?: ActionPriority,
+    includeIdentical: boolean = false
 ): Promise<Array<DiffDirFileItem>>
 {
     const leftPromise = leftDir.contents(true);
@@ -376,12 +380,8 @@ export function diffDirectories(
         });
 
         // Iterate over the diff map, creating a diffDirFileItem for each entry.
-
         const diffDirFileItemPromises: Array<Promise<DiffDirFileItem>> = [];
-
-        // let result: Array<DiffDirFileItem> = [];
         for (const [relativePath, files] of diffMap) {
-
             diffDirFileItemPromises.push(DiffDirFileItem.create(
                 leftDir,
                 rightDir,
@@ -390,20 +390,19 @@ export function diffDirectories(
                 files.rightFile,
                 actionPriority
             ));
-
-            // if (diffDirFileItem) {
-            //     result.push(diffDirFileItem);
-            // }
-            // else {
-            //     throw new Error("Illegal DiffDirFileItem.");
-            // }
         }
 
         return BBPromise.all(diffDirFileItemPromises);
-
-
     })
     .then((diffDirFileItems: Array<DiffDirFileItem>) => {
+
+        // If not including identical files, remove them.
+        if (!includeIdentical) {
+            _.remove(diffDirFileItems, (curDiffDirFileItem: DiffDirFileItem) => {
+                return curDiffDirFileItem.bothExistAndIdentical;
+            });
+        }
+
         // Sort the items so that left-only items are next to right-only items
         // in the final result.
         diffDirFileItems = _.sortBy(diffDirFileItems, (curDiffDirFileItem) => curDiffDirFileItem.relativeFilePath);

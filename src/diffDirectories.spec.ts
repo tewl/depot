@@ -133,7 +133,7 @@ describe("diffDirectories()", async () => {
     });
 
 
-    fdescribe("", () => {
+    describe("", () => {
 
         let leftDir:  Directory;
         let rightDir: Directory;
@@ -172,19 +172,23 @@ describe("diffDirectories()", async () => {
             expect(result.length).toEqual(3);
 
             expect(result[0].relativeFilePath).toEqual("both.txt");
-            expect(result[0].actions.length).toEqual(2);
+            expect(result[0].actions.length).toEqual(4);
             expect(result[0].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
             expect(result[0].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[0].actions[2].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(result[0].actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
 
             expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
-            expect(result[1].actions.length).toEqual(2);
+            expect(result[1].actions.length).toEqual(3);
             expect(result[1].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
             expect(result[1].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[1].actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
 
             expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
-            expect(result[2].actions.length).toEqual(2);
+            expect(result[2].actions.length).toEqual(3);
             expect(result[2].actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
             expect(result[2].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[2].actions[2].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
         });
 
 
@@ -217,19 +221,23 @@ describe("diffDirectories()", async () => {
             expect(result.length).toEqual(3);
 
             expect(result[0].relativeFilePath).toEqual("both.txt");
-            expect(result[0].actions.length).toEqual(2);
+            expect(result[0].actions.length).toEqual(4);
             expect(result[0].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
             expect(result[0].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[0].actions[2].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(result[0].actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
 
             expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
-            expect(result[1].actions.length).toEqual(2);
+            expect(result[1].actions.length).toEqual(3);
             expect(result[1].actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
             expect(result[1].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[1].actions[2].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
 
             expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
-            expect(result[2].actions.length).toEqual(2);
+            expect(result[2].actions.length).toEqual(3);
             expect(result[2].actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
             expect(result[2].actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
+            expect(result[2].actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
         });
 
 

@@ -185,10 +185,12 @@ export class DiffDirFileItem
             if (actionPriority === ActionPriority.L_TO_R) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
             }
             else if (actionPriority === ActionPriority.R_TO_L) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
             }
             else {
                 // No action priority specified.  Give priority to preserving
@@ -203,10 +205,12 @@ export class DiffDirFileItem
             if (actionPriority === ActionPriority.L_TO_R) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
             }
             else if (actionPriority === ActionPriority.R_TO_L) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
             }
             else {
                 // No action priority specified.  Give priority to preserving
@@ -220,10 +224,14 @@ export class DiffDirFileItem
             if (actionPriority === ActionPriority.L_TO_R) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
             }
             else if (actionPriority === ActionPriority.R_TO_L) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
             }
             else {
                 // No action priority specified.  Give priority to preserving

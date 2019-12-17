@@ -122,24 +122,33 @@ export class DiffDirFileItem
      *     actions associated with this file item can be prioritized
      * @return A newly created DiffDirFileItem instance
      */
-    public static create(
+    public static async create(
         leftRootDir:      Directory,
         rightRootDir:     Directory,
         relativeFilePath: string,
         leftFile:         undefined | File,
         rightFile:        undefined | File,
         actionPriority?:  ActionPriority
-        ):                undefined | DiffDirFileItem
+        ): Promise<DiffDirFileItem>
     {
+        // TODO: Need to find references to this static function and update them
+        // because this method is now async.
+
         // The relative file path must be legit.
         if (relativeFilePath.length === 0) {
-            return undefined;
+            return BBPromise.reject(new Error(`DiffDirFileItem relative file path cannot be 0-length.`));
         }
 
         // Either leftFile or rightFile or both should be defined.  If both are
         // undefined, there is a problem.
         if ((leftFile === undefined) && (rightFile === undefined)) {
-            return undefined;
+            return BBPromise.reject(new Error(`DiffDirFileItem cannot have undefined left and right files.`));
+        }
+
+        let bothFilesExistAndIdentical = false;
+        if ((leftFile !== undefined) && (rightFile !== undefined)) {
+            const [leftHash, rightHash] = await BBPromise.all([leftFile.getHash(), rightFile.getHash()]);
+            bothFilesExistAndIdentical = (leftHash === rightHash);
         }
 
         return new DiffDirFileItem(
@@ -148,38 +157,43 @@ export class DiffDirFileItem
             relativeFilePath,
             leftFile,
             rightFile,
+            bothFilesExistAndIdentical,
             actionPriority
         );
     }
 
 
     // #region Data Members
-    private _leftRootDir:      Directory;
-    private _rightRootDir:     Directory;
-    private _relativeFilePath: string;
-    private _leftFile:         undefined | File;
-    private _rightFile:        undefined | File;
-    private _actionPriority:   undefined | ActionPriority;
-    private _actions:          Array<DiffDirFileItemAction>;
+    private _leftRootDir:           Directory;
+    private _rightRootDir:          Directory;
+    private _relativeFilePath:      string;
+    private _leftFile:              undefined | File;
+    private _rightFile:             undefined | File;
+    private _actionPriority:        undefined | ActionPriority;
+    private _actions:               Array<DiffDirFileItemAction>;
+    private _bothExistAndIdentical: boolean;
     // #endregion
 
 
     private constructor(
-        leftRootDir:      Directory,
-        rightRootDir:     Directory,
-        relativeFilePath: string,
-        leftFile:         undefined | File,
-        rightFile:        undefined | File,
-        actionPriority?:  ActionPriority
+        leftRootDir:           Directory,
+        rightRootDir:          Directory,
+        relativeFilePath:      string,
+        leftFile:              undefined | File,
+        rightFile:             undefined | File,
+        bothExistAndIdentical: boolean,
+        actionPriority?:       ActionPriority
+
     )
     {
-        this._leftRootDir      = leftRootDir;
-        this._rightRootDir     = rightRootDir;
-        this._relativeFilePath = relativeFilePath;
-        this._leftFile         = leftFile;
-        this._rightFile        = rightFile;
-        this._actionPriority   = actionPriority;
-        this._actions          = [];
+        this._leftRootDir           = leftRootDir;
+        this._rightRootDir          = rightRootDir;
+        this._relativeFilePath      = relativeFilePath;
+        this._leftFile              = leftFile;
+        this._rightFile             = rightFile;
+        this._bothExistAndIdentical = bothExistAndIdentical;
+        this._actionPriority        = actionPriority;
+        this._actions               = [];
 
         if (this.isLeftOnly) {
             if (actionPriority === ActionPriority.L_TO_R) {
@@ -221,7 +235,11 @@ export class DiffDirFileItem
             }
         }
         else { // this.isInBoth() => true
-            if (actionPriority === ActionPriority.L_TO_R) {
+
+            if (bothExistAndIdentical) {
+                // When the files are identical, there should be no actions.
+            }
+            else if (actionPriority === ActionPriority.L_TO_R) {
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
                 this._actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
@@ -305,6 +323,12 @@ export class DiffDirFileItem
         return (this._leftFile !== undefined) && (this._rightFile !== undefined);
     }
 
+
+    public get bothExistAndIdentical(): boolean
+    {
+        return this._bothExistAndIdentical;
+    }
+
 }
 
 
@@ -351,31 +375,38 @@ export function diffDirectories(
             }
         });
 
-        let result: Array<DiffDirFileItem> = [];
+        // Iterate over the diff map, creating a diffDirFileItem for each entry.
+
+        const diffDirFileItemPromises: Array<Promise<DiffDirFileItem>> = [];
+
+        // let result: Array<DiffDirFileItem> = [];
         for (const [relativePath, files] of diffMap) {
 
-            const diffDirFileItem = DiffDirFileItem.create(
+            diffDirFileItemPromises.push(DiffDirFileItem.create(
                 leftDir,
                 rightDir,
                 relativePath,
                 files.leftFile,
                 files.rightFile,
                 actionPriority
-            );
+            ));
 
-            if (diffDirFileItem) {
-                result.push(diffDirFileItem);
-            }
-            else {
-                throw new Error("Illegal DiffDirFileItem.");
-            }
+            // if (diffDirFileItem) {
+            //     result.push(diffDirFileItem);
+            // }
+            // else {
+            //     throw new Error("Illegal DiffDirFileItem.");
+            // }
         }
 
+        return BBPromise.all(diffDirFileItemPromises);
+
+
+    })
+    .then((diffDirFileItems: Array<DiffDirFileItem>) => {
         // Sort the items so that left-only items are next to right-only items
         // in the final result.
-        result = _.sortBy(result, (curDiffDirFileItem) => curDiffDirFileItem.relativeFilePath);
-
-        return result;
+        diffDirFileItems = _.sortBy(diffDirFileItems, (curDiffDirFileItem) => curDiffDirFileItem.relativeFilePath);
+        return diffDirFileItems;
     });
-
 }

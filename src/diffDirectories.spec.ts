@@ -8,10 +8,11 @@ import { diffDirectories, ActionPriority, DiffDirFileItemActionType } from "./di
 
 describe("diffDirectories()", async () => {
 
-    let leftDir:  Directory;
-    let rightDir: Directory;
 
     describe("", () => {
+
+        let leftDir: Directory;
+        let rightDir: Directory;
 
         beforeEach(() => {
             tmpDir.emptySync();
@@ -90,6 +91,37 @@ describe("diffDirectories()", async () => {
             expect(diffDirFiles[4].isInBoth).toEqual(false);
         });
 
+
+    });
+
+
+    describe("", () => {
+
+        let leftDir: Directory;
+        let rightDir: Directory;
+
+        beforeEach(() => {
+            tmpDir.emptySync();
+
+            leftDir = new Directory(tmpDir, "left");
+            rightDir = new Directory(tmpDir, "right");
+
+            // The left version of the file.
+            const leftFile = new File(leftDir, "theFile.txt");
+            leftFile.writeSync("theFile");
+
+            // The (identical) right version of the file.
+            const rightFile = leftFile.copySync(rightDir);
+        });
+
+
+        it("will return an item with no actions for identical files",  async () => {
+            const diffDirFiles = await diffDirectories(leftDir, rightDir);
+            expect(diffDirFiles.length).toEqual(1);
+            expect(diffDirFiles[0].isInBoth).toEqual(true);
+            expect(diffDirFiles[0].bothExistAndIdentical).toEqual(true);
+            expect(diffDirFiles[0].actions.length).toEqual(0);
+        });
 
     });
 

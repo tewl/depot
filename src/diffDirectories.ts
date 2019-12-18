@@ -352,32 +352,24 @@ export function diffDirectories(
     includeIdentical: boolean = false
 ): Promise<Array<DiffDirFileItem>>
 {
-    const leftPromise = leftDir.contents(true);
-    const rightPromise = rightDir.contents(true);
-
     let leftFiles: Array<File>;
     let rightFiles: Array<File>;
 
-    return leftPromise
+    // Get the left-side files, accounting for nonexistence.
+    const leftContentsPromise = leftDir.contents(true)
     .then(
-        (leftContents) => {
-            leftFiles = leftContents.files;
-        },
-        () => {
-            // The left directory must not exist.  Continue with no left files.
-            leftFiles = [];
-        }
-    )
-    .then(() => rightPromise)
+        (leftContents) => { leftFiles = leftContents.files; },
+        () => { leftFiles = []; }
+    );
+
+    // Get the right-side files, accounting for nonexistence.
+    const rightContentsPromise = rightDir.contents(true)
     .then(
-        (rightContents) => {
-            rightFiles = rightContents.files;
-        },
-        () => {
-            // The right directory must not exist.  Continue with no right files.
-            rightFiles = [];
-        }
-    )
+        (rightContents) => { rightFiles = rightContents.files; },
+        () => { rightFiles = []; }
+    );
+
+    return BBPromise.all([leftContentsPromise, rightContentsPromise])
     .then(() => {
         const diffMap = new Map<string, { leftFile?: File, rightFile?: File; }>();
 

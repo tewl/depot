@@ -598,6 +598,19 @@ describe("Directory", () => {
             });
 
 
+            it("rejects when the directory does not exist", (done) => {
+                const dirA = new Directory(tmpDir, "dirA");  // Does not exist.
+
+                dirA.contents()
+                .then(() => {
+                    fail("The above call to contents() should have rejected.");
+                })
+                .catch((err) => {
+                    done();
+                });
+            });
+
+
         });
 
 

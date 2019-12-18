@@ -355,11 +355,31 @@ export function diffDirectories(
     const leftPromise = leftDir.contents(true);
     const rightPromise = rightDir.contents(true);
 
-    return BBPromise.all([leftPromise, rightPromise])
-    .then(([leftContents, rightContents]) => {
-        const leftFiles  = leftContents.files;
-        const rightFiles = rightContents.files;
-        const diffMap    = new Map<string, { leftFile?: File, rightFile?: File; }>();
+    let leftFiles: Array<File>;
+    let rightFiles: Array<File>;
+
+    return leftPromise
+    .then(
+        (leftContents) => {
+            leftFiles = leftContents.files;
+        },
+        () => {
+            // The left directory must not exist.  Continue with no left files.
+            leftFiles = [];
+        }
+    )
+    .then(() => rightPromise)
+    .then(
+        (rightContents) => {
+            rightFiles = rightContents.files;
+        },
+        () => {
+            // The right directory must not exist.  Continue with no right files.
+            rightFiles = [];
+        }
+    )
+    .then(() => {
+        const diffMap = new Map<string, { leftFile?: File, rightFile?: File; }>();
 
         // Put the left files into the diff map.
         _.forEach(leftFiles, (curFile) => {

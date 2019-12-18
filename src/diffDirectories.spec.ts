@@ -132,6 +132,55 @@ describe("diffDirectories()", async () => {
     });
 
 
+    describe("when the left directory doesn't exist", () => {
+
+        let leftDir: Directory;
+        let rightDir: Directory;
+
+        beforeEach(() => {
+            tmpDir.emptySync();
+
+            leftDir = new Directory(tmpDir, "left");  // Does not exist.
+
+            rightDir = new Directory(tmpDir, "right");
+            const rightFile = new File(rightDir, "rightOnly.txt");
+            rightFile.writeSync("rightOnly");
+        });
+
+
+        it("returns the expected results", async () => {
+            const diffDirFiles = await diffDirectories(leftDir, rightDir);
+            expect(diffDirFiles.length).toEqual(1);
+        });
+
+
+    });
+
+
+    describe("when the right directory doesn't exist", () => {
+
+        let leftDir: Directory;
+        let rightDir: Directory;
+
+        beforeEach(() => {
+            tmpDir.emptySync();
+
+            leftDir = new Directory(tmpDir, "left");
+            const leftFile = new File(leftDir, "leftOnly.txt");
+            leftFile.writeSync("leftOnly");
+
+            rightDir = new Directory(tmpDir, "right");  // Does not exist.
+        });
+
+
+        it("returns the expected results", async () => {
+            const diffDirFiles = await diffDirectories(leftDir, rightDir);
+            expect(diffDirFiles.length).toEqual(1);
+        });
+
+    });
+
+
     describe("", () => {
 
         let leftDir:  Directory;

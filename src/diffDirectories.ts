@@ -108,6 +108,7 @@ export class DiffDirFileItemAction
 }
 
 
+// tslint:disable-next-line:max-classes-per-file
 export class DiffDirFileItem
 {
     /**

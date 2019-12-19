@@ -75,7 +75,7 @@ function runTslint(emitError)
         // If we're supposed to emit an error, then go ahead and rethrow it.
         // Otherwise, just eat it.
         if (emitError) {
-            throw toGulpError(err);
+            throw toGulpError(err, "One or more TSLint errors found.");
         }
     });
 }
@@ -112,7 +112,7 @@ function runUnitTests() {
 
     return runJasmine(jasmine)
     .catch((err) => {
-        throw toGulpError(err);
+        throw toGulpError(err, "One or more unit test failures.");
     });
 }
 
@@ -146,7 +146,7 @@ gulp.task("build", () => {
     })
     .then(() => {
         if (firstError) {
-            throw toGulpError(firstError);
+            throw toGulpError(firstError, "One or more build tasks failed.");
         }
     });
 

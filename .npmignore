@@ -1,0 +1,13 @@
+.DS_Store
+.gitignore
+/.idea/
+.npmignore
+.nvmrc
+.vscode
+changelog-template.md
+gulpfile.js
+/src/
+/test/
+/tmp/
+tsconfig.json
+tslint.json

@@ -4,9 +4,41 @@ import * as _ from "lodash";
 import {tmpDir} from "../test/ut/spechelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
+import { Iterator } from "./list";
 
 
 describe("File", () => {
+
+
+    describe("static", () => {
+
+
+        describe("relative()", () => {
+
+
+            it("returns undefined when the left part string does not match", () => {
+                const d = new Directory("a/b");
+                const f = new File("a/b/c/d/e.txt");
+                expect(File.relative(d, f).toString()).toEqual("c/d/e.txt");
+            });
+
+
+        });
+
+
+        describe("relativeParts()", () => {
+
+
+            it("returns the expected array of path parts", () => {
+                const d = new Directory("a/b");
+                const f = new File("a/b/c/d/e.txt");
+                expect(File.relativeParts(d, f)).toEqual(["c", "d", "e.txt"]);
+            });
+        });
+
+
+
+    });
 
 
     describe("instance", () => {

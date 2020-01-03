@@ -32,6 +32,20 @@ describe("Directory", () => {
         });
 
 
+        describe("relativeParts()", () => {
+
+
+            it("returns the expected array of path parts", () => {
+
+                const dirA = new Directory("dirA");
+                const dirB = new Directory(dirA, "b", "c");
+                expect(Directory.relativeParts(dirA, dirB)).toEqual(["b", "c"]);
+            });
+
+
+        });
+
+
     });
 
 
@@ -579,6 +593,19 @@ describe("Directory", () => {
                     expect(files[0].toString()).toEqual("tmp/c.txt");
                     expect(files[1].toString()).toEqual("tmp/dirA/a.txt");
                     expect(files[2].toString()).toEqual("tmp/dirB/b.txt");
+                    done();
+                });
+            });
+
+
+            it("rejects when the directory does not exist", (done) => {
+                const dirA = new Directory(tmpDir, "dirA");  // Does not exist.
+
+                dirA.contents()
+                .then(() => {
+                    fail("The above call to contents() should have rejected.");
+                })
+                .catch((err) => {
                     done();
                 });
             });

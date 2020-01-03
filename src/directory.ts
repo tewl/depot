@@ -32,9 +32,24 @@ export class Directory
      * @param to - The ending directory
      * @return A directory representing the relative path from `from` to `to`
      */
-    public static relative(from: Directory, to: Directory): Directory {
+    public static relative(from: Directory, to: Directory): Directory
+    {
         const relPath = path.relative(from.toString(), to.toString());
         return new Directory(relPath);
+    }
+
+
+    /**
+     * Calculates the parts of the relative path from `from` to `to`.
+     * @param from - The starting point
+     * @param to - The ending point
+     * @return An array of strings representing the path segments needed to get
+     * from `from` to `to`.
+     */
+    public static relativeParts(from: Directory, to: Directory): Array<string>
+    {
+        const relPath = path.relative(from.toString(), to.toString());
+        return relPath.split(path.sep);
     }
 
 
@@ -371,8 +386,9 @@ export class Directory
      * Reads the contents of this directory.
      * @param recursive - Whether to find subdirectories and files recursively
      * @return The contents of the directory, separated into a list of files and
-     * a list of subdirectories.  All returned paths are relative to this
-     * directory.
+     * a list of subdirectories.  The relative/absolute nature of the returned
+     * File and Directory objects will be determined by the relative/absolute
+     * nature of this Directory object.
      */
     public contents(recursive: boolean = false): Promise<IDirectoryContents>
     {

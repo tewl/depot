@@ -5,8 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
-## [vx.y.z] yyyy-mm-dd
+## [v3.0.0] 2019-12-18
 ### Added
+- Lots of breaking changes while this package was modified but not yet a library.
 - Added logger ability to log additional parameters.
 
 ### Fixed

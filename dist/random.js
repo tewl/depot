@@ -1,0 +1,61 @@
+"use strict";
+//
+// Note
+// ----
+// The following functions were taken from:
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+// These functions do not produce cryptographically strong random values.
+//
+// To get cryptographically string random numbers, use window.crypto.getRandomValues().
+//
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Returns a random (floating point) number between 0 (included) and 1 (excluded)
+ * @returns The generated random floating point number
+ */
+function getRandom() {
+    "use strict";
+    return Math.random();
+}
+exports.getRandom = getRandom;
+/**
+ * Returns a random (floating point) number.
+ * @param minIncluded - The minimum possible value
+ * @param maxExcluded - The maximum value
+ * @returns The generated random floating point number
+ */
+function getRandomFloat(minIncluded, maxExcluded) {
+    "use strict";
+    return Math.random() * (maxExcluded - minIncluded) + minIncluded;
+}
+exports.getRandomFloat = getRandomFloat;
+/**
+ * Returns a random integer between minIncluded and maxExcluded
+ * @param minIncluded - The minimum possible value
+ * @param maxExcluded - The maximum possible value
+ * @returns The generated random integer
+ */
+function getRandomInt(minIncluded, maxExcluded) {
+    "use strict";
+    // Using Math.round() will give you a non-uniform distribution!
+    return Math.floor(Math.random() * (maxExcluded - minIncluded)) + minIncluded;
+}
+exports.getRandomInt = getRandomInt;
+/**
+ * Returns a random integer between minIncluded and maxIncluded
+ * @param minIncluded - The minimum possible value
+ * @param maxIncluded - The maximum possible value
+ * @returns The generated random integer
+ */
+function getRandomIntInclusive(minIncluded, maxIncluded) {
+    "use strict";
+    // Using Math.floor() instead of Math.round(), because Math.round() will
+    // give you a non-uniform distribution!
+    return Math.floor(Math.random() * (maxIncluded - minIncluded + 1)) + minIncluded;
+}
+exports.getRandomIntInclusive = getRandomIntInclusive;
+//
+// Note: There is no shuffle() here, because it is available in Lodash.
+//
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9yYW5kb20udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLEVBQUU7QUFDRixPQUFPO0FBQ1AsT0FBTztBQUNQLDJDQUEyQztBQUMzQywrRkFBK0Y7QUFDL0YseUVBQXlFO0FBQ3pFLEVBQUU7QUFDRix1RkFBdUY7QUFDdkYsRUFBRTs7QUFHRjs7O0dBR0c7QUFDSCxTQUFnQixTQUFTO0lBQ3JCLFlBQVksQ0FBQztJQUNiLE9BQU8sSUFBSSxDQUFDLE1BQU0sRUFBRSxDQUFDO0FBQ3pCLENBQUM7QUFIRCw4QkFHQztBQUdEOzs7OztHQUtHO0FBQ0gsU0FBZ0IsY0FBYyxDQUFDLFdBQW1CLEVBQUUsV0FBbUI7SUFDbkUsWUFBWSxDQUFDO0lBQ2IsT0FBTyxJQUFJLENBQUMsTUFBTSxFQUFFLEdBQUcsQ0FBQyxXQUFXLEdBQUcsV0FBVyxDQUFDLEdBQUcsV0FBVyxDQUFDO0FBQ3JFLENBQUM7QUFIRCx3Q0FHQztBQUdEOzs7OztHQUtHO0FBQ0gsU0FBZ0IsWUFBWSxDQUFDLFdBQW1CLEVBQUUsV0FBbUI7SUFDakUsWUFBWSxDQUFDO0lBQ2IsK0RBQStEO0lBQy9ELE9BQU8sSUFBSSxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsTUFBTSxFQUFFLEdBQUcsQ0FBQyxXQUFXLEdBQUcsV0FBVyxDQUFDLENBQUMsR0FBRyxXQUFXLENBQUM7QUFDakYsQ0FBQztBQUpELG9DQUlDO0FBR0Q7Ozs7O0dBS0c7QUFDSCxTQUFnQixxQkFBcUIsQ0FBQyxXQUFtQixFQUFFLFdBQW1CO0lBQzFFLFlBQVksQ0FBQztJQUNiLHdFQUF3RTtJQUN4RSx1Q0FBdUM7SUFDdkMsT0FBTyxJQUFJLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQyxNQUFNLEVBQUUsR0FBRyxDQUFDLFdBQVcsR0FBRyxXQUFXLEdBQUcsQ0FBQyxDQUFDLENBQUMsR0FBRyxXQUFXLENBQUM7QUFDckYsQ0FBQztBQUxELHNEQUtDO0FBR0QsRUFBRTtBQUNGLHVFQUF1RTtBQUN2RSxFQUFFIiwiZmlsZSI6InJhbmRvbS5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8vXG4vLyBOb3RlXG4vLyAtLS0tXG4vLyBUaGUgZm9sbG93aW5nIGZ1bmN0aW9ucyB3ZXJlIHRha2VuIGZyb206XG4vLyBodHRwczovL2RldmVsb3Blci5tb3ppbGxhLm9yZy9lbi1VUy9kb2NzL1dlYi9KYXZhU2NyaXB0L1JlZmVyZW5jZS9HbG9iYWxfT2JqZWN0cy9NYXRoL3JhbmRvbVxuLy8gVGhlc2UgZnVuY3Rpb25zIGRvIG5vdCBwcm9kdWNlIGNyeXB0b2dyYXBoaWNhbGx5IHN0cm9uZyByYW5kb20gdmFsdWVzLlxuLy9cbi8vIFRvIGdldCBjcnlwdG9ncmFwaGljYWxseSBzdHJpbmcgcmFuZG9tIG51bWJlcnMsIHVzZSB3aW5kb3cuY3J5cHRvLmdldFJhbmRvbVZhbHVlcygpLlxuLy9cblxuXG4vKipcbiAqIFJldHVybnMgYSByYW5kb20gKGZsb2F0aW5nIHBvaW50KSBudW1iZXIgYmV0d2VlbiAwIChpbmNsdWRlZCkgYW5kIDEgKGV4Y2x1ZGVkKVxuICogQHJldHVybnMgVGhlIGdlbmVyYXRlZCByYW5kb20gZmxvYXRpbmcgcG9pbnQgbnVtYmVyXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZXRSYW5kb20oKTogbnVtYmVyIHtcbiAgICBcInVzZSBzdHJpY3RcIjtcbiAgICByZXR1cm4gTWF0aC5yYW5kb20oKTtcbn1cblxuXG4vKipcbiAqIFJldHVybnMgYSByYW5kb20gKGZsb2F0aW5nIHBvaW50KSBudW1iZXIuXG4gKiBAcGFyYW0gbWluSW5jbHVkZWQgLSBUaGUgbWluaW11bSBwb3NzaWJsZSB2YWx1ZVxuICogQHBhcmFtIG1heEV4Y2x1ZGVkIC0gVGhlIG1heGltdW0gdmFsdWVcbiAqIEByZXR1cm5zIFRoZSBnZW5lcmF0ZWQgcmFuZG9tIGZsb2F0aW5nIHBvaW50IG51bWJlclxuICovXG5leHBvcnQgZnVuY3Rpb24gZ2V0UmFuZG9tRmxvYXQobWluSW5jbHVkZWQ6IG51bWJlciwgbWF4RXhjbHVkZWQ6IG51bWJlcik6IG51bWJlciB7XG4gICAgXCJ1c2Ugc3RyaWN0XCI7XG4gICAgcmV0dXJuIE1hdGgucmFuZG9tKCkgKiAobWF4RXhjbHVkZWQgLSBtaW5JbmNsdWRlZCkgKyBtaW5JbmNsdWRlZDtcbn1cblxuXG4vKipcbiAqIFJldHVybnMgYSByYW5kb20gaW50ZWdlciBiZXR3ZWVuIG1pbkluY2x1ZGVkIGFuZCBtYXhFeGNsdWRlZFxuICogQHBhcmFtIG1pbkluY2x1ZGVkIC0gVGhlIG1pbmltdW0gcG9zc2libGUgdmFsdWVcbiAqIEBwYXJhbSBtYXhFeGNsdWRlZCAtIFRoZSBtYXhpbXVtIHBvc3NpYmxlIHZhbHVlXG4gKiBAcmV0dXJucyBUaGUgZ2VuZXJhdGVkIHJhbmRvbSBpbnRlZ2VyXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZXRSYW5kb21JbnQobWluSW5jbHVkZWQ6IG51bWJlciwgbWF4RXhjbHVkZWQ6IG51bWJlcik6IG51bWJlciB7XG4gICAgXCJ1c2Ugc3RyaWN0XCI7XG4gICAgLy8gVXNpbmcgTWF0aC5yb3VuZCgpIHdpbGwgZ2l2ZSB5b3UgYSBub24tdW5pZm9ybSBkaXN0cmlidXRpb24hXG4gICAgcmV0dXJuIE1hdGguZmxvb3IoTWF0aC5yYW5kb20oKSAqIChtYXhFeGNsdWRlZCAtIG1pbkluY2x1ZGVkKSkgKyBtaW5JbmNsdWRlZDtcbn1cblxuXG4vKipcbiAqIFJldHVybnMgYSByYW5kb20gaW50ZWdlciBiZXR3ZWVuIG1pbkluY2x1ZGVkIGFuZCBtYXhJbmNsdWRlZFxuICogQHBhcmFtIG1pbkluY2x1ZGVkIC0gVGhlIG1pbmltdW0gcG9zc2libGUgdmFsdWVcbiAqIEBwYXJhbSBtYXhJbmNsdWRlZCAtIFRoZSBtYXhpbXVtIHBvc3NpYmxlIHZhbHVlXG4gKiBAcmV0dXJucyBUaGUgZ2VuZXJhdGVkIHJhbmRvbSBpbnRlZ2VyXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZXRSYW5kb21JbnRJbmNsdXNpdmUobWluSW5jbHVkZWQ6IG51bWJlciwgbWF4SW5jbHVkZWQ6IG51bWJlcik6IG51bWJlciB7XG4gICAgXCJ1c2Ugc3RyaWN0XCI7XG4gICAgLy8gVXNpbmcgTWF0aC5mbG9vcigpIGluc3RlYWQgb2YgTWF0aC5yb3VuZCgpLCBiZWNhdXNlIE1hdGgucm91bmQoKSB3aWxsXG4gICAgLy8gZ2l2ZSB5b3UgYSBub24tdW5pZm9ybSBkaXN0cmlidXRpb24hXG4gICAgcmV0dXJuIE1hdGguZmxvb3IoTWF0aC5yYW5kb20oKSAqIChtYXhJbmNsdWRlZCAtIG1pbkluY2x1ZGVkICsgMSkpICsgbWluSW5jbHVkZWQ7XG59XG5cblxuLy9cbi8vIE5vdGU6IFRoZXJlIGlzIG5vIHNodWZmbGUoKSBoZXJlLCBiZWNhdXNlIGl0IGlzIGF2YWlsYWJsZSBpbiBMb2Rhc2guXG4vL1xuIl19

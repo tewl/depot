@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var counter = 0;
+var startTimestamp = Date.now();
+var pid = process.pid;
+/**
+ * Creates a string that will be unique across this machine.
+ * @return Returns a unique string comprised of a timestamp, pid and counter.
+ */
+function getUniqueProcessStr() {
+    var uniqueStr = startTimestamp + "_pid" + pid + "_" + counter;
+    counter++;
+    return uniqueStr;
+}
+exports.getUniqueProcessStr = getUniqueProcessStr;
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy91bmlxdWVQcm9jZXNzU3RyLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUEsSUFBSSxPQUFPLEdBQUcsQ0FBQyxDQUFDO0FBQ2hCLElBQU0sY0FBYyxHQUFHLElBQUksQ0FBQyxHQUFHLEVBQUUsQ0FBQztBQUNsQyxJQUFNLEdBQUcsR0FBRyxPQUFPLENBQUMsR0FBRyxDQUFDO0FBR3hCOzs7R0FHRztBQUNILFNBQWdCLG1CQUFtQjtJQUUvQixJQUFNLFNBQVMsR0FBTSxjQUFjLFlBQU8sR0FBRyxTQUFJLE9BQVMsQ0FBQztJQUMzRCxPQUFPLEVBQUUsQ0FBQztJQUNWLE9BQU8sU0FBUyxDQUFDO0FBQ3JCLENBQUM7QUFMRCxrREFLQyIsImZpbGUiOiJ1bmlxdWVQcm9jZXNzU3RyLmpzIiwic291cmNlc0NvbnRlbnQiOlsibGV0IGNvdW50ZXIgPSAwO1xuY29uc3Qgc3RhcnRUaW1lc3RhbXAgPSBEYXRlLm5vdygpO1xuY29uc3QgcGlkID0gcHJvY2Vzcy5waWQ7XG5cblxuLyoqXG4gKiBDcmVhdGVzIGEgc3RyaW5nIHRoYXQgd2lsbCBiZSB1bmlxdWUgYWNyb3NzIHRoaXMgbWFjaGluZS5cbiAqIEByZXR1cm4gUmV0dXJucyBhIHVuaXF1ZSBzdHJpbmcgY29tcHJpc2VkIG9mIGEgdGltZXN0YW1wLCBwaWQgYW5kIGNvdW50ZXIuXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZXRVbmlxdWVQcm9jZXNzU3RyKCk6IHN0cmluZ1xue1xuICAgIGNvbnN0IHVuaXF1ZVN0ciA9IGAke3N0YXJ0VGltZXN0YW1wfV9waWQke3BpZH1fJHtjb3VudGVyfWA7XG4gICAgY291bnRlcisrO1xuICAgIHJldHVybiB1bmlxdWVTdHI7XG59XG4iXX0=

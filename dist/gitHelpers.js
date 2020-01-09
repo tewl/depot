@@ -1,0 +1,39 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// A regular expression to match valid Git repo URLs.
+// match[1]: project name
+var gitUrlRegexp = /.*\/(.*)\.git$/;
+/**
+ * Determines whether `gitUrl` is a valid Git repo URL
+ * @param gitUrl - The string to test
+ * @return true if valid; false otherwise
+ */
+function isGitUrl(gitUrl) {
+    return !!gitUrl.match(gitUrlRegexp);
+}
+exports.isGitUrl = isGitUrl;
+/**
+ * Extracts the project name from a Git URL
+ * @param gitUrl - The Git URL for a repository
+ * @return The name of the project.  This method will throw an Error if the
+ * provided URL is invalid.
+ */
+function gitUrlToProjectName(gitUrl) {
+    var match = gitUrl.match(gitUrlRegexp);
+    if (!match) {
+        throw new Error("Tried to get project name from invalid Git URL.");
+    }
+    return match[1];
+}
+exports.gitUrlToProjectName = gitUrlToProjectName;
+/**
+ * Gets the project name from a directory path
+ * @param dir - The directory path
+ * @return The project name
+ */
+function dirToProjectName(dir) {
+    return dir.dirName;
+}
+exports.dirToProjectName = dirToProjectName;
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9naXRIZWxwZXJzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBR0EscURBQXFEO0FBQ3JELHlCQUF5QjtBQUN6QixJQUFNLFlBQVksR0FBRyxnQkFBZ0IsQ0FBQztBQUd0Qzs7OztHQUlHO0FBQ0gsU0FBZ0IsUUFBUSxDQUFDLE1BQWM7SUFFbkMsT0FBTyxDQUFDLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FBQyxZQUFZLENBQUMsQ0FBQztBQUN4QyxDQUFDO0FBSEQsNEJBR0M7QUFHRDs7Ozs7R0FLRztBQUNILFNBQWdCLG1CQUFtQixDQUFDLE1BQWM7SUFFOUMsSUFBTSxLQUFLLEdBQUcsTUFBTSxDQUFDLEtBQUssQ0FBQyxZQUFZLENBQUMsQ0FBQztJQUN6QyxJQUFJLENBQUMsS0FBSyxFQUNWO1FBQ0ksTUFBTSxJQUFJLEtBQUssQ0FBQyxpREFBaUQsQ0FBQyxDQUFDO0tBQ3RFO0lBRUQsT0FBTyxLQUFLLENBQUMsQ0FBQyxDQUFDLENBQUM7QUFDcEIsQ0FBQztBQVRELGtEQVNDO0FBR0Q7Ozs7R0FJRztBQUNILFNBQWdCLGdCQUFnQixDQUFDLEdBQWM7SUFDM0MsT0FBTyxHQUFHLENBQUMsT0FBTyxDQUFDO0FBQ3ZCLENBQUM7QUFGRCw0Q0FFQyIsImZpbGUiOiJnaXRIZWxwZXJzLmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtEaXJlY3Rvcnl9IGZyb20gXCIuL2RpcmVjdG9yeVwiO1xuXG5cbi8vIEEgcmVndWxhciBleHByZXNzaW9uIHRvIG1hdGNoIHZhbGlkIEdpdCByZXBvIFVSTHMuXG4vLyBtYXRjaFsxXTogcHJvamVjdCBuYW1lXG5jb25zdCBnaXRVcmxSZWdleHAgPSAvLipcXC8oLiopXFwuZ2l0JC87XG5cblxuLyoqXG4gKiBEZXRlcm1pbmVzIHdoZXRoZXIgYGdpdFVybGAgaXMgYSB2YWxpZCBHaXQgcmVwbyBVUkxcbiAqIEBwYXJhbSBnaXRVcmwgLSBUaGUgc3RyaW5nIHRvIHRlc3RcbiAqIEByZXR1cm4gdHJ1ZSBpZiB2YWxpZDsgZmFsc2Ugb3RoZXJ3aXNlXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBpc0dpdFVybChnaXRVcmw6IHN0cmluZyk6IGJvb2xlYW5cbntcbiAgICByZXR1cm4gISFnaXRVcmwubWF0Y2goZ2l0VXJsUmVnZXhwKTtcbn1cblxuXG4vKipcbiAqIEV4dHJhY3RzIHRoZSBwcm9qZWN0IG5hbWUgZnJvbSBhIEdpdCBVUkxcbiAqIEBwYXJhbSBnaXRVcmwgLSBUaGUgR2l0IFVSTCBmb3IgYSByZXBvc2l0b3J5XG4gKiBAcmV0dXJuIFRoZSBuYW1lIG9mIHRoZSBwcm9qZWN0LiAgVGhpcyBtZXRob2Qgd2lsbCB0aHJvdyBhbiBFcnJvciBpZiB0aGVcbiAqIHByb3ZpZGVkIFVSTCBpcyBpbnZhbGlkLlxuICovXG5leHBvcnQgZnVuY3Rpb24gZ2l0VXJsVG9Qcm9qZWN0TmFtZShnaXRVcmw6IHN0cmluZyk6IHN0cmluZ1xue1xuICAgIGNvbnN0IG1hdGNoID0gZ2l0VXJsLm1hdGNoKGdpdFVybFJlZ2V4cCk7XG4gICAgaWYgKCFtYXRjaClcbiAgICB7XG4gICAgICAgIHRocm93IG5ldyBFcnJvcihcIlRyaWVkIHRvIGdldCBwcm9qZWN0IG5hbWUgZnJvbSBpbnZhbGlkIEdpdCBVUkwuXCIpO1xuICAgIH1cblxuICAgIHJldHVybiBtYXRjaFsxXTtcbn1cblxuXG4vKipcbiAqIEdldHMgdGhlIHByb2plY3QgbmFtZSBmcm9tIGEgZGlyZWN0b3J5IHBhdGhcbiAqIEBwYXJhbSBkaXIgLSBUaGUgZGlyZWN0b3J5IHBhdGhcbiAqIEByZXR1cm4gVGhlIHByb2plY3QgbmFtZVxuICovXG5leHBvcnQgZnVuY3Rpb24gZGlyVG9Qcm9qZWN0TmFtZShkaXI6IERpcmVjdG9yeSk6IHN0cmluZyB7XG4gICAgcmV0dXJuIGRpci5kaXJOYW1lO1xufVxuIl19

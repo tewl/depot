@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable-next-line:no-submodule-imports no-var-requires no-require-imports
+var uuidv4 = require("uuid/v4");
+// This class is a simple wrapper around the uuid package's uuid generator.
+// I created this function, because I could not find accurate type definitions
+// for this package.
+/**
+ * Returns a uuid v4 string (e.g. "c17898d0-6c10-46ad-9a50-966f602f73ca").
+ * @return The generated uuid
+ */
+function generateUuid() {
+    return uuidv4();
+}
+exports.generateUuid = generateUuid;
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy91dWlkLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUEsbUZBQW1GO0FBQ25GLElBQU0sTUFBTSxHQUFpQixPQUFPLENBQUMsU0FBUyxDQUFDLENBQUM7QUFFaEQsMkVBQTJFO0FBQzNFLDhFQUE4RTtBQUM5RSxvQkFBb0I7QUFFcEI7OztHQUdHO0FBQ0gsU0FBZ0IsWUFBWTtJQUN4QixPQUFPLE1BQU0sRUFBRSxDQUFDO0FBQ3BCLENBQUM7QUFGRCxvQ0FFQyIsImZpbGUiOiJ1dWlkLmpzIiwic291cmNlc0NvbnRlbnQiOlsiLy8gdHNsaW50OmRpc2FibGUtbmV4dC1saW5lOm5vLXN1Ym1vZHVsZS1pbXBvcnRzIG5vLXZhci1yZXF1aXJlcyBuby1yZXF1aXJlLWltcG9ydHNcbmNvbnN0IHV1aWR2NDogKCkgPT4gc3RyaW5nID0gcmVxdWlyZShcInV1aWQvdjRcIik7XG5cbi8vIFRoaXMgY2xhc3MgaXMgYSBzaW1wbGUgd3JhcHBlciBhcm91bmQgdGhlIHV1aWQgcGFja2FnZSdzIHV1aWQgZ2VuZXJhdG9yLlxuLy8gSSBjcmVhdGVkIHRoaXMgZnVuY3Rpb24sIGJlY2F1c2UgSSBjb3VsZCBub3QgZmluZCBhY2N1cmF0ZSB0eXBlIGRlZmluaXRpb25zXG4vLyBmb3IgdGhpcyBwYWNrYWdlLlxuXG4vKipcbiAqIFJldHVybnMgYSB1dWlkIHY0IHN0cmluZyAoZS5nLiBcImMxNzg5OGQwLTZjMTAtNDZhZC05YTUwLTk2NmY2MDJmNzNjYVwiKS5cbiAqIEByZXR1cm4gVGhlIGdlbmVyYXRlZCB1dWlkXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZW5lcmF0ZVV1aWQoKTogc3RyaW5nIHtcbiAgICByZXR1cm4gdXVpZHY0KCk7XG59XG4iXX0=

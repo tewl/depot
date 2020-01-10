@@ -17,7 +17,9 @@ describe("comment()", () => {
         const text = [
             "",
             "    one",
+            "",
             "        two",
+            "",
             "            three",
             ""
         ];
@@ -26,7 +28,9 @@ describe("comment()", () => {
         expect(resultLines).toEqual([
             "    //",
             "    // one",
+            "    //",
             "    //     two",
+            "    //",
             "    //         three",
             "    //"
         ]);

@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import {piNewline} from "./regexpHelpers";
+import {createEolRegex} from "./regexpHelpers";
 
 
 /**
@@ -39,7 +39,8 @@ export function indent(
     src: string,
     numSpacesOrPad: number | string,
     skipFirstLine: boolean = false
-): string {
+): string
+{
     if (numSpacesOrPad === 0) {
         return src;
     }
@@ -81,7 +82,7 @@ export function indent(
  */
 export function outdent(str: string, padStr: string = " ", greedy: boolean = true): string
 {
-    const lines = str.split(piNewline);
+    const lines = splitIntoLines(str, true);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
     let numToRemove = _.min(initOccurrences);
     if (!greedy) {
@@ -94,7 +95,7 @@ export function outdent(str: string, padStr: string = " ", greedy: boolean = tru
 
     const resultLines = _.map(lines, (curLine) => curLine.slice(numCharsToRemove));
     // Join the lines back together again.
-    return resultLines.join("\n");
+    return resultLines.join("");
 }
 
 
@@ -108,7 +109,7 @@ const blankLineRegex = /^\s*$/;
  */
 export function trimBlankLines(str: string): string
 {
-    const lines = str.split(piNewline);
+    const lines = splitIntoLines(str, true);
 
     while ((lines.length > 0) &&
           blankLineRegex.test(lines[0]))
@@ -122,15 +123,44 @@ export function trimBlankLines(str: string): string
         lines.pop();
     }
 
-    return lines.join("\n");
+    // If lines have been removed from the end, we will have a new last line.
+    // We need to make sure that new last line does not have an EOL.
+    lines[lines.length - 1] = lines[lines.length - 1].replace(createEolRegex(), "");
+
+    return lines.join("");
 }
 
 
+/**
+ * Returns a string that is the same as `str`, but with blank lines removed.
+ * @param str - The source string
+ * @return A new string with blank lines removed
+ */
 export function removeBlankLines(str: string): string
 {
-    let lines = str.split(piNewline);
-    lines = _.filter(lines, (curLine) => !blankLineRegex.test(curLine));
-    return lines.join("\n");
+    if (str.length === 0) {
+        return "";
+    }
+
+    let lines = splitIntoLines(str, true);
+    lines = _.filter(lines, (curLine) => !isBlank(curLine));
+
+    // If lines have been removed from the end, we will have a new last line.
+    // We need to make sure that new last line does not have an EOL.
+    lines[lines.length - 1] = lines[lines.length - 1].replace(createEolRegex(), "");
+
+    return lines.join("");
+}
+
+
+/**
+ * Determines whether `text` consists of nothing but whitespace.
+ * @param text - The string to analyze
+ * @return true if `text` is nothing but whitespace; false otherwise.
+ */
+export function isBlank(text: string): boolean
+{
+    return blankLineRegex.test(text);
 }
 
 
@@ -145,4 +175,63 @@ const whitespaceRegex = /\s+/g;
 export function removeWhitespace(str: string): string
 {
     return str.replace(whitespaceRegex, "");
+}
+
+
+/**
+ * Splits a string into its individual lines.
+ * @param text - The text to be split into individual lines
+ * @param retainLineEndings - Whether each line should include the original line endings
+ * @return An array containing the individual lines from `text`.
+ */
+export function splitIntoLines(text: string, retainLineEndings: boolean = false): Array<string>
+{
+    if (text.length === 0) {
+        return [];
+    }
+
+    const lines: Array<string> = [];
+    const eolRegex = createEolRegex("g");
+    let done = false;
+
+    while (!done) {
+
+        const startIndex = eolRegex.lastIndex;
+
+        const match = eolRegex.exec(text);
+        if (match) {
+
+            let line: string = text.slice(startIndex, match.index);
+            if (retainLineEndings) {
+                line += match[0];
+            }
+            lines.push(line);
+
+        }
+        else {
+            const line = text.slice(startIndex);
+            lines.push(line);
+            done = true;
+        }
+    }
+
+    return lines;
+}
+
+
+/**
+ * Figures our what EOL string is being used in the specified string.
+ * @param text - The string to analyze
+ * @return A string representing the EOL characters being used in `text`.  If no
+ * end-of-line is found, and empty string is returned.
+ */
+export function getEol(text: string): string
+{
+    const match = createEolRegex().exec(text);
+    if (!match) {
+        return "";
+    }
+    else {
+        return match[0];
+    }
 }

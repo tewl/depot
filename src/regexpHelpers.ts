@@ -1,5 +1,11 @@
 /**
- * A RegExp that will match newlines in a platform independent way (i.e. Linux,
- * Mac and Windows).
+ * Creates a new regular expression capable of detecting EOL.  Because regular
+ * expressions have state, a function is used here to create new instances for
+ * clients.
+ * @param flags - Any RegExp flag that should be used when creating the regex.
+ * @return The newly created regex
  */
-export const piNewline: RegExp = /\r?\n/;
+export function createEolRegex(flags?: string): RegExp
+{
+    return new RegExp("\\r?\\n", flags);
+}

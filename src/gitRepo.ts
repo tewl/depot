@@ -9,7 +9,7 @@ import {Url} from "./url";
 import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
-import {piNewline} from "./regexpHelpers";
+import {splitIntoLines} from "./stringHelpers";
 
 
 interface IGitLogEntry
@@ -181,7 +181,7 @@ export class GitRepo
         return spawn("git", ["ls-files"], {cwd: this._dir.toString()})
         .closePromise
         .then((stdout) => {
-            const relativeFilePaths = stdout.split(piNewline);
+            const relativeFilePaths = splitIntoLines(stdout);
             return _.map(relativeFilePaths, (curRelFilePath) => {
                 return new File(this._dir, curRelFilePath);
             });
@@ -200,7 +200,7 @@ export class GitRepo
             {
                 return [];
             }
-            const relativeFilePaths = stdout.split(piNewline);
+            const relativeFilePaths = splitIntoLines(stdout);
             return _.map(relativeFilePaths, (curRelativeFilePath) => {
                 return new File(this._dir, curRelativeFilePath);
             });
@@ -219,7 +219,7 @@ export class GitRepo
             {
                 return [];
             }
-            const relativeFilePaths = stdout.split(piNewline);
+            const relativeFilePaths = splitIntoLines(stdout);
             return _.map(relativeFilePaths, (curRelativePath) => {
                 return new File(this._dir, curRelativePath);
             });
@@ -254,7 +254,7 @@ export class GitRepo
         .closePromise
         .then((stdout) => {
 
-            const lines = stdout.split(piNewline);
+            const lines = splitIntoLines(stdout);
             const remotes: {[name: string]: string} = {};
             lines.forEach((curLine) => {
                 const match = curLine.match(/^(\w+)\s+(.*)\s+\(\w+\)$/);
@@ -332,7 +332,7 @@ export class GitRepo
                 return [];
             }
 
-            return stdout.split(piNewline);
+            return splitIntoLines(stdout);
         });
     }
 

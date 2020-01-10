@@ -1,6 +1,6 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
-    removeBlankLines
+    removeBlankLines, splitIntoLines
 } from "./stringHelpers";
 
 
@@ -206,6 +206,57 @@ describe("removeWhitespace", () => {
 
     it("will remove different kinds of whitespace", () => {
         expect(removeWhitespace("\tfoo\t    \tbar\t\t")).toEqual("foobar");
+    });
+
+
+});
+
+
+describe("splitIntoLines", () => {
+
+
+    it("properly handles case where there is only one line",  () => {
+        expect(splitIntoLines("foo", true)).toEqual(["foo"]);
+    });
+
+
+    it("splits on CRLF", async () => {
+        const text = "\r\none\r\ntwo\r\nthree\r\n";
+        const result = splitIntoLines(text, false);
+        expect(result).toEqual([
+            "",
+            "one",
+            "two",
+            "three",
+            ""
+        ]);
+    });
+
+
+    it("splits on LF", async () => {
+        const text = "\none\ntwo\nthree\n";
+        const result = splitIntoLines(text, false);
+        expect(result).toEqual([
+            "",
+            "one",
+            "two",
+            "three",
+            ""
+        ]);
+    });
+
+
+    it("retains line endings", () => {
+        const text = "\none\r\ntwo\nthree\r\nfour\n";
+        const result = splitIntoLines(text, true);
+        expect(result).toEqual([
+            "\n",
+            "one\r\n",
+            "two\n",
+            "three\r\n",
+            "four\n",
+            ""
+        ]);
     });
 
 

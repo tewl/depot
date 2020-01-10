@@ -16,9 +16,9 @@ describe("comment()", () => {
     it("will place the comment token at the same place on all lines",  () => {
         const text = [
             "",
-            "    one",
+            "        one",
             "",
-            "        two",
+            "    two",
             "",
             "            three",
             ""
@@ -27,9 +27,9 @@ describe("comment()", () => {
         const resultLines = splitIntoLines(result);
         expect(resultLines).toEqual([
             "    //",
-            "    // one",
+            "    //     one",
             "    //",
-            "    //     two",
+            "    // two",
             "    //",
             "    //         three",
             "    //"

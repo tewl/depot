@@ -1,4 +1,3 @@
-import * as BBPromise from "bluebird";
 import {EventEmitter} from "events";
 import {PriorityQueue} from "./priorityQueue";
 import {Task} from "./promiseHelpers";
@@ -25,6 +24,7 @@ export class TaskQueue extends EventEmitter
     private _isProcessingLastFulfillment: boolean;
     private _isRunning: boolean;
     private readonly _pauseWhenDrained: boolean;
+    private _lastSettledInternalRunPromise: Promise<void> | undefined;
     // endregion
 
 
@@ -53,6 +53,7 @@ export class TaskQueue extends EventEmitter
         this._isProcessingLastFulfillment = false;
         this._isRunning = !Boolean(pauseWhenDrained);
         this._pauseWhenDrained = Boolean(pauseWhenDrained);
+        this._lastSettledInternalRunPromise = undefined;
 
         Object.seal(this);
     }
@@ -118,12 +119,12 @@ export class TaskQueue extends EventEmitter
                                                   // (if this._isProcessingLastFulfillment is true
                                                   // there will be a drained event fired in the future)
         ) {
-            return BBPromise.resolve();
+            return Promise.resolve();
         }
 
         // Return a Promise that will be resolved when this TaskQueue eventually
         // drains.
-        return new BBPromise<void>((resolve: () => void) => {
+        return new Promise<void>((resolve: () => void) => {
             this.once(TaskQueue.EVENT_DRAINED, resolve);
         });
     }
@@ -157,6 +158,7 @@ export class TaskQueue extends EventEmitter
     private startTasks(justAddedNewTask: boolean): void
     {
         if (justAddedNewTask) {
+            // console.log("New tasks have been added to TaskQueue.");
             this._isProcessingLastFulfillment = false;
         }
 
@@ -166,12 +168,12 @@ export class TaskQueue extends EventEmitter
             // tasks get enqueued.  If the last fulfillment handler enqueues a
             // new task, this_isProcessingLastFulfillment will be set to false.
             this._isProcessingLastFulfillment = true;
-            // console.log("Looks like we might be done.  Waiting 1 tick.");
+            // console.log("Looks like we might be done.  Waiting for handlers to run.");
 
-            BBPromise.resolve()
+            this._lastSettledInternalRunPromise!
             .then(() => {
                 if (this._isProcessingLastFulfillment) {
-                    // console.log(`We are done and _numRunning is ${this._numRunning}`);
+                    // console.log("No additional tasks queued. TaskQueue is now drained.");
 
                     // We waited one more tick and no new tasks have been
                     // enqueued.  It is safe to say that this queue is now
@@ -201,13 +203,16 @@ export class TaskQueue extends EventEmitter
 
             if (curTask) {
                 ++this._numRunning;
-                curTask.task()
+
+                const curRunPromise: Promise<void> = curTask.task()
                 .then((value: any) => {
+                    this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.resolve(value);
                     --this._numRunning;
                     this.startTasks(false);
                 })
                 .catch((err: any) => {
+                    this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.reject(err);
                     --this._numRunning;
                     this.startTasks(false);

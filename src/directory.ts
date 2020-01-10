@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {File} from "./file";
 import {promisify1, sequence} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
@@ -120,7 +119,7 @@ export class Directory
 
     public exists(): Promise<fs.Stats | undefined>
     {
-        return new BBPromise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
+        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
             fs.stat(this._dirPath, (err: any, stats: fs.Stats) => {
 
                 if (!err && stats.isDirectory())
@@ -339,7 +338,7 @@ export class Directory
                         }
                     });
 
-                    return BBPromise.all(deletePromises);
+                    return Promise.all(deletePromises);
                 })
                 .then(() => {
                     // Now that all of the items in the directory have been deleted, delete
@@ -414,7 +413,7 @@ export class Directory
                 });
             });
 
-            return BBPromise.all(promises)
+            return Promise.all(promises)
             .then(() => {
                 return contents;
             });
@@ -425,7 +424,7 @@ export class Directory
             }
 
             // Get the contents of each subdirectory.
-            return BBPromise.all<IDirectoryContents>(_.map(contents.subdirs, (curSubdir) => curSubdir.contents(true)))
+            return Promise.all<IDirectoryContents>(_.map(contents.subdirs, (curSubdir) => curSubdir.contents(true)))
             .then((subdirContents: Array<IDirectoryContents>) => {
                 // Put the contents of each subdirectory into the returned
                 // `contents` object.
@@ -507,7 +506,7 @@ export class Directory
                 });
             });
 
-            return BBPromise.all(promises)
+            return Promise.all(promises)
             .then(() => {
             });
         });
@@ -575,7 +574,7 @@ export class Directory
                 return curSubdir.copy(destDir, true);
             });
 
-            return BBPromise.all(_.concat<any>(fileCopyPromises, dirCopyPromises));
+            return Promise.all(_.concat<any>(fileCopyPromises, dirCopyPromises));
         })
         .then(() => {
             return destDir;
@@ -661,13 +660,13 @@ export class Directory
 
         // Invoke the callback for all files concurrently.
         const filePromises: Array<Promise<boolean>> = _.map(thisDirectoryContents.files, (curFile: File) => {
-            return BBPromise.resolve(cb(curFile));
+            return Promise.resolve(cb(curFile));
         });
-        await BBPromise.all(filePromises);
+        await Promise.all(filePromises);
 
         // Process each of the subdirectories one at a time.
         for (const curSubDir of thisDirectoryContents.subdirs) {
-            const shouldRecurse = await BBPromise.resolve(cb(curSubDir));
+            const shouldRecurse = await Promise.resolve(cb(curSubDir));
             if (shouldRecurse) {
                 await curSubDir.walk(cb);
             }

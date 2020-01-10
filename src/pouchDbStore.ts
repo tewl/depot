@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import * as PouchDB from "pouchdb";
 import {SerializationRegistry} from "./serializationRegistry";
 import {AStore, IdString, ISerialized, IStoreGetResult, IStorePutResult} from "./serialization";
@@ -17,7 +16,7 @@ export class PouchDbStore extends AStore<IPouchDbStow>
     public static create(registry: SerializationRegistry, pouchDb: PouchDB.Database): Promise<PouchDbStore>
     {
         const instance = new PouchDbStore(registry, pouchDb);
-        return BBPromise.resolve(instance);
+        return Promise.resolve(instance);
     }
 
 

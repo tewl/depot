@@ -1,7 +1,6 @@
 import * as http from "http";
 import * as https from "https";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import * as net from "net";
 import {getFirstExternalIpv4Address} from "./networkHelpers";
 import {RequestType} from "./requestHelpers";
@@ -146,10 +145,10 @@ export class QuickServer
     {
         // If this server is already started, just resolve.
         if (this._server) {
-            return BBPromise.resolve();
+            return Promise.resolve();
         }
 
-        return new BBPromise((resolve) => {
+        return new Promise((resolve) => {
 
             if (this._sslConfig) {
                 this._server = https.createServer(this._sslConfig, this._requestListener);
@@ -198,10 +197,10 @@ export class QuickServer
     {
         // If this server is already stopped, just resolve.
         if (!this._server) {
-            return BBPromise.resolve();
+            return Promise.resolve();
         }
 
-        return new BBPromise((resolve) => {
+        return new Promise((resolve) => {
             this._server!.close(() => {
                 this._server = undefined;
                 this._isReferenced = undefined;

@@ -1,6 +1,3 @@
-import * as BBPromise from "bluebird";
-
-
 export class Deferred<ResolveType>
 {
     public promise: Promise<ResolveType>;
@@ -15,7 +12,7 @@ export class Deferred<ResolveType>
         this.resolve = (): void => {};
         this.reject = (): void => {};
 
-        this.promise = new BBPromise((resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
+        this.promise = new Promise((resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
             this.resolve = resolve;
             this.reject = reject;
         });

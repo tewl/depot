@@ -1,4 +1,3 @@
-// import * as BBPromise from "bluebird";
 // import {isStringError, StringError} from "./stringError";
 // import {assertNever} from "./never";
 //
@@ -13,7 +12,7 @@
 //     // A helper function to make sure that we only return errors of the desired
 //     // type (since promises always treat errors as `any`).
 //     function reject(err: BuildCastleError): Promise<never> {
-//         return BBPromise.reject(new StringError<BuildCastleError>(err));
+//         return Promise.reject(new StringError<BuildCastleError>(err));
 //     }
 // }
 //

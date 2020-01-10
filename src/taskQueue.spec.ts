@@ -1,5 +1,4 @@
 import {EventEmitter} from "events";
-import * as BBPromise from "bluebird";
 import {Task, getTimerPromise, allSettled} from "./promiseHelpers";
 import {TaskQueue} from "./taskQueue";
 import {Deferred} from "./deferred";
@@ -20,13 +19,18 @@ interface ITaskInfo<ResolveType> {
  * resolve or reject.
  *
  */
-function createTask<ResolveType>(): ITaskInfo<ResolveType>
+function createTask<ResolveType>(name: string = ""): ITaskInfo<ResolveType>
 {
     const dfd = new Deferred<ResolveType>();
 
     // Create a task that will return the Promise we just created (which is
     // controlled by the deferred's resolve() and reject()).
-    const theTask = () => dfd.promise;
+    const theTask = () => {
+        // Uncomment the following lines to assist debugging.
+        // const msg = name ? `Running task ${name}.` : "Running task.";
+        // console.log(msg);
+        return dfd.promise;
+    };
 
     return {
         task:     theTask,
@@ -175,23 +179,29 @@ describe("TaskQueue", () => {
             numDrainedEvents++;
         });
 
-        const taskInfo1 = createTask<number>();
-        const taskInfo2 = createTask<number>();
+        const taskInfo1 = createTask<number>("1");
+        const taskInfo2 = createTask<number>("2");
         queue.push(taskInfo1.task)
         .then(() => {
-            // The drained event will happen after resolving the last promise in
-            // the event that promise's fulfillment handler enqueues another task.
+            // The drained event should not have fired, because handlers should
+            // have the opportunity to queue more work.  If they do, the queue
+            // should not emit the drained event.
             expect(numDrainedEvents).toEqual(0);
-            taskInfo2.deferred.resolve(2);
+
+            getTimerPromise(10, 5)
+            .then(() => taskInfo2.deferred.resolve(2));
+
             return queue.push(taskInfo2.task);
         })
         .then(() => {
+            // Again, the drained event should not have fired, because this
+            // handler has the ability to queue more work.
             expect(numDrainedEvents).toEqual(0);
-            return getTimerPromise(20, 5);
+
+            // Once this handler returns without queuing more work, the drained
+            // event should fire.
         })
-        .then(
-            () => {
-                // One drain event should have been fired.
+        .then(() => {
                 expect(numDrainedEvents).toEqual(1);
                 done();
             }
@@ -216,19 +226,22 @@ describe("TaskQueue", () => {
 
         queue.push(task1)
         .then(() => {
-            // When queued work is done (as it is here), the client should
-            // always be given the opportunity to enqueue more work.  In this
-            // case, the queue is never "drained".
+            // task1 is now complete.  The client should always be given the
+            // opportunity to enqueue more work (before the TaskQueue can
+            // officially say that it has been drained).  So we will queue task2
+            // and make sure that the drained event is not fired.
             expect(numDrainedEvents).toEqual(0);
             return queue.push(task2);
         })
         .then(() => {
-            // When queued work is done (as it is here), the client should
-            // always be given the opportunity to enqueue more work.  In this
-            // case, the queue is never "drained".
+            // task2 is now complete and the client should be given yet another
+            // opportunity to queue more work (before the TaskQueue can
+            // officailly say that it has been drained).  This time, we will not
+            // queue more work.
             expect(numDrainedEvents).toEqual(0);
 
-            // In this case, we are not enqueuing more work.
+            // Once we return from this handler without queuing more work, the
+            // drained event should fire.
         })
         .then(() => {
             expect(numDrainedEvents).toEqual(1);
@@ -245,29 +258,38 @@ describe("TaskQueue", () => {
             numDrainedEvents++;
         });
 
-        let t1Prom: Promise<number>;
-        let t2Prom: Promise<number>;
-        let t3Prom: Promise<number>;
+        let t1HasResolved = false;
+        let t2HasResolved = false;
+        let t3HasResolved = false;
 
-        t1Prom = queue.push(createTimerTask(50, 1));
-        t1Prom
+        const task1: Task<boolean> = () => {
+            return getTimerPromise(10, undefined)
+            .then(() => t1HasResolved = true);
+        };
+
+        const task2: Task<boolean> = () => {
+            return getTimerPromise(10, undefined)
+            .then(() => t2HasResolved = true);
+        };
+
+        const task3: Task<boolean> = () => {
+            return getTimerPromise(10, undefined)
+            .then(() => t3HasResolved = true);
+        };
+
+        queue.push(task1)
         .then(() => {
-            t2Prom = queue.push(createTimerTask(50, 2));
-            return t2Prom;
+            return queue.push(task2);
         })
         .then(() => {
-            t3Prom = queue.push(createTimerTask(50, 3));
-            return t3Prom;
+            return queue.push(task3);
         });
 
         queue.drain()
         .then(() => {
-            expect(BBPromise.resolve(t1Prom).isFulfilled()).toBeTruthy();
-            expect(BBPromise.resolve(t2Prom).isFulfilled()).toBeTruthy();
-            expect(BBPromise.resolve(t3Prom).isFulfilled()).toBeTruthy();
-            return getTimerPromise(5, undefined);
-        })
-        .then(() => {
+            expect(t1HasResolved).toBeTruthy();
+            expect(t2HasResolved).toBeTruthy();
+            expect(t3HasResolved).toBeTruthy();
             expect(numDrainedEvents).toEqual(1);
             done();
         });
@@ -277,25 +299,41 @@ describe("TaskQueue", () => {
     it("cancelAllPending() will cancel pending tasks with the specified error", (done) => {
         const queue: TaskQueue = new TaskQueue(1);
 
-        const t1: Task<number> = createTimerTask(50, 1);
-        const t2: Task<number> = createTimerTask(50, 2);
+        const t1 = createTimerTask(50, 1);
+        const t2 = createTimerTask(50, 2);
 
-        const t1Prom: Promise<number> = queue.push(t1);
-        const t2Prom: Promise<number> = queue.push(t2);
+        let t1Value: number | undefined;
+        let t1Error: Error  | undefined;
+        let t2Value: number | undefined;
+        let t2Error: Error  | undefined;
 
+        const t1Prom = queue.push(t1)
+        .then(
+            (val) => t1Value = val,
+            (err) => t1Error = err
+        );
+
+        const t2Prom = queue.push(t2)
+        .then(
+            (val) => t2Value = val,
+            (err) => t2Error = err
+        );
+
+        // Cancel the tasks before they have a chance to complete.
+        // Only task1 should have had a chance to start.
         queue.cancelAllPending(new Error("queue is cancelled"));
 
         allSettled([t1Prom, t2Prom])
-        .then((inspections: Array<BBPromise.Inspection<any>>) => {
-            // In-progress tasks should complete normally
-            expect(inspections[0].isFulfilled()).toBeTruthy();
-            // In-progress tasks should return their normal value
-            expect(inspections[0].value()).toEqual(1);
+        .then(() => {
+            // In-progress tasks should complete normally and return their
+            // normal value.
+            expect(t1Value).toEqual(1);
+            expect(t1Error).toEqual(undefined);
 
-            // Pending tasks should be rejected
-            expect(inspections[1].isRejected()).toBeTruthy();
-            // Pending tasks should be rejected with the value specified by the client
-            expect(inspections[1].reason().message).toEqual("queue is cancelled");
+            // Pending tasks should be rejected with the specified Error.
+            expect(t2Value).toEqual(undefined);
+            expect(t2Error).toBeDefined();
+            expect(t2Error!.message).toEqual("queue is cancelled");
 
             done();
         });
@@ -305,26 +343,41 @@ describe("TaskQueue", () => {
     it("cancelAllPending() will cancel pending tasks with the default error if not specified", (done) => {
         const queue: TaskQueue = new TaskQueue(1);
 
-        const t1: Task<number> = createTimerTask(50, 1);
-        const t2: Task<number> = createTimerTask(50, 2);
+        const t1 = createTimerTask(50, 1);
+        const t2 = createTimerTask(50, 2);
 
-        const t1Prom: Promise<number> = queue.push(t1);
-        const t2Prom: Promise<number> = queue.push(t2);
+        let t1Value: number | undefined;
+        let t1Error: Error | undefined;
+        let t2Value: number | undefined;
+        let t2Error: Error | undefined;
 
-        queue.cancelAllPending();  // Use default rejection value.
+        const t1Prom = queue.push(t1)
+        .then(
+            (val) => t1Value = val,
+            (err) => t1Error = err
+        );
+
+        const t2Prom = queue.push(t2)
+        .then(
+            (val) => t2Value = val,
+            (err) => t2Error = err
+        );
+
+        // Cancel the tasks before they have a chance to complete.
+        // Only task1 should have had a chance to start.
+        queue.cancelAllPending();
 
         allSettled([t1Prom, t2Prom])
-        .then((inspections: Array<BBPromise.Inspection<any>>) => {
+        .then(() => {
+            // In-progress tasks should complete normally and return their
+            // normal value.
+            expect(t1Value).toEqual(1);
+            expect(t1Error).toEqual(undefined);
 
-            // In-progress tasks should complete normally
-            expect(inspections[0].isFulfilled()).toBeTruthy();
-            // In-progress tasks should return their normal value
-            expect(inspections[0].value()).toEqual(1);
-
-            // Pending tasks should be rejected
-            expect(inspections[1].isRejected()).toBeTruthy();
-            // Pending tasks should be rejected with the value specified by the client
-            expect(inspections[1].reason().message).toEqual("Task cancelled because its TaskQueue was cancelled.");
+            // Pending tasks should be rejected with the specified Error.
+            expect(t2Value).toEqual(undefined);
+            expect(t2Error).toBeDefined();
+            expect(t2Error!.message).toEqual("Task cancelled because its TaskQueue was cancelled.");
 
             done();
         });
@@ -337,7 +390,7 @@ describe("TaskQueue", () => {
 
         const task = (): Promise<number> => {
             taskHasRun = true;
-            return BBPromise.resolve(1);
+            return Promise.resolve(1);
         };
 
         queue.push(task);
@@ -390,7 +443,7 @@ describe("TaskQueue", () => {
         let taskHasRun: boolean = false;
         const task = (): Promise<void> => {
             taskHasRun = true;
-            return BBPromise.resolve();
+            return Promise.resolve();
         };
 
         const queue = new TaskQueue(4, true);
@@ -416,17 +469,17 @@ describe("TaskQueue", () => {
 
         const task1 = () => {
             log.push(1);      // Log that task 1 has run
-            return BBPromise.resolve();
+            return Promise.resolve();
         };
 
         const task2 = () => {
             log.push(2);      // Log that task 2 has run
-            return BBPromise.resolve();
+            return Promise.resolve();
         };
 
         const task3 = () => {
             log.push(3);      // Log that task 3 has run
-            return BBPromise.resolve();
+            return Promise.resolve();
         };
 
         // Set pauseWhenDrained so tasks won't start running immediately.
@@ -437,7 +490,7 @@ describe("TaskQueue", () => {
         const t3Prom = queue.push(task3, 3);
 
         // Setup code that will check the results.
-        BBPromise.all([t1Prom, t2Prom, t3Prom])
+        Promise.all([t1Prom, t2Prom, t3Prom])
         .then(() => {
             expect(log).toEqual([3, 2, 1]);
             done();

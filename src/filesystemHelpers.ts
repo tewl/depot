@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as BBPromise from "bluebird";
 import {Directory} from "./directory";
 import {File} from "./file";
 
@@ -12,7 +11,7 @@ import {File} from "./file";
  */
 export function getFilesystemItem(path: string): Promise<Directory | File>
 {
-    return new BBPromise<Directory | File>((resolve, reject) => {
+    return new Promise<Directory | File>((resolve, reject) => {
 
         fs.stat(path, (err, stats: fs.Stats) => {
             if (err) {

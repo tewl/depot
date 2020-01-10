@@ -1,5 +1,4 @@
 import {tmpdir} from "os";
-import * as BBPromise from "bluebird";
 import {spawn} from "./spawn";
 import {Directory} from "./directory";
 import {File} from "./file";
@@ -47,14 +46,14 @@ export class SelfSignedCertificate
             ).closePromise;
 
             // Read the key and cert data (in parallel).
-            const [keyData, certData] = await BBPromise.all<string, string>([keyFile.read(), certFile.read()]);
+            const [keyData, certData] = await Promise.all<string, string>([keyFile.read(), certFile.read()]);
 
             // Create the new instance.
             const instance = new SelfSignedCertificate(
                 countryCode, state, location, organization, organizationalUnit, commonName, keyData, certData);
 
             // Cleanup
-            await BBPromise.all([keyFile.delete(), certFile.delete()]);
+            await Promise.all([keyFile.delete(), certFile.delete()]);
 
             return instance;
         }

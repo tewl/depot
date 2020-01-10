@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as BBPromise from "bluebird";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
@@ -176,7 +175,7 @@ export class NodePackage
         tmpDir = tmpDir.absolute();
 
         if (publishDir.equals(tmpDir)) {
-            return BBPromise.reject("When publishing, publishDir cannot be the same as tmpDir");
+            return Promise.reject("When publishing, publishDir cannot be the same as tmpDir");
         }
 
         return this.pack(tmpDir)

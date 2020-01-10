@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import { tmpDir } from "../test/ut/specHelpers";
 import { File } from "./file";
 import { Directory } from "./directory";
@@ -288,7 +287,7 @@ describe("diffDirectories()", async () => {
                 return curDiffDirFileItem.actions[0].execute();
             });
 
-            await BBPromise.all(promises);
+            await Promise.all(promises);
 
             // Check the state of the left directory.  It should be unchanged.
             expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");
@@ -337,7 +336,7 @@ describe("diffDirectories()", async () => {
                 return curDiffDirFileItem.actions[0].execute();
             });
 
-            await BBPromise.all(promises);
+            await Promise.all(promises);
 
             // Check the state of the left directory.
             expect(new File(leftDir, "leftOnly.txt").existsSync()).toEqual(undefined);   // deleted
@@ -386,7 +385,7 @@ describe("diffDirectories()", async () => {
                 return curDiffDirFileItem.actions[0].execute();
             });
 
-            await BBPromise.all(promises);
+            await Promise.all(promises);
 
             // Check the state of the left directory.
             expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");    // unchanged

@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {getIllegalChars, PersistentCache} from "./persistentCache";
 import {generateUuid} from "./uuid";
 import {tmpDir} from "../test/ut/specHelpers";
@@ -247,9 +246,9 @@ describe("PersistentCache", () => {
 
                 PersistentCache.create(cacheName, {dir: tmpDir.toString()})
                 .then((cache) => {
-                    return BBPromise.all([cache.put(key1, generateUuid()),
-                                          cache.put(key2, generateUuid()),
-                                          cache.put(key3, generateUuid())]);
+                    return Promise.all([cache.put(key1, generateUuid()),
+                                        cache.put(key2, generateUuid()),
+                                        cache.put(key3, generateUuid())]);
                 })
                 .then(() => {
                     return PersistentCache.create(cacheName, {dir: tmpDir.toString()});

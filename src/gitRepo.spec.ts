@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {GitRepo} from "./gitRepo";
 import {sampleRepoDir, sampleRepoUrl, tmpDir} from "../test/ut/specHelpers";
 import {Directory} from "./directory";
@@ -73,7 +72,7 @@ describe("GitRepo", () => {
 
                 const originDir = new Directory(tmpDir, "origin");
                 const workingDir = new Directory(tmpDir, "working");
-                await BBPromise.all([originDir.ensureExists(), workingDir.ensureExists()]);
+                await Promise.all([originDir.ensureExists(), workingDir.ensureExists()]);
 
                 const originRepo  = await GitRepo.clone(sampleRepoDir, originDir);
                 const workingRepo = await GitRepo.clone(originRepo.directory, workingDir);

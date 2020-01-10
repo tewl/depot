@@ -21,7 +21,7 @@ export function promisifyN<ResultType>(
 
     const promisifiedFunc = function (...args: Array<any>): Promise<ResultType> {
 
-        return new BBPromise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
             func.apply(undefined, args.concat((err: any, result: ResultType) => {
                 if (err) {
                     reject(err);
@@ -49,7 +49,7 @@ export function promisify1<ResultType, Arg1Type>(
 ): (arg1: Arg1Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type): Promise<ResultType> {
-        return new BBPromise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
             func(arg1, (err: any, result?: ResultType) => {
                 if (err) {
                     reject(err);
@@ -78,7 +78,7 @@ export function promisify2<ResultType, Arg1Type, Arg2Type>(
 ): (arg1: Arg1Type, arg2: Arg2Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type, arg2: Arg2Type): Promise<ResultType> {
-        return new BBPromise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
             func(arg1, arg2, (err: any, result?: ResultType) => {
                 if (err) {
                     reject(err);
@@ -106,7 +106,7 @@ export function promisify3<ResultType, Arg1Type, Arg2Type, Arg3Type>(
 ): (arg1: Arg1Type, arg2: Arg2Type, arg3: Arg3Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type, arg2: Arg2Type, arg3: Arg3Type): Promise<ResultType> {
-        return new BBPromise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
             func(arg1, arg2, arg3, (err: any, result?: ResultType) => {
                 if (err) {
                     reject(err);
@@ -148,7 +148,7 @@ export function sequence(
         (accumulator, curTask) => {
             return accumulator.then(curTask);
         },
-        BBPromise.resolve(initialValue));
+        Promise.resolve(initialValue));
 }
 
 
@@ -170,7 +170,7 @@ export function allSettled(promises: Array<Promise<any>>): Promise<Array<BBPromi
     const wrappedPromises: Array<BBPromise.Inspection<any>> = _.map(
         promises,
         (curPromise: Promise<any>) => BBPromise.resolve(curPromise).reflect());
-    return BBPromise.all(wrappedPromises);
+    return Promise.all(wrappedPromises);
 }
 
 
@@ -190,7 +190,7 @@ export function getTimerPromise<ResolveType>(
 ): Promise<ResolveType> {
     "use strict";
 
-    return new BBPromise(
+    return new Promise(
         (resolve: (resolveValue: ResolveType) => void) => {
             setTimeout(
                 () => {
@@ -223,7 +223,7 @@ export function conditionalTask<ResolveType>(
         return task();
     }
     else {
-        return BBPromise.resolve(falseResolveValue);
+        return Promise.resolve(falseResolveValue);
     }
 }
 
@@ -241,7 +241,7 @@ export function eventToPromise<ResolveType>(
     rejectEventName?: string
 ): Promise<ResolveType>
 {
-    return new BBPromise<ResolveType>(
+    return new Promise<ResolveType>(
         (resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
             const tracker = new ListenerTracker(emitter);
 
@@ -355,7 +355,7 @@ function retryWhileImpl<ResolveType>(
     attemptsSoFar:   number
 ): Promise<ResolveType> {
     "use strict";
-    return new BBPromise(
+    return new Promise(
         (resolve: (value: ResolveType|Promise<ResolveType>) => void, reject: (err: any) => void) => {
 
             ++attemptsSoFar;
@@ -416,7 +416,7 @@ function retryWhileImpl<ResolveType>(
 export function promiseWhile(predicate: () => boolean, body: Task<void>): Promise<void> {
     "use strict";
 
-    return new BBPromise<void>((resolve: () => void, reject: () => void) => {
+    return new Promise<void>((resolve: () => void, reject: () => void) => {
 
         function loop(): void {
             if (!predicate()) {
@@ -427,7 +427,7 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
             // We are not done iterating.  Invoke body() and execute this loop
             // again when it resolves.  Note: The value returned from body() is
             // wrapped in a promise in case it doesn't return a promise.
-            BBPromise.resolve(body())
+            Promise.resolve(body())
             .then(loop, reject);
         }
 
@@ -454,7 +454,7 @@ export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Prom
     _.forEach(inputPromises, (curInputPromise) => {
         const previousPromise: Promise<any> = outputPromises.length > 0 ?
                                               outputPromises[outputPromises.length - 1] :
-                                              BBPromise.resolve();
+                                              Promise.resolve();
 
         const promise: Promise<any> = delaySettle(curInputPromise, previousPromise);
         outputPromises.push(promise);

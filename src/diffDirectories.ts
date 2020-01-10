@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import { Directory } from "./directory";
 import {File} from "./file";
 
@@ -54,7 +53,7 @@ export class DiffDirFileItemAction
         if (this._actionType === DiffDirFileItemActionType.COPY_LEFT) {
             // In order to copy left, the right file must exist.
             if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("COPY_LEFT cannot be done without a right file."));
+                return Promise.reject(new Error("COPY_LEFT cannot be done without a right file."));
             }
             const destFile: File = new File(this._fileItem.leftRootDir, this._fileItem.relativeFilePath);
             return this._fileItem.rightFile.copy(destFile)
@@ -63,7 +62,7 @@ export class DiffDirFileItemAction
         else if (this._actionType === DiffDirFileItemActionType.COPY_RIGHT) {
             // In order to copy right, the left file must exist.
             if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("COPY_RIGHT cannot be done without a left file."));
+                return Promise.reject(new Error("COPY_RIGHT cannot be done without a left file."));
             }
             const destFile: File = new File(this._fileItem.rightRootDir, this._fileItem.relativeFilePath);
             return this._fileItem.leftFile.copy(destFile)
@@ -72,37 +71,37 @@ export class DiffDirFileItemAction
         else if (this._actionType === DiffDirFileItemActionType.DELETE_LEFT) {
             // In order to delete left, the left file must exist.
             if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_LEFT cannot be done without a left file."));
+                return Promise.reject(new Error("DELETE_LEFT cannot be done without a left file."));
             }
             return this._fileItem.leftFile.delete();
         }
         else if (this._actionType === DiffDirFileItemActionType.DELETE_RIGHT) {
             // In order to delete right, the right file must exist.
             if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_RIGHT cannot be done without a right file."));
+                return Promise.reject(new Error("DELETE_RIGHT cannot be done without a right file."));
             }
             return this._fileItem.rightFile.delete();
         }
         else if (this._actionType === DiffDirFileItemActionType.DELETE_BOTH) {
             // In order to delete the left file, the left file must exist.
             if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_BOTH cannot be done without a left file."));
+                return Promise.reject(new Error("DELETE_BOTH cannot be done without a left file."));
             }
             // In order to delete the right file, the right file must exist.
             if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_BOTH cannot be done without a right file."));
+                return Promise.reject(new Error("DELETE_BOTH cannot be done without a right file."));
             }
-            return BBPromise.all([
+            return Promise.all([
                 this._fileItem.leftFile.delete(),
                 this._fileItem.rightFile.delete()])
             .then(() => { });
 
         }
         else if (this._actionType === DiffDirFileItemActionType.SKIP) {
-            return BBPromise.resolve();
+            return Promise.resolve();
         }
         else {
-            return BBPromise.reject(new Error(`Unsupported action "${this._actionType}".`));
+            return Promise.reject(new Error(`Unsupported action "${this._actionType}".`));
         }
     }
 }
@@ -137,18 +136,18 @@ export class DiffDirFileItem
 
         // The relative file path must be legit.
         if (relativeFilePath.length === 0) {
-            return BBPromise.reject(new Error(`DiffDirFileItem relative file path cannot be 0-length.`));
+            return Promise.reject(new Error(`DiffDirFileItem relative file path cannot be 0-length.`));
         }
 
         // Either leftFile or rightFile or both should be defined.  If both are
         // undefined, there is a problem.
         if ((leftFile === undefined) && (rightFile === undefined)) {
-            return BBPromise.reject(new Error(`DiffDirFileItem cannot have undefined left and right files.`));
+            return Promise.reject(new Error(`DiffDirFileItem cannot have undefined left and right files.`));
         }
 
         let bothFilesExistAndIdentical = false;
         if ((leftFile !== undefined) && (rightFile !== undefined)) {
-            const [leftHash, rightHash] = await BBPromise.all([leftFile.getHash(), rightFile.getHash()]);
+            const [leftHash, rightHash] = await Promise.all([leftFile.getHash(), rightFile.getHash()]);
             bothFilesExistAndIdentical = (leftHash === rightHash);
         }
 
@@ -370,7 +369,7 @@ export function diffDirectories(
         () => { rightFiles = []; }
     );
 
-    return BBPromise.all([leftContentsPromise, rightContentsPromise])
+    return Promise.all([leftContentsPromise, rightContentsPromise])
     .then(() => {
         const diffMap = new Map<string, { leftFile?: File, rightFile?: File; }>();
 
@@ -405,7 +404,7 @@ export function diffDirectories(
             ));
         }
 
-        return BBPromise.all(diffDirFileItemPromises);
+        return Promise.all(diffDirFileItemPromises);
     })
     .then((diffDirFileItems: Array<DiffDirFileItem>) => {
 

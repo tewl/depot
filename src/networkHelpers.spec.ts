@@ -1,6 +1,5 @@
 import * as net from "net";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {
     getExternalIpv4Addresses, isTcpPortAvailable, getAvailableTcpPort,
     selectAvailableTcpPort, determinePort} from "./networkHelpers";
@@ -13,7 +12,7 @@ interface IServerInfo {
 
 // A helper function to start a server.
 function startServerAtFirstAvailablePort(): Promise<IServerInfo> {
-    return new BBPromise<IServerInfo>((resolve, reject) => {
+    return new Promise<IServerInfo>((resolve, reject) => {
         const server = net.createServer();
         server.unref();    // So the server will not prevent the process from exiting
         server.on("error", reject);
@@ -26,7 +25,7 @@ function startServerAtFirstAvailablePort(): Promise<IServerInfo> {
 
 // A helper function to shutdown a running server.
 function shutdownServer(server: net.Server): Promise<void> {
-    return new BBPromise((resolve) => {
+    return new Promise((resolve) => {
         server.close(() => {
             resolve();
         });
@@ -122,7 +121,7 @@ describe("selectAvailableTcpPort()", () => {
         expect(selectedPort).not.toEqual(serverInfo1.port);
         expect(selectedPort).not.toEqual(serverInfo2.port);
 
-        await BBPromise.all([shutdownServer(serverInfo1.server),
+        await Promise.all([shutdownServer(serverInfo1.server),
                              shutdownServer(serverInfo2.server)]);
     });
 

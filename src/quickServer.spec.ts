@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import * as express from "express";
 import {ISslConfig, QuickServer} from "./quickServer";
 import {determinePort, getFirstExternalIpv4Address, IPortConfig} from "./networkHelpers";
@@ -62,7 +61,7 @@ describe("QuickServer", () => {
                 })
                 .then(() => {
 
-                    return new BBPromise((resolve) => {
+                    return new Promise((resolve) => {
                         derivedServer.server!.on("connection", () => {
                             // Now that we have a connection, close the server
                             // forcibly closing all existing connections.

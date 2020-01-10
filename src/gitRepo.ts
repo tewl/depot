@@ -9,7 +9,6 @@ import {Url} from "./url";
 import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
-import * as BBPromise from "bluebird";
 import {piNewline} from "./regexpHelpers";
 
 
@@ -41,7 +40,7 @@ const GIT_LOG_ENTRY_REGEX = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:
  */
 export function isGitRepoDir(dir: Directory): Promise<boolean>
 {
-    return BBPromise.all([
+    return Promise.all([
         dir.exists(),                        // The directory exists
         new Directory(dir, ".git").exists()  // The directory contains a .git directory
     ])
@@ -467,7 +466,7 @@ export class GitRepo
         else
         {
             // The internal cache does not need to be updated.
-            updatePromise = BBPromise.resolve();
+            updatePromise = Promise.resolve();
         }
 
         return updatePromise
@@ -502,7 +501,7 @@ export class GitRepo
         .then((branchName) => {
             if (branchName === "HEAD") {
                 // The repo is in detached head state.
-                return BBPromise.resolve(undefined);
+                return Promise.resolve(undefined);
             }
             else {
                 return GitBranch.create(this, branchName);
@@ -635,7 +634,7 @@ export class GitRepo
                 {cwd: this._dir.toString()}
             ).closePromise;
 
-            return BBPromise.all([numAheadPromise, numBehindPromise]);
+            return Promise.all([numAheadPromise, numBehindPromise]);
         })
         .then((results) => {
             return {
@@ -736,7 +735,7 @@ export class GitRepo
         }
         else
         {
-            updatePromise = BBPromise.resolve();
+            updatePromise = Promise.resolve();
         }
 
         return updatePromise

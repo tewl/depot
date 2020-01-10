@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {promiseWhile, sequence} from "./promiseHelpers";
 import {generateUuid} from "./uuid";
 import {SerializationRegistry} from "./serializationRegistry";
@@ -204,9 +203,9 @@ export abstract class AStore<StowType>
         const promises = _.map(completionFuncs, (curCompletionFunc) => {
             // Wrap the return value from each completion function in a promise
             // in the event the function returns void instead of Promise<void>.
-            return BBPromise.resolve(curCompletionFunc(deserializedSoFar));
+            return Promise.resolve(curCompletionFunc(deserializedSoFar));
         });
-        await BBPromise.all(promises);
+        await Promise.all(promises);
 
         return {
             obj: deserialized as T,
@@ -386,7 +385,7 @@ export class MemoryStore extends AStore<IMemoryStow>
     public static create(registry: SerializationRegistry): Promise<MemoryStore>
     {
         const instance = new MemoryStore(registry);
-        return BBPromise.resolve(instance);
+        return Promise.resolve(instance);
     }
 
 

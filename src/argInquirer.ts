@@ -2,7 +2,6 @@
 
 import * as path from "path";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import * as yargs from "yargs";
 import * as inquirer from "inquirer";
 
@@ -54,7 +53,7 @@ class ArgInquirer {
 
         if (argv.help) {
             this.printUsage();
-            return BBPromise.resolve(undefined);
+            return Promise.resolve(undefined);
         } else if (argv._.length === argNames.length) {
             // TODO: Run the values through each question's validate() method.
 
@@ -65,7 +64,7 @@ class ArgInquirer {
             });
             // Copy any other command line arguments onto the returned object.
             _.assign(argValues, argv);
-            return BBPromise.resolve(argValues);
+            return Promise.resolve(argValues);
 
         } else {
             // The user has not provided the correct number of arguments.

@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {Directory} from "./directory";
 import {File} from "./file";
 
@@ -27,7 +26,7 @@ export class PersistentCache<T> {
     public static create<T>(name: string, options?: IPersistentCacheOptions): Promise<PersistentCache<T>> {
 
         if (!isValidFilesystemName(name)) {
-            return BBPromise.reject(new Error("Illegal cache name"));
+            return Promise.reject(new Error("Illegal cache name"));
         }
 
         options = _.defaults({}, options, {dir: process.cwd()});
@@ -35,7 +34,7 @@ export class PersistentCache<T> {
         const rootDir = new Directory(options.dir!);
 
         if (!rootDir.existsSync()) {
-            return BBPromise.reject(new Error(`Directory "${options.dir!}" does not exist.`));
+            return Promise.reject(new Error(`Directory "${options.dir!}" does not exist.`));
         }
 
         // Create the directory for the cache being created.
@@ -96,7 +95,7 @@ export class PersistentCache<T> {
      */
     public put(key: string, val: T): Promise<void> {
         if (!isValidFilesystemName(key)) {
-            return BBPromise.reject(new Error(`Invalid character in key ${key}`));
+            return Promise.reject(new Error(`Invalid character in key ${key}`));
         }
 
         // Add the entry to the memory cache.
@@ -118,7 +117,7 @@ export class PersistentCache<T> {
     public get(key: string): Promise<T> {
         // If the requested key is in the memory cache, use it.
         if (this._memCache.hasOwnProperty(key)) {
-            return BBPromise.resolve(this._memCache[key].payload);
+            return Promise.resolve(this._memCache[key].payload);
         }
 
         // See if the requested key is persisted.

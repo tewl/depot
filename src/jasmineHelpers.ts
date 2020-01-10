@@ -1,4 +1,3 @@
-import * as BBPromise from "bluebird";
 // tslint:disable-next-line:no-require-imports
 import Jasmine = require("jasmine");
 
@@ -11,7 +10,7 @@ import Jasmine = require("jasmine");
  * completed.
  */
 export function runJasmine(jasmineInstance: Jasmine): Promise<void> {
-    return new BBPromise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
         // Jasmine's execute() method does not provide the usual promise or
         // accept a callback.  Therefore, we have to rely on registering a

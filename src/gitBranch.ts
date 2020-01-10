@@ -1,5 +1,4 @@
 import {EOL} from "os";
-import * as BBPromise from "bluebird";
 import * as _ from "lodash";
 import {GitRepo} from "./gitRepo";
 import {spawn} from "./spawn";
@@ -242,11 +241,11 @@ export class GitBranch
             );
 
             if (lastCols.length === 0) {
-                return BBPromise.resolve(undefined);
+                return Promise.resolve(undefined);
             }
             else if (lastCols.length > 1) {
                 // We should never get more than 1 matching line.
-                return BBPromise.reject(new Error(`Unexpectedly got multiple results for ${this.name}.`));
+                return Promise.reject(new Error(`Unexpectedly got multiple results for ${this.name}.`));
             }
 
             const lastCol = lastCols[0];
@@ -266,7 +265,7 @@ export class GitBranch
             if (matches) {
                 const remoteBranchStr = matches[2];
                 if (remoteBranchStr === undefined) {
-                    return BBPromise.resolve(undefined);
+                    return Promise.resolve(undefined);
                 }
 
                 // A regex to pull apart the remote branch string
@@ -279,13 +278,13 @@ export class GitBranch
                     return GitBranch.create(this.repo, matches[2], matches[1]);
                 }
                 else {
-                    return BBPromise.reject(new Error(`Could not parse remote branch string ${remoteBranchStr}.`));
+                    return Promise.reject(new Error(`Could not parse remote branch string ${remoteBranchStr}.`));
                 }
 
             }
             else {
                 // The specified branch is not tracking a remote branch.
-                return BBPromise.resolve(undefined);
+                return Promise.resolve(undefined);
             }
 
         });

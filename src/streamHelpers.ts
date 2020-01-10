@@ -1,9 +1,8 @@
 import {Readable} from "stream";
-import * as BBPromise from "bluebird";
 
 
 export function readableStreamToText(readable: Readable): Promise<string> {
-    return new BBPromise<string>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
         readable.setEncoding("utf8");
         let accumulatedText = "";
 

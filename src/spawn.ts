@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {CollectorStream} from "./collectorStream";
 import * as cp from "child_process";
 import * as stream from "stream";
@@ -59,7 +58,7 @@ export function spawn(
     const stderrCollector = new CollectorStream();
     let childProcess: cp.ChildProcess;
 
-    const closePromise = new BBPromise((resolve: (output: string) => void,
+    const closePromise = new Promise((resolve: (output: string) => void,
                                         reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
 
         const spawnOptions: cp.SpawnOptions = _.defaults(

@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
-import * as BBPromise from "bluebird";
 import {ListenerTracker} from "./listenerTracker";
 import {promisify1} from "./promiseHelpers";
 import {Directory} from "./directory";
@@ -122,7 +121,7 @@ export class File
      */
     public exists(): Promise<fs.Stats | undefined>
     {
-        return new BBPromise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
+        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
             fs.stat(this._filePath, (err: any, stats: fs.Stats) => {
 
                 if (!err && stats.isFile())
@@ -166,7 +165,7 @@ export class File
      */
     public chmod(mode: number): Promise<File>
     {
-        return new BBPromise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             fs.chmod(this._filePath, mode, (err) => {
                 if (err) {
                     reject(err);
@@ -207,7 +206,7 @@ export class File
         return this.exists()
         .then((stats) => {
             if (!stats) {
-                return BBPromise.resolve();
+                return Promise.resolve();
             } else {
                 return unlinkAsync(this._filePath);
             }
@@ -490,7 +489,7 @@ export class File
     {
         return this.directory.ensureExists()
         .then(() => {
-            return new BBPromise<void>((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
                 fs.writeFile(this._filePath, text, "utf8", (err) => {
                     if (err) {
                         reject(err);
@@ -549,7 +548,7 @@ export class File
      */
     public getHash(algorithm: string = "md5"): Promise<string>
     {
-        return new BBPromise<string>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             const input = fs.createReadStream(this._filePath);
             const hash = crypto.createHash(algorithm);
             hash.setEncoding("hex");
@@ -592,7 +591,7 @@ export class File
      */
     public read(): Promise<string>
     {
-        return new BBPromise<string>((resolve: (text: string) => void, reject: (err: any) => void) => {
+        return new Promise<string>((resolve: (text: string) => void, reject: (err: any) => void) => {
             fs.readFile(this._filePath, {encoding: "utf8"}, (err, data) => {
                 if (err)
                 {
@@ -666,7 +665,7 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
     // streams can read and write smaller chunks of the data.
     //
 
-    return new BBPromise<void>((resolve: () => void, reject: (err: any) => void) => {
+    return new Promise<void>((resolve: () => void, reject: (err: any) => void) => {
 
         const readStream = fs.createReadStream(sourceFilePath);
         const readListenerTracker = new ListenerTracker(readStream);
@@ -709,7 +708,7 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
                 // by 1000 below and truncation happens, we are actually setting
                 // dest's timestamps *before* those of of source.
                 //
-                return new BBPromise<void>((resolve, reject) => {
+                return new Promise<void>((resolve, reject) => {
                     fs.utimes(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000, (err) => {
                         if (err) {
                             reject(err);

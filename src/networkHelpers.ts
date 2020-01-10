@@ -1,7 +1,6 @@
 import * as os from "os";
 import * as net from "net";
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 
 
 /**
@@ -51,7 +50,7 @@ export function getFirstExternalIpv4Address(): string
  */
 function isAvailable(port: number): Promise<number>
 {
-    return new BBPromise<number>((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
         const server = net.createServer();
         server.unref();
         server.on("error", reject);
@@ -110,7 +109,7 @@ export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promis
         (acc, curPort) => {
             return acc.catch(() => isAvailable(curPort));
         },
-        BBPromise.reject(undefined)
+        Promise.reject(undefined)
     );
 }
 
@@ -133,7 +132,7 @@ export function determinePort(portConfig?: IPortConfig): Promise<number>
 {
     portConfig = portConfig || {};
 
-    return BBPromise.resolve()
+    return Promise.resolve()
     .then(() => {
         if (!(portConfig!.requiredPort)) {
             // There is no required port.  Yield 0.

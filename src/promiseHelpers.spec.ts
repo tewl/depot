@@ -3,7 +3,6 @@ import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
     delaySettle} from "./promiseHelpers";
-import * as BBPromise from "bluebird";
 
 
 describe("promisifyN()", () => {
@@ -107,15 +106,15 @@ describe("sequence()", () => {
         const tasks: Array<(previousValue: any) => Promise<any>> = [
             (previousResult) => {
                 expect(previousResult).toEqual(100);
-                return BBPromise.resolve(200);
+                return Promise.resolve(200);
             },
             (previousResult) => {
                 expect(previousResult).toEqual(200);
-                return BBPromise.resolve(300);
+                return Promise.resolve(300);
             },
             (previousResult) => {
                 expect(previousResult).toEqual(300);
-                return BBPromise.resolve(400);
+                return Promise.resolve(400);
             }
         ];
 
@@ -214,7 +213,7 @@ describe("conditionalTask", () => {
         let taskWasRun = false;
         const task = () => {
             taskWasRun = true;
-            return BBPromise.resolve(5);
+            return Promise.resolve(5);
         };
 
         conditionalTask(true, task, 10)
@@ -232,7 +231,7 @@ describe("conditionalTask", () => {
         let taskWasRun = false;
         const task = () => {
             taskWasRun = true;
-            return BBPromise.resolve(5);
+            return Promise.resolve(5);
         };
 
         conditionalTask(false, task, 10)
@@ -387,9 +386,9 @@ function getFuncThatWillRejectNTimes<T, U>(numFailures: number, resolveValue: T,
     return () => {
         if (numFailuresRemaining > 0) {
             --numFailuresRemaining;
-            return BBPromise.reject(rejectValue);
+            return Promise.reject(rejectValue);
         }
-        return BBPromise.resolve(resolveValue);
+        return Promise.resolve(resolveValue);
     };
 }
 
@@ -449,7 +448,7 @@ describe("promiseWhile()", () => {
                 return val.length < 5;
             },
             () => {
-                return new BBPromise<void>((resolve: () => void/*, reject: () => void*/) => {
+                return new Promise<void>((resolve: () => void/*, reject: () => void*/) => {
                     setTimeout(
                         () => {
                             val = val + "a";
@@ -470,7 +469,7 @@ describe("promiseWhile()", () => {
         promiseWhile(
             (): boolean => val.length < 5,
             (): Promise<void> => {
-                return new BBPromise<void>((resolve, reject) => {
+                return new Promise<void>((resolve, reject) => {
                     setTimeout(
                         () => {
                             if (val === "aaa")

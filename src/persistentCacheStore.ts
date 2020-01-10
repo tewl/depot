@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
 import {SerializationRegistry} from "./serializationRegistry";
 import {PersistentCache} from "./persistentCache";
 import {AStore, ISerialized, IdString, IStoreGetResult, IStorePutResult} from "./serialization";
@@ -19,7 +18,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     public static create(registry: SerializationRegistry, persistentCache: PersistentCache<ISerialized>): Promise<PersistentCacheStore>
     {
         const instance = new PersistentCacheStore(registry, persistentCache);
-        return BBPromise.resolve(instance);
+        return Promise.resolve(instance);
     }
 
 

@@ -1,4 +1,4 @@
-import { comment } from "./commenter";
+import { comment } from "./comment";
 import {splitIntoLines} from "./stringHelpers";
 
 

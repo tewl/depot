@@ -50,7 +50,7 @@ describe("comment()", () => {
             ""
         ];
         const result = comment(text.join("\n"));
-        const resultLines = splitIntoLines(result);
+        const resultLines = splitIntoLines(result!);
         expect(resultLines).toEqual([
             "    //",
             "    //     one",
@@ -79,7 +79,7 @@ describe("comment()", () => {
             ""
         ];
         const result = comment(text.join("\n"));
-        const resultLines = splitIntoLines(result);
+        const resultLines = splitIntoLines(result!);
         expect(resultLines).toEqual([
             "    //",
             "    //     one",

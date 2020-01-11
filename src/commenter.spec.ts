@@ -4,12 +4,14 @@ import {splitIntoLines} from "./stringHelpers";
 
 describe("comment()", () => {
 
-    it("will place a comment token between initial whitespace and non-whitespace", () => {
-        const text = [
-            "    xyzzy"
-        ];
-        const result = comment(text.join("\n"));
-        expect(result).toEqual("    // xyzzy");
+
+    it("will place a comment token at the beginning when there is no indentation", () => {
+        expect(comment("xyzzy")).toEqual("// xyzzy");
+    });
+
+
+    it("will place a comment token between initial whitespace and non-whitespace when there is indentation", () => {
+        expect(comment("    xyzzy")).toEqual("    // xyzzy");
     });
 
 

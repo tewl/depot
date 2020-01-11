@@ -30,13 +30,19 @@ export function comment(
         return "";
     }
 
-    const indentChar = nonEmptyLines[0][0];
-    const numIndentChars = _.chain(nonEmptyLines)
-    .map((curLine) => numInitial(curLine, indentChar))
-    .min()
-    .value();
+    let indentStr: string;
+    if (/^\s/.test(nonEmptyLines[0][0])) {
+        const indentChar = nonEmptyLines[0][0];
+        const numIndentChars = _.chain(nonEmptyLines)
+            .map((curLine) => numInitial(curLine, indentChar))
+            .min()
+            .value();
 
-    const indentStr = _.repeat(indentChar, numIndentChars);
+        indentStr = _.repeat(indentChar, numIndentChars);
+    }
+    else {
+        indentStr = "";
+    }
 
     const result: string = _.chain(sourceLines)
     .map((curLine) => {

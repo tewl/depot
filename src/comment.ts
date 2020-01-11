@@ -65,7 +65,7 @@ export function comment(
             // will be everything following the common indent.
             const blank = isBlank(curLine);
             const sourceText = blank ? getEol(curLine) :
-                                    curLine.slice(indentStr.length);
+                                       curLine.slice(indentStr.length);
 
             // The whitespace that will follow the comment token.
             const postCommentSpace = blank ? "" : " ";

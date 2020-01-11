@@ -13,23 +13,25 @@ function getCommentToken(): string
  * @param linesToComment - The source to be commented
  * @param precedingLine - The line preceding the source to be commented.  Used
  *     to infer preceding comment indentation.
- * @return A new string representing the commented version of the source
+ * @return A new string representing the commented version of the source.
+ * `undefined` is returned if there was an error and the original source should
+ * not be modified.
  */
 export function comment(
     linesToComment: string,
     precedingLine?: string
-): string
+): string | undefined
 {
-    if (linesToComment.length === 0) {
+    if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
         // There is nothing in need of commenting.
-        return "";
+        return undefined;
     }
 
     const sourceLines = splitIntoLines(linesToComment, true);
     const nonEmptyLines = splitIntoLines(removeBlankLines(linesToComment), true);
     if (nonEmptyLines.length === 0) {
         // All lines were empty.  There really isn't a need to comment them.
-        return "";
+        return undefined;
     }
 
     // Figure out what the indentation string will be.  This is the part before
@@ -76,5 +78,44 @@ export function comment(
         .value();
 
     return result;
+}
 
+/**
+ * Transform `linesToUncomment` into lines that are no longer commented out.
+ * @param linesToUncomment - The source to be uncommented
+ * @return A new string representing the uncommented version of the source.
+ * `undefined` is returned if there was an error and the original source should
+ * not be modified.
+ */
+export function uncomment(linesToUncomment: string): string | undefined
+{
+    if (linesToUncomment.length === 0 || /^\s*$/.test(linesToUncomment)) {
+        // There is nothing in need of uncommenting.
+        return undefined;
+    }
+
+    const sourceLines = splitIntoLines(linesToUncomment, true);
+    const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
+
+    const resultLines = _.chain(sourceLines)
+    .map((curLine) =>
+    {
+        const match = commentedLineRegex.exec(curLine);
+        if (!match) {
+            return curLine;
+        }
+
+        const beginWs = match.groups!.begin_ws;
+        // For the post-comment whitespace, we will use all of it except the
+        // first character.  We are assuming that the first whitespace character
+        // was add with the comment token itself.
+        const newPostCommentWs = match.groups!.post_comment_ws.slice(1);
+        const text             = match.groups!.text;
+        const eol              = getEol(curLine);
+        const uncommented      = beginWs + newPostCommentWs + text + eol;
+        return uncommented;
+    })
+    .value();
+
+    return resultLines.join("");
 }

@@ -145,6 +145,11 @@ export function removeBlankLines(str: string): string
     let lines = splitIntoLines(str, true);
     lines = _.filter(lines, (curLine) => !isBlank(curLine));
 
+    // If all processed lines were blank, just return an empty string.
+    if (lines.length === 0) {
+        return "";
+    }
+
     // If lines have been removed from the end, we will have a new last line.
     // We need to make sure that new last line does not have an EOL.
     lines[lines.length - 1] = lines[lines.length - 1].replace(createEolRegex(), "");

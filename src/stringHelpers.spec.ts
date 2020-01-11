@@ -144,6 +144,22 @@ describe("trimBlankLines()", () => {
 
 describe("removeBlankLines()", () => {
 
+    it("returns an empty string when given a single blank line", () => {
+        expect(removeBlankLines("  \t  ")).toEqual("");
+    });
+
+
+    it("returns an empty string when given multiple blank lines", () => {
+        const orig = [
+            "  \t  ",
+            "\t  \t",
+            "\t\t\t",
+            "      "
+        ].join("\n");
+
+        expect(removeBlankLines(orig)).toEqual("");
+    });
+
 
     it("removes blank lines from the middle of a string", () => {
         const orig = [

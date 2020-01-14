@@ -92,6 +92,21 @@ describe("comment()", () => {
     });
 
 
+    it("will comment a single line of code, matching the comment that precedes it.", () => {
+        const text = [
+            "    // Preceding line",
+            "        will be commented"
+        ];
+        const precedingLine: string = text.shift()!;
+        const resultLines = splitIntoLines(comment(text.join("\n"), precedingLine)!);
+        expect(resultLines).toEqual(
+            [
+                "    //     will be commented"
+            ]
+        );
+    });
+
+
 });
 
 
@@ -137,7 +152,6 @@ describe("uncomment()", () => {
         ]);
 
     });
-
 
 
 });

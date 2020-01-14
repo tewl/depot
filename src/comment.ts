@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import {removeBlankLines, splitIntoLines, numInitial, isBlank, getEol} from "./stringHelpers";
+import { insertIf } from "./arrayHelpers";
 
 
 function getCommentToken(): string
@@ -34,28 +35,29 @@ export function comment(
         return undefined;
     }
 
-    // Figure out what the indentation string will be.  This is the part before
-    // the comment token.
     let indentStr: string;
-    if (/^\s/.test(nonEmptyLines[0][0])) {
+
+    // If the first character is non-whitespace, the comment must start in
+    // column 0.
+    if (!/\s/.test(nonEmptyLines[0][0])) {
+        indentStr = "";
+    }
+    else {
         // We will assume the the whitespace used for indentation is the first
-        // character of the first non-emtpy line.  This will (hopefully) figure
+        // character of the first non-empty line.  This will (hopefully) figure
         // out whether the user is using spaces or tabs.
         const indentChar = nonEmptyLines[0][0];
-        // The amount of indentation will be determined the the line with the
+
+        const linesToConsider: Array<string> = [...nonEmptyLines, ...insertIf(precedingLine, precedingLine!)];
+
+        // The amount of indentation will be determined by the line with the
         // least indentation characters at the beginning.
-        const numIndentChars = _.chain(nonEmptyLines)
+        const numIndentChars = _.chain(linesToConsider)
             .map((curLine) => numInitial(curLine, indentChar))
             .min()
             .value();
 
         indentStr = _.repeat(indentChar, numIndentChars);
-    }
-    else {
-        // The first character of the first non-empty line is not a whitespace
-        // character.  We will assume that the comment token will start in
-        // column 0.
-        indentStr = "";
     }
 
     const result: string = _.chain(sourceLines)

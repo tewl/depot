@@ -1,4 +1,4 @@
-import { comment, uncomment } from "./comment";
+import { comment, uncomment, toggleComment } from "./comment";
 import {splitIntoLines} from "./stringHelpers";
 
 
@@ -151,6 +151,54 @@ describe("uncomment()", () => {
             "            baz"
         ]);
 
+    });
+
+
+});
+
+
+describe("toggleComment()", () => {
+
+
+    it("returns undefined when there is nothing to comment or uncomment", () => {
+        expect(toggleComment("")).toEqual(undefined);
+    });
+
+
+    it("will comment out code that is not commented", () => {
+        const orig = [
+            "    // preceding",
+            "        blah",
+            "        blah",
+            "        blah"
+        ];
+        const precedingLine = orig.shift();
+
+        const result = toggleComment(orig.join("\n"), precedingLine!);
+        expect(result).toBeDefined();
+        expect(splitIntoLines(result!)).toEqual([
+            "    //     blah",
+            "    //     blah",
+            "    //     blah"
+        ]);
+
+    });
+
+
+    it("will uncomment code this is commented", () => {
+        const orig = [
+            "    //     blah",
+            "    //     blah",
+            "    //     blah"
+        ];
+
+        const result = toggleComment(orig.join("\n"));
+        expect(result).toBeDefined();
+        expect(splitIntoLines(result!)).toEqual([
+            "        blah",
+            "        blah",
+            "        blah"
+        ]);
     });
 
 

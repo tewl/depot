@@ -16,7 +16,7 @@ function getCommentToken(): string
  *     to infer preceding comment indentation.
  * @return A new string representing the commented version of the source.
  * `undefined` is returned if there was an error and the original source should
- * not be modified.
+ * not be replaced.
  */
 export function comment(
     linesToComment: string,
@@ -87,7 +87,7 @@ export function comment(
  * @param linesToUncomment - The source to be uncommented
  * @return A new string representing the uncommented version of the source.
  * `undefined` is returned if there was an error and the original source should
- * not be modified.
+ * not be replaced.
  */
 export function uncomment(linesToUncomment: string): string | undefined
 {
@@ -120,4 +120,30 @@ export function uncomment(linesToUncomment: string): string | undefined
     .value();
 
     return resultLines.join("");
+}
+
+
+/**
+ * Toggles the commented state of `linesToToggle`
+ * @param linesToToggle - The source lines to be toggled
+ * @param precedingLine - The line preceding `linesToToggle`.  Used as context.
+ * @return A new string representing the toggled source.  `undefined` is
+ * returned if there was an error and the original source should not be
+ * replaced.
+ */
+export function toggleComment(linesToToggle: string, precedingLine?: string): string | undefined
+{
+    if (linesToToggle.length === 0) {
+        return undefined;
+    }
+
+    const firstNonWhitespace = /\s*(\S\S)/m;
+    const match = firstNonWhitespace.exec(linesToToggle);
+    if (match && match[1] === "//") {
+        return uncomment(linesToToggle);
+    }
+    else {
+        return comment(linesToToggle, precedingLine);
+    }
+
 }

@@ -146,10 +146,6 @@ export function uncomment(linesToUncomment: string): string | undefined
  */
 export function toggleComment(linesToToggle: string, precedingLine?: string): string | undefined
 {
-    if (linesToToggle.length === 0) {
-        return undefined;
-    }
-
     const firstNonWhitespace = /\s*(\S\S)/m;
     const match = firstNonWhitespace.exec(linesToToggle);
     if (match && match[1] === "//") {
@@ -158,5 +154,4 @@ export function toggleComment(linesToToggle: string, precedingLine?: string): st
     else {
         return comment(linesToToggle, precedingLine);
     }
-
 }

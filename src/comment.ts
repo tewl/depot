@@ -24,8 +24,21 @@ export function comment(
 ): string | undefined
 {
     if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
-        // There is nothing in need of commenting.
-        return undefined;
+
+        if (precedingLine) {
+            const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
+            const match = commentedLineRegex.exec(precedingLine);
+            if (match) {
+                return `${match.groups!.begin_ws}${match.groups!.comment_token}`;
+            }
+            else {
+                return undefined;
+            }
+        }
+        else {
+            // There is nothing to comment and nothing to continue from above.
+            return undefined;
+        }
     }
 
     const sourceLines = splitIntoLines(linesToComment, true);

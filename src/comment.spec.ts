@@ -107,6 +107,21 @@ describe("comment()", () => {
     });
 
 
+    it("will continue a comment onto an empty line", () => {
+        const text = [
+            "    // Preceding line",
+            ""
+        ];
+        const precedingLine: string = text.shift()!;
+        const resultLines = splitIntoLines(comment(text.join("\n"), precedingLine)!);
+        expect(resultLines).toEqual(
+            [
+                "    //"
+            ]
+        );
+    });
+
+
 });
 
 

@@ -23,10 +23,11 @@ export function comment(
     precedingLine?: string
 ): string | undefined
 {
+    const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
+
     if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
 
         if (precedingLine) {
-            const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
             const match = commentedLineRegex.exec(precedingLine);
             if (match) {
                 return `${match.groups!.begin_ws}${match.groups!.comment_token}`;
@@ -61,7 +62,10 @@ export function comment(
         // out whether the user is using spaces or tabs.
         const indentChar = nonEmptyLines[0][0];
 
-        const linesToConsider: Array<string> = [...nonEmptyLines, ...insertIf(precedingLine, precedingLine!)];
+        const linesToConsider: Array<string> = [
+            ...nonEmptyLines,
+            ...insertIf(precedingLine && commentedLineRegex.test(precedingLine), precedingLine!)
+        ];
 
         // The amount of indentation will be determined by the line with the
         // least indentation characters at the beginning.

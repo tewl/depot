@@ -122,6 +122,20 @@ describe("comment()", () => {
     });
 
 
+    it("will indent appropriately when preceding line has no comment", () => {
+        const text = [
+            "    {",
+            "        codeToBeCommented();"
+        ];
+
+        const precedingLine: string = text.shift()!;
+        const resultLines = splitIntoLines(comment(text.join("\n"), precedingLine)!);
+        expect(resultLines).toEqual([
+            "        // codeToBeCommented();"
+        ]);
+    });
+
+
 });
 
 

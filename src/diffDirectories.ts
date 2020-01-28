@@ -24,8 +24,8 @@ export enum DiffDirFileItemActionType
 export class DiffDirFileItemAction
 {
 
-    private _fileItem: DiffDirFileItem;
-    private _actionType: DiffDirFileItemActionType;
+    private          _fileItem:   DiffDirFileItem;
+    private readonly _actionType: DiffDirFileItemActionType;
 
     public constructor(
         fileItem: DiffDirFileItem,
@@ -164,14 +164,14 @@ export class DiffDirFileItem
 
 
     // #region Data Members
-    private _leftRootDir:           Directory;
-    private _rightRootDir:          Directory;
-    private _relativeFilePath:      string;
-    private _leftFile:              undefined | File;
-    private _rightFile:             undefined | File;
-    private _actionPriority:        undefined | ActionPriority;
-    private _actions:               Array<DiffDirFileItemAction>;
-    private _bothExistAndIdentical: boolean;
+    private readonly _leftRootDir:           Directory;
+    private readonly _rightRootDir:          Directory;
+    private readonly _relativeFilePath:      string;
+    private readonly _leftFile:              undefined | File;
+    private readonly _rightFile:             undefined | File;
+    private readonly _actionPriority:        undefined | ActionPriority;
+    private readonly _actions:               Array<DiffDirFileItemAction>;
+    private readonly _bothExistAndIdentical: boolean;
     // #endregion
 
 
@@ -340,7 +340,7 @@ export class DiffDirFileItem
  * @param actionPriority - The action being performed so that the actions
  *     associated with each result can be prioritized.
  * @param includeIdentical - Whether to include files that are identical in both
- *     `leftDir` and `rightDir` in the returned resuls.  If true, identical
+ *     `leftDir` and `rightDir` in the returned results.  If true, identical
  *     files will be included with a 0-length array of actions.
  * @return An array of items representing the differences found between
  *     `leftDir` and `rightDir`.

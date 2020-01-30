@@ -24,7 +24,7 @@ export enum DiffDirFileItemActionType
 export class DiffDirFileItemAction
 {
 
-    private          _fileItem:   DiffDirFileItem;
+    private readonly _fileItem:   DiffDirFileItem;
     private readonly _actionType: DiffDirFileItemActionType;
 
     public constructor(
@@ -129,11 +129,8 @@ export class DiffDirFileItem
         leftFile:         undefined | File,
         rightFile:        undefined | File,
         actionPriority?:  ActionPriority
-        ): Promise<DiffDirFileItem>
+    ): Promise<DiffDirFileItem>
     {
-        // TODO: Need to find references to this static function and update them
-        // because this method is now async.
-
         // The relative file path must be legit.
         if (relativeFilePath.length === 0) {
             return Promise.reject(new Error(`DiffDirFileItem relative file path cannot be 0-length.`));

@@ -34,7 +34,7 @@ describe("Result", () => {
             return;
         }
 
-        expect(result.errorId).toEqual("ERROR_1");
+        expect(result.error).toEqual("ERROR_1");
     });
 
 

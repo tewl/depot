@@ -29,7 +29,6 @@ export function numericEnumRandomValue<T>(enumObject: T): T[keyof T] {
 }
 
 
-
 /**
  * Gets a random key from a string based enumeration
  * @param enumObject - The enumeration to choose a key from

@@ -580,7 +580,6 @@ describe("Fraction", () => {
             });
 
 
-
             it("will return equal floor and ceil values when the value falls on an increment", () =>
             {
                 const val = toFraction("1/2").add(toFraction("1/32"));

@@ -585,9 +585,10 @@ describe("Fraction", () => {
             {
                 const val = toFraction("1/2").add(toFraction("1/32"));
                 const increment = toFraction("1/32");
-                expect(val.bracket(increment).floor.toString()).toEqual("17/32");
-                expect(val.bracket(increment).ceil.toString()).toEqual("17/32");
-                expect(val.bracket(increment).nearest.toString()).toEqual("17/32");
+                const bracketResult = val.bracket(increment);
+                expect(bracketResult.floor.toString()).toEqual("17/32");
+                expect(bracketResult.ceil.toString()).toEqual("17/32");
+                expect(bracketResult.nearest.toString()).toEqual("17/32");
 
             });
 
@@ -596,9 +597,10 @@ describe("Fraction", () => {
             {
                 const val = toFraction("1/2").add(toFraction("1/32"));
                 const increment = toFraction("1/8");
-                expect(val.bracket(increment).floor.toString()).toEqual("4/8");
-                expect(val.bracket(increment).ceil.toString()).toEqual("5/8");
-                expect(val.bracket(increment).nearest.toString()).toEqual("4/8");
+                const bracketResult = val.bracket(increment);
+                expect(bracketResult.floor.toString()).toEqual("4/8");
+                expect(bracketResult.ceil.toString()).toEqual("5/8");
+                expect(bracketResult.nearest.toString()).toEqual("4/8");
             });
 
 

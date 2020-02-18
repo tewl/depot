@@ -1,4 +1,4 @@
-import {Fraction, greatestCommonDivisor, leastCommonMultiple} from "./fraction";
+import {Fraction, greatestCommonDivisor, leastCommonMultiple, toFraction} from "./fraction";
 
 
 describe("Fraction", () => {
@@ -500,6 +500,34 @@ describe("Fraction", () => {
 
 
         });
+
+
+        describe("ceil()", () => {
+
+            it("rounds up to the next greatest whole integer", () => {
+                expect(toFraction(0.95).ceil()).toEqual(1);
+                expect(toFraction(4).ceil()).toEqual(4);
+                expect(toFraction(7.004).ceil()).toEqual(8);
+                expect(toFraction(-7.004).ceil()).toEqual(-7);
+            });
+
+
+        });
+
+
+        describe("floor()", () => {
+
+
+            it("rounds down to the next smallest whole integer", () => {
+                expect(toFraction(5.95).floor()).toEqual(5);
+                expect(toFraction(5.05).floor()).toEqual(5);
+                expect(toFraction(5).floor()).toEqual(5);
+                expect(toFraction(-5.05).floor()).toEqual(-6);
+            });
+
+
+        });
+
 
     });
 

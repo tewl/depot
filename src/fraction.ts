@@ -404,6 +404,48 @@ export class Fraction
     }
 
 
+    /**
+     * Returns the smallest integer greater than or equal to this value.
+     * @return The next largest integer
+     */
+    public ceil(): number
+    {
+        const whole = this.wholePart();
+        const frac = this.fractionalPart();
+
+        if (frac._num === 0) {
+            return whole;
+        }
+        else if (whole < 0) {
+            return whole;
+        }
+        else {
+            return whole + 1;
+        }
+    }
+
+
+    /**
+     * Returns the largest integer less than or equal to this number.
+     * @return The next smallest integer
+     */
+    public floor(): number
+    {
+        const whole = this.wholePart();
+        const frac = this.fractionalPart();
+
+        if (frac._num === 0) {
+            return whole;
+        }
+        else if (whole < 0) {
+            return whole - 1;
+        }
+        else {
+            return whole;
+        }
+    }
+
+
 }
 
 

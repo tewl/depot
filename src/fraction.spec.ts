@@ -589,7 +589,16 @@ describe("Fraction", () => {
                 expect(bracketResult.floor.toString()).toEqual("17/32");
                 expect(bracketResult.ceil.toString()).toEqual("17/32");
                 expect(bracketResult.nearest.toString()).toEqual("17/32");
+            });
 
+
+            it("will return equal floor and ceil values when the value is negative and falls on an increment", () => {
+                const val = toFraction("-1/2").add(toFraction("-1/32"));
+                const increment = toFraction("1/32");
+                const bracketResult = val.bracket(increment);
+                expect(bracketResult.floor.toString()).toEqual("-17/32");
+                expect(bracketResult.ceil.toString()).toEqual("-17/32");
+                expect(bracketResult.nearest.toString()).toEqual("-17/32");
             });
 
 

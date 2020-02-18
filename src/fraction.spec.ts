@@ -502,19 +502,6 @@ describe("Fraction", () => {
         });
 
 
-        describe("ceil()", () => {
-
-            it("rounds up to the next greatest whole integer", () => {
-                expect(toFraction(0.95).ceil()).toEqual(1);
-                expect(toFraction(4).ceil()).toEqual(4);
-                expect(toFraction(7.004).ceil()).toEqual(8);
-                expect(toFraction(-7.004).ceil()).toEqual(-7);
-            });
-
-
-        });
-
-
         describe("floor()", () => {
 
 
@@ -522,7 +509,112 @@ describe("Fraction", () => {
                 expect(toFraction(5.95).floor()).toEqual(5);
                 expect(toFraction(5.05).floor()).toEqual(5);
                 expect(toFraction(5).floor()).toEqual(5);
+                expect(toFraction(-0.5).floor()).toEqual(-1);
                 expect(toFraction(-5.05).floor()).toEqual(-6);
+            });
+
+
+        });
+
+
+        describe("ceil()", () => {
+
+            it("rounds up to the next greatest whole integer", () => {
+                expect(toFraction(0.95).ceil()).toEqual(1);
+                expect(toFraction(4).ceil()).toEqual(4);
+                expect(toFraction(7.004).ceil()).toEqual(8);
+                expect(toFraction(-0.5).ceil()).toEqual(0);
+                expect(toFraction(-7.004).ceil()).toEqual(-7);
+            });
+
+
+        });
+
+
+        describe("abs()", () => {
+
+            it("returns the absolute value when the value is negative", () => {
+                const val = toFraction(-2.125);
+                expect(val.abs().toString()).toEqual("2 125/1000");
+            });
+
+
+            it("returns the absolute value when the value is zero", () =>
+            {
+                const val = toFraction(0);
+                expect(val.abs().toString()).toEqual("0");
+            });
+
+
+            it("returns the absolute value when the value is positive", () =>
+            {
+                const val = toFraction(2.125);
+                expect(val.abs().toString()).toEqual("2 125/1000");
+            });
+
+
+        });
+
+
+        describe("bracket()", () => {
+
+
+            it("throws when the increment is negative", () =>
+            {
+                const val = toFraction(0.5);
+                expect(() => { val.bracket(-0.25); }).toThrow();
+            });
+
+
+            it("throws when the increment is zero", () =>
+            {
+                const val = toFraction(0.5);
+                expect(() => { val.bracket(-0.25); }).toThrow();
+            });
+
+
+            it("throws when 1 is not divisible by the increment", () =>
+            {
+                const val = toFraction(0.5);
+                expect(() => { val.bracket(toFraction("7/8")); }).toThrow();
+            });
+
+
+
+            it("will return equal floor and ceil values when the value falls on an increment", () =>
+            {
+                const val = toFraction("1/2").add(toFraction("1/32"));
+                const increment = toFraction("1/32");
+                expect(val.bracket(increment).floor.toString()).toEqual("17/32");
+                expect(val.bracket(increment).ceil.toString()).toEqual("17/32");
+                expect(val.bracket(increment).nearest.toString()).toEqual("17/32");
+
+            });
+
+
+            it("will return the expected floor and ceil values when the value does not fall on an increment", () =>
+            {
+                const val = toFraction("1/2").add(toFraction("1/32"));
+                const increment = toFraction("1/8");
+                expect(val.bracket(increment).floor.toString()).toEqual("4/8");
+                expect(val.bracket(increment).ceil.toString()).toEqual("5/8");
+                expect(val.bracket(increment).nearest.toString()).toEqual("4/8");
+            });
+
+
+            it("will return the expected floor and ceil values when the value does not fall on an increment and is negative", () =>
+            {
+                const val = toFraction("-1/2").add(toFraction("-1/32"));
+                const increment = toFraction("1/8");
+                const bracketResult = val.bracket(increment);
+                expect(bracketResult.floor.toString()).toEqual("-5/8");
+                expect(bracketResult.ceil.toString()).toEqual("-4/8");
+                expect(bracketResult.nearest.toString()).toEqual("-4/8");
+            });
+
+
+            it("makes it possible to round to the nearest 1/16", () => {
+                expect(toFraction("45/64").bracket(toFraction("1/16")).nearest.toString()).toEqual("11/16");
             });
 
 

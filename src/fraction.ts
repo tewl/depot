@@ -405,27 +405,6 @@ export class Fraction
 
 
     /**
-     * Returns the smallest integer greater than or equal to this value.
-     * @return The next largest integer
-     */
-    public ceil(): number
-    {
-        const whole = this.wholePart();
-        const frac = this.fractionalPart();
-
-        if (frac._num === 0) {
-            return whole;
-        }
-        else if (whole < 0) {
-            return whole;
-        }
-        else {
-            return whole + 1;
-        }
-    }
-
-
-    /**
      * Returns the largest integer less than or equal to this number.
      * @return The next smallest integer
      */
@@ -437,7 +416,7 @@ export class Fraction
         if (frac._num === 0) {
             return whole;
         }
-        else if (whole < 0) {
+        else if (this._num < 0) {
             return whole - 1;
         }
         else {
@@ -445,6 +424,102 @@ export class Fraction
         }
     }
 
+
+    /**
+     * Returns the smallest integer greater than or equal to this value.
+     * @return The next largest integer
+     */
+    public ceil(): number
+    {
+        const whole = this.wholePart();
+        const frac = this.fractionalPart();
+
+        if (frac._num === 0) {
+            return whole;
+        }
+        else if (this._num < 0) {
+            return whole;
+        }
+        else {
+            return whole + 1;
+        }
+    }
+
+
+    /**
+     * Returns the absolute value of this value
+     * @return The absolute value of this value
+     */
+    public abs(): Fraction
+    {
+        return Fraction.fromParts(Math.abs(this._num), this._den);
+    }
+
+
+    /**
+     * Finds the increment below and above this value.
+     * @param increment - The increment size (must be positive)
+     * @return The increment below and above this value as well as the increment
+     * that is closest.
+     */
+    public bracket(
+        increment: number | Fraction
+    ): {floor: Fraction, ceil: Fraction, nearest: Fraction}
+    {
+        const incr = toFraction(increment);
+
+        // The increment must be a positive value.
+        if (incr._num === 0 || incr.toNumber() < 0) {
+            throw new Error("bracket() increment must be positive.");
+        }
+
+        // 1 must be evenly divisible by the specified increment value (since we
+        // will be stepping from floor() to ceil()).
+        if (incr.reduce()._num !== 1) {
+            throw new Error("bracket() 1 must be divisible by the specified increment.");
+        }
+
+        const rangeFloor = toFraction(this.floor());
+        const rangeCeil  = toFraction(this.ceil());
+
+        let floorVal: Fraction;
+
+        // Find the floor value.
+        for (let curVal = rangeCeil;
+            curVal.isGreaterThanOrEqualTo(rangeFloor);
+            curVal = curVal.subtract(incr)
+        )
+        {
+            if (curVal.isLessThanOrEqualTo(this))
+            {
+                floorVal = curVal;
+                break;
+            }
+        }
+
+        let ceilVal: Fraction;
+
+        // Find the ceil value.
+        for (let curVal = rangeFloor;
+             curVal.isLessThanOrEqualTo(rangeCeil);
+             curVal = curVal.add(incr)
+        ) {
+            if (curVal.isGreaterThanOrEqualTo(this)) {
+                ceilVal = curVal;
+                break;
+            }
+        }
+
+        const floorDelta = this.subtract(floorVal!);
+        const ceilDelta  = ceilVal!.subtract(this);
+        const nearest    = floorDelta.isLessThan(ceilDelta) ? floorVal! : ceilVal!;
+
+        return {
+            floor:   floorVal!,
+            ceil:    ceilVal!,
+            nearest: nearest
+        };
+    }
 
 }
 

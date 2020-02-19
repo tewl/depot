@@ -257,7 +257,7 @@ export class Fraction
     /**
      * Returns the whole part of this fraction
      * @return The whole part of this fraction.  If this fraction is negative
-     * and the whole part is non-zero, the returned value will be negative.
+     * and the whole part is non-zero, the returned whole part will be negative.
      */
     public wholePart(): number
     {
@@ -274,7 +274,9 @@ export class Fraction
 
     /**
      * Return the fractional part of this fraction
-     * @return The fractional part of this fraction.  If this fraction
+     * @return The fractional part of this fraction.  If this fraction is
+     * negative and the fractional part is non-zero, the returned fractional
+     * part will be negative.
      */
     public fractionalPart(): Fraction
     {

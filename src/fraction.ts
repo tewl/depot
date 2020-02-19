@@ -9,6 +9,23 @@ const allParts  = /^(\d+) (\d+)\/(\d+)$/;
 
 export class Fraction
 {
+    public static from(val: number | Fraction | string): Fraction
+    {
+        if (typeof val === "number")
+        {
+            return Fraction.fromNumber(val);
+        }
+        else if (typeof val === "string")
+        {
+            return Fraction.fromString(val);
+        }
+        else
+        {
+            return val;
+        }
+    }
+
+
     public static fromParts(whole: number, num: number, den: number): Fraction; // tslint:disable-line:unified-signatures
     public static fromParts(num: number, den: number): Fraction;                // tslint:disable-line:unified-signatures
     public static fromParts(whole: number): Fraction;
@@ -176,8 +193,8 @@ export class Fraction
             }
         }
 
-        const fracA = toFraction(a);
-        const fracB = toFraction(b);
+        const fracA = Fraction.from(a);
+        const fracB = Fraction.from(b);
 
         const crossA = fracA._num * fracB._den;
         const crossB = fracA._den * fracB._num;
@@ -346,7 +363,7 @@ export class Fraction
     public add(other: number): Fraction;
     public add(other: Fraction | number): Fraction
     {
-        const otherFrac = toFraction(other);
+        const otherFrac = Fraction.from(other);
         const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
@@ -363,7 +380,7 @@ export class Fraction
     public subtract(other: number): Fraction;
     public subtract(other: Fraction | number): Fraction
     {
-        const otherFrac = toFraction(other);
+        const otherFrac = Fraction.from(other);
         const lcm = leastCommonMultiple(this._den, otherFrac._den);
 
         const thisScale = lcm  / this._den;
@@ -380,7 +397,7 @@ export class Fraction
     public multiply(other: number): Fraction;
     public multiply(other: Fraction | number): Fraction
     {
-        const otherFrac = toFraction(other);
+        const otherFrac = Fraction.from(other);
         const num = this._num * otherFrac._num;
         const den = this._den * otherFrac._den;
         const product = new Fraction(num, den);
@@ -393,7 +410,7 @@ export class Fraction
     public divide(other: Fraction): Fraction;
     public divide(other: number | Fraction): Fraction
     {
-        const fracOther = toFraction(other);
+        const fracOther = Fraction.from(other);
         const result = this.multiply(fracOther.reciprocal());
         return result;
     }
@@ -466,7 +483,7 @@ export class Fraction
         increment: number | Fraction
     ): {floor: Fraction, ceil: Fraction, nearest: Fraction}
     {
-        const incr = toFraction(increment);
+        const incr = Fraction.from(increment);
 
         // The increment must be a positive value.
         if (incr._num === 0 || incr.toNumber() < 0) {
@@ -479,8 +496,8 @@ export class Fraction
             throw new Error("bracket() 1 must be divisible by the specified increment.");
         }
 
-        const rangeFloor = toFraction(this.floor());
-        const rangeCeil  = toFraction(this.ceil());
+        const rangeFloor = Fraction.from(this.floor());
+        const rangeCeil  = Fraction.from(this.ceil());
 
         let floorVal: Fraction;
 
@@ -521,20 +538,6 @@ export class Fraction
         };
     }
 
-}
-
-
-export function toFraction(val: number | Fraction | string): Fraction
-{
-    if (typeof val === "number") {
-        return Fraction.fromNumber(val);
-    }
-    else if (typeof val === "string") {
-        return Fraction.fromString(val);
-    }
-    else {
-        return val;
-    }
 }
 
 

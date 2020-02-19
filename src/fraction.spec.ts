@@ -190,6 +190,7 @@ describe("Fraction", () => {
                 expect(Fraction.fromParts(3).toString()).toEqual("3");
                 expect(Fraction.fromParts(3, 2).toString()).toEqual("1 1/2");
                 expect(Fraction.fromParts(1, 3, 2).toString()).toEqual("2 1/2");
+                expect(Fraction.fromParts(-1, 4).toString()).toEqual("-1/4");
             });
 
 

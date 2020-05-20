@@ -1,7 +1,7 @@
 import {constants} from "fs";
 import {EOL} from "os";
 import {File} from "./file";
-
+import {getOs, OperatingSystem} from "./os";
 
 const NODEJS_SHEBANG = "#!/usr/bin/env node";
 
@@ -26,3 +26,25 @@ export function makeNodeScriptExecutable(file: File): Promise<File> {
         return file;
     });
 }
+
+
+/**
+ * Converts the specified `node_modules/.bin/` script file name to the one
+ * that should be executed on the current OS.  On Windows, this means the file
+ * with the `.cmd` extension.
+ * @param nodeBinFile - The node binary symbolic link file that exists in
+ * `node_modules/.bin/`.
+ * @return The node script file that should be executed for the current OS.
+ */
+export function nodeBinForOs(nodeBinFile: File): File
+{
+    if (getOs() === OperatingSystem.WINDOWS)
+    {
+        return new File(nodeBinFile.directory, nodeBinFile.baseName + ".cmd");
+    }
+    else
+    {
+        return nodeBinFile;
+    }
+}
+

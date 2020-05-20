@@ -9,7 +9,7 @@ const _ = require("lodash");
 const spawn = require("./src/spawn").spawn;
 const Deferred = require("./src/deferred").Deferred;
 const toGulpError = require("./src/gulpHelpers").toGulpError;
-
+const nodeBinForOs = require("./src/nodeUtil").nodeBinForOs;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Default
@@ -68,7 +68,8 @@ function runTslint(emitError)
     // Add the globs defining source files to the list of arguments.
     tslintArgs = tslintArgs.concat(getSrcGlobs(true));
 
-    return spawn("./node_modules/.bin/tslint", tslintArgs, {cwd: __dirname},
+    const cmd = path.join(".", "node_modules", ".bin", "tslint.cmd");
+    return spawn(nodeBinForOs(cmd), tslintArgs, {cwd: __dirname},
                  undefined, process.stdout, process.stderr)
     .closePromise
     .catch((err) => {

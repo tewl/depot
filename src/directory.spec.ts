@@ -3,6 +3,7 @@ import * as path from "path";
 import {File} from "./file";
 import {Directory, IDirectoryContents} from "./directory";
 import * as _ from "lodash";
+import {getOs, OperatingSystem} from "./os";
 
 
 describe("Directory", () => {
@@ -20,11 +21,11 @@ describe("Directory", () => {
                 const dirB = new Directory(tmpDir, "dirB");
                 const dirC = new Directory(dirB, "dirC");
 
-                expect(Directory.relative(dirA, dirB).toString()).toEqual("../dirB");
-                expect(Directory.relative(dirA, dirC).toString()).toEqual("../dirB/dirC");
-                expect(Directory.relative(dirB, dirA).toString()).toEqual("../dirA");
+                expect(Directory.relative(dirA, dirB).toString()).toEqual(path.join("..", "dirB"));
+                expect(Directory.relative(dirA, dirC).toString()).toEqual(path.join("..", "dirB", "dirC"));
+                expect(Directory.relative(dirB, dirA).toString()).toEqual(path.join("..", "dirA"));
                 expect(Directory.relative(dirB, dirC).toString()).toEqual("dirC");
-                expect(Directory.relative(dirC, dirA).toString()).toEqual("../../dirA");
+                expect(Directory.relative(dirC, dirA).toString()).toEqual(path.join("..", "..", "dirA"));
                 expect(Directory.relative(dirC, dirB).toString()).toEqual("..");
             });
 
@@ -74,7 +75,7 @@ describe("Directory", () => {
 
             it("will return the string that was passed into the constructor", () => {
                 const dir1 = new Directory("./foo/bar");
-                expect(dir1.toString()).toEqual("foo/bar");
+                expect(dir1.toString()).toEqual(path.join("foo", "bar"));
             });
 
 
@@ -118,8 +119,14 @@ describe("Directory", () => {
 
             it("return a string containing the absolute path", () => {
                 const absPath = tmpDir.absPath();
-                expect(absPath[0]).toEqual("/");
-                expect(_.endsWith(absPath, "/tmp")).toBeTruthy();
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
+                    expect(_.endsWith(absPath, "\\tmp")).toBeTruthy();
+                }
+                else {
+                    expect(absPath[0]).toEqual("/");
+                    expect(_.endsWith(absPath, "/tmp")).toBeTruthy();
+                }
             });
 
 
@@ -135,8 +142,14 @@ describe("Directory", () => {
 
                 expect(tmpDir.toString()[0]).not.toEqual("/");
 
-                expect(path[0]).toEqual("/");
-                expect(_.endsWith(path, "/tmp")).toBeTruthy();
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.endsWith(path, "C:\\")).toBeTruthy();
+                    expect(_.endsWith(path, "\\tmp")).toBeTruthy();
+                }
+                else {
+                    expect(path[0]).toEqual("/");
+                    expect(_.endsWith(path, "/tmp")).toBeTruthy();
+                }
             });
 
 
@@ -529,11 +542,11 @@ describe("Directory", () => {
 
                     // Put the subdirectories in a deterministic order.
                     const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
-                    expect(subdirs[0].toString()).toEqual("tmp/dirA");
-                    expect(subdirs[1].toString()).toEqual("tmp/dirB");
+                    expect(subdirs[0].toString()).toEqual(path.join("tmp", "dirA"));
+                    expect(subdirs[1].toString()).toEqual(path.join("tmp", "dirB"));
 
                     expect(result.files.length).toEqual(1);
-                    expect(result.files[0].toString()).toEqual("tmp/c.txt");
+                    expect(result.files[0].toString()).toEqual(path.join("tmp", "c.txt"));
                     done();
                 });
             });
@@ -550,9 +563,9 @@ describe("Directory", () => {
                 tmpDir.contents()
                 .then((contents: IDirectoryContents) => {
                     expect(contents.files.length).toEqual(1);
-                    expect(contents.files[0].toString()).toEqual("tmp/.dotfile");
+                    expect(contents.files[0].toString()).toEqual(path.join("tmp", ".dotfile"));
                     expect(contents.subdirs.length).toEqual(1);
-                    expect(contents.subdirs[0].toString()).toEqual("tmp/.dotfolder");
+                    expect(contents.subdirs[0].toString()).toEqual(path.join("tmp", ".dotfolder"));
                     done();
                 });
             });
@@ -583,16 +596,16 @@ describe("Directory", () => {
 
                     // Put the subdirectories in a deterministic order.
                     const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
-                    expect(subdirs[0].toString()).toEqual("tmp/dirA");
-                    expect(subdirs[1].toString()).toEqual("tmp/dirA/dirA2");
-                    expect(subdirs[2].toString()).toEqual("tmp/dirB");
+                    expect(subdirs[0].toString()).toEqual(path.join("tmp", "dirA"));
+                    expect(subdirs[1].toString()).toEqual(path.join("tmp", "dirA", "dirA2"));
+                    expect(subdirs[2].toString()).toEqual(path.join("tmp", "dirB"));
 
                     expect(result.files.length).toEqual(3);
                     // Put the files in a deterministic order.
                     const files = _.sortBy(result.files, (curFile) => curFile.absPath());
-                    expect(files[0].toString()).toEqual("tmp/c.txt");
-                    expect(files[1].toString()).toEqual("tmp/dirA/a.txt");
-                    expect(files[2].toString()).toEqual("tmp/dirB/b.txt");
+                    expect(files[0].toString()).toEqual(path.join("tmp", "c.txt"));
+                    expect(files[1].toString()).toEqual(path.join("tmp", "dirA", "a.txt"));
+                    expect(files[2].toString()).toEqual(path.join("tmp", "dirB", "b.txt"));
                     done();
                 });
             });
@@ -642,10 +655,10 @@ describe("Directory", () => {
                 const contents = tmpDir.contentsSync();
 
                 expect(contents.subdirs.length).toEqual(2);
-                expect(contents.subdirs[0].toString()).toEqual("tmp/dirA");
-                expect(contents.subdirs[1].toString()).toEqual("tmp/dirB");
+                expect(contents.subdirs[0].toString()).toEqual(path.join("tmp", "dirA"));
+                expect(contents.subdirs[1].toString()).toEqual(path.join("tmp", "dirB"));
                 expect(contents.files.length).toEqual(1);
-                expect(contents.files[0].toString()).toEqual("tmp/c.txt");
+                expect(contents.files[0].toString()).toEqual(path.join("tmp", "c.txt"));
             });
 
 
@@ -660,9 +673,9 @@ describe("Directory", () => {
                 const contents = tmpDir.contentsSync();
 
                 expect(contents.files.length).toEqual(1);
-                expect(contents.files[0].toString()).toEqual("tmp/.dotfile");
+                expect(contents.files[0].toString()).toEqual(path.join("tmp", ".dotfile"));
                 expect(contents.subdirs.length).toEqual(1);
-                expect(contents.subdirs[0].toString()).toEqual("tmp/.dotfolder");
+                expect(contents.subdirs[0].toString()).toEqual(path.join("tmp", ".dotfolder"));
             });
 
 
@@ -690,16 +703,16 @@ describe("Directory", () => {
 
                 // Put the subdirectories in a deterministic order.
                 const subdirs = _.sortBy(result.subdirs, (curSubdir) => curSubdir.absPath());
-                expect(subdirs[0].toString()).toEqual("tmp/dirA");
-                expect(subdirs[1].toString()).toEqual("tmp/dirA/dirA2");
-                expect(subdirs[2].toString()).toEqual("tmp/dirB");
+                expect(subdirs[0].toString()).toEqual(path.join("tmp", "dirA"));
+                expect(subdirs[1].toString()).toEqual(path.join("tmp", "dirA", "dirA2"));
+                expect(subdirs[2].toString()).toEqual(path.join("tmp", "dirB"));
 
                 expect(result.files.length).toEqual(3);
                 // Put the files in a deterministic order.
                 const files = _.sortBy(result.files, (curFile) => curFile.absPath());
-                expect(files[0].toString()).toEqual("tmp/c.txt");
-                expect(files[1].toString()).toEqual("tmp/dirA/a.txt");
-                expect(files[2].toString()).toEqual("tmp/dirB/b.txt");
+                expect(files[0].toString()).toEqual(path.join("tmp", "c.txt"));
+                expect(files[1].toString()).toEqual(path.join("tmp", "dirA", "a.txt"));
+                expect(files[2].toString()).toEqual(path.join("tmp", "dirB", "b.txt"));
 
             });
 

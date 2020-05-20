@@ -1,3 +1,4 @@
+import * as path from "path";
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import { tmpDir } from "../test/ut/specHelpers";
@@ -63,29 +64,29 @@ describe("diffDirectories()", async () => {
 
             // Note:  All items should be sorted according to their relative path.
 
-            expect(diffDirFiles[0].relativeFilePath).toEqual("both/both.txt");
+            expect(diffDirFiles[0].relativeFilePath).toEqual(path.join("both", "both.txt"));
             expect(diffDirFiles[0].isLeftOnly).toEqual(false);
             expect(diffDirFiles[0].isRightOnly).toEqual(false);
             expect(diffDirFiles[0].isInBoth).toEqual(true);
 
-            expect(diffDirFiles[1].relativeFilePath).toEqual("leftSubdir/leftOnly.txt");
+            expect(diffDirFiles[1].relativeFilePath).toEqual(path.join("leftSubdir", "leftOnly.txt"));
             expect(diffDirFiles[1].isLeftOnly).toEqual(true);
             expect(diffDirFiles[1].isRightOnly).toEqual(false);
             expect(diffDirFiles[1].isInBoth).toEqual(false);
 
             // This right-only file will only preceded the following left-only file
             // (commonDirLeftUnique.txt) when the results array is sorted.
-            expect(diffDirFiles[2].relativeFilePath).toEqual("rightSubdir/rightOnly.txt");
+            expect(diffDirFiles[2].relativeFilePath).toEqual(path.join("rightSubdir", "rightOnly.txt"));
             expect(diffDirFiles[2].isLeftOnly).toEqual(false);
             expect(diffDirFiles[2].isRightOnly).toEqual(true);
             expect(diffDirFiles[2].isInBoth).toEqual(false);
 
-            expect(diffDirFiles[3].relativeFilePath).toEqual("zCommonDir/commonDirLeftUnique.txt");
+            expect(diffDirFiles[3].relativeFilePath).toEqual(path.join("zCommonDir", "/commonDirLeftUnique.txt"));
             expect(diffDirFiles[3].isLeftOnly).toEqual(true);
             expect(diffDirFiles[3].isRightOnly).toEqual(false);
             expect(diffDirFiles[3].isInBoth).toEqual(false);
 
-            expect(diffDirFiles[4].relativeFilePath).toEqual("zCommonDir/commonDirRightUnique.txt");
+            expect(diffDirFiles[4].relativeFilePath).toEqual(path.join("zCommonDir", "commonDirRightUnique.txt"));
             expect(diffDirFiles[4].isLeftOnly).toEqual(false);
             expect(diffDirFiles[4].isRightOnly).toEqual(true);
             expect(diffDirFiles[4].isInBoth).toEqual(false);

@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import {tmpDir} from "../test/ut/spechelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
-import { Iterator } from "./list";
+import {getOs, OperatingSystem} from "./os";
 
 
 describe("File", () => {
@@ -17,9 +17,9 @@ describe("File", () => {
 
 
             it("returns undefined when the left part string does not match", () => {
-                const d = new Directory("a/b");
-                const f = new File("a/b/c/d/e.txt");
-                expect(File.relative(d, f).toString()).toEqual("c/d/e.txt");
+                const d = new Directory(path.join("a", "b"));
+                const f = new File(path.join("a", "b", "c", "d", "e.txt"));
+                expect(File.relative(d, f).toString()).toEqual(path.join("c", "d", "e.txt"));
             });
 
 
@@ -30,8 +30,8 @@ describe("File", () => {
 
 
             it("returns the expected array of path parts", () => {
-                const d = new Directory("a/b");
-                const f = new File("a/b/c/d/e.txt");
+                const d = new Directory(path.join("a", "b"));
+                const f = new File(path.join("a", "b", "c", "d", "e.txt"));
                 expect(File.relativeParts(d, f)).toEqual(["c", "d", "e.txt"]);
             });
         });
@@ -52,9 +52,19 @@ describe("File", () => {
         describe("dirName, baseName, fileName, extName", () => {
 
 
-            it("will give the correct parts of a normal file path", () => {
+            it("will give the correct parts of a normal file path with initial parent dir", () =>
+            {
                 const file1: File = new File("..", "tmp", "bar", "baz.txt");
-                expect(file1.dirName).toEqual("../tmp/bar/");
+                expect(file1.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
+                expect(file1.baseName).toEqual("baz");
+                expect(file1.fileName).toEqual("baz.txt");
+                expect(file1.extName).toEqual(".txt");
+            });
+
+            it("will give the correct parts of a normal file path", () =>
+            {
+                const file1: File = new File("tmp", "bar", "baz.txt");
+                expect(file1.dirName).toEqual(path.join("tmp", "bar") + path.sep);
                 expect(file1.baseName).toEqual("baz");
                 expect(file1.fileName).toEqual("baz.txt");
                 expect(file1.extName).toEqual(".txt");
@@ -64,7 +74,7 @@ describe("File", () => {
             it("will give the correct parts of a file path with no directory", () => {
                 const file: File = new File("baz.foo");
 
-                expect(file.dirName).toEqual("./");
+                expect(file.dirName).toEqual("." + path.sep);
                 expect(file.baseName).toEqual("baz");
                 expect(file.fileName).toEqual("baz.foo");
                 expect(file.extName).toEqual(".foo");
@@ -72,9 +82,9 @@ describe("File", () => {
 
 
             it("will give the correct parts of a file path with no extension", () => {
-                const file: File = new File("../tmp/bar/baz");
+                const file: File = new File(path.join("..", "tmp", "bar", "baz"));
 
-                expect(file.dirName).toEqual("../tmp/bar/");
+                expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
                 expect(file.baseName).toEqual("baz");
                 expect(file.fileName).toEqual("baz");
                 expect(file.extName).toEqual("");
@@ -82,9 +92,9 @@ describe("File", () => {
 
 
             it("will give the correct parts for a dotfile", () => {
-                const file: File = new File("../tmp/bar/.baz");
+                const file: File = new File(path.join("..", "tmp", "bar", ".baz"));
 
-                expect(file.dirName).toEqual("../tmp/bar/");
+                expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
                 expect(file.baseName).toEqual(".baz");
                 expect(file.fileName).toEqual(".baz");
                 expect(file.extName).toEqual("");
@@ -98,7 +108,7 @@ describe("File", () => {
 
 
             it("will return a Directory object representing the directory containing the file", () => {
-                const dir = new Directory("../foo/bar");
+                const dir = new Directory(path.join("..", "foo", "bar"));
                 const file = new File(dir, "baz.txt");
                 expect(file.directory.toString()).toEqual(dir.toString());
             });
@@ -111,8 +121,8 @@ describe("File", () => {
 
 
             it("will return the string that was passed into the constructor", () => {
-                const file1 = new File("./foo/bar.txt");
-                expect(file1.toString()).toEqual("foo/bar.txt");
+                const file1 = new File(path.join(".", "foo", "bar.txt"));
+                expect(file1.toString()).toEqual(path.join("foo", "bar.txt"));
             });
 
 
@@ -213,26 +223,73 @@ describe("File", () => {
             });
 
 
-            it("will change the mode bits to the specified value", (done) => {
-                testFile.chmod(
-                    constants.S_IRWXU |
-                    constants.S_IRGRP | constants.S_IXGRP |
-                    constants.S_IROTH | constants.S_IXOTH
-                )
-                .then((testFile) => {
-                    const afterStats = testFile.existsSync();
-                    expect(afterStats).toBeTruthy();
-                    expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
-                    expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
-                    expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
-                    expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
-                    expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
-                    expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
-                    expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
-                    expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
-                    expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+            it("will change the mode bits to the specified value (non-Windows)", (done) => {
+
+                if (getOs() !== OperatingSystem.WINDOWS)
+                {
+                    testFile.chmod(
+                        constants.S_IRWXU |
+                        constants.S_IRGRP | constants.S_IXGRP |
+                        constants.S_IROTH | constants.S_IXOTH
+                    )
+                    .then((testFile) =>
+                    {
+                        const afterStats = testFile.existsSync();
+                        expect(afterStats).toBeTruthy();
+                        expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                        expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                        expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                        expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                        expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                        expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                        expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                        done();
+                    });
+                }
+                else {
                     done();
-                });
+                }
+            });
+
+            it("will change the mode bits to the specified value (Windows)", (done) =>
+            {
+                if (getOs() === OperatingSystem.WINDOWS)
+                {
+
+                    // The Node.js documentation states:
+                    //
+                    // Caveats: on Windows only the write permission can be
+                    // changed, and the distinction among the permissions of
+                    // group, owner or others is not implemented.
+                    //
+                    // Try to set read, write and execute on the file. Since the
+                    // read mode is always set on Windows and since only the
+                    // write permission can be changed, this will result in the
+                    // read and write modes being set for user, group and other.
+
+                    testFile.chmod(constants.S_IRUSR | constants.S_IWUSR | constants.S_IXUSR)
+                    .then((testFile) =>
+                    {
+                        const afterStats = testFile.existsSync();
+                        expect(afterStats).toBeTruthy();
+                        expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                        expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                        expect(afterStats!.mode & constants.S_IXUSR).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                        expect(afterStats!.mode & constants.S_IWGRP).toEqual(constants.S_IWGRP);
+                        expect(afterStats!.mode & constants.S_IXGRP).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                        expect(afterStats!.mode & constants.S_IWOTH).toEqual(constants.S_IWOTH);
+                        expect(afterStats!.mode & constants.S_IXOTH).toEqual(0);
+                        done();
+                    });
+                }
+                else
+                {
+                    done();
+                }
             });
 
 
@@ -246,24 +303,26 @@ describe("File", () => {
             });
 
 
-            it("will change the mode bits to the specified value", () => {
-                testFile.chmodSync(
-                    constants.S_IRWXU |
-                    constants.S_IRGRP | constants.S_IXGRP |
-                    constants.S_IROTH | constants.S_IXOTH
-                );
+            it("will change the mode bits to the specified value (non-Windows)", () => {
+                if (getOs() !== OperatingSystem.WINDOWS) {
+                    testFile.chmodSync(
+                        constants.S_IRWXU |
+                        constants.S_IRGRP | constants.S_IXGRP |
+                        constants.S_IROTH | constants.S_IXOTH
+                    );
 
-                const afterStats = testFile.existsSync();
-                expect(afterStats).toBeTruthy();
-                expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
-                expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
-                expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
-                expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
-                expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
-                expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
-                expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
-                expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
-                expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                    const afterStats = testFile.existsSync();
+                    expect(afterStats).toBeTruthy();
+                    expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                    expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                    expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                    expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                    expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                    expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                    expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                }
             });
         });
 

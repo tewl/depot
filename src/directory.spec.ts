@@ -143,7 +143,7 @@ describe("Directory", () => {
                 expect(tmpDir.toString()[0]).not.toEqual("/");
 
                 if (getOs() === OperatingSystem.WINDOWS) {
-                    expect(_.endsWith(path, "C:\\")).toBeTruthy();
+                    expect(_.startsWith(path, "C:\\")).toBeTruthy();
                     expect(_.endsWith(path, "\\tmp")).toBeTruthy();
                 }
                 else {
@@ -862,7 +862,7 @@ describe("Directory", () => {
                 srcDir.copy(destDir, true)
                 .then((counterpartDestDir) => {
                     // Should resolve with the counterpart of the source folder.
-                    expect(counterpartDestDir.toString()).toEqual("tmp/dest/src");
+                    expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest", "src"));
 
                     expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
                     expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
@@ -909,7 +909,7 @@ describe("Directory", () => {
                 srcDir.copy(destDir, false)
                 .then((counterpartDestDir) => {
                     // Should resolve with the counterpart of the source folder.
-                    expect(counterpartDestDir.toString()).toEqual("tmp/dest");
+                    expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest"));
 
                     expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
                     expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
@@ -965,7 +965,7 @@ describe("Directory", () => {
                 destDir.ensureExistsSync();
 
                 const counterpartDestDir = srcDir.copySync(destDir, true);
-                expect(counterpartDestDir.toString()).toEqual("tmp/dest/src");
+                expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest", "src"));
                 expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
                 expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "src", "dirA", "dirB").existsSync()).toBeTruthy();
@@ -1007,7 +1007,7 @@ describe("Directory", () => {
                 destDir.ensureExistsSync();
 
                 const counterpartDestDir = srcDir.copySync(destDir, false);
-                expect(counterpartDestDir.toString()).toEqual("tmp/dest");
+                expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest"));
                 expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
                 expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "dirA", "dirB").existsSync()).toBeTruthy();
@@ -1065,7 +1065,7 @@ describe("Directory", () => {
                     expect(dstFile.readSync()).toEqual("test");
                     // The promise should have been resolved with a directory
                     // representing the new location.
-                    expect(newDir.toString()).toEqual("tmp/dst/src");
+                    expect(newDir.toString()).toEqual(path.join("tmp", "dst", "src"));
                     done();
                 });
             });
@@ -1090,7 +1090,7 @@ describe("Directory", () => {
                     expect(dstFile.readSync()).toEqual("test");
                     // The promise should have been resolved with a directory
                     // representing the new location.
-                    expect(newDir.toString()).toEqual("tmp/dst");
+                    expect(newDir.toString()).toEqual(path.join("tmp", "dst"));
                     done();
                 });
             });
@@ -1111,7 +1111,7 @@ describe("Directory", () => {
                 const destDir = new Directory(tmpDir, "dest");
                 srcDir.move(destDir, false)
                 .then((newDir) => {
-                    expect(newDir.toString()).toEqual("tmp/dest");
+                    expect(newDir.toString()).toEqual(path.join("tmp", "dest"));
                     const destFile = new File(destDir, "dirA", "dirB", "file.txt");
                     expect(destFile.existsSync).toBeTruthy();
                     expect(destFile.readSync()).toEqual("test");
@@ -1183,18 +1183,18 @@ describe("Directory", () => {
                 await tmpDir.walk(handler);
 
                 expect(encountered.length).toEqual(12);
-                expect(encountered).toContain("tmp/dirA");
-                expect(encountered).toContain("tmp/dirA/dirAA");
-                expect(encountered).toContain("tmp/dirA/dirAA/aa1.txt");
-                expect(encountered).toContain("tmp/dirA/dirAA/aa2.txt");
-                expect(encountered).toContain("tmp/dirA/dirAB");
-                expect(encountered).toContain("tmp/dirA/dirAB/ab1.txt");
-                expect(encountered).toContain("tmp/dirA/dirAB/ab2.txt");
-                expect(encountered).toContain("tmp/dirB");
-                expect(encountered).toContain("tmp/dirB/b1.txt");
-                expect(encountered).toContain("tmp/dirB/b2.txt");
-                expect(encountered).toContain("tmp/root1.txt");
-                expect(encountered).toContain("tmp/root2.txt");
+                expect(encountered).toContain(path.join("tmp", "dirA"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAA"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAA", "aa1.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAA", "aa2.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB", "ab1.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB", "ab2.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirB"));
+                expect(encountered).toContain(path.join("tmp", "dirB", "b1.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirB", "b2.txt"));
+                expect(encountered).toContain(path.join("tmp", "root1.txt"));
+                expect(encountered).toContain(path.join("tmp", "root2.txt"));
             });
 
 
@@ -1210,17 +1210,17 @@ describe("Directory", () => {
                 await tmpDir.walk(handler);
 
                 expect(encountered.length).toEqual(10);
-                expect(encountered).toContain("tmp/dirA");
-                expect(encountered).toContain("tmp/dirA/dirAA");
+                expect(encountered).toContain(path.join("tmp", "dirA"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAA"));
                 // dirAA's files will be skipped.
-                expect(encountered).toContain("tmp/dirA/dirAB");
-                expect(encountered).toContain("tmp/dirA/dirAB/ab1.txt");
-                expect(encountered).toContain("tmp/dirA/dirAB/ab2.txt");
-                expect(encountered).toContain("tmp/dirB");
-                expect(encountered).toContain("tmp/dirB/b1.txt");
-                expect(encountered).toContain("tmp/dirB/b2.txt");
-                expect(encountered).toContain("tmp/root1.txt");
-                expect(encountered).toContain("tmp/root2.txt");
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB", "ab1.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirA", "dirAB", "ab2.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirB"));
+                expect(encountered).toContain(path.join("tmp", "dirB", "b1.txt"));
+                expect(encountered).toContain(path.join("tmp", "dirB", "b2.txt"));
+                expect(encountered).toContain(path.join("tmp", "root1.txt"));
+                expect(encountered).toContain(path.join("tmp", "root2.txt"));
             });
 
 

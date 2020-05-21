@@ -258,31 +258,42 @@ describe("File", () => {
                 if (getOs() === OperatingSystem.WINDOWS)
                 {
 
-                    // The Node.js documentation states:
+                    // chmod() is implemented very strangely on Windows.
                     //
-                    // Caveats: on Windows only the write permission can be
-                    // changed, and the distinction among the permissions of
-                    // group, owner or others is not implemented.
+                    // - First, fs.constants such as constants.S_IRUSR,
+                    //   constants.S_IWUSR and constants.S_IXUSR are undefined.
+                    //   This is why I am using octal constants below.
                     //
+                    // - Secondly, the Node.js says the following about the
+                    //   Windows implementation:
+                    //
+                    //   Caveats: on Windows only the write permission can be
+                    //   changed, and the distinction among the permissions of
+                    //   group, owner or others is not implemented.
+
                     // Try to set read, write and execute on the file. Since the
                     // read mode is always set on Windows and since only the
                     // write permission can be changed, this will result in the
                     // read and write modes being set for user, group and other.
+                    // user:  rwx  <-- This will be used for user, group and other
+                    // group: r x
+                    // other: r x
+                    const newMode = 0o755;
 
-                    testFile.chmod(constants.S_IRUSR | constants.S_IWUSR | constants.S_IXUSR)
+                    testFile.chmod(newMode)
                     .then((testFile) =>
                     {
                         const afterStats = testFile.existsSync();
                         expect(afterStats).toBeTruthy();
-                        expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
-                        expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
-                        expect(afterStats!.mode & constants.S_IXUSR).toEqual(0);
-                        expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
-                        expect(afterStats!.mode & constants.S_IWGRP).toEqual(constants.S_IWGRP);
-                        expect(afterStats!.mode & constants.S_IXGRP).toEqual(0);
-                        expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
-                        expect(afterStats!.mode & constants.S_IWOTH).toEqual(constants.S_IWOTH);
-                        expect(afterStats!.mode & constants.S_IXOTH).toEqual(0);
+                        expect(afterStats!.mode & 0o400).toEqual(0o400);
+                        expect(afterStats!.mode & 0o200).toEqual(0o200);
+                        expect(afterStats!.mode & 0o100).toEqual(0);
+                        expect(afterStats!.mode & 0o040).toEqual(0o040);
+                        expect(afterStats!.mode & 0o020).toEqual(0o020);
+                        expect(afterStats!.mode & 0o010).toEqual(0);
+                        expect(afterStats!.mode & 0o004).toEqual(0o004);
+                        expect(afterStats!.mode & 0o002).toEqual(0o002);
+                        expect(afterStats!.mode & 0o001).toEqual(0);
                         done();
                     });
                 }
@@ -333,7 +344,14 @@ describe("File", () => {
             it("will return the absolute path of the file", () => {
                 const file = new File(__filename);
                 const absPath = file.absPath();
-                expect(absPath[0]).toEqual("/");
+
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
+                }
+                else {
+                    expect(_.startsWith(absPath, "/")).toBeTruthy();
+                }
+
                 expect(_.endsWith(absPath, ".spec.ts")).toBeTruthy();
             });
 
@@ -346,10 +364,15 @@ describe("File", () => {
 
             it("will return a File instance that is absolute", () => {
                 const relFile = new File("../package.json");
-                expect(relFile.toString()[0]).not.toEqual("/");
+                expect(_.startsWith(relFile.toString(), ".." + path.sep)).toBeTruthy();
 
                 const absFile = relFile.absolute();
-                expect(absFile.toString()[0]).toEqual("/");
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.startsWith(absFile.toString(), "C:\\")).toBeTruthy();
+                }
+                else {
+                    expect(_.startsWith(absFile.toString(), "/")).toBeTruthy();
+                }
             });
 
 

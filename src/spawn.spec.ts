@@ -1,9 +1,10 @@
 import * as path from "path";
+import * as cp from "child_process";
 import * as fs from "fs";
 import * as _ from "lodash";
 import {spawn} from "./spawn";
 import {tmpDir} from "../test/ut/specHelpers";
-
+import {getOs, OperatingSystem} from "./os";
 
 describe("spawn", () => {
 
@@ -13,8 +14,15 @@ describe("spawn", () => {
 
 
     it("will run the specified command", (done) => {
+        const os = getOs();
+        const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
+        let cmd = "ls";
+        if (os === OperatingSystem.WINDOWS) {
+            options.shell = true;
+            cmd = "dir";
+        }
         const testFilePath = path.join(tmpDir.absPath(), "foo.txt");
-        spawn("touch", ["foo.txt"], {cwd: tmpDir.absPath()}).closePromise
+        spawn("dir", [">", "foo.txt"], options).closePromise
         .then(() => {
             const stats = fs.statSync(testFilePath);
             expect(stats.isFile()).toBeTruthy();
@@ -24,9 +32,18 @@ describe("spawn", () => {
 
 
     it("will resolve with the stdout text", (done) => {
-        spawn("touch", ["foo.txt"], {cwd: tmpDir.absPath()}).closePromise
+        const os = getOs();
+        const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
+        let lsCmd = "ls";
+        if (os === OperatingSystem.WINDOWS)
+        {
+            options.shell = true;
+            lsCmd = "dir";
+        }
+
+        spawn(lsCmd, [">", "foo.txt"], options).closePromise
         .then(() => {
-            return spawn("ls", [], {cwd: tmpDir.absPath()}).closePromise;
+            return spawn(lsCmd, [], options).closePromise;
         })
         .then((output) => {
             expect(output).toContain("foo.txt");
@@ -36,7 +53,20 @@ describe("spawn", () => {
 
 
     it("provides access to the underlying child process", (done) => {
-        const spawnResult = spawn("sleep", ["10"], {cwd: tmpDir.absPath()});
+
+        let cmd: string;
+        let args: Array<string>;
+
+        if (getOs() === OperatingSystem.WINDOWS) {
+            cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
+            args = ["-c ", "sleep 10"];
+        }
+        else {
+            cmd = "sleep";
+            args = ["10"];
+        }
+
+        const spawnResult = spawn(cmd, args, {cwd: tmpDir.absPath()});
         spawnResult.childProcess.kill();
         spawnResult.closePromise
         .then(() => {
@@ -113,11 +143,17 @@ describe("spawn", () => {
 
     it("provides the exit code and stderr when the command fails", (done) => {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
-        spawn("cat", [nonExistantFilePath]).closePromise
+        const os = getOs();
+        const lsCmd = os === OperatingSystem.WINDOWS ? "dir" : "ls";
+        const options = os === OperatingSystem.WINDOWS ? {shell: true} : undefined;
+        spawn(lsCmd, [nonExistantFilePath], options).closePromise
         .catch((err) => {
             expect(err).toBeTruthy();
             expect(err.exitCode).not.toEqual(0);
-            expect(err.stderr).toContain("No such file or directory");
+
+            const windowsMsgRegex = /File Not Found/;
+            const macMsgRegex = /No such file or directory/;
+            expect(windowsMsgRegex.test(err.stderr) || macMsgRegex.test(err.stderr)).toBeTruthy();
             done();
         });
     });

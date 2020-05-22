@@ -163,3 +163,40 @@ export function splitLinesOsIndependent(src: string): Array<string>
     });
     return lines;
 }
+
+
+export function padLeft(src: string, pad: string, desiredLength: number): string {
+    const numPadChars = desiredLength - src.length;
+    if (numPadChars <= 0)
+    {
+        return src;
+    }
+
+    let fullPad: string = "";
+    while (fullPad.length < numPadChars)
+    {
+        fullPad = fullPad + pad;
+    }
+
+    fullPad = fullPad.slice(0, numPadChars);
+    return fullPad + src;
+}
+
+
+export function padRight(src: string, pad: string, desiredLength: number): string
+{
+    const numPadChars = desiredLength - src.length;
+    if (numPadChars <= 0)
+    {
+        return src;
+    }
+
+    let fullPad: string = "";
+    while (fullPad.length < numPadChars)
+    {
+        fullPad = fullPad + pad;
+    }
+
+    fullPad = fullPad.slice(0, numPadChars);
+    return src + fullPad;
+}

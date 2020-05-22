@@ -1,9 +1,11 @@
 import * as fs from "fs";
+import * as cp from "child_process";
 import * as BBPromise from "bluebird";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
 import {gitUrlToProjectName} from "./gitHelpers";
+import {getOs, OperatingSystem} from "./os";
 
 
 export interface IPackageJson
@@ -131,7 +133,18 @@ export class NodePackage
      */
     public pack(outDir?: Directory): Promise<File>
     {
-        return spawn("npm", ["pack"], {cwd: this._pkgDir.toString()})
+        const spawnOptions: cp.SpawnOptions = { cwd: this._pkgDir.toString() };
+        if (getOs() === OperatingSystem.WINDOWS) {
+            // On Windows child_process.spawn() can only run executables, not
+            // scripts.  Since npm is a script on windows, we need to set the
+            // shell option so that we are not directly running the script, but
+            // rather a shell, which is then running the script.  For more
+            // information, see:
+            // https://github.com/nodejs/node-v0.x-archive/issues/2318
+            spawnOptions.shell = true;
+        }
+
+        return spawn("npm", ["pack"], spawnOptions)
         .closePromise
         .then((stdout: string) => {
             return new File(this._pkgDir, stdout);

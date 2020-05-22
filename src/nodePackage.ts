@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as cp from "child_process";
 import * as BBPromise from "bluebird";
+import * as compressing from "compressing";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
@@ -196,32 +197,13 @@ export class NodePackage
         .then((tgzFile: File) => {
             packageBaseName = tgzFile.baseName;
 
-            // Running the following gunzip command will extract the .tgz file
-            // to a .tar file with the same basename.  The original .tgz file is
-            // deleted.
-            return spawn("gunzip", ["--force", tgzFile.fileName], {cwd: tmpDir.toString()})
-            .closePromise;
-        })
-        .then(() => {
-            // The above gunzip command should have extracted a .tar file.  Make
-            // sure this assumption is true.
-            extractedTarFile = new File(tmpDir, packageBaseName + ".tar");
-            return extractedTarFile.exists()
-            .then((exists) => {
-                if (!exists) {
-                    throw new Error(`Extracted .tar file ${extractedTarFile.toString()} does not exist.  Aborting.`);
-                }
-            });
-        })
-        .then(() => {
-            // We are about to unpack the tar file.  Create an empty
-            // directory where its contents will be placed.
             unpackedDir = new Directory(tmpDir, packageBaseName);
-            return unpackedDir.empty();  // Creates (if needed) and empties this directory.
-        })
-        .then(() => {
-            return spawn("tar", ["-x", "-C", unpackedDir.toString(), "-f", extractedTarFile.toString()], {cwd: tmpDir.toString()})
-            .closePromise;
+            // Emptying the directory will create it if it does not exist.
+            return unpackedDir.empty()
+            .then(() => {
+                // Use the "compressing" package to extract the .tgz file.
+                return compressing.tgz.uncompress(tgzFile.absPath(), unpackedDir.absPath());
+            });
         })
         .then(() => {
             // When uncompressed, all content is contained within a "package"

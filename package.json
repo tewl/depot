@@ -85,6 +85,7 @@
     "@types/pouchdb": "6.3.3",
     "@types/request-promise": "4.1.42",
     "bluebird": "3.5.5",
+    "compressing": "^1.5.1",
     "inquirer": "6.2.0",
     "lodash": "4.17.13",
     "pouchdb": "7.0.0",

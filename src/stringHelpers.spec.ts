@@ -1,6 +1,6 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
-    removeBlankLines
+    removeBlankLines, splitLinesOsIndependent
 } from "./stringHelpers";
 
 
@@ -206,6 +206,32 @@ describe("removeWhitespace", () => {
 
     it("will remove different kinds of whitespace", () => {
         expect(removeWhitespace("\tfoo\t    \tbar\t\t")).toEqual("foobar");
+    });
+
+
+});
+
+
+describe("splitLinesOsIndependent()", () => {
+
+
+    it("will split a string with posix-style newlines (\\n)", () => {
+        const src = "line 1\nline 2\nline 3";
+        const result = splitLinesOsIndependent(src);
+        expect(result.length).toEqual(3);
+        expect(result[0]).toEqual("line 1");
+        expect(result[1]).toEqual("line 2");
+        expect(result[2]).toEqual("line 3");
+    });
+
+
+    it("will split a string with windows-style newlines (\\r\\n)", () => {
+        const src = "line 1\r\nline 2\r\nline 3";
+        const result = splitLinesOsIndependent(src);
+        expect(result.length).toEqual(3);
+        expect(result[0]).toEqual("line 1");
+        expect(result[1]).toEqual("line 2");
+        expect(result[2]).toEqual("line 3");
     });
 
 

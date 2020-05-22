@@ -39,7 +39,8 @@ export function indent(
     src: string,
     numSpacesOrPad: number | string,
     skipFirstLine: boolean = false
-): string {
+): string
+{
     if (numSpacesOrPad === 0) {
         return src;
     }
@@ -145,4 +146,20 @@ const whitespaceRegex = /\s+/g;
 export function removeWhitespace(str: string): string
 {
     return str.replace(whitespaceRegex, "");
+}
+
+
+/**
+ * Splits a string into individual lines. The source string may contain
+ * posix-style newlines, Windows-style newlines, or a mixture of the two.
+ * @param src - The string to be split.
+ * @return An array of string segments
+ */
+export function splitLinesOsIndependent(src: string): Array<string>
+{
+    let lines = _.split(src, "\n");
+    lines = _.map(lines, (curLine) => {
+        return _.trimEnd(curLine, "\r");
+    });
+    return lines;
 }

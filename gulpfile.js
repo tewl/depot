@@ -68,8 +68,9 @@ function runTslint(emitError)
     // Add the globs defining source files to the list of arguments.
     tslintArgs = tslintArgs.concat(getSrcGlobs(true));
 
-    const cmd = path.join(".", "node_modules", ".bin", "tslint.cmd");
-    return spawn(nodeBinForOs(cmd), tslintArgs, {cwd: __dirname},
+    let cmd = path.join(".", "node_modules", ".bin", "tslint");
+    cmd = nodeBinForOs(cmd).toString();
+    return spawn(cmd, tslintArgs, {cwd: __dirname},
                  undefined, process.stdout, process.stderr)
     .closePromise
     .catch((err) => {

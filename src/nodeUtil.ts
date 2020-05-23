@@ -36,15 +36,17 @@ export function makeNodeScriptExecutable(file: File): Promise<File> {
  * `node_modules/.bin/`.
  * @return The node script file that should be executed for the current OS.
  */
-export function nodeBinForOs(nodeBinFile: File): File
+export function nodeBinForOs(nodeBinFile: File | string): File
 {
+    const inputFile: File = nodeBinFile instanceof File ? nodeBinFile : new File(nodeBinFile);
+
     if (getOs() === OperatingSystem.WINDOWS)
     {
-        return new File(nodeBinFile.directory, nodeBinFile.baseName + ".cmd");
+        return new File(inputFile.directory, inputFile.baseName + ".cmd");
     }
     else
     {
-        return nodeBinFile;
+        return inputFile;
     }
 }
 

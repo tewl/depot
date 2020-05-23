@@ -5,7 +5,7 @@ import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
 import {piNewline} from "./regexpHelpers";
-import {splitLinesOsIndependent} from "./stringHelpers"
+import {splitLinesOsIndependent} from "./stringHelpers";
 
 
 // TODO: To get the branches that are pointing at a given commit:

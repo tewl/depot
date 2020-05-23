@@ -180,7 +180,6 @@ export class NodePackage
     public publish(publishDir: Directory, emptyPublishDir: boolean, tmpDir: Directory): Promise<Directory>
     {
         let packageBaseName: string;
-        let extractedTarFile: File;
         let unpackedDir: Directory;
         let unpackedPackageDir: Directory;
 

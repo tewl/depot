@@ -71,12 +71,9 @@
     "del": "3.0.0",
     "express": "4.16.4",
     "gulp": "3.9.1",
-    "gulp-sourcemaps": "2.6.4",
-    "gulp-typescript": "4.0.2",
     "jasmine": "2.8.0",
     "publishtogit": "git+https://github.com/kwpeters/publishtogit.git#v2.1.0",
     "semver": "5.5.0",
-    "strip-json-comments": "2.0.1",
     "ts-node": "5.0.1",
     "tslint": "5.17.0",
     "typescript": "3.5.1"

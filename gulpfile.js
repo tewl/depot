@@ -217,8 +217,7 @@ function compileTypeScript() {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Gets globbing patterns for the the toad library source files.  This does not
- * include the scripts.  For that see getBinGlobs().
+ * Gets globbing patterns for source files.
  * @param includeSpecs - Whether to include unit test *.spec.ts files.
  * @return {Array<string>} An array of string globbing patterns
  */

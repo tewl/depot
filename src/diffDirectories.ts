@@ -341,7 +341,7 @@ export class DiffDirFileItem
  * @param actionPriority - The action being performed so that the actions
  *     associated with each result can be prioritized.
  * @param includeIdentical - Whether to include files that are identical in both
- *     `leftDir` and `rightDir` in the returned resuls.  If true, identical
+ *     `leftDir` and `rightDir` in the returned results.  If true, identical
  *     files will be included with a 0-length array of actions.
  * @return An array of items representing the differences found between
  *     `leftDir` and `rightDir`.

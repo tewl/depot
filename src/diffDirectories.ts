@@ -6,7 +6,7 @@ import {File} from "./file";
 
 
 export enum ActionPriority {
-    NONE   = "no priority",
+    PRESERVE   = "preserve",
     L_TO_R = "sync left to right",
     R_TO_L = "sync right to left"
 }
@@ -26,15 +26,15 @@ export enum DiffDirFileItemActionType
 export class DiffDirFileItemAction
 {
 
-    private _fileItem: DiffDirFileItem;
+    private _files: IFilesToCompare;
     private _actionType: DiffDirFileItemActionType;
 
     public constructor(
-        fileItem: DiffDirFileItem,
+        files: IFilesToCompare,
         actionType: DiffDirFileItemActionType
     )
     {
-        this._fileItem   = fileItem;
+        this._files      = files;
         this._actionType = actionType;
     }
 
@@ -53,51 +53,24 @@ export class DiffDirFileItemAction
     public execute(): Promise<void>
     {
         if (this._actionType === DiffDirFileItemActionType.COPY_LEFT) {
-            // In order to copy left, the right file must exist.
-            if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("COPY_LEFT cannot be done without a right file."));
-            }
-            const destFile: File = new File(this._fileItem.leftRootDir, this._fileItem.relativeFilePath);
-            return this._fileItem.rightFile.copy(destFile)
-            .then(() => { });
+            return this._files.rightFile.copy(this._files.leftFile)
+            .then(() => {});
         }
         else if (this._actionType === DiffDirFileItemActionType.COPY_RIGHT) {
-            // In order to copy right, the left file must exist.
-            if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("COPY_RIGHT cannot be done without a left file."));
-            }
-            const destFile: File = new File(this._fileItem.rightRootDir, this._fileItem.relativeFilePath);
-            return this._fileItem.leftFile.copy(destFile)
+            return this._files.leftFile.copy(this._files.rightFile)
             .then(() => { });
         }
         else if (this._actionType === DiffDirFileItemActionType.DELETE_LEFT) {
-            // In order to delete left, the left file must exist.
-            if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_LEFT cannot be done without a left file."));
-            }
-            return this._fileItem.leftFile.delete();
+            return this._files.leftFile.delete();
         }
         else if (this._actionType === DiffDirFileItemActionType.DELETE_RIGHT) {
-            // In order to delete right, the right file must exist.
-            if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_RIGHT cannot be done without a right file."));
-            }
-            return this._fileItem.rightFile.delete();
+            return this._files.rightFile.delete();
         }
         else if (this._actionType === DiffDirFileItemActionType.DELETE_BOTH) {
-            // In order to delete the left file, the left file must exist.
-            if (this._fileItem.leftFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_BOTH cannot be done without a left file."));
-            }
-            // In order to delete the right file, the right file must exist.
-            if (this._fileItem.rightFile === undefined) {
-                return BBPromise.reject(new Error("DELETE_BOTH cannot be done without a right file."));
-            }
             return BBPromise.all([
-                this._fileItem.leftFile.delete(),
-                this._fileItem.rightFile.delete()])
+                this._files.leftFile.delete(),
+                this._files.rightFile.delete()])
             .then(() => { });
-
         }
         else if (this._actionType === DiffDirFileItemActionType.SKIP) {
             return BBPromise.resolve();
@@ -106,6 +79,192 @@ export class DiffDirFileItemAction
             return BBPromise.reject(new Error(`Unsupported action "${this._actionType}".`));
         }
     }
+}
+
+export interface IFilesToCompare
+{
+    leftFile: File;
+    rightFile: File;
+    actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+}
+
+
+// tslint:disable-next-line:max-classes-per-file
+export class FileComparer implements IFilesToCompare
+{
+    public static create(leftFile: File, rightFile: File): FileComparer
+    {
+        return new FileComparer(leftFile, rightFile);
+    }
+
+
+    // #region Data Members
+    private _leftFile: File;
+    private _rightFile: File;
+    // #endregion
+
+
+    public get leftFile(): File {
+        return this._leftFile;
+    }
+
+
+    public get rightFile(): File {
+        return this._rightFile;
+    }
+
+    private constructor(leftFile: File, rightFile: File)
+    {
+        this._leftFile = leftFile;
+        this._rightFile = rightFile;
+    }
+
+    public async isLeftOnly(): Promise<boolean>
+    {
+        const [leftExists, rightExists] = await BBPromise.all([
+            this._leftFile.exists(),
+            this._rightFile.exists()
+        ]);
+
+        return !!(leftExists && !rightExists);
+    }
+
+    public async isRightOnly(): Promise<boolean>
+    {
+        const [leftExists, rightExists] = await BBPromise.all([
+            this._leftFile.exists(),
+            this._rightFile.exists()
+        ]);
+
+        return !!(!leftExists && rightExists);
+    }
+
+    public async isInBoth(): Promise<boolean>
+    {
+        const [leftExists, rightExists] = await BBPromise.all([
+            this._leftFile.exists(),
+            this._rightFile.exists()
+        ]);
+
+        return !!(leftExists && rightExists);
+    }
+
+
+    public async bothExistAndIdentical(): Promise<boolean>
+    {
+        const [leftExists, rightExists] = await BBPromise.all([
+            this._leftFile.exists(),
+            this._rightFile.exists()
+        ]);
+
+        if (!leftExists || !rightExists)
+        {
+            // One or both of the files do not exist.
+            return false;
+        }
+
+        // Both files exist.  Return a value indicating whether they are
+        // identical.
+        const [leftHash, rightHash] = await BBPromise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
+        return leftHash === rightHash;
+    }
+
+    public async actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+    {
+        const [leftExists, rightExists] = await BBPromise.all([
+            this._leftFile.exists(),
+            this._rightFile.exists()
+        ]);
+
+        const isLeftOnly = !!(leftExists && !rightExists);
+        const isRightOnly = !!(!leftExists && rightExists);
+        const isInBoth = !!(leftExists && rightExists);
+
+        const actions: Array<DiffDirFileItemAction> = [];
+
+        if (isLeftOnly)
+        {
+            if (actionPriority === ActionPriority.L_TO_R)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
+            }
+            else if (actionPriority === ActionPriority.R_TO_L)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+            }
+            else if (actionPriority === ActionPriority.PRESERVE)
+            {
+                // No action priority specified.  Give priority to preserving
+                // files.
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
+            }
+        }
+        else if (isRightOnly)
+        {
+            if (actionPriority === ActionPriority.L_TO_R)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+            }
+            else if (actionPriority === ActionPriority.R_TO_L)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
+            }
+            else if (actionPriority === ActionPriority.PRESERVE)
+            {
+                // No action priority specified.  Give priority to preserving
+                // files.
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
+            }
+        }
+        else if (isInBoth)
+        {
+            const [leftHash, rightHash] = await BBPromise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
+            const filesAreIdentical = leftHash === rightHash;
+
+            if (filesAreIdentical)
+            {
+                // When the files are identical, there should be no actions.
+            }
+            else if (actionPriority === ActionPriority.L_TO_R)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+            }
+            else if (actionPriority === ActionPriority.R_TO_L)
+            {
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+            }
+            else
+            {
+                // No action priority specified.  Give priority to preserving
+                // files.
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
+                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+            }
+        }
+
+        return actions;
+    }
+
 }
 
 
@@ -125,8 +284,7 @@ export class DiffDirFileItem
     public static async create(
         leftRootDir:      Directory,
         rightRootDir:     Directory,
-        relativeFilePath: string,
-        actionPriority:   ActionPriority
+        relativeFilePath: string
         ): Promise<DiffDirFileItem>
     {
         // TODO: Need to find references to this static function and update them
@@ -144,9 +302,7 @@ export class DiffDirFileItem
             leftRootDir,
             rightRootDir,
             relativeFilePath,
-            leftFile,
-            rightFile,
-            actionPriority
+            FileComparer.create(leftFile, rightFile)
         );
     }
 
@@ -155,9 +311,7 @@ export class DiffDirFileItem
     private _leftRootDir:           Directory;
     private _rightRootDir:          Directory;
     private _relativeFilePath:      string;
-    private _leftFile:              File;
-    private _rightFile:             File;
-    private _actionPriority:        undefined | ActionPriority;
+    private _files:                 IFilesToCompare;
     // #endregion
 
 
@@ -165,18 +319,13 @@ export class DiffDirFileItem
         leftRootDir:           Directory,
         rightRootDir:          Directory,
         relativeFilePath:      string,
-        leftFile:              File,
-        rightFile:             File,
-        actionPriority:       ActionPriority
-
+        files:                 IFilesToCompare
     )
     {
         this._leftRootDir           = leftRootDir;
         this._rightRootDir          = rightRootDir;
         this._relativeFilePath      = relativeFilePath;
-        this._leftFile              = leftFile;
-        this._rightFile             = rightFile;
-        this._actionPriority        = actionPriority;
+        this._files                 = files;
     }
 
 
@@ -200,112 +349,21 @@ export class DiffDirFileItem
 
     public get leftFile(): undefined | File
     {
-        return this._leftFile;
+        return this._files.leftFile;
     }
 
 
     public get rightFile(): undefined | File
     {
-        return this._rightFile;
-    }
-
-
-    public get actionPriority(): undefined | ActionPriority
-    {
-        return this._actionPriority;
-    }
-
-
-    public async actions(): Promise<Array<DiffDirFileItemAction>>
-    {
-        const [leftExists, rightExists] = await BBPromise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
-        ]);
-
-        const isLeftOnly  = !!(leftExists && !rightExists);
-        const isRightOnly = !!(!leftExists && rightExists);
-
-        const actions: Array<DiffDirFileItemAction> = [];
-
-        if (isLeftOnly) {
-            if (this._actionPriority === ActionPriority.L_TO_R) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
-            }
-            else if (this._actionPriority === ActionPriority.R_TO_L) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-            }
-            else {
-                // No action priority specified.  Give priority to preserving
-                // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
-            }
-        }
-        else if (isRightOnly)
-        {
-            if (this._actionPriority === ActionPriority.L_TO_R) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-            }
-            else if (this._actionPriority === ActionPriority.R_TO_L) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
-            }
-            else {
-                // No action priority specified.  Give priority to preserving
-                // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
-            }
-        }
-        else { // The file appears in both locations
-
-            const [leftHash, rightHash] = await BBPromise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
-            const filesAreIdentical = leftHash === rightHash;
-
-            if (filesAreIdentical) {
-                // When the files are identical, there should be no actions.
-            }
-            else if (this._actionPriority === ActionPriority.L_TO_R) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
-            }
-            else if (this._actionPriority === ActionPriority.R_TO_L) {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
-            }
-            else {
-                // No action priority specified.  Give priority to preserving
-                // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
-            }
-        }
-
-        return actions;
+        return this._files.rightFile;
     }
 
 
     public async isLeftOnly(): Promise<boolean>
     {
         const [leftExists, rightExists] = await BBPromise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
+            this._files.leftFile.exists(),
+            this._files.rightFile.exists()
         ]);
 
         return !!(leftExists && !rightExists);
@@ -315,8 +373,8 @@ export class DiffDirFileItem
     public async isRightOnly(): Promise<boolean>
     {
         const [leftExists, rightExists] = await BBPromise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
+            this._files.leftFile.exists(),
+            this._files.rightFile.exists()
         ]);
 
         return !!(!leftExists && rightExists);
@@ -326,8 +384,8 @@ export class DiffDirFileItem
     public async isInBoth(): Promise<boolean>
     {
         const [leftExists, rightExists] = await BBPromise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
+            this._files.leftFile.exists(),
+            this._files.rightFile.exists()
         ]);
 
         return !!(leftExists && rightExists);
@@ -337,8 +395,8 @@ export class DiffDirFileItem
     public async bothExistAndIdentical(): Promise<boolean>
     {
         const [leftExists, rightExists] = await BBPromise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
+            this._files.leftFile.exists(),
+            this._files.rightFile.exists()
         ]);
 
         if (!leftExists || !rightExists) {
@@ -348,8 +406,15 @@ export class DiffDirFileItem
 
         // Both files exist.  Return a value indicating whether they are
         // identical.
-        const [leftHash, rightHash] = await BBPromise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
+        const [leftHash, rightHash] = await BBPromise.all([this._files.leftFile.getHash(), this._files.rightFile.getHash()]);
         return leftHash === rightHash;
+    }
+
+
+    public async actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+    {
+        const actions = this._files.actions(actionPriority);
+        return actions;
     }
 }
 
@@ -370,7 +435,6 @@ export class DiffDirFileItem
 export async function diffDirectories(
     leftDir: Directory,
     rightDir: Directory,
-    actionPriority: ActionPriority,
     includeIdentical: boolean = false
 ): Promise<Array<DiffDirFileItem>>
 {
@@ -385,7 +449,7 @@ export async function diffDirectories(
     .then((leftFiles) => {
         const promises = _.map(leftFiles, (curLeftFile) => {
             const relativePath = path.relative(leftDir.toString(), curLeftFile.toString());
-            return DiffDirFileItem.create(leftDir, rightDir, relativePath, actionPriority);
+            return DiffDirFileItem.create(leftDir, rightDir, relativePath);
         });
         return BBPromise.all(promises);
     });
@@ -401,12 +465,12 @@ export async function diffDirectories(
     .then((rightFiles) => {
         const promises = _.map(rightFiles, (curRightFile) => {
             const relativePath = path.relative(rightDir.toString(), curRightFile.toString());
-            return DiffDirFileItem.create(leftDir, rightDir, relativePath, actionPriority);
+            return DiffDirFileItem.create(leftDir, rightDir, relativePath);
         });
         return BBPromise.all(promises);
     });
 
-    // Combine the left and right files.
+    // Combine the left and right files into a single array.
     let diffDirFileItems = _.concat(await leftPromise, await rightPromise);
 
     // If a file exists in both left and right, we don't want it to be

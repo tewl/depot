@@ -12,7 +12,7 @@ export enum ActionPriority {
 }
 
 
-export enum DiffDirFileItemActionType
+export enum FileCompareActionType
 {
     COPY_LEFT    = "copy left",
     COPY_RIGHT   = "copy right",
@@ -23,15 +23,15 @@ export enum DiffDirFileItemActionType
 }
 
 
-export class DiffDirFileItemAction
+export class FileCompareAction
 {
 
     private _files: IFilesToCompare;
-    private _actionType: DiffDirFileItemActionType;
+    private _actionType: FileCompareActionType;
 
     public constructor(
         files: IFilesToCompare,
-        actionType: DiffDirFileItemActionType
+        actionType: FileCompareActionType
     )
     {
         this._files      = files;
@@ -39,7 +39,7 @@ export class DiffDirFileItemAction
     }
 
 
-    public get type(): DiffDirFileItemActionType
+    public get type(): FileCompareActionType
     {
         return this._actionType;
     }
@@ -52,27 +52,27 @@ export class DiffDirFileItemAction
      */
     public execute(): Promise<void>
     {
-        if (this._actionType === DiffDirFileItemActionType.COPY_LEFT) {
+        if (this._actionType === FileCompareActionType.COPY_LEFT) {
             return this._files.rightFile.copy(this._files.leftFile)
             .then(() => {});
         }
-        else if (this._actionType === DiffDirFileItemActionType.COPY_RIGHT) {
+        else if (this._actionType === FileCompareActionType.COPY_RIGHT) {
             return this._files.leftFile.copy(this._files.rightFile)
             .then(() => { });
         }
-        else if (this._actionType === DiffDirFileItemActionType.DELETE_LEFT) {
+        else if (this._actionType === FileCompareActionType.DELETE_LEFT) {
             return this._files.leftFile.delete();
         }
-        else if (this._actionType === DiffDirFileItemActionType.DELETE_RIGHT) {
+        else if (this._actionType === FileCompareActionType.DELETE_RIGHT) {
             return this._files.rightFile.delete();
         }
-        else if (this._actionType === DiffDirFileItemActionType.DELETE_BOTH) {
+        else if (this._actionType === FileCompareActionType.DELETE_BOTH) {
             return BBPromise.all([
                 this._files.leftFile.delete(),
                 this._files.rightFile.delete()])
             .then(() => { });
         }
-        else if (this._actionType === DiffDirFileItemActionType.SKIP) {
+        else if (this._actionType === FileCompareActionType.SKIP) {
             return BBPromise.resolve();
         }
         else {
@@ -85,7 +85,7 @@ export interface IFilesToCompare
 {
     leftFile: File;
     rightFile: File;
-    actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+    actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>;
 }
 
 
@@ -169,7 +169,7 @@ export class FileComparer implements IFilesToCompare
         return leftHash === rightHash;
     }
 
-    public async actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+    public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
     {
         const [leftExists, rightExists] = await BBPromise.all([
             this._leftFile.exists(),
@@ -180,52 +180,52 @@ export class FileComparer implements IFilesToCompare
         const isRightOnly = !!(!leftExists && rightExists);
         const isInBoth = !!(leftExists && rightExists);
 
-        const actions: Array<DiffDirFileItemAction> = [];
+        const actions: Array<FileCompareAction> = [];
 
         if (isLeftOnly)
         {
             if (actionPriority === ActionPriority.L_TO_R)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_LEFT));
             }
             else if (actionPriority === ActionPriority.R_TO_L)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
             }
             else if (actionPriority === ActionPriority.PRESERVE)
             {
                 // No action priority specified.  Give priority to preserving
                 // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_LEFT));
             }
         }
         else if (isRightOnly)
         {
             if (actionPriority === ActionPriority.L_TO_R)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
             }
             else if (actionPriority === ActionPriority.R_TO_L)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_RIGHT));
             }
             else if (actionPriority === ActionPriority.PRESERVE)
             {
                 // No action priority specified.  Give priority to preserving
                 // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_RIGHT));
             }
         }
         else if (isInBoth)
@@ -239,26 +239,26 @@ export class FileComparer implements IFilesToCompare
             }
             else if (actionPriority === ActionPriority.L_TO_R)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_BOTH));
             }
             else if (actionPriority === ActionPriority.R_TO_L)
             {
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_BOTH));
             }
             else
             {
                 // No action priority specified.  Give priority to preserving
                 // files.
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_RIGHT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.COPY_LEFT));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.SKIP));
-                actions.push(new DiffDirFileItemAction(this, DiffDirFileItemActionType.DELETE_BOTH));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_RIGHT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.COPY_LEFT));
+                actions.push(new FileCompareAction(this, FileCompareActionType.SKIP));
+                actions.push(new FileCompareAction(this, FileCompareActionType.DELETE_BOTH));
             }
         }
 
@@ -411,7 +411,7 @@ export class DiffDirFileItem
     }
 
 
-    public async actions(actionPriority: ActionPriority): Promise<Array<DiffDirFileItemAction>>
+    public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
     {
         const actions = this._files.actions(actionPriority);
         return actions;

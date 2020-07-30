@@ -4,7 +4,7 @@ import * as BBPromise from "bluebird";
 import { tmpDir } from "../test/ut/specHelpers";
 import { File } from "./file";
 import { Directory } from "./directory";
-import { diffDirectories, ActionPriority, DiffDirFileItemActionType } from "./diffDirectories";
+import { diffDirectories, ActionPriority, FileCompareActionType } from "./diffDirectories";
 
 
 describe("diffDirectories()", async () => {
@@ -262,24 +262,24 @@ describe("diffDirectories()", async () => {
             expect(diffDirFileItems[0].relativeFilePath).toEqual("both.txt");
             let actions = await diffDirFileItems[0].actions(ActionPriority.L_TO_R);
             expect(actions.length).toEqual(4);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
-            expect(actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_RIGHT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.COPY_LEFT);
+            expect(actions[3].type).toEqual(FileCompareActionType.DELETE_BOTH);
 
             expect(diffDirFileItems[1].relativeFilePath).toEqual("leftOnly.txt");
             actions = await diffDirFileItems[1].actions(ActionPriority.L_TO_R);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_RIGHT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.DELETE_LEFT);
 
             expect(diffDirFileItems[2].relativeFilePath).toEqual("rightOnly.txt");
             actions = await diffDirFileItems[2].actions(ActionPriority.L_TO_R);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
+            expect(actions[0].type).toEqual(FileCompareActionType.DELETE_RIGHT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.COPY_LEFT);
         });
 
 
@@ -314,24 +314,24 @@ describe("diffDirectories()", async () => {
             expect(diffDirFileItems[0].relativeFilePath).toEqual("both.txt");
             let actions = await diffDirFileItems[0].actions(ActionPriority.R_TO_L);
             expect(actions.length).toEqual(4);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
-            expect(actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_LEFT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.COPY_RIGHT);
+            expect(actions[3].type).toEqual(FileCompareActionType.DELETE_BOTH);
 
             expect(diffDirFileItems[1].relativeFilePath).toEqual("leftOnly.txt");
             actions = await diffDirFileItems[1].actions(ActionPriority.R_TO_L);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
+            expect(actions[0].type).toEqual(FileCompareActionType.DELETE_LEFT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.COPY_RIGHT);
 
             expect(diffDirFileItems[2].relativeFilePath).toEqual("rightOnly.txt");
             actions = await diffDirFileItems[2].actions(ActionPriority.R_TO_L);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_LEFT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.DELETE_RIGHT);
         });
 
 
@@ -366,24 +366,24 @@ describe("diffDirectories()", async () => {
             expect(result[0].relativeFilePath).toEqual("both.txt");
             let actions = await result[0].actions(ActionPriority.PRESERVE);
             expect(actions.length).toEqual(4);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[3].type).toEqual(DiffDirFileItemActionType.DELETE_BOTH);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_RIGHT);
+            expect(actions[1].type).toEqual(FileCompareActionType.COPY_LEFT);
+            expect(actions[2].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[3].type).toEqual(FileCompareActionType.DELETE_BOTH);
 
             expect(result[1].relativeFilePath).toEqual("leftOnly.txt");
             actions = await result[1].actions(ActionPriority.PRESERVE);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_RIGHT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_LEFT);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_RIGHT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.DELETE_LEFT);
 
             expect(result[2].relativeFilePath).toEqual("rightOnly.txt");
             actions = await result[2].actions(ActionPriority.PRESERVE);
             expect(actions.length).toEqual(3);
-            expect(actions[0].type).toEqual(DiffDirFileItemActionType.COPY_LEFT);
-            expect(actions[1].type).toEqual(DiffDirFileItemActionType.SKIP);
-            expect(actions[2].type).toEqual(DiffDirFileItemActionType.DELETE_RIGHT);
+            expect(actions[0].type).toEqual(FileCompareActionType.COPY_LEFT);
+            expect(actions[1].type).toEqual(FileCompareActionType.SKIP);
+            expect(actions[2].type).toEqual(FileCompareActionType.DELETE_RIGHT);
         });
 
 

@@ -343,13 +343,13 @@ export class DiffDirFileItem
     }
 
 
-    public get leftFile(): undefined | File
+    public get leftFile(): File
     {
         return this._files.leftFile;
     }
 
 
-    public get rightFile(): undefined | File
+    public get rightFile(): File
     {
         return this._files.rightFile;
     }

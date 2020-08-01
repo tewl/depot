@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import { Directory } from "./directory";
 import {File} from "./file";
-import {Result, failureResult, successResult} from "./result";
 
 export enum ActionPriority {
     PRESERVE   = "preserve",

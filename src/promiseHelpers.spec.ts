@@ -2,9 +2,8 @@ import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-    delaySettle, zipWithAsyncValues} from "./promiseHelpers";
+    delaySettle, zipWithAsyncValues, filterAsync} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
-import { zipWith } from "lodash";
 
 
 describe("promisifyN()", () => {
@@ -789,25 +788,74 @@ describe("zipWithAsyncValues()", () => {
     });
 
 
-    it("will reject if obtaining any of the asynchronous values rejects", (done) => {
+    it("will reject if obtaining any of the asynchronous values rejects", (done) =>
+    {
         const src = [10, 31, 16];
 
-        const valueFunc = (curNum: number): Promise<number> => {
-            if (curNum % 2 === 0) {
+        const valueFunc = (curNum: number): Promise<number> =>
+        {
+            if (curNum % 2 === 0)
+            {
                 return getTimerPromise(curNum, curNum + 1);
             }
-            else {
+            else
+            {
                 return getTimerPromise(curNum, true)
-                .then(() => {
-                    throw new Error(`${curNum} rejected.`);
-                });
+                    .then(() =>
+                    {
+                        throw new Error(`${curNum} rejected.`);
+                    });
             }
         };
 
         zipWithAsyncValues(src, valueFunc)
-        .catch((err) => {
-            expect(err.message).toEqual("31 rejected.");
-            done();
-        });
+            .catch((err) =>
+            {
+                expect(err.message).toEqual("31 rejected.");
+                done();
+            });
     });
+});
+
+
+describe("filterAsync", () => {
+
+    it("will include values with truthy async values", async () => {
+        const src = [10, 31, 16];
+
+        const asyncIsEven = async (curNum: number): Promise<boolean> =>
+        {
+            return getTimerPromise(curNum, curNum % 2 === 0);
+        };
+
+        const result = await filterAsync(src, asyncIsEven);
+        expect(result[0]).toEqual(10);
+        expect(result[1]).toEqual(16);
+    });
+
+
+    it("will reject if any of the async predicate invocations rejects", (done) =>
+    {
+        const src = [10, 31, 16];
+
+        const asyncRejectIfOdd = async (curNum: number): Promise<boolean> =>
+        {
+            await getTimerPromise(curNum, curNum);
+
+            if (curNum % 2 === 0) {
+                return true;
+            }
+            else {
+                throw new Error(`${curNum} rejected.`);
+            }
+        };
+
+        filterAsync(src, asyncRejectIfOdd)
+            .catch((err) =>
+            {
+                expect(err.message).toEqual("31 rejected.");
+                done();
+            });
+    });
+
 });

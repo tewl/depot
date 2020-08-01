@@ -493,6 +493,16 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
     });
 }
 
+/**
+ * Zips values in `collection` into a tuple with the result of calling the async
+ * function.
+ * @param collection - The collection of items.
+ * @param asyncValueFunction - The async function that will be called for each
+ * item in the collection.
+ * @return A promise for an array of 2-element tuples.  The first item is the
+ * item from `collection` and the second item is the resolved value returned
+ * from `asyncValueFunction`.
+ */
 export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<[T, V]>>
 {
     const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
@@ -505,4 +515,22 @@ export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueF
     });
 
     return pairs;
+}
+
+
+/**
+ * Filters a collection based on the result of an asynchronous predicate.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in collection.  Returns a truthy or falsy value indicating whether the
+ * collection item should be included.
+ * @return A promise for an array of collection items for which the async
+ * predicate returned a truthy value.
+ */
+export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>> {
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+    return _.chain(pairs)
+    .filter((curPair) => !!curPair[1])
+    .map((curPair) => curPair[0])
+    .value();
 }

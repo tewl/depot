@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import { Directory } from "./directory";
 import {File} from "./file";
-
+import {Result, failureResult, successResult} from "./result";
 
 export enum ActionPriority {
     PRESERVE   = "preserve",
@@ -281,29 +281,26 @@ export class DiffDirFileItem
      *     actions associated with this file item can be prioritized
      * @return A newly created DiffDirFileItem instance
      */
-    public static async create(
+    public static create(
         leftRootDir:      Directory,
         rightRootDir:     Directory,
         relativeFilePath: string
-        ): Promise<DiffDirFileItem>
+        ): Result<DiffDirFileItem, void>
     {
-        // TODO: Need to find references to this static function and update them
-        // because this method is now asynchronous.
-
         // The relative file path must be legit.
         if (relativeFilePath.length === 0) {
-            return BBPromise.reject(new Error(`DiffDirFileItem relative file path cannot be 0-length.`));
+            return failureResult(undefined, `DiffDirFileItem relative file path cannot be 0-length.`);
         }
 
         const leftFile = new File(leftRootDir, relativeFilePath);
         const rightFile = new File(rightRootDir, relativeFilePath);
 
-        return new DiffDirFileItem(
+        return successResult(new DiffDirFileItem(
             leftRootDir,
             rightRootDir,
             relativeFilePath,
             FileComparer.create(leftFile, rightFile)
-        );
+        ));
     }
 
 
@@ -447,11 +444,19 @@ export async function diffDirectories(
         () => []     // Left directory does not exist.
     )
     .then((leftFiles) => {
-        const promises = _.map(leftFiles, (curLeftFile) => {
-            const relativePath = path.relative(leftDir.toString(), curLeftFile.toString());
-            return DiffDirFileItem.create(leftDir, rightDir, relativePath);
-        });
-        return BBPromise.all(promises);
+        return _.reduce<File, Array<DiffDirFileItem>>(
+            leftFiles,
+            (acc, curLeftFile) =>
+            {
+                const result = DiffDirFileItem.create(leftDir, rightDir, path.relative(leftDir.toString(), curLeftFile.toString()));
+                if (result.success)
+                {
+                    acc.push(result.value);
+                }
+                return acc;
+            },
+            []
+        );
     });
 
     //
@@ -463,18 +468,26 @@ export async function diffDirectories(
         () => []    // Right directory does not exist.
     )
     .then((rightFiles) => {
-        const promises = _.map(rightFiles, (curRightFile) => {
-            const relativePath = path.relative(rightDir.toString(), curRightFile.toString());
-            return DiffDirFileItem.create(leftDir, rightDir, relativePath);
-        });
-        return BBPromise.all(promises);
+        return _.reduce<File, Array<DiffDirFileItem>>(
+            rightFiles,
+            (acc, curRightFile) =>
+            {
+                const result = DiffDirFileItem.create(leftDir, rightDir, path.relative(rightDir.toString(), curRightFile.toString()));
+                if (result.success)
+                {
+                    acc.push(result.value);
+                }
+                return acc;
+            },
+            []
+        );
     });
 
     // Combine the left and right files into a single array.
-    let diffDirFileItems = _.concat(await leftPromise, await rightPromise);
+    let diffDirFileItems: Array<DiffDirFileItem> = _.concat<DiffDirFileItem>(await leftPromise, await rightPromise);
 
     // If a file exists in both left and right, we don't want it to be
-    // represented twice.  So make the list unique based on the files relative
+    // represented twice.  So make the list unique based on the file's relative
     // path.
     diffDirFileItems = _.uniqBy(diffDirFileItems, (curDiffDirFileItem) => curDiffDirFileItem.relativeFilePath);
 

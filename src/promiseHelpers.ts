@@ -527,10 +527,61 @@ export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueF
  * @return A promise for an array of collection items for which the async
  * predicate returned a truthy value.
  */
-export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>> {
+export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+{
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
     return _.chain(pairs)
     .filter((curPair) => !!curPair[1])
     .map((curPair) => curPair[0])
     .value();
+}
+
+
+/**
+ * Partitions a collection into two collections based on the result of invoking
+ * an asynchronous predicate on each item.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in the collection.  Returns a truthy or falsy value indicating whether the
+ * collection belongs in the first array or second array.
+ * @return A promise for a 2-item tuple. The first item is an array for which
+ * the predicate resolved to a truthy value.  The second item is an array for
+ * which the predicate resolved to a falsy value.
+ */
+export async function partitionAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<[Array<T>, Array<T>]>
+{
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+
+    const [truthyPairs, falsyPairs] = _.partition(pairs, (curPair) => !!curPair[1]);
+    return [
+        _.map(truthyPairs, (curPair) => curPair[0]),
+        _.map(falsyPairs, (curPair) => curPair[0])
+    ];
+
+}
+
+
+/**
+ * Removes items from a collection based on the result of an asynchronous predicate.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in collection.  Returns a truthy or falsy value indicating whether the
+ * collection item should be removed.
+ * @return A promise for an array of collection items that have been removed.
+ */
+export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+{
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+
+    const removed: Array<T> = [];
+    for (let i = 0; i < pairs.length; i++) {
+        const curPair = pairs[i];
+        if (curPair[1]) {
+            // Remove the current item.
+            removed.push(curPair[0]);
+            collection.splice(i, 1);
+        }
+    }
+
+    return removed;
 }

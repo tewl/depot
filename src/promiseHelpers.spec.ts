@@ -2,7 +2,7 @@ import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-    delaySettle, zipWithAsyncValues, filterAsync} from "./promiseHelpers";
+    delaySettle, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
 
 
@@ -854,6 +854,111 @@ describe("filterAsync", () => {
             .catch((err) =>
             {
                 expect(err.message).toEqual("31 rejected.");
+                done();
+            });
+    });
+
+});
+
+
+describe("partitionAsync", () =>
+{
+
+    it("will separate values based on the result of the async predicate", async () =>
+    {
+        const src = [10, 31, 16];
+
+        const asyncIsEven = async (curNum: number): Promise<boolean> =>
+        {
+            return getTimerPromise(curNum, curNum % 2 === 0);
+        };
+
+        const [evens, odds] = await partitionAsync(src, asyncIsEven);
+        expect(evens.length).toEqual(2);
+        expect(evens[0]).toEqual(10);
+        expect(evens[1]).toEqual(16);
+
+        expect(odds.length).toEqual(1);
+        expect(odds[0]).toEqual(31);
+    });
+
+
+    it("will reject if any of the async predicate invocations rejects", (done) =>
+    {
+        const src = [10, 31, 16];
+
+        const asyncRejectIfOdd = async (curNum: number): Promise<boolean> =>
+        {
+            await getTimerPromise(curNum, curNum);
+
+            if (curNum % 2 === 0)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Error(`${curNum} rejected.`);
+            }
+        };
+
+        partitionAsync(src, asyncRejectIfOdd)
+            .catch((err) =>
+            {
+                expect(err.message).toEqual("31 rejected.");
+                done();
+            });
+    });
+
+});
+
+
+
+describe("removeAsync", () =>
+{
+
+    it("will remove values for which the async predicate resolves truthy", async () =>
+    {
+        const src = [10, 31, 16];
+
+        const asyncIsOdd = (curNum: number): Promise<boolean> =>
+        {
+            return getTimerPromise(curNum, curNum % 2 === 1);
+        };
+
+        const removed = await removeAsync(src, asyncIsOdd);
+        expect(removed.length).toEqual(1);
+        expect(removed[0]).toEqual(31);
+
+        expect(src.length).toEqual(2);
+        expect(src[0]).toEqual(10);
+        expect(src[1]).toEqual(16);
+    });
+
+
+    it("will reject if any of the async predicate invocations rejects", (done) =>
+    {
+        const src = [10, 31, 16];
+
+        const asyncRejectIfOdd = async (curNum: number): Promise<boolean> =>
+        {
+            await getTimerPromise(curNum, curNum);
+
+            if (curNum % 2 === 0)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Error(`${curNum} rejected.`);
+            }
+        };
+
+        removeAsync(src, asyncRejectIfOdd)
+            .catch((err) =>
+            {
+                expect(err.message).toEqual("31 rejected.");
+                // `src` should be unmodified.
+                expect(src.length).toEqual(3);
                 done();
             });
     });

@@ -492,3 +492,17 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
         .catch(() => { throw err; });
     });
 }
+
+export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<[T, V]>>
+{
+    const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
+    const values = await BBPromise.all(promises);
+
+    const pairs: Array<[T, V]> = [];
+    _.forEach(collection, (curItem, index) =>
+    {
+        pairs.push([curItem, values[index]]);
+    });
+
+    return pairs;
+}

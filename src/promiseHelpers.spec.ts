@@ -2,8 +2,9 @@ import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-    delaySettle} from "./promiseHelpers";
+    delaySettle, zipWithAsyncValues} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
+import { zipWith } from "lodash";
 
 
 describe("promisifyN()", () => {
@@ -770,4 +771,43 @@ describe("delaySettle()", () => {
     });
 
 
+});
+
+
+describe("zipWithAsyncValues()", () => {
+
+    it("will resolve with the expected tuples when all async values are successfully gotten.", async () => {
+        const src = [10, 30, 15];
+
+        const pairs = await zipWithAsyncValues(src, async (curNum) => {
+            return getTimerPromise(curNum, curNum + 1);
+        });
+
+        expect(pairs[0]).toEqual([10, 11]);
+        expect(pairs[1]).toEqual([30, 31]);
+        expect(pairs[2]).toEqual([15, 16]);
+    });
+
+
+    it("will reject if obtaining any of the asynchronous values rejects", (done) => {
+        const src = [10, 31, 16];
+
+        const valueFunc = (curNum: number): Promise<number> => {
+            if (curNum % 2 === 0) {
+                return getTimerPromise(curNum, curNum + 1);
+            }
+            else {
+                return getTimerPromise(curNum, true)
+                .then(() => {
+                    throw new Error(`${curNum} rejected.`);
+                });
+            }
+        };
+
+        zipWithAsyncValues(src, valueFunc)
+        .catch((err) => {
+            expect(err.message).toEqual("31 rejected.");
+            done();
+        });
+    });
 });

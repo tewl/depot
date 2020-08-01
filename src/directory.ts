@@ -537,15 +537,15 @@ export class Directory
 
 
     /**
-     * Copies this directory to destDir.
+     * Copies this directory to `destDir`.
      * @param destDir - The destination directory
      * @param copyRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      * @return A promise that is resolved with a Directory object representing
-     * the destination directory.  If copyRoot is false, this will be destDir.
+     * the destination directory.  If copyRoot is false, this will be `destDir`.
      * If copyRoot is true, this will be this Directory's counterpart
-     * subdirectory in destDir.
+     * subdirectory in `destDir`.
      */
     public copy(destDir: Directory, copyRoot: boolean): Promise<Directory>
     {
@@ -585,11 +585,11 @@ export class Directory
 
 
     /**
-     * Copies this directory to destDir.
+     * Copies this directory to `destDir`.
      * @param destDir - The destination directory
      * @param copyRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      */
     public copySync(destDir: Directory, copyRoot: boolean): Directory
     {
@@ -621,15 +621,15 @@ export class Directory
 
 
     /**
-     * Moves this Directory or the contents of this Directory to destDir.
+     * Moves this Directory or the contents of this Directory to `destDir`.
      * @param destDir - The destination directory
      * @param moveRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      * @return A promise that is resolved with a Directory object representing
-     * the destination directory.  If moveRoot is false, this will be destDir.
+     * the destination directory.  If moveRoot is false, this will be `destDir`.
      * If moveRoot is true, this will be this Directory's counterpart
-     * subdirectory in destDir.
+     * subdirectory in `destDir`.
      */
     public move(destDir: Directory, moveRoot: boolean): Promise<Directory>
     {

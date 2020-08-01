@@ -285,22 +285,22 @@ export class DiffDirFileItem
         leftRootDir:      Directory,
         rightRootDir:     Directory,
         relativeFilePath: string
-        ): Result<DiffDirFileItem, void>
+    ): DiffDirFileItem
     {
         // The relative file path must be legit.
         if (relativeFilePath.length === 0) {
-            return failureResult(undefined, `DiffDirFileItem relative file path cannot be 0-length.`);
+            throw new Error(`DiffDirFileItem relative file path cannot be 0-length.`);
         }
 
         const leftFile = new File(leftRootDir, relativeFilePath);
         const rightFile = new File(rightRootDir, relativeFilePath);
 
-        return successResult(new DiffDirFileItem(
+        return new DiffDirFileItem(
             leftRootDir,
             rightRootDir,
             relativeFilePath,
             FileComparer.create(leftFile, rightFile)
-        ));
+        );
     }
 
 
@@ -444,18 +444,9 @@ export async function diffDirectories(
         () => []     // Left directory does not exist.
     )
     .then((leftFiles) => {
-        return _.reduce<File, Array<DiffDirFileItem>>(
+        return _.map(
             leftFiles,
-            (acc, curLeftFile) =>
-            {
-                const result = DiffDirFileItem.create(leftDir, rightDir, path.relative(leftDir.toString(), curLeftFile.toString()));
-                if (result.success)
-                {
-                    acc.push(result.value);
-                }
-                return acc;
-            },
-            []
+            (curLeftFile) => DiffDirFileItem.create(leftDir, rightDir, path.relative(leftDir.toString(), curLeftFile.toString()))
         );
     });
 
@@ -468,18 +459,9 @@ export async function diffDirectories(
         () => []    // Right directory does not exist.
     )
     .then((rightFiles) => {
-        return _.reduce<File, Array<DiffDirFileItem>>(
+        return _.map(
             rightFiles,
-            (acc, curRightFile) =>
-            {
-                const result = DiffDirFileItem.create(leftDir, rightDir, path.relative(rightDir.toString(), curRightFile.toString()));
-                if (result.success)
-                {
-                    acc.push(result.value);
-                }
-                return acc;
-            },
-            []
+            (curRightFile) => DiffDirFileItem.create(leftDir, rightDir, path.relative(rightDir.toString(), curRightFile.toString()))
         );
     });
 

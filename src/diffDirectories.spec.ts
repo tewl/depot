@@ -5,6 +5,7 @@ import { tmpDir } from "../test/ut/specHelpers";
 import { File } from "./file";
 import { Directory } from "./directory";
 import { diffDirectories, ActionPriority, FileCompareActionType } from "./diffDirectories";
+import {mapAsync} from "./promiseHelpers";
 
 
 describe("diffDirectories()", async () => {
@@ -287,12 +288,11 @@ describe("diffDirectories()", async () => {
             const diffDirFileItems = await diffDirectories(leftDir, rightDir);
 
             expect(diffDirFileItems.length).toEqual(3);
-            const promises = _.map(diffDirFileItems, async (curDiffDirFileItem) => {
+
+            await mapAsync(diffDirFileItems, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.L_TO_R))[0].execute();
             });
-
-            await BBPromise.all(promises);
 
             // Check the state of the left directory.  It should be unchanged.
             expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");
@@ -339,12 +339,10 @@ describe("diffDirectories()", async () => {
             const result = await diffDirectories(leftDir, rightDir);
 
             expect(result.length).toEqual(3);
-            const promises = _.map(result, async (curDiffDirFileItem) => {
+            await mapAsync(result, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.R_TO_L))[0].execute();
             });
-
-            await BBPromise.all(promises);
 
             // Check the state of the left directory.
             expect(new File(leftDir, "leftOnly.txt").existsSync()).toEqual(undefined);   // deleted
@@ -391,12 +389,10 @@ describe("diffDirectories()", async () => {
             const result = await diffDirectories(leftDir, rightDir);
 
             expect(result.length).toEqual(3);
-            const promises = _.map(result, async (curDiffDirFileItem) => {
+            await mapAsync(result, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.PRESERVE))[0].execute();
             });
-
-            await BBPromise.all(promises);
 
             // Check the state of the left directory.
             expect(new File(leftDir, "leftOnly.txt").readSync()).toEqual("leftOnly");    // unchanged

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
-import {promiseWhile, sequence} from "./promiseHelpers";
+import {promiseWhile, sequence, mapAsync} from "./promiseHelpers";
 import {generateUuid} from "./uuid";
 import {SerializationRegistry} from "./serializationRegistry";
 
@@ -201,12 +201,11 @@ export abstract class AStore<StowType>
 
         // Second pass:  Run all completion functions so that each object can
         // set its references to other objects.
-        const promises = _.map(completionFuncs, (curCompletionFunc) => {
+        await mapAsync(completionFuncs, (curCompletionFunc) => {
             // Wrap the return value from each completion function in a promise
             // in the event the function returns void instead of Promise<void>.
             return BBPromise.resolve(curCompletionFunc(deserializedSoFar));
         });
-        await BBPromise.all(promises);
 
         return {
             obj: deserialized as T,

@@ -3,7 +3,7 @@ import * as path from "path";
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {File} from "./file";
-import {promisify1, sequence} from "./promiseHelpers";
+import {promisify1, sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
 
 
@@ -403,7 +403,7 @@ export class Directory
 
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
-            const promises = fsEntryPaths.map((curPath) => {
+            return mapAsync(fsEntryPaths, (curPath) => {
                 return lstatAsync(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {
@@ -413,9 +413,7 @@ export class Directory
                     }
                     // Note: We are ignoring symbolic links here.
                 });
-            });
-
-            return BBPromise.all(promises)
+            })
             .then(() => {
                 return contents;
             });
@@ -490,7 +488,7 @@ export class Directory
     {
         return this.contents()
         .then((contents) => {
-            const promises = contents.subdirs.map((curSubdir) => {
+            return mapAsync(contents.subdirs, (curSubdir) => {
                 //
                 // Prune the current subdirectory.
                 //
@@ -506,9 +504,7 @@ export class Directory
                         return curSubdir.delete();
                     }
                 });
-            });
-
-            return BBPromise.all(promises)
+            })
             .then(() => {
             });
         });

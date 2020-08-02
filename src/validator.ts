@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import * as BBPromise from "bluebird";
+import {mapAsync} from "./promiseHelpers";
 
 
 /**
@@ -44,13 +45,11 @@ export class Validator<SubjectType>
      */
     public isValid(subject: SubjectType): Promise<boolean>
     {
-        const promises: Array<Promise<boolean>> = _.map(this._validatorFuncs, (curValidatorFunc) => {
+        return mapAsync(this._validatorFuncs, (curValidatorFunc) => {
             const result: Promise<boolean> | boolean = curValidatorFunc(subject);
             // Wrap each return value in a Promise.
             return BBPromise.resolve(result);
-        });
-
-        return BBPromise.all<boolean>(promises)
+        })
         .then((validationResults: Array<boolean>) => {
             // Return true only if every validator returned true.
             return _.every(validationResults);

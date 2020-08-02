@@ -493,6 +493,21 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
     });
 }
 
+
+/**
+ * Maps values in `collection` using an async function.
+ * @param collection - The collection of items to iterate over.
+ * @param asyncValueFunc - The async mapping function.
+ * @return A promise for an array of the resulting mapped values.
+ */
+export async function mapAsync<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<V>>
+{
+    const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
+    const values = await BBPromise.all(promises);
+    return values;
+}
+
+
 /**
  * Zips values in `collection` into a tuple with the result of calling the async
  * function.
@@ -505,8 +520,7 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
  */
 export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<[T, V]>>
 {
-    const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
-    const values = await BBPromise.all(promises);
+    const values = await mapAsync(collection, (curItem) => asyncValueFunc(curItem));
 
     const pairs: Array<[T, V]> = [];
     _.forEach(collection, (curItem, index) =>

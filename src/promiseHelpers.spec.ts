@@ -2,7 +2,7 @@ import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
     retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-    delaySettle, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
+    delaySettle, mapAsync, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
 import * as BBPromise from "bluebird";
 
 
@@ -770,6 +770,55 @@ describe("delaySettle()", () => {
     });
 
 
+});
+
+
+describe("mapAsync()", () =>
+{
+
+    it("will resolve with the expected values when all async values are successfully gotten.", async () =>
+    {
+        const src = [10, 30, 15];
+
+        const mappedValues = await mapAsync(src, async (curNum) =>
+        {
+            return getTimerPromise(curNum, curNum + 1);
+        });
+
+        expect(mappedValues.length).toEqual(3);
+        expect(mappedValues[0]).toEqual(11);
+        expect(mappedValues[1]).toEqual(31);
+        expect(mappedValues[2]).toEqual(16);
+    });
+
+
+    it("will reject if obtaining any of the asynchronous values rejects", (done) =>
+    {
+        const src = [10, 31, 16];
+
+        const valueFunc = (curNum: number): Promise<number> =>
+        {
+            if (curNum % 2 === 0)
+            {
+                return getTimerPromise(curNum, curNum + 1);
+            }
+            else
+            {
+                return getTimerPromise(curNum, true)
+                    .then(() =>
+                    {
+                        throw new Error(`${curNum} rejected.`);
+                    });
+            }
+        };
+
+        mapAsync(src, valueFunc)
+            .catch((err) =>
+            {
+                expect(err.message).toEqual("31 rejected.");
+                done();
+            });
+    });
 });
 
 

@@ -5,6 +5,8 @@ import * as BBPromise from "bluebird";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {getOs, OperatingSystem} from "./os";
+import {mapAsync} from "./promiseHelpers";
+
 
 const NODEJS_SHEBANG = "#!/usr/bin/env node";
 
@@ -50,8 +52,7 @@ export function makeAllJsScriptsExecutable(dir: Directory, recursive: boolean = 
     return dir.contents(recursive)
     .then((contents) => {
         const scriptFiles = _.filter(contents.files, (curFile) => curFile.extName === ".js");
-        const promises = _.map(scriptFiles, (curScriptFile) => makeNodeScriptExecutable(curScriptFile));
-        return BBPromise.all(promises)
+        return mapAsync(scriptFiles, (curScriptFile) => makeNodeScriptExecutable(curScriptFile))
         .then(() => {
             return scriptFiles;
         });

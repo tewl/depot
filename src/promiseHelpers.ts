@@ -275,8 +275,8 @@ export function streamToPromise(stream: Writable): Promise<void> {
 
 /**
  * Adapts a promise-returning function into a promise-returning function that
- * will retry the operation up to maxNumAttempts times before rejecting.
- * Retries are performed using exponential backoff.
+ * will retry the operation up to `maxNumAttempts` times before rejecting.
+ * Retries are performed using exponential back off.
  *
  * @param theFunc - The promise-returning function that will be retried multiple
  * times
@@ -287,7 +287,7 @@ export function streamToPromise(stream: Writable): Promise<void> {
  *
  * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
- * returned by theFunc rejects, it will be retried up to maxNumAttempts
+ * returned by theFunc rejects, it will be retried up to `maxNumAttempts`
  * invocations.  If the Promise returned by the last invocation of theFunc
  * rejects, the returned Promise will be rejected with the same value.
  */
@@ -303,8 +303,8 @@ export function retry<ResolveType>(
 /**
  * Adapts a promise-returning function into a promise-returning function that
  * will continue to retry the operation as long as whilePredicate returns true
- * up to maxNumAttempts attempts before rejecting.  Retries are performed using
- * exponential backoff.
+ * up to `maxNumAttempts` attempts before rejecting.  Retries are performed using
+ * exponential back off.
  *
  * @param theFunc - The promise-returning function that will be retried multiple
  * times
@@ -319,7 +319,7 @@ export function retry<ResolveType>(
  *
  * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
- * returned by theFunc rejects, it will be retried up to maxNumAttempts
+ * returned by theFunc rejects, it will be retried up to `maxNumAttempts`
  * invocations.  If the Promise returned by the last invocation of theFunc
  * rejects, the returned Promise will be rejected with the same value.
  */
@@ -334,7 +334,7 @@ export function retryWhile<ResolveType>(
 
 /**
  * The value that will be multiplied by successively higher powers of 2 when
- * calculating delay time during exponential backoff.
+ * calculating delay time during exponential back off.
  */
 const BACKOFF_MULTIPLIER: number = 20;
 

@@ -588,9 +588,11 @@ export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curV
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 
     const removed: Array<T> = [];
-    for (let i = 0; i < pairs.length; i++) {
+    for (let i = pairs.length - 1; i >= 0; i--)
+    {
         const curPair = pairs[i];
-        if (curPair[1]) {
+        if (!!curPair[1])
+        {
             // Remove the current item.
             removed.push(curPair[0]);
             collection.splice(i, 1);

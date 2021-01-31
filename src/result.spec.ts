@@ -1,53 +1,100 @@
-import {Result, failureResult} from "./result";
+import { assertNever } from "./never";
+import {Result, succeededResult, failedResult, succeeded, failed} from "./result";
 
 
-//
-// The Result type is purely a compile-time feature.  The following unit tests
-// do not really exercise any behaviors.  These tests are just a convenient
-// place to write code that uses the Result type to ensure that the TypeScript
-// compiler issues the expected errors.
-//
+////////////////////////////////////////////////////////////////////////////////
+// Test Infrastructure
 
-type FailureIds = "ERROR_1" | "ERROR_2" | "ERROR_3";
-
-
-function failingOperation(): Result<void, FailureIds> {
-    return failureResult<FailureIds>("ERROR_1", "Error 1");
+enum OperationError
+{
+    TIMEOUT,
+    SERVICE_NOT_AVAILABLE
 }
 
+const successfulOperation = (): Result<number, OperationError> =>
+{
+    return succeededResult(5);
+};
 
-function successfulOperation(): Result<number, FailureIds> {
-    return {
-        success: true,
-        value:     5
-    };
-}
+const failureOperation = (): Result<number, OperationError> =>
+{
+    return failedResult(OperationError.SERVICE_NOT_AVAILABLE);
+};
 
-
-describe("Result", () => {
-
-
-    it("will have the expected fields upon failure", () => {
-        const result = failingOperation();
-        if (result.success) {
-            fail("The operation should not have succeeded");
-            return;
-        }
-
-        expect(result.errorId).toEqual("ERROR_1");
-    });
+////////////////////////////////////////////////////////////////////////////////
 
 
-    it("will have the expected fields upon success", () => {
+describe("example", () => {
+
+    it("of exhaustiveness checking", () =>
+    {
         const result = successfulOperation();
-        if (!result.success) {
-            fail("The operation should have succeeded.");
-            return;
+        switch (result.state)
+        {
+            case "succeeded":
+                break;
+
+            // Commenting out the following case will cause a compiler error for
+            // the call to assertNever() below.
+            case "failed":
+                break;
+
+            default:
+                return assertNever(result);
         }
-
-        expect(result.value).toEqual(5);
     });
+});
 
+
+describe("succeededResult()", () => {
+
+    it("returns an object describing a successful result", () => {
+        const result = succeededResult(5);
+        expect(result.state).toEqual("succeeded");
+        expect(result.result).toEqual(5);
+    });
 
 });
 
+
+describe("failedResult()", () => {
+
+    it("returns an object describing a failed result", () => {
+        const result = failedResult(3);
+        expect(result.state).toEqual("failed");
+        expect(result.error).toEqual(3);
+    });
+
+});
+
+
+describe("succeeded()", () => {
+
+    it("returns true when given a successful result", () => {
+        const result = successfulOperation();
+        expect(succeeded(result)).toBeTruthy();
+    });
+
+
+    it("returns false when given a failure result", () => {
+        const result = failureOperation();
+        expect(succeeded(result)).toBeFalsy();
+    });
+
+});
+
+
+describe("failed()", () => {
+
+    it("returns true when given a failure result", async () => {
+        const result = failureOperation();
+        expect(failed(result)).toBeTruthy();
+    });
+
+
+    it("returns false when given a successful result", () => {
+        const result = successfulOperation();
+        expect(failed(result)).toBeFalsy();
+    });
+
+});

@@ -215,6 +215,48 @@ describe("File", () => {
         });
 
 
+        describe("getSiblingFiles()", () => {
+
+            beforeEach(() =>
+            {
+                tmpDir.emptySync();
+            });
+
+            it("rejects when called on a nonexistant file", (done) => {
+                const file = new File(tmpDir, "foo.txt");
+                file.getSiblingFiles()
+                .catch((err) => {
+                    done();
+                })
+            });
+
+
+            it("resolves with expected sibling files and they contain expected path", async () => {
+
+                const subDir = new Directory(tmpDir, "subdir");
+                await subDir.ensureExists();
+
+                const fileA = new File(subDir, "a.txt");
+                const fileB = new File(subDir, "b.txt");
+                const fileC = new File(subDir, "c.txt");
+                const fileD = new File(subDir, "d.txt");
+
+                fileA.writeSync("fileA");
+                fileB.writeSync("fileB");
+                fileC.writeSync("fileC");
+                fileD.writeSync("fileD");
+
+                const siblingFiles = await fileB.getSiblingFiles();
+                expect(siblingFiles.length).toEqual(3);
+
+                const siblingPaths = _.map(siblingFiles, (curFile) => curFile.toString());
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "a.txt"));
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "c.txt"));
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "d.txt"));
+            });
+        });
+
+
         describe("chmod()", () => {
 
             const testFile = new File(tmpDir, "test.txt");

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import * as _ from "lodash";
 import * as BBPromise from "bluebird";
 import {ListenerTracker} from "./listenerTracker";
 import {promisify1} from "./promiseHelpers";
@@ -155,6 +156,34 @@ export class File
                 throw err;
             }
         }
+    }
+
+
+    /**
+     * Gets the other files in the same directory as this file.
+     * @return A promise that resolves with an array of sibling files.  This
+     * promise will reject if this file does not exist.  The relative/absolute
+     * nature of the returned files' path will match that of this file.
+     */
+    public getSiblingFiles(): Promise<Array<File>>
+    {
+        return this.exists()
+        .then((stats) => {
+            if (stats === undefined) {
+                throw new Error(`Cannot get sibling files for non existent file ${this.absPath}`);
+            }
+
+            const parentDir = this.directory;
+            return parentDir.contents(false);
+        })
+        .then((dirContents) => {
+
+            const thisFileName = this.fileName;
+
+            const allFiles = dirContents.files;
+            const siblingFiles = _.filter(allFiles, (curFile) => curFile.fileName !== thisFileName);
+            return siblingFiles;
+        });
     }
 
 

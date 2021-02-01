@@ -185,7 +185,8 @@ export class File
      * fs.constants.S_I*.
      * @return A promise for this file (for easy chaining)
      */
-    public chmodSync(mode: number): void {
+    public chmodSync(mode: number): void
+    {
         fs.chmodSync(this._filePath, mode);
     }
 
@@ -577,7 +578,8 @@ export class File
      * `openssl list-message-digest-algorithms`.
      * @return A hexadecimal string containing the hash
      */
-    public getHashSync(algorithm: string = "md5"): string {
+    public getHashSync(algorithm: string = "md5"): string
+    {
         const fileData = fs.readFileSync(this._filePath);
         const hash = crypto.createHash(algorithm);
         hash.update(fileData);

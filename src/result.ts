@@ -10,7 +10,7 @@
 export interface ISucceededResult<TSuccess>
 {
     state: "succeeded";
-    result: TSuccess;
+    value: TSuccess;
 }
 
 
@@ -42,9 +42,9 @@ export type Result<TSuccess, TError> = ISucceededResult<TSuccess> | IFailedResul
  * @param result - The success value that will be wrapped
  * @return The successful Result instance
  */
-export function succeededResult<TSuccess>(result: TSuccess): ISucceededResult<TSuccess>
+export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess>
 {
-    return { state: "succeeded", result: result};
+    return { state: "succeeded", value: value};
 }
 
 

@@ -51,7 +51,7 @@ describe("succeededResult()", () => {
     it("returns an object describing a successful result", () => {
         const result = succeededResult(5);
         expect(result.state).toEqual("succeeded");
-        expect(result.result).toEqual(5);
+        expect(result.value).toEqual(5);
     });
 
 });

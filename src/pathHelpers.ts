@@ -13,6 +13,14 @@ export function reducePathParts(pathParts: Array<PathPart>): string
         {
             return curPathPart.toString();
         }
-        return path.join(acc, curPathPart.toString());
+
+        const curPathPartStr = curPathPart.toString();
+
+        // If we are starting with a Windows drive letter, just return it.
+        if (acc.length === 0 && _.endsWith(curPathPartStr, ":")) {
+            return curPathPart;
+        }
+
+        return path.join(acc, curPathPartStr);
     }, "");
 }

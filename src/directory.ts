@@ -63,8 +63,16 @@ export class Directory
         const allParts: Array<PathPart> = [pathPart].concat(pathParts);
         this._dirPath = reducePathParts(allParts);
 
+        if (this._dirPath === "\\" || this._dirPath === "/")
+        {
+            // The path begins with a directory separator, which means that it
+            // is a relative path starting from the root of the drive.
+            this._dirPath = path.resolve(this._dirPath);
+        }
+
         // Remove trailing directory separator characters.
-        while (_.endsWith(this._dirPath, path.sep)) {
+        while ((this._dirPath.length > 1) &&
+               _.endsWith(this._dirPath, path.sep)) {
             this._dirPath = this._dirPath.slice(0, -1);
         }
     }
@@ -98,12 +106,54 @@ export class Directory
 
 
     /**
+     * Gets the parent directory of this directory, if one exists.
+     * @return This directory's parent directory.  undefined is returned if this
+     * directory is the root of a drive.
+     */
+    public parentDir(): undefined | Directory
+    {
+        const absPath = this.absPath();
+        const parts = _.split(absPath, path.sep);
+
+        // If the directory separator was not found, the split will result in a
+        // 1-element array.  If this is the case, this directory is the root of
+        // the drive.
+        if (parts.length === 1) {
+            return undefined;
+        }
+
+        const parentParts = _.dropRight(parts);
+        const [first, ...rest] = parentParts;
+        const firstDir = new Directory(first);
+        const parentDir = new Directory(firstDir, ...rest);
+        return parentDir;
+    }
+
+
+    /**
+     * Determines whether this directory is the root of a drive.
+     * @return true if this directory is the root of a drive.  false otherwise.
+     */
+    public isRoot(): boolean
+    {
+        return this.parentDir() === undefined;
+    }
+
+
+    /**
      * Gets the absolute path of this Directory.
      * @return The absolute path of this Directory
      */
     public absPath(): string
     {
-        return path.resolve(this._dirPath);
+        if (this._dirPath[1] === ":") {
+            // The path is a Windows path that already has a drive letter at the
+            // beginning.  It is already absolute.
+            return this._dirPath;
+        }
+        else {
+            return path.resolve(this._dirPath);
+        }
     }
 
 
@@ -412,6 +462,10 @@ export class Directory
                         contents.subdirs.push(new Directory(curPath));
                     }
                     // Note: We are ignoring symbolic links here.
+                })
+                .catch((err) => {
+                    // We failed to stat the current item.  This is probably a
+                    // permissions error.  Pretend like it's not here.
                 });
             })
             .then(() => {

@@ -227,7 +227,7 @@ describe("File", () => {
                 file.getSiblingFiles()
                 .catch((err) => {
                     done();
-                })
+                });
             });
 
 

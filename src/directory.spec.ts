@@ -64,13 +64,20 @@ describe("Directory", () => {
 
             it("will return / for the name of the filesystem root", () => {
                 const root = new Directory("/");
-                expect(root.dirName).toEqual("/");
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(root.dirName).toEqual("C:");
+                }
+                else {
+                    expect(root.dirName).toEqual("/");
+                }
+
+
             });
 
         });
 
 
-        describe("toString", () => {
+        describe("toString()", () => {
 
 
             it("will return the string that was passed into the constructor", () => {
@@ -114,6 +121,76 @@ describe("Directory", () => {
         });
 
 
+        describe("parentDir()", () => {
+
+            beforeEach(() =>
+            {
+                tmpDir.ensureExistsSync();
+                tmpDir.emptySync();
+            });
+
+
+            it("returns the expected parent directory when one exists", () => {
+                const parentDir = tmpDir.parentDir();
+
+                expect(parentDir).not.toBeUndefined();
+                expect(_.endsWith(parentDir!.absPath(), "depot")).toBeTruthy();
+            });
+
+
+            it("returns the root of a drive when the directory is a first level directory", () => {
+                const dir1 = new Directory("c:", "tmp");
+                expect(dir1.parentDir()!.absPath()).toEqual("c:");
+
+                const dir2 = new Directory("/", "tmp");
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(dir2.parentDir()!.absPath()).toEqual("C:");
+                }
+                else {
+                    expect(dir2.parentDir()!.absPath()).toEqual("/");
+                }
+
+            });
+
+
+            it("return undefined when the directory is the root of a drive", () => {
+                const dir1 = new Directory("c:\\");
+                expect(dir1.parentDir()).toBeUndefined();
+
+                const dir2 = new Directory("c:");
+                expect(dir2.parentDir()).toBeUndefined();
+
+                const dir3 = new Directory("/");
+                expect(dir3.parentDir()).toBeUndefined();
+            });
+
+        });
+
+
+        describe("isRoot()", () => {
+
+            beforeEach(() =>
+            {
+                tmpDir.ensureExistsSync();
+                tmpDir.emptySync();
+            });
+
+            it("Returns false for a directory that is not the root of a drive", () => {
+                expect(tmpDir.isRoot()).toBeFalsy();
+            });
+
+
+            it("returns true for a directory that is the root of a drive", () => {
+
+                const dir1 = new Directory("c:\\");
+                expect(dir1.isRoot()).toBeTruthy();
+
+                const dir2 = new Directory("/");
+                expect(dir2.isRoot()).toBeTruthy();
+            });
+        });
+
+
         describe("absPath()", () => {
 
 
@@ -127,6 +204,12 @@ describe("Directory", () => {
                     expect(absPath[0]).toEqual("/");
                     expect(_.endsWith(absPath, "/tmp")).toBeTruthy();
                 }
+            });
+
+
+            it("when the directory already has an absolute path returns the same path", () => {
+                const dir = new Directory(tmpDir.absPath());
+                expect(dir.absPath()).toEqual(tmpDir.absPath());
             });
 
 

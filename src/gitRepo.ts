@@ -4,12 +4,11 @@ import {File} from "./file";
 import {spawn} from "./spawn";
 import {GitBranch} from "./gitBranch";
 import * as _ from "lodash";
-import {outdent, trimBlankLines} from "./stringHelpers";
+import {outdent, trimBlankLines, splitIntoLines} from "./stringHelpers";
 import {Url} from "./url";
 import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
-import {splitIntoLines} from "./stringHelpers";
 
 
 interface IGitLogEntry

@@ -1,4 +1,3 @@
-import {EOL} from "os";
 import {Transform} from "stream";
 import {Deferred} from "./deferred";
 
@@ -30,13 +29,13 @@ export class PrefixStream extends Transform
             chunkBuf;
 
         // While complete lines exist, push them.
-        let index: number = this._partial.indexOf(EOL);
+        let index: number = this._partial.indexOf("\n");
         while (index !== -1) {
             const line = this._partial.slice(0, ++index);
             this._partial = this._partial.slice(index);
             this.push(Buffer.concat([this._prefixBuf, line]));
 
-            index = this._partial.indexOf(EOL);
+            index = this._partial.indexOf("\n");
         }
         done();
     }

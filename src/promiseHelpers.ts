@@ -275,8 +275,8 @@ export function streamToPromise(stream: Writable): Promise<void> {
 
 /**
  * Adapts a promise-returning function into a promise-returning function that
- * will retry the operation up to maxNumAttempts times before rejecting.
- * Retries are performed using exponential backoff.
+ * will retry the operation up to `maxNumAttempts` times before rejecting.
+ * Retries are performed using exponential back off.
  *
  * @param theFunc - The promise-returning function that will be retried multiple
  * times
@@ -287,7 +287,7 @@ export function streamToPromise(stream: Writable): Promise<void> {
  *
  * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
- * returned by theFunc rejects, it will be retried up to maxNumAttempts
+ * returned by theFunc rejects, it will be retried up to `maxNumAttempts`
  * invocations.  If the Promise returned by the last invocation of theFunc
  * rejects, the returned Promise will be rejected with the same value.
  */
@@ -303,8 +303,8 @@ export function retry<ResolveType>(
 /**
  * Adapts a promise-returning function into a promise-returning function that
  * will continue to retry the operation as long as whilePredicate returns true
- * up to maxNumAttempts attempts before rejecting.  Retries are performed using
- * exponential backoff.
+ * up to `maxNumAttempts` attempts before rejecting.  Retries are performed using
+ * exponential back off.
  *
  * @param theFunc - The promise-returning function that will be retried multiple
  * times
@@ -319,7 +319,7 @@ export function retry<ResolveType>(
  *
  * @returns A Promise that will be resolved immediately (with the same
  * value) when the promise returned by the Func resolves.  If the Promise
- * returned by theFunc rejects, it will be retried up to maxNumAttempts
+ * returned by theFunc rejects, it will be retried up to `maxNumAttempts`
  * invocations.  If the Promise returned by the last invocation of theFunc
  * rejects, the returned Promise will be rejected with the same value.
  */
@@ -334,7 +334,7 @@ export function retryWhile<ResolveType>(
 
 /**
  * The value that will be multiplied by successively higher powers of 2 when
- * calculating delay time during exponential backoff.
+ * calculating delay time during exponential back off.
  */
 const BACKOFF_MULTIPLIER: number = 20;
 
@@ -491,4 +491,113 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
         .then(() => { throw err; })
         .catch(() => { throw err; });
     });
+}
+
+
+/**
+ * Maps values in `collection` using an async function.
+ * @param collection - The collection of items to iterate over.
+ * @param asyncValueFunc - The async mapping function.
+ * @return A promise for an array of the resulting mapped values.
+ */
+export async function mapAsync<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<V>>
+{
+    const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
+    const values = await Promise.all(promises);
+    return values;
+}
+
+
+/**
+ * Zips values in `collection` into a tuple with the result of calling the async
+ * function.
+ * @param collection - The collection of items.
+ * @param asyncValueFunction - The async function that will be called for each
+ * item in the collection.
+ * @return A promise for an array of 2-element tuples.  The first item is the
+ * item from `collection` and the second item is the resolved value returned
+ * from `asyncValueFunction`.
+ */
+export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<[T, V]>>
+{
+    const values = await mapAsync(collection, (curItem) => asyncValueFunc(curItem));
+
+    const pairs: Array<[T, V]> = [];
+    _.forEach(collection, (curItem, index) =>
+    {
+        pairs.push([curItem, values[index]]);
+    });
+
+    return pairs;
+}
+
+
+/**
+ * Filters a collection based on the result of an asynchronous predicate.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in collection.  Returns a truthy or falsy value indicating whether the
+ * collection item should be included.
+ * @return A promise for an array of collection items for which the async
+ * predicate returned a truthy value.
+ */
+export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+{
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+    return _.chain(pairs)
+    .filter((curPair) => !!curPair[1])
+    .map((curPair) => curPair[0])
+    .value();
+}
+
+
+/**
+ * Partitions a collection into two collections based on the result of invoking
+ * an asynchronous predicate on each item.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in the collection.  Returns a truthy or falsy value indicating whether the
+ * collection belongs in the first array or second array.
+ * @return A promise for a 2-item tuple. The first item is an array for which
+ * the predicate resolved to a truthy value.  The second item is an array for
+ * which the predicate resolved to a falsy value.
+ */
+export async function partitionAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<[Array<T>, Array<T>]>
+{
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+
+    const [truthyPairs, falsyPairs] = _.partition(pairs, (curPair) => !!curPair[1]);
+    return [
+        _.map(truthyPairs, (curPair) => curPair[0]),
+        _.map(falsyPairs, (curPair) => curPair[0])
+    ];
+
+}
+
+
+/**
+ * Removes items from a collection based on the result of an asynchronous predicate.
+ * @param collection - The collection of items.
+ * @param asyncPredicate - The async function that will be called for each item
+ * in collection.  Returns a truthy or falsy value indicating whether the
+ * collection item should be removed.
+ * @return A promise for an array of collection items that have been removed.
+ */
+export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+{
+    const pairs = await zipWithAsyncValues(collection, asyncPredicate);
+
+    const removed: Array<T> = [];
+    for (let i = pairs.length - 1; i >= 0; i--)
+    {
+        const curPair = pairs[i];
+        if (!!curPair[1])
+        {
+            // Remove the current item.
+            removed.push(curPair[0]);
+            collection.splice(i, 1);
+        }
+    }
+
+    return removed;
 }

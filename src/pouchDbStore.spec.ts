@@ -67,6 +67,7 @@ describe("PouchDbStore", async () => {
                 expect(model.rootPerson!.father!.father!.firstName).toEqual("Aerys");
             })();
 
+            await db.close();
         });
 
 

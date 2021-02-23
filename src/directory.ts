@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as _ from "lodash";
 import {File} from "./file";
-import {promisify1, sequence} from "./promiseHelpers";
+import {promisify1, sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
 
 
@@ -62,8 +62,16 @@ export class Directory
         const allParts: Array<PathPart> = [pathPart].concat(pathParts);
         this._dirPath = reducePathParts(allParts);
 
+        if (this._dirPath === "\\" || this._dirPath === "/")
+        {
+            // The path begins with a directory separator, which means that it
+            // is a relative path starting from the root of the drive.
+            this._dirPath = path.resolve(this._dirPath);
+        }
+
         // Remove trailing directory separator characters.
-        while (_.endsWith(this._dirPath, path.sep)) {
+        while ((this._dirPath.length > 1) &&
+               _.endsWith(this._dirPath, path.sep)) {
             this._dirPath = this._dirPath.slice(0, -1);
         }
     }
@@ -97,12 +105,54 @@ export class Directory
 
 
     /**
+     * Gets the parent directory of this directory, if one exists.
+     * @return This directory's parent directory.  undefined is returned if this
+     * directory is the root of a drive.
+     */
+    public parentDir(): undefined | Directory
+    {
+        const absPath = this.absPath();
+        const parts = _.split(absPath, path.sep);
+
+        // If the directory separator was not found, the split will result in a
+        // 1-element array.  If this is the case, this directory is the root of
+        // the drive.
+        if (parts.length === 1) {
+            return undefined;
+        }
+
+        const parentParts = _.dropRight(parts);
+        const [first, ...rest] = parentParts;
+        const firstDir = new Directory(first);
+        const parentDir = new Directory(firstDir, ...rest);
+        return parentDir;
+    }
+
+
+    /**
+     * Determines whether this directory is the root of a drive.
+     * @return true if this directory is the root of a drive.  false otherwise.
+     */
+    public isRoot(): boolean
+    {
+        return this.parentDir() === undefined;
+    }
+
+
+    /**
      * Gets the absolute path of this Directory.
      * @return The absolute path of this Directory
      */
     public absPath(): string
     {
-        return path.resolve(this._dirPath);
+        if (this._dirPath[1] === ":") {
+            // The path is a Windows path that already has a drive letter at the
+            // beginning.  It is already absolute.
+            return this._dirPath;
+        }
+        else {
+            return path.resolve(this._dirPath);
+        }
     }
 
 
@@ -384,6 +434,7 @@ export class Directory
     /**
      * Reads the contents of this directory.
      * @param recursive - Whether to find subdirectories and files recursively
+     * (default is false).
      * @return The contents of the directory, separated into a list of files and
      * a list of subdirectories.  The relative/absolute nature of the returned
      * File and Directory objects will be determined by the relative/absolute
@@ -401,7 +452,7 @@ export class Directory
 
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
-            const promises = fsEntryPaths.map((curPath) => {
+            return mapAsync(fsEntryPaths, (curPath) => {
                 return lstatAsync(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {
@@ -410,10 +461,12 @@ export class Directory
                         contents.subdirs.push(new Directory(curPath));
                     }
                     // Note: We are ignoring symbolic links here.
+                })
+                .catch((err) => {
+                    // We failed to stat the current item.  This is probably a
+                    // permissions error.  Pretend like it's not here.
                 });
-            });
-
-            return Promise.all(promises)
+            })
             .then(() => {
                 return contents;
             });
@@ -488,7 +541,7 @@ export class Directory
     {
         return this.contents()
         .then((contents) => {
-            const promises = contents.subdirs.map((curSubdir) => {
+            return mapAsync(contents.subdirs, (curSubdir) => {
                 //
                 // Prune the current subdirectory.
                 //
@@ -504,9 +557,7 @@ export class Directory
                         return curSubdir.delete();
                     }
                 });
-            });
-
-            return Promise.all(promises)
+            })
             .then(() => {
             });
         });
@@ -535,15 +586,15 @@ export class Directory
 
 
     /**
-     * Copies this directory to destDir.
+     * Copies this directory to `destDir`.
      * @param destDir - The destination directory
      * @param copyRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      * @return A promise that is resolved with a Directory object representing
-     * the destination directory.  If copyRoot is false, this will be destDir.
+     * the destination directory.  If copyRoot is false, this will be `destDir`.
      * If copyRoot is true, this will be this Directory's counterpart
-     * subdirectory in destDir.
+     * subdirectory in `destDir`.
      */
     public copy(destDir: Directory, copyRoot: boolean): Promise<Directory>
     {
@@ -583,11 +634,11 @@ export class Directory
 
 
     /**
-     * Copies this directory to destDir.
+     * Copies this directory to `destDir`.
      * @param destDir - The destination directory
      * @param copyRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      */
     public copySync(destDir: Directory, copyRoot: boolean): Directory
     {
@@ -619,15 +670,15 @@ export class Directory
 
 
     /**
-     * Moves this Directory or the contents of this Directory to destDir.
+     * Moves this Directory or the contents of this Directory to `destDir`.
      * @param destDir - The destination directory
      * @param moveRoot - If true, this directory name will be a subdirectory of
-     * destDir.  If false, only the contents of this directory will be copied
-     * into destDir.
+     * `destDir`.  If false, only the contents of this directory will be copied
+     * into `destDir`.
      * @return A promise that is resolved with a Directory object representing
-     * the destination directory.  If moveRoot is false, this will be destDir.
+     * the destination directory.  If moveRoot is false, this will be `destDir`.
      * If moveRoot is true, this will be this Directory's counterpart
-     * subdirectory in destDir.
+     * subdirectory in `destDir`.
      */
     public move(destDir: Directory, moveRoot: boolean): Promise<Directory>
     {

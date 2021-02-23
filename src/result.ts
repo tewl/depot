@@ -1,45 +1,88 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Result Types
+//
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Defines a failure result.
+ * Describes a successful result for an operation that may succeed or fail.
  */
-export interface IFailureResult<ErrorType> {
-    success:  false;
-    error:    ErrorType;
-    message?: string;
+export interface ISucceededResult<TSuccess>
+{
+    state: "succeeded";
+    value: TSuccess;
 }
 
 
 /**
- * Defines a successful result.
+ * Describes a failure result for an operation that may succeed or fail.
  */
-export interface ISuccessResult<SuccessType> {
-    success: true;
-    value: SuccessType;
+export interface IFailedResult<TError>
+{
+    state: "failed";
+    error: TError;
 }
 
 
 /**
- * Represents the result of some action that can either succeed or fail.
+ * Describes the result for an operation that may succeed or fail.
  */
-export type Result<SuccessType, ErrorType> = ISuccessResult<SuccessType> | IFailureResult<ErrorType>;
+export type Result<TSuccess, TError> = ISucceededResult<TSuccess> | IFailedResult<TError>;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Creation Convenience Functions
+//
+////////////////////////////////////////////////////////////////////////////////
 
 
 /**
- * Factory function used to create an IFailureResult.
- * @param error - An error value describing the failure
- * @param message - An (optional) human readable error message.  Should only be
- *     specified when error does not contain an error message.
- * @return The IFailureResult object
+ * Convenience function that creates a successful result.
+ * @param result - The success value that will be wrapped
+ * @return The successful Result instance
  */
-export function failureResult<ErrorType>(error: ErrorType, message?: string): IFailureResult<ErrorType> {
-    return {success: false, error: error, message: message};
+export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess>
+{
+    return { state: "succeeded", value: value};
 }
 
 
 /**
- * Factory function used to create an ISuccessResult.
- * @param val - The successful result value
- * @return The ISuccessResult object
+ * Convenience function that creates a failure result.
+ * @param error - The error payload that will be wrapped
+ * @return The failure Result instance
  */
-export function successResult<SuccessType>(val: SuccessType): ISuccessResult<SuccessType> {
-    return {success: true, value: val};
+export function failedResult<TError>(error: TError): IFailedResult<TError>
+{
+    return {state: "failed", error: error};
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// User-Defined Type Guards
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * User-defined type guard that determines if a Result is a successful one.
+ * @param result - The Result instance to inspect
+ * @return Whether the Result instance represents a success.
+ */
+export function succeeded<TSuccess, TError>(result: Result<TSuccess, TError>): result is ISucceededResult<TSuccess>
+{
+    return result.state === "succeeded";
+}
+
+
+/**
+ * User-defined type guard that determines if a Result is a failure one.
+ * @param result - The Result instance to inspect
+ * @return Whether the Result instance represents a failure.
+ */
+export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): result is IFailedResult<TError>
+{
+    return result.state === "failed";
 }

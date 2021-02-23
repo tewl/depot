@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
 import {promisify1} from "./promiseHelpers";
 import {Directory} from "./directory";
@@ -158,6 +159,34 @@ export class File
 
 
     /**
+     * Gets the other files in the same directory as this file.
+     * @return A promise that resolves with an array of sibling files.  This
+     * promise will reject if this file does not exist.  The relative/absolute
+     * nature of the returned files' path will match that of this file.
+     */
+    public getSiblingFiles(): Promise<Array<File>>
+    {
+        return this.exists()
+        .then((stats) => {
+            if (stats === undefined) {
+                throw new Error(`Cannot get sibling files for non existent file ${this.absPath}`);
+            }
+
+            const parentDir = this.directory;
+            return parentDir.contents(false);
+        })
+        .then((dirContents) => {
+
+            const thisFileName = this.fileName;
+
+            const allFiles = dirContents.files;
+            const siblingFiles = _.filter(allFiles, (curFile) => curFile.fileName !== thisFileName);
+            return siblingFiles;
+        });
+    }
+
+
+    /**
      * Sets the access mode bits for this file
      * @param mode - Numeric value representing the new access modes.  See
      * fs.constants.S_I*.
@@ -184,7 +213,8 @@ export class File
      * fs.constants.S_I*.
      * @return A promise for this file (for easy chaining)
      */
-    public chmodSync(mode: number): void {
+    public chmodSync(mode: number): void
+    {
         fs.chmodSync(this._filePath, mode);
     }
 
@@ -576,7 +606,8 @@ export class File
      * `openssl list-message-digest-algorithms`.
      * @return A hexadecimal string containing the hash
      */
-    public getHashSync(algorithm: string = "md5"): string {
+    public getHashSync(algorithm: string = "md5"): string
+    {
         const fileData = fs.readFileSync(this._filePath);
         const hash = crypto.createHash(algorithm);
         hash.update(fileData);

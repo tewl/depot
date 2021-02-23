@@ -191,7 +191,8 @@ export function removeWhitespace(str: string): string
  */
 export function splitIntoLines(text: string, retainLineEndings: boolean = false): Array<string>
 {
-    if (text.length === 0) {
+    if (text.length === 0)
+    {
         return [];
     }
 
@@ -199,21 +200,25 @@ export function splitIntoLines(text: string, retainLineEndings: boolean = false)
     const eolRegex = createEolRegex("g");
     let done = false;
 
-    while (!done) {
+    while (!done)
+    {
 
         const startIndex = eolRegex.lastIndex;
 
         const match = eolRegex.exec(text);
-        if (match) {
+        if (match)
+        {
 
             let line: string = text.slice(startIndex, match.index);
-            if (retainLineEndings) {
+            if (retainLineEndings)
+            {
                 line += match[0];
             }
             lines.push(line);
 
         }
-        else {
+        else
+        {
             const line = text.slice(startIndex);
             lines.push(line);
             done = true;
@@ -221,6 +226,59 @@ export function splitIntoLines(text: string, retainLineEndings: boolean = false)
     }
 
     return lines;
+}
+
+
+/**
+ * Splits a string into individual lines. The source string may contain
+ * posix-style newlines, Windows-style newlines, or a mixture of the two.
+ * @param src - The string to be split.
+ * @return An array of string segments
+ */
+export function splitLinesOsIndependent(src: string): Array<string>
+{
+    let lines = _.split(src, "\n");
+    lines = _.map(lines, (curLine) => {
+        return _.trimEnd(curLine, "\r");
+    });
+    return lines;
+}
+
+
+export function padLeft(src: string, pad: string, desiredLength: number): string {
+    const numPadChars = desiredLength - src.length;
+    if (numPadChars <= 0)
+    {
+        return src;
+    }
+
+    let fullPad: string = "";
+    while (fullPad.length < numPadChars)
+    {
+        fullPad = fullPad + pad;
+    }
+
+    fullPad = fullPad.slice(0, numPadChars);
+    return fullPad + src;
+}
+
+
+export function padRight(src: string, pad: string, desiredLength: number): string
+{
+    const numPadChars = desiredLength - src.length;
+    if (numPadChars <= 0)
+    {
+        return src;
+    }
+
+    let fullPad: string = "";
+    while (fullPad.length < numPadChars)
+    {
+        fullPad = fullPad + pad;
+    }
+
+    fullPad = fullPad.slice(0, numPadChars);
+    return src + fullPad;
 }
 
 

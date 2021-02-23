@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import {tmpDir} from "../test/ut/spechelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
-import { Iterator } from "./list";
+import {getOs, OperatingSystem} from "./os";
 
 
 describe("File", () => {
@@ -17,9 +17,9 @@ describe("File", () => {
 
 
             it("returns undefined when the left part string does not match", () => {
-                const d = new Directory("a/b");
-                const f = new File("a/b/c/d/e.txt");
-                expect(File.relative(d, f).toString()).toEqual("c/d/e.txt");
+                const d = new Directory(path.join("a", "b"));
+                const f = new File(path.join("a", "b", "c", "d", "e.txt"));
+                expect(File.relative(d, f).toString()).toEqual(path.join("c", "d", "e.txt"));
             });
 
 
@@ -30,8 +30,8 @@ describe("File", () => {
 
 
             it("returns the expected array of path parts", () => {
-                const d = new Directory("a/b");
-                const f = new File("a/b/c/d/e.txt");
+                const d = new Directory(path.join("a", "b"));
+                const f = new File(path.join("a", "b", "c", "d", "e.txt"));
                 expect(File.relativeParts(d, f)).toEqual(["c", "d", "e.txt"]);
             });
         });
@@ -52,9 +52,19 @@ describe("File", () => {
         describe("dirName, baseName, fileName, extName", () => {
 
 
-            it("will give the correct parts of a normal file path", () => {
+            it("will give the correct parts of a normal file path with initial parent dir", () =>
+            {
                 const file1: File = new File("..", "tmp", "bar", "baz.txt");
-                expect(file1.dirName).toEqual("../tmp/bar/");
+                expect(file1.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
+                expect(file1.baseName).toEqual("baz");
+                expect(file1.fileName).toEqual("baz.txt");
+                expect(file1.extName).toEqual(".txt");
+            });
+
+            it("will give the correct parts of a normal file path", () =>
+            {
+                const file1: File = new File("tmp", "bar", "baz.txt");
+                expect(file1.dirName).toEqual(path.join("tmp", "bar") + path.sep);
                 expect(file1.baseName).toEqual("baz");
                 expect(file1.fileName).toEqual("baz.txt");
                 expect(file1.extName).toEqual(".txt");
@@ -64,7 +74,7 @@ describe("File", () => {
             it("will give the correct parts of a file path with no directory", () => {
                 const file: File = new File("baz.foo");
 
-                expect(file.dirName).toEqual("./");
+                expect(file.dirName).toEqual("." + path.sep);
                 expect(file.baseName).toEqual("baz");
                 expect(file.fileName).toEqual("baz.foo");
                 expect(file.extName).toEqual(".foo");
@@ -72,9 +82,9 @@ describe("File", () => {
 
 
             it("will give the correct parts of a file path with no extension", () => {
-                const file: File = new File("../tmp/bar/baz");
+                const file: File = new File(path.join("..", "tmp", "bar", "baz"));
 
-                expect(file.dirName).toEqual("../tmp/bar/");
+                expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
                 expect(file.baseName).toEqual("baz");
                 expect(file.fileName).toEqual("baz");
                 expect(file.extName).toEqual("");
@@ -82,9 +92,9 @@ describe("File", () => {
 
 
             it("will give the correct parts for a dotfile", () => {
-                const file: File = new File("../tmp/bar/.baz");
+                const file: File = new File(path.join("..", "tmp", "bar", ".baz"));
 
-                expect(file.dirName).toEqual("../tmp/bar/");
+                expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
                 expect(file.baseName).toEqual(".baz");
                 expect(file.fileName).toEqual(".baz");
                 expect(file.extName).toEqual("");
@@ -98,7 +108,7 @@ describe("File", () => {
 
 
             it("will return a Directory object representing the directory containing the file", () => {
-                const dir = new Directory("../foo/bar");
+                const dir = new Directory(path.join("..", "foo", "bar"));
                 const file = new File(dir, "baz.txt");
                 expect(file.directory.toString()).toEqual(dir.toString());
             });
@@ -111,8 +121,8 @@ describe("File", () => {
 
 
             it("will return the string that was passed into the constructor", () => {
-                const file1 = new File("./foo/bar.txt");
-                expect(file1.toString()).toEqual("foo/bar.txt");
+                const file1 = new File(path.join(".", "foo", "bar.txt"));
+                expect(file1.toString()).toEqual(path.join("foo", "bar.txt"));
             });
 
 
@@ -205,6 +215,48 @@ describe("File", () => {
         });
 
 
+        describe("getSiblingFiles()", () => {
+
+            beforeEach(() =>
+            {
+                tmpDir.emptySync();
+            });
+
+            it("rejects when called on a nonexistant file", (done) => {
+                const file = new File(tmpDir, "foo.txt");
+                file.getSiblingFiles()
+                .catch((err) => {
+                    done();
+                });
+            });
+
+
+            it("resolves with expected sibling files and they contain expected path", async () => {
+
+                const subDir = new Directory(tmpDir, "subdir");
+                await subDir.ensureExists();
+
+                const fileA = new File(subDir, "a.txt");
+                const fileB = new File(subDir, "b.txt");
+                const fileC = new File(subDir, "c.txt");
+                const fileD = new File(subDir, "d.txt");
+
+                fileA.writeSync("fileA");
+                fileB.writeSync("fileB");
+                fileC.writeSync("fileC");
+                fileD.writeSync("fileD");
+
+                const siblingFiles = await fileB.getSiblingFiles();
+                expect(siblingFiles.length).toEqual(3);
+
+                const siblingPaths = _.map(siblingFiles, (curFile) => curFile.toString());
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "a.txt"));
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "c.txt"));
+                expect(siblingPaths).toContain(path.join("tmp", "subdir", "d.txt"));
+            });
+        });
+
+
         describe("chmod()", () => {
 
             const testFile = new File(tmpDir, "test.txt");
@@ -213,26 +265,84 @@ describe("File", () => {
             });
 
 
-            it("will change the mode bits to the specified value", (done) => {
-                testFile.chmod(
-                    constants.S_IRWXU |
-                    constants.S_IRGRP | constants.S_IXGRP |
-                    constants.S_IROTH | constants.S_IXOTH
-                )
-                .then((testFile) => {
-                    const afterStats = testFile.existsSync();
-                    expect(afterStats).toBeTruthy();
-                    expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
-                    expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
-                    expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
-                    expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
-                    expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
-                    expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
-                    expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
-                    expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
-                    expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+            it("will change the mode bits to the specified value (non-Windows)", (done) => {
+
+                if (getOs() !== OperatingSystem.WINDOWS)
+                {
+                    testFile.chmod(
+                        constants.S_IRWXU |
+                        constants.S_IRGRP | constants.S_IXGRP |
+                        constants.S_IROTH | constants.S_IXOTH
+                    )
+                    .then((testFile) =>
+                    {
+                        const afterStats = testFile.existsSync();
+                        expect(afterStats).toBeTruthy();
+                        expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                        expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                        expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                        expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                        expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                        expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                        expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                        expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                        done();
+                    });
+                }
+                else {
                     done();
-                });
+                }
+            });
+
+            it("will change the mode bits to the specified value (Windows)", (done) =>
+            {
+                if (getOs() === OperatingSystem.WINDOWS)
+                {
+
+                    // chmod() is implemented very strangely on Windows.
+                    //
+                    // - First, fs.constants such as constants.S_IRUSR,
+                    //   constants.S_IWUSR and constants.S_IXUSR are undefined.
+                    //   This is why I am using octal constants below.
+                    //
+                    // - Secondly, the Node.js says the following about the
+                    //   Windows implementation:
+                    //
+                    //   Caveats: on Windows only the write permission can be
+                    //   changed, and the distinction among the permissions of
+                    //   group, owner or others is not implemented.
+
+                    // Try to set read, write and execute on the file. Since the
+                    // read mode is always set on Windows and since only the
+                    // write permission can be changed, this will result in the
+                    // read and write modes being set for user, group and other.
+                    // user:  rwx  <-- This will be used for user, group and other
+                    // group: r x
+                    // other: r x
+                    const newMode = 0o755;
+
+                    testFile.chmod(newMode)
+                    .then((testFile) =>
+                    {
+                        const afterStats = testFile.existsSync();
+                        expect(afterStats).toBeTruthy();
+                        expect(afterStats!.mode & 0o400).toEqual(0o400);
+                        expect(afterStats!.mode & 0o200).toEqual(0o200);
+                        expect(afterStats!.mode & 0o100).toEqual(0);
+                        expect(afterStats!.mode & 0o040).toEqual(0o040);
+                        expect(afterStats!.mode & 0o020).toEqual(0o020);
+                        expect(afterStats!.mode & 0o010).toEqual(0);
+                        expect(afterStats!.mode & 0o004).toEqual(0o004);
+                        expect(afterStats!.mode & 0o002).toEqual(0o002);
+                        expect(afterStats!.mode & 0o001).toEqual(0);
+                        done();
+                    });
+                }
+                else
+                {
+                    done();
+                }
             });
 
 
@@ -246,24 +356,26 @@ describe("File", () => {
             });
 
 
-            it("will change the mode bits to the specified value", () => {
-                testFile.chmodSync(
-                    constants.S_IRWXU |
-                    constants.S_IRGRP | constants.S_IXGRP |
-                    constants.S_IROTH | constants.S_IXOTH
-                );
+            it("will change the mode bits to the specified value (non-Windows)", () => {
+                if (getOs() !== OperatingSystem.WINDOWS) {
+                    testFile.chmodSync(
+                        constants.S_IRWXU |
+                        constants.S_IRGRP | constants.S_IXGRP |
+                        constants.S_IROTH | constants.S_IXOTH
+                    );
 
-                const afterStats = testFile.existsSync();
-                expect(afterStats).toBeTruthy();
-                expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
-                expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
-                expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
-                expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
-                expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
-                expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
-                expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
-                expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
-                expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                    const afterStats = testFile.existsSync();
+                    expect(afterStats).toBeTruthy();
+                    expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
+                    expect(afterStats!.mode & constants.S_IWUSR).toEqual(constants.S_IWUSR);
+                    expect(afterStats!.mode & constants.S_IXUSR).toEqual(constants.S_IXUSR);
+                    expect(afterStats!.mode & constants.S_IRGRP).toEqual(constants.S_IRGRP);
+                    expect(afterStats!.mode & constants.S_IWGRP).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXGRP).toEqual(constants.S_IXGRP);
+                    expect(afterStats!.mode & constants.S_IROTH).toEqual(constants.S_IROTH);
+                    expect(afterStats!.mode & constants.S_IWOTH).toEqual(0);
+                    expect(afterStats!.mode & constants.S_IXOTH).toEqual(constants.S_IXOTH);
+                }
             });
         });
 
@@ -274,7 +386,14 @@ describe("File", () => {
             it("will return the absolute path of the file", () => {
                 const file = new File(__filename);
                 const absPath = file.absPath();
-                expect(absPath[0]).toEqual("/");
+
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
+                }
+                else {
+                    expect(_.startsWith(absPath, "/")).toBeTruthy();
+                }
+
                 expect(_.endsWith(absPath, ".spec.ts")).toBeTruthy();
             });
 
@@ -287,10 +406,15 @@ describe("File", () => {
 
             it("will return a File instance that is absolute", () => {
                 const relFile = new File("../package.json");
-                expect(relFile.toString()[0]).not.toEqual("/");
+                expect(_.startsWith(relFile.toString(), ".." + path.sep)).toBeTruthy();
 
                 const absFile = relFile.absolute();
-                expect(absFile.toString()[0]).toEqual("/");
+                if (getOs() === OperatingSystem.WINDOWS) {
+                    expect(_.startsWith(absFile.toString(), "C:\\")).toBeTruthy();
+                }
+                else {
+                    expect(_.startsWith(absFile.toString(), "/")).toBeTruthy();
+                }
             });
 
 
@@ -746,6 +870,11 @@ describe("File", () => {
 
 
             it("will copy the atime and mtime from the source file", (done) => {
+                const operatingSystem = getOs();
+
+                // Create a source file.  Then, wait 2 seconds and move it while
+                // preserving timestamps.  The destination should have
+                // timestamps similar to the original source file.
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -773,14 +902,26 @@ describe("File", () => {
                             return;
                         }
 
-                        // The destination file will have a last access time
-                        // (atime) close to now, because it was copied from the
-                        // source file and the source file's atime was updated
-                        // during the copy operation.  Because the destination
-                        // file's atime could be up to 1 second before the
-                        // source file's, we will allow for a little over 1
-                        // second.
-                        expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
+                        if (operatingSystem === OperatingSystem.WINDOWS) {
+                            // On Windows, the srcFile's atime is not updated
+                            // when it is copied.  If it was properly copied to
+                            // dstFile, then the atime should be a little over 2
+                            // seconds ago.
+                            const delta = Date.now() - dstStats.atime.valueOf();
+                            expect(delta).toBeGreaterThanOrEqual(2000);
+                            expect(delta).toBeLessThan(2200);
+                        }
+                        else {
+                            // The destination file will have a last access time
+                            // (atime) close to now, because it was copied from the
+                            // source file and the source file's atime was updated
+                            // during the copy operation.  Because the destination
+                            // file's atime could be up to 1 second before the
+                            // source file's, we will allow for a little over 1
+                            // second.
+                            expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
+                        }
+
                         expect(dstStats.mtime.valueOf() - srcStats.mtime.valueOf()).toBeLessThan(1000);
                         done();
                     });
@@ -887,7 +1028,11 @@ describe("File", () => {
 
 
             it("will copy the atime and mtime from the source file", (done) => {
+                const operatingSystem = getOs();
 
+                // Create a source file.  Then, wait 2 seconds and move it while
+                // preserving timestamps.  The destination should have
+                // timestamps similar to the original source file.
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -914,14 +1059,25 @@ describe("File", () => {
                         return;
                     }
 
-                    // The destination file will have a last access time
-                    // (atime) close to now, because it was copied from the
-                    // source file and the source file's atime was updated
-                    // during the copy operation.  Because the destination
-                    // file's atime could be up to 1 second before the
-                    // source file's, we will allow for a little over 1
-                    // second.
-                    expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
+                    if (operatingSystem === OperatingSystem.WINDOWS) {
+                        // On Windows, the srcFile's atime is not updated when
+                        // it is copied.  If it was properly copied to dstFile,
+                        // then the atime should be a little over 2 seconds ago.
+                        const delta = Date.now() - dstStats.atime.valueOf();
+                        expect(delta).toBeGreaterThanOrEqual(2000);
+                        expect(delta).toBeLessThan(2200);
+                    }
+                    else {
+                        // The destination file will have a last access time
+                        // (atime) close to now, because it was copied from the
+                        // source file and the source file's atime was updated
+                        // during the copy operation.  Because the destination
+                        // file's atime could be up to 1 second before the
+                        // source file's, we will allow for a little over 1
+                        // second.
+                        expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
+                    }
+
                     expect(dstStats.mtime.valueOf() - srcStats.mtime.valueOf()).toBeLessThan(1000);
                     done();
 

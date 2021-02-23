@@ -59,7 +59,7 @@ export function spawn(
     let childProcess: cp.ChildProcess;
 
     const closePromise = new Promise((resolve: (output: string) => void,
-                                        reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
+                                      reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
 
         const spawnOptions: cp.SpawnOptions = _.defaults(
             {},

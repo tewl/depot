@@ -1,8 +1,11 @@
 import * as fs from "fs";
+import * as cp from "child_process";
+import * as compressing from "compressing";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
 import {gitUrlToProjectName} from "./gitHelpers";
+import {getOs, OperatingSystem} from "./os";
 
 
 export interface IPackageJson
@@ -130,7 +133,18 @@ export class NodePackage
      */
     public pack(outDir?: Directory): Promise<File>
     {
-        return spawn("npm", ["pack"], {cwd: this._pkgDir.toString()})
+        const spawnOptions: cp.SpawnOptions = { cwd: this._pkgDir.toString() };
+        if (getOs() === OperatingSystem.WINDOWS) {
+            // On Windows child_process.spawn() can only run executables, not
+            // scripts.  Since npm is a script on windows, we need to set the
+            // shell option so that we are not directly running the script, but
+            // rather a shell, which is then running the script.  For more
+            // information, see:
+            // https://github.com/nodejs/node-v0.x-archive/issues/2318
+            spawnOptions.shell = true;
+        }
+
+        return spawn("npm", ["pack"], spawnOptions)
         .closePromise
         .then((stdout: string) => {
             return new File(this._pkgDir, stdout);
@@ -165,7 +179,6 @@ export class NodePackage
     public publish(publishDir: Directory, emptyPublishDir: boolean, tmpDir: Directory): Promise<Directory>
     {
         let packageBaseName: string;
-        let extractedTarFile: File;
         let unpackedDir: Directory;
         let unpackedPackageDir: Directory;
 
@@ -182,32 +195,13 @@ export class NodePackage
         .then((tgzFile: File) => {
             packageBaseName = tgzFile.baseName;
 
-            // Running the following gunzip command will extract the .tgz file
-            // to a .tar file with the same basename.  The original .tgz file is
-            // deleted.
-            return spawn("gunzip", ["--force", tgzFile.fileName], {cwd: tmpDir.toString()})
-            .closePromise;
-        })
-        .then(() => {
-            // The above gunzip command should have extracted a .tar file.  Make
-            // sure this assumption is true.
-            extractedTarFile = new File(tmpDir, packageBaseName + ".tar");
-            return extractedTarFile.exists()
-            .then((exists) => {
-                if (!exists) {
-                    throw new Error(`Extracted .tar file ${extractedTarFile.toString()} does not exist.  Aborting.`);
-                }
-            });
-        })
-        .then(() => {
-            // We are about to unpack the tar file.  Create an empty
-            // directory where its contents will be placed.
             unpackedDir = new Directory(tmpDir, packageBaseName);
-            return unpackedDir.empty();  // Creates (if needed) and empties this directory.
-        })
-        .then(() => {
-            return spawn("tar", ["-x", "-C", unpackedDir.toString(), "-f", extractedTarFile.toString()], {cwd: tmpDir.toString()})
-            .closePromise;
+            // Emptying the directory will create it if it does not exist.
+            return unpackedDir.empty()
+            .then(() => {
+                // Use the "compressing" package to extract the .tgz file.
+                return compressing.tgz.uncompress(tgzFile.absPath(), unpackedDir.absPath());
+            });
         })
         .then(() => {
             // When uncompressed, all content is contained within a "package"

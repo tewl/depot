@@ -1,6 +1,6 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
-    removeBlankLines, splitIntoLines
+    removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight
 } from "./stringHelpers";
 
 
@@ -22,7 +22,7 @@ describe("numInitial()", () => {
     });
 
 
-    it("returns the corrent number when the whole string is the pad", () => {
+    it("returns the correct number when the whole string is the pad", () => {
         expect(numInitial("xxxxx", "x")).toEqual(5);
     });
 
@@ -275,5 +275,111 @@ describe("splitIntoLines", () => {
         ]);
     });
 
+
+});
+
+
+describe("splitLinesOsIndependent()", () => {
+
+
+    it("will split a string with posix-style newlines (\\n)", () => {
+        const src = "line 1\nline 2\nline 3";
+        const result = splitLinesOsIndependent(src);
+        expect(result.length).toEqual(3);
+        expect(result[0]).toEqual("line 1");
+        expect(result[1]).toEqual("line 2");
+        expect(result[2]).toEqual("line 3");
+    });
+
+
+    it("will split a string with windows-style newlines (\\r\\n)", () => {
+        const src = "line 1\r\nline 2\r\nline 3";
+        const result = splitLinesOsIndependent(src);
+        expect(result.length).toEqual(3);
+        expect(result[0]).toEqual("line 1");
+        expect(result[1]).toEqual("line 2");
+        expect(result[2]).toEqual("line 3");
+    });
+
+
+});
+
+
+describe("padLeft()", () =>
+{
+
+    it("Will insert no pad when the source equals the desired length", () =>
+    {
+        const padded = padLeft("1234", "x", 4);
+        expect(padded).toEqual("1234");
+    });
+
+
+    it("Will insert no pad when the source exceeds the desired length", () =>
+    {
+        const padded = padLeft("12345", "x", 4);
+        expect(padded).toEqual("12345");
+    });
+
+
+    it("Will insert correct pad when the pad string is one character", async () =>
+    {
+        const padded = padLeft("123", "x", 5);
+        expect(padded).toEqual("xx123");
+    });
+
+
+    it("Will insert correct pad when the pad string is multiple characters and fits evenly", () =>
+    {
+        const padded = padLeft("123", "xy", 5);
+        expect(padded).toEqual("xy123");
+    });
+
+
+    it("Will insert correct pad when the pad string is multiple characters and does not fit evenly", () =>
+    {
+        const padded = padLeft("123", "xy", 6);
+        expect(padded).toEqual("xyx123");
+    });
+
+});
+
+
+describe("padRight()", () =>
+{
+
+    it("Will insert no pad when the source equals the desired length", () =>
+    {
+        const padded = padRight("1234", "x", 4);
+        expect(padded).toEqual("1234");
+    });
+
+
+    it("Will insert no pad when the source exceeds the desired length", () =>
+    {
+        const padded = padRight("12345", "x", 4);
+        expect(padded).toEqual("12345");
+    });
+
+
+    it("Will insert correct pad when the pad string is one character", async () =>
+    {
+        const padded = padRight("123", "x", 5);
+        expect(padded).toEqual("123xx");
+    });
+
+
+    it("Will insert correct pad when the pad string is multiple characters and fits evenly", () =>
+    {
+        const padded = padRight("123", "xy", 5);
+        expect(padded).toEqual("123xy");
+    });
+
+
+    it("Will insert correct pad when the pad string is multiple characters and does not fit evenly", () =>
+    {
+        const padded = padRight("123", "xy", 6);
+        expect(padded).toEqual("123xyx");
+    });
 
 });

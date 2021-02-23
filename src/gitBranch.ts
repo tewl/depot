@@ -1,10 +1,9 @@
-import {EOL} from "os";
 import * as _ from "lodash";
 import {GitRepo} from "./gitRepo";
 import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
-import {splitIntoLines} from "./stringHelpers";
+import { splitIntoLines, splitLinesOsIndependent} from "./stringHelpers";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -217,7 +216,7 @@ export class GitBranch
 
         return spawn("git", ["branch", "-vv"], {cwd: this._repo.directory.toString()}).closePromise
         .then((output) => {
-            const outputLines = output.split(EOL);
+            const outputLines = splitLinesOsIndependent(output);
 
             // The last column for lines matching the specified local branch.
             const lastCols = _.reduce<string, Array<string>>(

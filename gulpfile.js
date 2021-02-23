@@ -3,13 +3,12 @@ const path = require("path");
 require('ts-node').register({project: path.join(__dirname, "tsconfig.json")});
 const fs = require("fs");
 const gulp = require("gulp");
-const stripJsonComments = require("strip-json-comments");
 const del = require("del");
 const _ = require("lodash");
 const spawn = require("./src/spawn").spawn;
 const Deferred = require("./src/deferred").Deferred;
 const toGulpError = require("./src/gulpHelpers").toGulpError;
-
+const nodeBinForOs = require("./src/nodeUtil").nodeBinForOs;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Default
@@ -18,10 +17,11 @@ const toGulpError = require("./src/gulpHelpers").toGulpError;
 gulp.task("default", () => {
     const usage = [
         "Gulp tasks",
-        "  clean  - Delete built and temporary files",
-        "  tslint - Run TSLint on source files",
-        "  ut     - Run unit tests",
-        "  build  - Run TSLint, unit tests, and compile TypeScript"
+        "  clean   - Delete built and temporary files",
+        "  tslint  - Run TSLint on source files",
+        "  ut      - Run unit tests",
+        "  build   - Run TSLint, unit tests, and compile TypeScript",
+        "  compile - Compile TS files"
     ];
     console.log(usage.join("\n"));
 });
@@ -68,10 +68,18 @@ function runTslint(emitError)
     // Add the globs defining source files to the list of arguments.
     tslintArgs = tslintArgs.concat(getSrcGlobs(true));
 
-    return spawn("./node_modules/.bin/tslint", tslintArgs, {cwd: __dirname},
+    let cmd = path.join(".", "node_modules", ".bin", "tslint");
+    cmd = nodeBinForOs(cmd).toString();
+    return spawn(cmd, tslintArgs, {cwd: __dirname},
                  undefined, process.stdout, process.stderr)
     .closePromise
+    .then((stdout) => {
+        console.log(stdout);
+    })
     .catch((err) => {
+        console.error(err.stdout);
+        console.error(err.stderr);
+
         // If we're supposed to emit an error, then go ahead and rethrow it.
         // Otherwise, just eat it.
         if (emitError) {
@@ -153,54 +161,54 @@ gulp.task("build", () => {
 });
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Compile
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This Gulp task compiles **all** TS files (src and bin).
+ */
+gulp.task("compile", () => {
+    "use strict";
+    const sourceGlobs = getSrcGlobs(true);
+
+    return clean()
+    .then(() => {
+        // Do not build if there are TSLint errors.
+        return runTslint(true, sourceGlobs);
+    })
+    .then(() => {
+        // Everything seems ok.  Go ahead and compile.
+        return compileTypeScript();
+    });
+});
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper Functions
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Compiles TypeScript sources.
+ * @return {Promise<void>} A promise that is resolved or rejected when
+ * transpilation finishes.
+ */
 function compileTypeScript() {
-    // TODO: Change this to just spawn a child process running tsc.
-    //   - Remove unneeded gulp packages
-
-    const ts         = require("gulp-typescript");
-    const sourcemaps = require("gulp-sourcemaps");
-
     console.log("Compiling TypeScript...");
 
-    // The gulp-typescript package interacts correctly with gulp if you
-    // return this outer steam from your task function.  I, however, prefer
-    // to use promises so that build steps can be composed in a more modular
-    // fashion.
-    const tsResultDfd = new Deferred();
-    const jsDfd       = new Deferred();
-    const dtsDfd      = new Deferred();
+    const cmd = nodeBinForOs(path.join(".", "node_modules", ".bin", "tsc")).toString();
+    const args = [
+        "--project", path.join(".", "tsconfig_release.json"),
+        "--pretty"
+    ];
 
-    const outDir = path.join(__dirname, "dist");
-    let numErrors = 0;
-
-    const tsResults = gulp.src(getSrcGlobs(false))
-    .pipe(sourcemaps.init())
-    .pipe(ts(getTsConfig(), ts.reporter.longReporter()))
-    .on("error", () => {
-        numErrors++;
-    })
-    .on("finish", () => {
-        if (numErrors > 0) {
-            tsResultDfd.reject(new Error(`TypeScript transpilation failed with ${numErrors} errors.`));
-        } else {
-            tsResultDfd.resolve();
-        }
+    // ./node_modules/.bin/tsc --project ./tsconfig_release.json
+    return spawn(cmd, args, { cwd: __dirname})
+    .closePromise
+    .catch((err) => {
+        console.error(_.trim(err.stdout + err.stderr));
+        throw toGulpError(new Error("TypeScript compilation failed."));
     });
-
-    tsResults.js
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(outDir))
-    .on("finish", () => {
-        jsDfd.resolve();
-    });
-
-    tsResults.dts
-    .pipe(gulp.dest(outDir))
-    .on("finish", () => {
-        dtsDfd.resolve();
-    });
-
-    return Promise.all([tsResultDfd.promise, jsDfd.promise, dtsDfd.promise]);
 }
 
 
@@ -208,6 +216,11 @@ function compileTypeScript() {
 // Project Management
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Gets globbing patterns for source files.
+ * @param includeSpecs - Whether to include unit test *.spec.ts files.
+ * @return {Array<string>} An array of string globbing patterns
+ */
 function getSrcGlobs(includeSpecs) {
     "use strict";
 
@@ -217,19 +230,4 @@ function getSrcGlobs(includeSpecs) {
     }
 
     return srcGlobs;
-}
-
-
-function getTsConfig(tscConfigOverrides) {
-    "use strict";
-
-    const tsConfigFile = path.join(__dirname, "tsconfig.json");
-    const tsConfigJsonText = fs.readFileSync(tsConfigFile, "utf8");
-    const compilerOptions = JSON.parse(stripJsonComments(tsConfigJsonText)).compilerOptions;
-
-    // Apply any overrides provided by the caller.
-    _.assign(compilerOptions, tscConfigOverrides);
-
-    compilerOptions.typescript = require("typescript");
-    return compilerOptions;
 }

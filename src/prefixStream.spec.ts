@@ -12,7 +12,7 @@ describe("PrefixStream", () => {
     });
 
 
-    it("prefixes each line", (done) => {
+    it("prefixes each line when the line endings are posix style (\\n)", (done) => {
         const sourceStream = new SourceStream("a\nb\nc\n");
         const prefixStream = new PrefixStream("prefix");
         const collectorStream = new CollectorStream();
@@ -23,6 +23,24 @@ describe("PrefixStream", () => {
 
         collectorStream.on("finish", () => {
             expect(collectorStream.collected).toEqual("[prefix] a\n[prefix] b\n[prefix] c\n");
+            done();
+        });
+    });
+
+
+    it("prefixes each line when the line endings are Windows style (\\r\\n)", (done) =>
+    {
+        const sourceStream = new SourceStream("a\r\nb\r\nc\r\n");
+        const prefixStream = new PrefixStream("prefix");
+        const collectorStream = new CollectorStream();
+
+        sourceStream
+            .pipe(prefixStream)
+            .pipe(collectorStream);
+
+        collectorStream.on("finish", () =>
+        {
+            expect(collectorStream.collected).toEqual("[prefix] a\r\n[prefix] b\r\n[prefix] c\r\n");
             done();
         });
     });

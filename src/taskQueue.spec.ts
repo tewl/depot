@@ -1,5 +1,6 @@
 import {EventEmitter} from "events";
-import {Task, getTimerPromise, allSettled} from "./promiseHelpers";
+import {Task, getTimerPromise} from "./promiseHelpers";
+import {allSettled} from "./promiseHelpersLegacy";
 import {TaskQueue} from "./taskQueue";
 import {Deferred} from "./deferred";
 

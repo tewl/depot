@@ -2,7 +2,6 @@ import {Writable} from "stream";
 import {EventEmitter} from "events";
 import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
-import * as BBPromise from "bluebird";
 
 
 export type CallBackType<ResultType> = (err: any, result?: ResultType) => void;
@@ -149,32 +148,6 @@ export function sequence(
             return accumulator.then(curTask);
         },
         Promise.resolve(initialValue));
-}
-
-
-/**
- *  Creates a promise that is resolved when all input promises have been settled
- *  (resolved or rejected).  The returned Promise is resolved with an array of
- *  BBPromise.Inspection objects.
- *
- *  This is the commonly accepted way of implementing allSettled() in Bluebird.
- *  See:  http://bluebirdjs.com/docs/api/reflect.html
- *
- *  Note: This function has been added to Node.js 12.9.0 (according to
- *  node.green) and later and can be removed once I stop using earlier
- *  versions.
- *
- * @param promises - The array of input promises.
- * @returns A promise that will be resolved with an inspection object for each
- * input promise.
- */
-export function allSettled(promises: Array<Promise<any>>): Promise<Array<BBPromise.Inspection<any>>>  {
-    "use strict";
-
-    const wrappedPromises: Array<BBPromise.Inspection<any>> = _.map(
-        promises,
-        (curPromise: Promise<any>) => BBPromise.resolve(curPromise).reflect());
-    return Promise.all(wrappedPromises);
 }
 
 

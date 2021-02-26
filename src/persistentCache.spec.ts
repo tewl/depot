@@ -3,7 +3,7 @@ import {getIllegalChars, PersistentCache} from "./persistentCache";
 import {generateUuid} from "./uuid";
 import {tmpDir} from "../test/ut/specHelpers";
 import {Directory} from "./directory";
-import {allSettled} from "./promiseHelpers";
+import {allSettled} from "./promiseHelpersLegacy";
 
 
 describe("PersistentCache", () => {

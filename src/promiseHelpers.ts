@@ -153,12 +153,16 @@ export function sequence(
 
 
 /**
- *  Creates a promise that is resolved when all input promises have been
- *  settled (resolved or rejected).  The returned Promise is resolved with an
- *  array of BBPromise.Inspection objects.
+ *  Creates a promise that is resolved when all input promises have been settled
+ *  (resolved or rejected).  The returned Promise is resolved with an array of
+ *  BBPromise.Inspection objects.
  *
  *  This is the commonly accepted way of implementing allSettled() in Bluebird.
  *  See:  http://bluebirdjs.com/docs/api/reflect.html
+ *
+ *  Note: This function has been added to Node.js 12.9.0 (according to
+ *  node.green) and later and can be removed once I stop using earlier
+ *  versions.
  *
  * @param promises - The array of input promises.
  * @returns A promise that will be resolved with an inspection object for each

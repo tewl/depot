@@ -11,6 +11,7 @@ export interface ISucceededResult<TSuccess>
 {
     state: "succeeded";
     value: TSuccess;
+    error: undefined;
 }
 
 
@@ -20,6 +21,7 @@ export interface ISucceededResult<TSuccess>
 export interface IFailedResult<TError>
 {
     state: "failed";
+    value: undefined;
     error: TError;
 }
 
@@ -44,7 +46,7 @@ export type Result<TSuccess, TError> = ISucceededResult<TSuccess> | IFailedResul
  */
 export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess>
 {
-    return { state: "succeeded", value: value};
+    return { state: "succeeded", value: value, error: undefined};
 }
 
 
@@ -55,7 +57,7 @@ export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSu
  */
 export function failedResult<TError>(error: TError): IFailedResult<TError>
 {
-    return {state: "failed", error: error};
+    return {state: "failed", value: undefined, error: error};
 }
 
 

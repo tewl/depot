@@ -31,7 +31,6 @@ export * from "./nullStream";
 export * from "./pathHelpers";
 export * from "./persistentCache";
 export * from "./persistentCacheStore";
-export * from "./pouchDbStore";
 export * from "./prefixStream";
 export * from "./priorityQueue";
 export * from "./promiseHelpers";

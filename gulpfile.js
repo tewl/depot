@@ -14,7 +14,7 @@ const nodeBinForOs = require("./src/nodeUtil").nodeBinForOs;
 // Default
 ////////////////////////////////////////////////////////////////////////////////
 
-gulp.task("default", () => {
+gulp.task("default", async () => {
     const usage = [
         "Gulp tasks",
         "  clean   - Delete built and temporary files",

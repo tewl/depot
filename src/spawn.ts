@@ -70,13 +70,13 @@ export function spawn(
 
         const outputStream = stdoutStream || new NullStream();
 
-        childProcess.stdout
+        childProcess.stdout!
         .pipe(stdoutCollector)
         .pipe(outputStream);
 
         const errorStream = stderrStream || new NullStream();
 
-        childProcess.stderr
+        childProcess.stderr!
         .pipe(stderrCollector)  // to capture stderr in case child process errors
         .pipe(errorStream);
 

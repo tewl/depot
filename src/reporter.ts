@@ -6,6 +6,9 @@ type ReporterListenerFn = (output: string) => void;
 export type RemoveListenerFunc = () => void;
 
 
+/**
+ * A class that facilitates the writing of indented text to generate reports.
+ */
 export class Reporter
 {
     // #region Instance Member Variables

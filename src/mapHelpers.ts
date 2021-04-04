@@ -36,3 +36,26 @@ export function jsonToStrMap<TValue>(jsonStr: string): Map<string, TValue>
 {
     return objToStrMap(JSON.parse(jsonStr));
 }
+
+
+/**
+ * Converts a Map to a map that has string keys.  This is needed before
+ * converting the map to a string-keyed map and to JSON.
+ * @param srcMap - The map to be converted.
+ * @param keyMapper - A function that will be invoked with each key from
+ * _srcMap_ that returns the new string key.
+ * @return The new Map.
+ */
+export function mapToStrMap<TKey, TValue>(
+    srcMap: Map<TKey, TValue>,
+    keyMapper: (key: TKey) => string
+): Map<string, TValue>
+{
+    const destMap = new Map<string, TValue>();
+    for (const [key, value] of srcMap)
+    {
+        const newKey = keyMapper(key);
+        destMap.set(newKey, value);
+    }
+    return destMap;
+}

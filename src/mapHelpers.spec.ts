@@ -1,4 +1,4 @@
-import { objToStrMap, strMapToObj, strMapToJson, jsonToStrMap, mapToStrMap } from "./mapHelpers";
+import { objToStrMap, strMapToObj, strMapToJson, jsonToStrMap, mapToStrMap, mapToJson } from "./mapHelpers";
 
 
 describe("strMapToObj()", () => {
@@ -63,6 +63,20 @@ describe("mapToStrMap()", () => {
         expect(destMap.size).toEqual(2);
         expect(destMap.get("3")).toEqual(3);
         expect(destMap.get("5")).toEqual(5);
+    });
+
+});
+
+
+describe("mapToJson()", () => {
+
+    it("converts to the expected JSON", () => {
+        const map = new Map<number, number>();
+        map.set(2, 3);
+        map.set(4, 5);
+
+        const actual = mapToJson(map, (curKey) => curKey.toString(), undefined, 4);
+        expect(actual).toEqual(`{\n    "2": 3,\n    "4": 5\n}`);
     });
 
 });

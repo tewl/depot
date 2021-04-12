@@ -59,3 +59,25 @@ export function mapToStrMap<TKey, TValue>(
     }
     return destMap;
 }
+
+
+/**
+ * Converts a map to a JSON string.
+ * @param srcMap - The map to be converted.
+ * @param keyMapper - A function that will be invoked with each key from
+ * @param replacer - Replacer function.
+ * @param space - JSON indentation.
+ * @return Description
+ */
+export function mapToJson<TKey, TValue>(
+    srcMap: Map<TKey, TValue>,
+    keyMapper: (key: TKey) => string,
+    replacer?: (this: any, key: string, value: any) => any,
+    space?: string | number
+): string
+{
+    const strMap = mapToStrMap(srcMap, keyMapper);
+    const obj = strMapToObj(strMap);
+    const json = JSON.stringify(obj, replacer, space);
+    return json;
+}

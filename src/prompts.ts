@@ -34,3 +34,54 @@ export function promptToContinue<T>(
         }
     });
 }
+
+
+/**
+ * Prompts the user to enter a string.
+ * @param message - The prompt message to display
+ * @param defaultValue - The default input value
+ * @return A promise that is resolved with the string the user entered.
+ */
+export function promtpForString(
+    message: string,
+    defaultValue?: string
+): Promise<string>
+{
+    const question: inquirer.Question = {
+        type: "input",
+        name: "inputValue",
+        message: message,
+        default: defaultValue
+    };
+
+    return inquirer.prompt<{ inputValue: string; }>([question])
+        .then((answers) =>
+        {
+            return answers.inputValue;
+        });
+}
+
+
+/**
+ * Prompts the user to enter a string via their default editor.
+ * @param message - The prompt message to display
+ * @param defaultValue - The default input value
+ * @return A promise that is resolved with the string the user entered.
+ */
+export function promtpForStringInEditor(
+    message: string,
+    defaultValue?: string
+): Promise<string>
+{
+    const question: inquirer.Question = {
+        type: "editor",
+        name: "editorInput",
+        message: message,
+        default: defaultValue
+    };
+
+    return inquirer.prompt<{editorInput: string}>([question])
+    .then((answers) => {
+        return answers.editorInput;
+    });
+}

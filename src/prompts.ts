@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as inquirer from "inquirer";
 
 
@@ -40,7 +41,7 @@ export function promptToContinue<T>(
  * Prompts the user to enter a string.
  * @param message - The prompt message to display
  * @param defaultValue - The default input value
- * @return A promise that is resolved with the string the user entered.
+ * @return A promise that resolves with the string the user entered.
  */
 export function promtpForString(
     message: string,
@@ -54,11 +55,54 @@ export function promtpForString(
         default: defaultValue
     };
 
-    return inquirer.prompt<{ inputValue: string; }>([question])
-        .then((answers) =>
-        {
-            return answers.inputValue;
-        });
+    return inquirer.prompt<{inputValue: string}>([question])
+    .then((answers) =>
+    {
+        return answers.inputValue;
+    });
+}
+
+
+/**
+ * Interface defining the properties of a choice of type string.
+ */
+export interface IChoiceString {
+    name: string;
+    value: string;
+}
+
+
+/**
+ * Prompts the user to choose one of the provided choices or to enter their own
+ * "other" string value.
+ * @param message - The prompt to display
+ * @param choices - The provided choices to present along with "other"
+ * @return A promise that resolves with the string entered by the user.
+ */
+export async function promptForStringWithChoices(
+    message: string,
+    choices: Array<IChoiceString>
+): Promise<string>
+{
+    const otherValue = "otherValueXyzzy";
+    const actualChoices =
+        _.chain(choices)
+        .map((curChoice) => ({name: curChoice.name, value: curChoice.value, short: curChoice.name}))
+        .concat({name: "other", value: otherValue, short: "other"})
+        .value();
+
+    const question: inquirer.Question = {
+        type: "list",
+        name: "inputValue",
+        message: message,
+        choices: actualChoices
+    };
+
+    const answers = await inquirer.prompt<{inputValue: string}>([question]);
+    return answers.inputValue === otherValue ?
+        promtpForString(message) :
+        answers.inputValue;
+
 }
 
 
@@ -66,7 +110,7 @@ export function promtpForString(
  * Prompts the user to enter a string via their default editor.
  * @param message - The prompt message to display
  * @param defaultValue - The default input value
- * @return A promise that is resolved with the string the user entered.
+ * @return A promise that resolves with the string the user entered.
  */
 export function promtpForStringInEditor(
     message: string,

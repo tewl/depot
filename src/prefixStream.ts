@@ -2,6 +2,9 @@ import {Transform} from "stream";
 import {Deferred} from "./deferred";
 
 
+/**
+ * A stream that prefixes each line with a specified string.
+ */
 export class PrefixStream extends Transform
 {
     // region Private Members

@@ -902,25 +902,14 @@ describe("File", () => {
                             return;
                         }
 
-                        if (operatingSystem === OperatingSystem.WINDOWS) {
-                            // On Windows, the srcFile's atime is not updated
-                            // when it is copied.  If it was properly copied to
-                            // dstFile, then the atime should be a little over 2
-                            // seconds ago.
-                            const delta = Date.now() - dstStats.atime.valueOf();
-                            expect(delta).toBeGreaterThanOrEqual(2000);
-                            expect(delta).toBeLessThan(2200);
-                        }
-                        else {
-                            // The destination file will have a last access time
-                            // (atime) close to now, because it was copied from the
-                            // source file and the source file's atime was updated
-                            // during the copy operation.  Because the destination
-                            // file's atime could be up to 1 second before the
-                            // source file's, we will allow for a little over 1
-                            // second.
-                            expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
-                        }
+                        // The destination file will have a last access time
+                        // (atime) close to now, because it was copied from the
+                        // source file and the source file's atime was updated
+                        // during the copy operation.  Because the destination
+                        // file's atime could be up to 1 second before the
+                        // source file's, we will allow for a little over 1
+                        // second.
+                        expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
 
                         expect(dstStats.mtime.valueOf() - srcStats.mtime.valueOf()).toBeLessThan(1000);
                         done();
@@ -1059,24 +1048,14 @@ describe("File", () => {
                         return;
                     }
 
-                    if (operatingSystem === OperatingSystem.WINDOWS) {
-                        // On Windows, the srcFile's atime is not updated when
-                        // it is copied.  If it was properly copied to dstFile,
-                        // then the atime should be a little over 2 seconds ago.
-                        const delta = Date.now() - dstStats.atime.valueOf();
-                        expect(delta).toBeGreaterThanOrEqual(2000);
-                        expect(delta).toBeLessThan(2200);
-                    }
-                    else {
-                        // The destination file will have a last access time
-                        // (atime) close to now, because it was copied from the
-                        // source file and the source file's atime was updated
-                        // during the copy operation.  Because the destination
-                        // file's atime could be up to 1 second before the
-                        // source file's, we will allow for a little over 1
-                        // second.
-                        expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
-                    }
+                    // The destination file will have a last access time
+                    // (atime) close to now, because it was copied from the
+                    // source file and the source file's atime was updated
+                    // during the copy operation.  Because the destination
+                    // file's atime could be up to 1 second before the
+                    // source file's, we will allow for a little over 1
+                    // second.
+                    expect(Date.now() - dstStats.atime.valueOf()).toBeLessThan(1100);
 
                     expect(dstStats.mtime.valueOf() - srcStats.mtime.valueOf()).toBeLessThan(1000);
                     done();

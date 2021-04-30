@@ -2,9 +2,10 @@ import * as path from "path";
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as _ from "lodash";
-import {spawn} from "./spawn";
+import {spawn, SpawnCloseError} from "./spawn";
 import {tmpDir} from "../test/ut/specHelpers";
 import {getOs, OperatingSystem} from "./os";
+
 
 describe("spawn", () => {
 
@@ -156,6 +157,20 @@ describe("spawn", () => {
             expect(windowsMsgRegex.test(err.stderr) || macMsgRegex.test(err.stderr)).toBeTruthy();
             done();
         });
+    });
+
+
+    it("provides the expected system error information when the process fails to start", (done) => {
+        spawn("notarealcommand.exe", []).closePromise
+        .catch((err: SpawnCloseError) => {
+            if (err.type !== "ISpawnSystemError") {
+                fail("Should have gotten an ISpawnSystemError.");
+                return;
+            }
+
+            expect(err.code).toEqual("ENOENT");
+            done();
+        })
     });
 
 

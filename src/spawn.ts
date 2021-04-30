@@ -5,6 +5,23 @@ import * as stream from "stream";
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
 
+
+// A Node.js error type that is not defined within the Node.js type definitions.
+// https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33217
+export interface ISystemError
+{
+    address?: string; // If present, the address to which a network connection failed
+    code?: string;    // The string error code
+    dest?: string;    // If present, the file path destination when reporting a file system error
+    errno?: number;   // The system-provided error number
+    info?: object;    // If present, extra details about the error condition
+    message?: string; // A system-provided human - readable description of the error
+    path?: string;    // If present, the file path when reporting a file system error
+    port?: number;    // If present, the network connection port that is not available
+    syscall?: string; // The name of the system call that triggered the error
+}
+
+
 export interface ISpawnResult
 {
     /**
@@ -18,6 +35,25 @@ export interface ISpawnResult
      */
     closePromise: Promise<string>;
 }
+
+
+export type SpawnCloseError = ISpawnSystemError | ISpawnExitError;
+
+
+export interface ISpawnSystemError extends ISystemError
+{
+    type: "ISpawnSystemError";
+}
+
+
+export interface ISpawnExitError
+{
+    type:     "ISpawnExitError";
+    exitCode: number;
+    stderr:   string;
+    stdout:   string;
+}
+
 
 /**
  * Spawns a child process.  Each stdout and stderr output line is prefixed with
@@ -59,8 +95,7 @@ export function spawn(
     let childProcess: cp.ChildProcess;
 
     const closePromise = new Promise((resolve: (output: string) => void,
-                                      reject: (err: {exitCode: number, stderr: string, stdout: string}) => void) => {
-
+                                      reject: (err: SpawnCloseError) => void) => {
         const spawnOptions: cp.SpawnOptions = _.defaults(
             {},
             options,
@@ -80,6 +115,10 @@ export function spawn(
         .pipe(stderrCollector)  // to capture stderr in case child process errors
         .pipe(errorStream);
 
+        childProcess.once("error", (err: ISystemError) => {
+            reject({type: "ISpawnSystemError", ...err});
+        });
+
         childProcess.once("exit", (exitCode: number) => {
             // Wait for all steams to flush before reporting that the child
             // process has finished.
@@ -96,7 +135,12 @@ export function spawn(
                     {
                         console.log(`Child process failed: ${cmdLineRepresentation}`);
                     }
-                    reject({exitCode: exitCode, stderr: stderrCollector.collected, stdout: stdoutCollector.collected});
+                    reject({
+                        type: "ISpawnExitError",
+                        exitCode: exitCode,
+                        stderr: stderrCollector.collected,
+                        stdout: stdoutCollector.collected
+                    });
                 }
             });
         });

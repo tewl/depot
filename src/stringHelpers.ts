@@ -1,3 +1,4 @@
+import * as os from "os";
 import * as _ from "lodash";
 import {createEolRegex} from "./regexpHelpers";
 
@@ -297,4 +298,17 @@ export function getEol(text: string): string
     else {
         return match[0];
     }
+}
+
+
+/**
+ * Concatenates an array of string into a single string using the specified
+ * separator.
+ * @param strings - The strings to join
+ * @param sep - The separator to insert between each array element
+ * @return Description
+ */
+export function concatStrings(strings: Array<string>, sep: string = os.EOL): string
+{
+    return strings.join(sep);
 }

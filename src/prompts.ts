@@ -7,17 +7,14 @@ import * as inquirer from "inquirer";
  * @param message - The message to display
  * @param defaultToConfirm - true to make confirmation the default response.
  * false to make canceling the default.
- * @param resolveValue - If the user chooses to continue, the returned promise
- * will be resolved with this value.  This makes promise chains easier to
- * create.
- * @return A promise that is resolved with resolveValue when the user chooses to
- * continue and rejects when they decline
+ * @return A promise that is resolved with a boolean indicating whether the user
+ * has confirmed (true) or not (false).
  */
-export function promptToContinue<T>(
-    message: string,
-    defaultToConfirm: boolean,
-    resolveValue: T
-): Promise<T> {
+export async function promptToContinue(
+    message:          string,
+    defaultToConfirm: boolean
+): Promise<boolean>
+{
     const questionConfirmation: inquirer.Question = {
         type: "confirm",
         name: "confirm",
@@ -25,15 +22,8 @@ export function promptToContinue<T>(
         message: message || "Continue?"
     };
 
-    return inquirer.prompt<{confirm: boolean}>([questionConfirmation])
-    .then((answers) => {
-        if (!answers.confirm) {
-            throw "Operation cancelled by user.";  // tslint:disable-line:no-string-throw
-        }
-        else {
-            return resolveValue;
-        }
-    });
+    const answers = await inquirer.prompt<{ confirm: boolean; }>([questionConfirmation]);
+    return answers.confirm;
 }
 
 

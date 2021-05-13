@@ -26,7 +26,7 @@ export function readableStreamToText(readable: Readable): Promise<string> {
 
 
 // A helper method used to read a Node.js readable stream into a Buffer
-export function streamToBuffer(readableStream: Readable): Promise<Buffer>
+export function streamToBuffer(readableStream: NodeJS.ReadableStream): Promise<Buffer>
 {
     return new Promise((resolve, reject) =>
     {

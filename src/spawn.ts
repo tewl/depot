@@ -38,7 +38,11 @@ export interface ISpawnResult
 
 
 export type SpawnCloseError = ISpawnSystemError | ISpawnExitError;
-
+export function isSpawnCloseError(a: any): a is SpawnCloseError
+{
+    return (a as SpawnCloseError).type === "ISpawnSystemError" ||
+           (a as SpawnCloseError).type === "ISpawnExitError";
+}
 
 export interface ISpawnSystemError extends ISystemError
 {

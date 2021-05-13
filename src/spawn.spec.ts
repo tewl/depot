@@ -170,7 +170,7 @@ describe("spawn", () => {
 
             expect(err.code).toEqual("ENOENT");
             done();
-        })
+        });
     });
 
 

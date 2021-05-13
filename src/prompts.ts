@@ -102,7 +102,6 @@ export async function promptForStringWithChoices(
     return answers.inputValue === otherValue ?
         promtpForString(message) :
         answers.inputValue;
-
 }
 
 
@@ -112,7 +111,7 @@ export async function promptForStringWithChoices(
  * @param defaultValue - The default input value
  * @return A promise that resolves with the string the user entered.
  */
-export function promtpForStringInEditor(
+export function promptForStringInEditor(
     message: string,
     defaultValue?: string
 ): Promise<string>

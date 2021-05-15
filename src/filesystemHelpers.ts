@@ -37,7 +37,7 @@ export function getFilesystemItem(path: string): Promise<Directory | File>
 
 
 /**
- * Locates a file is the specified directory or a parent directory.
+ * Locates a file in the specified directory or a parent directory.
  * @param searchFileName - The file being searched for
  * @param startingDir - The directory where to start searching
  * @return A promise that resolves with a result of the search.  If the search

@@ -302,7 +302,7 @@ export function getEol(text: string): string
 
 
 /**
- * Concatenates an array of string into a single string using the specified
+ * Concatenates an array of strings into a single string using the specified
  * separator.
  * @param strings - The strings to join
  * @param sep - The separator to insert between each array element

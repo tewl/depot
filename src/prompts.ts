@@ -63,11 +63,40 @@ export interface IChoiceString {
 
 
 /**
+ * Prompts the user to choose one of the specified choices.
+ * @param message - The prompt to display
+ * @param choices - The choices to present to the user.
+ * @return A promise that resolves with the chosen choice's value.
+ */
+export async function promptForChoice(
+    message: string,
+    choices: Array<IChoiceString>
+): Promise<string>
+{
+    const actualChoices = _.chain(choices)
+        .map((curChoice) => ({name: curChoice.name, value: curChoice.value, short: curChoice.name}))
+        .value();
+
+    const question: inquirer.Question = {
+        type: "list",
+        name: "inputValue",
+        message: message,
+        choices: actualChoices
+    };
+
+    const answers = await inquirer.prompt<{inputValue: string}>([question]);
+    return answers.inputValue;
+}
+
+
+/**
  * Prompts the user to choose one of the provided choices or to enter their own
  * "other" string value.
  * @param message - The prompt to display
  * @param choices - The provided choices to present along with "other"
- * @return A promise that resolves with the string entered by the user.
+ * @return A promise that resolves with the entered string. If the user selected
+ * from the choices, the choice's value is returned.  If the user chose to enter
+ * another value, that value is returned.
  */
 export async function promptForStringWithChoices(
     message: string,

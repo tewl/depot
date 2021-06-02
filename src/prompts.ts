@@ -119,7 +119,7 @@ export async function promptForStringWithChoices(
 
     const answers = await inquirer.prompt<{inputValue: string}>([question]);
     return answers.inputValue === otherValue ?
-        promtpForString(message) :
+        promptForString(message) :
         answers.inputValue;
 }
 

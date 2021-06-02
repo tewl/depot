@@ -33,7 +33,7 @@ export async function promptToContinue(
  * @param defaultValue - The default input value
  * @return A promise that resolves with the string the user entered.
  */
-export function promtpForString(
+export function promptForString(
     message: string,
     defaultValue?: string
 ): Promise<string>

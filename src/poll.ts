@@ -40,7 +40,9 @@ type Func<TReturn> = (() => TReturn);
 /**
  * Performs an operation until a predicate returns true.
  * @param func - The operation to be performed periodically.  This function
- * takes no parameters and returns TReturn.
+ * takes no parameters and returns TReturn.  Any thrown exceptions should be
+ * caught within this function, because it will not be called within a try/catch
+ * block.
  * @param continuePollingPredicate - The predicate which determines whether
  * polling will continue.  This function is called with the iteration number,
  * the number of milliseconds since polling began, and _func_'s return value for

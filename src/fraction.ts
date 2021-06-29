@@ -117,6 +117,8 @@ export class Fraction
 
     public static fromString(str: string): Fraction
     {
+        str = _.trim(str);
+
         let negativeAdjuster = 1;   // If positive, multiply by 1
         if (str[0] === "-") {
             negativeAdjuster = -1;  // If negative, will multiply by -1

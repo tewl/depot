@@ -5,7 +5,7 @@ import { getTimerPromise } from "./promiseHelpers";
 
 describe("poll()", () => {
 
-    it("will poll until the predicate says to stop", async () => {
+    it("", async () => {
 
         const logger = new Logger();
         logger.pushLogLevel(LogLevel.DEBUG_5);
@@ -51,24 +51,4 @@ describe("poll()", () => {
         const result = await poll<Promise<number>, string>(asyncOperation, predicate);
         expect(result).toEqual("7");
     });
-
-
-    it("will timeout and return the configured value", async () => {
-        const startTime = Date.now();
-        const timeoutMs = 1000 * 2;
-        let numInvocations = 0;
-        const result = await poll(
-            () => {
-                numInvocations++;
-                return 5;
-            },
-            async () => continuePollingYes(100),
-            {timeoutPeriodMs: timeoutMs, timeoutValue: 60}
-        );
-
-        expect(result).toEqual(60);
-        expect(Date.now() - startTime).toBeGreaterThanOrEqual(timeoutMs);
-        expect(numInvocations).toBeGreaterThanOrEqual(18);
-    });
-
 });

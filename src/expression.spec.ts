@@ -1,12 +1,12 @@
-import {IExpressionTokenNumber, parse} from "./expression";
+import {IExpressionTokenNumber, IExpressionTokenOperator, scan} from "./expression";
 import {Fraction} from "./fraction";
 import {succeeded, failed} from "./result";
 
-fdescribe("parse", () => {
+describe("scan()", () => {
 
 
-    it("successfully parses a whole number", () => {
-        const parseResult = parse("3");
+    it("successfully tokenizes a whole number", () => {
+        const parseResult = scan("3");
         expect(succeeded(parseResult)).toBeTruthy();
         const tokens = parseResult.value!;
         expect(tokens.length).toEqual(1);
@@ -15,9 +15,9 @@ fdescribe("parse", () => {
     });
 
 
-    it("successfully parses an expression with leading whitespace", () =>
+    it("successfully tokenizes an expression with leading whitespace", () =>
     {
-        const parseResult = parse("   \t  3");
+        const parseResult = scan("   \t  3");
         expect(succeeded(parseResult)).toBeTruthy();
         const tokens = parseResult.value!;
         expect(tokens.length).toEqual(1);
@@ -26,9 +26,9 @@ fdescribe("parse", () => {
     });
 
 
-    it("successfully parses an expression with trailing whitespace", () =>
+    it("successfully tokenizes an expression with trailing whitespace", () =>
     {
-        const parseResult = parse("3  \t   ");
+        const parseResult = scan("3  \t   ");
         expect(succeeded(parseResult)).toBeTruthy();
         const tokens = parseResult.value!;
         expect(tokens.length).toEqual(1);
@@ -37,8 +37,8 @@ fdescribe("parse", () => {
     });
 
 
-    it("successfully parses a fraction", () => {
-        const parseResult = parse("1/4");
+    it("successfully tokenizes a fraction", () => {
+        const parseResult = scan("1/4");
         expect(succeeded(parseResult)).toBeTruthy();
         const tokens = parseResult.value!;
         expect(tokens.length).toEqual(1);
@@ -47,9 +47,9 @@ fdescribe("parse", () => {
     });
 
 
-    it("successfully parses a fraction that contains a whole number and a fractional part", () =>
+    it("successfully tokenizes a fraction that contains a whole number and a fractional part", () =>
     {
-        const parseResult = parse("2 1/4");
+        const parseResult = scan("2 1/4");
         expect(succeeded(parseResult)).toBeTruthy();
         const tokens = parseResult.value!;
         expect(tokens.length).toEqual(1);
@@ -58,15 +58,15 @@ fdescribe("parse", () => {
     });
 
 
-    it("successfully parses a fraction that contains a plus operator", () => {
-
-    });
-
-
-    it("fails to parse an expression with two consecutive numbers", () => {
-        const parseResult = parse("2 1/4 1/2");
-        expect(failed(parseResult)).toBeTruthy();
-        expect(parseResult.error).toEqual(`Illegal consecutive number token "1/2" at index 6.`);
+    it("successfully tokenizes an expression that contains a plus operator", () => {
+        const scanResult = scan("2 + 3");
+        expect(succeeded(scanResult)).toBeTruthy();
+        const tokens = scanResult.value!;
+        expect(tokens.length).toEqual(3);
+        expect(tokens[0].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[1].type).toEqual("IExpressionTokenOperator");
+        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("+");
+        expect(tokens[2].type).toEqual("IExpressionTokenNumber");
     });
 
 });

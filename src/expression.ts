@@ -110,7 +110,7 @@ const plusTokenizer = {
 tokenizers.push(plusTokenizer);
 
 
-export function scan(input: string): Result<Array<ExpressionToken>, string>
+export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 {
     const originalExpression = input;
     let remainingExpression = input;

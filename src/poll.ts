@@ -37,10 +37,16 @@ export type ContinuePollingPredicate<TReturn, TResult> =
 type Func<TReturn> = (() => TReturn);
 
 
+export interface ITimeoutConfig<T>
+{
+    timeoutPeriodMs: number;
+    timeoutValue: T;
+}
+
 /**
  * Performs an operation until a predicate returns true.
  * @param func - The operation to be performed periodically.  This function
- * takes no parameters and returns TReturn.  Any thrown exceptions should be
+ * takes no parameters and returns _TReturn_.  Any thrown exceptions should be
  * caught within this function, because it will not be called within a try/catch
  * block.
  * @param continuePollingPredicate - The predicate which determines whether
@@ -51,18 +57,27 @@ type Func<TReturn> = (() => TReturn);
  * these objects, use the _continuePollingYes()_ and _continuePollingNo()_
  * functions.  When _IContinuePollingNo_ is returned, the value specified for
  * _result_ will be returned.
+ * @param timeoutConfig - (Optional) A timeout period and return value.  If
+ * polling exceeds the specified amount of time, the specified return value will
+ * be returned.
  * @return The _result_ value the predicate specified when returning
- * _IContinuePollingNo_.
+ * _IContinuePollingNo_ or the timeout value.
  */
 export async function poll<TReturn, TResult>(
     func: Func<TReturn>,
-    continuePollingPredicate: ContinuePollingPredicate<TReturn, TResult>
+    continuePollingPredicate: ContinuePollingPredicate<TReturn, TResult>,
+    timeoutConfig?: ITimeoutConfig<TResult>
 ): Promise<TResult>
 {
     const startTime = Date.now();
     let   iterationNum = 1;
 
     while (true) {
+        const elapsedTime = Date.now() - startTime;
+        if (timeoutConfig && elapsedTime > timeoutConfig.timeoutPeriodMs) {
+            return timeoutConfig.timeoutValue;
+        }
+
         const retVal = func();
 
         // Invoke the predicate to see if polling should continue.  Wrap the

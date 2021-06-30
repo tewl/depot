@@ -54,7 +54,6 @@ type Func<TReturn> = (() => TReturn);
  * @return The _result_ value the predicate specified when returning
  * _IContinuePollingNo_.
  */
-
 export async function poll<TReturn, TResult>(
     func: Func<TReturn>,
     continuePollingPredicate: ContinuePollingPredicate<TReturn, TResult>

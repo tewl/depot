@@ -1,4 +1,5 @@
 import { getTimerPromise } from "./promiseHelpers";
+import { Result, succeeded } from "./result";
 
 
 interface IContinuePollingYes
@@ -78,4 +79,40 @@ export async function poll<TReturn, TResult>(
             return continueResult.result;
         }
     }
+}
+
+
+/**
+ * Performs an asynchronous operation that returns a Promise for a Result until
+ * the returned result is successful or a timeout period elapses.
+ * @param asyncResultOp - The Result-returning asynchronous operation.
+ * @param pollIntervalMs - The number of milliseconds to delay between failed
+ *      invocations of _asyncResultop_.
+ * @param timeoutMs - Number of milliseconds from the start time to give up
+ *      and return the most recent failure result.
+ * @return Description
+ */
+export async function pollAsyncResult<TSuccess, TError>(
+    asyncResultOp: () => Promise<Result<TSuccess, TError>>,
+    pollIntervalMs: number,
+    timeoutMs: number
+): Promise<Result<TSuccess, TError>>
+{
+    const result = await poll(
+        asyncResultOp,
+        async (iterationNum, startTime, asyncResultPromise) =>
+        {
+            const result = await asyncResultPromise;
+            if (succeeded(result) ||
+                (Date.now() - startTime > timeoutMs))
+            {
+                return continuePollingNo(result);
+            }
+            else
+            {
+                return continuePollingYes(pollIntervalMs);
+            }
+        }
+    );
+    return result;
 }

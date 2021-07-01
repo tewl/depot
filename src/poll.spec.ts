@@ -1,6 +1,7 @@
 import { Logger, LogLevel } from "./logger";
-import { continuePollingNo, ContinuePollingPredicate, continuePollingYes, poll } from "./poll";
+import { continuePollingNo, ContinuePollingPredicate, continuePollingYes, poll, pollAsyncResult } from "./poll";
 import { getTimerPromise } from "./promiseHelpers";
+import { failed, failedResult, succeeded, succeededResult } from "./result";
 
 
 describe("poll()", () => {
@@ -51,4 +52,41 @@ describe("poll()", () => {
         const result = await poll<Promise<number>, string>(asyncOperation, predicate);
         expect(result).toEqual("7");
     });
+});
+
+
+describe("pollAsyncResult()", () => {
+
+
+    it("when operation succeeds, returns the successful result", async () => {
+
+        const startTime = Date.now();
+        let numInvocations = 0;
+        const pollingInterval = 100;
+
+        const asyncResultOp = async () =>
+        {
+            numInvocations++;
+            return numInvocations === 4 ? succeededResult(4) : failedResult(0);
+        };
+
+        const result = await pollAsyncResult(asyncResultOp, pollingInterval, 1000);
+        expect(succeeded(result)).toBeTruthy();
+        expect(Date.now() - startTime).toBeGreaterThan(3 * pollingInterval);
+        expect(result.value).toEqual(4);
+    });
+
+
+    it("when timing out returns the most recent failure", async () => {
+
+        const asyncResultOp = async () => {
+            return failedResult(5);
+        };
+
+        const result = await pollAsyncResult(asyncResultOp, 100, 1000);
+        expect(failed(result)).toBeTruthy();
+        expect(result.error).toEqual(5);
+    });
+
+
 });

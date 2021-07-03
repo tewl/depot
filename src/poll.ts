@@ -1,5 +1,5 @@
 import { getTimerPromise } from "./promiseHelpers";
-import { Result, succeeded } from "./result";
+import { ISucceededResult, Result, succeeded } from "./result";
 
 
 interface IContinuePollingYes
@@ -86,6 +86,11 @@ export async function poll<TReturn, TResult>(
  * Performs an asynchronous operation that returns a Promise for a Result until
  * the returned result is successful or a timeout period elapses.
  * @param asyncResultOp - The Result-returning asynchronous operation.
+ * @param additionalPredicate - A function that will be called if the current
+ *      iteration is successful.  This predicate should return false if polling
+ *      should stop or true to continue polling.  This parameter is useful when
+ *      the asynchronous operation succeeds but the desired side effects are not
+ *      yet present in the returned result value.
  * @param pollIntervalMs - The number of milliseconds to delay between failed
  *      invocations of _asyncResultop_.
  * @param timeoutMs - Number of milliseconds from the start time to give up
@@ -94,6 +99,7 @@ export async function poll<TReturn, TResult>(
  */
 export async function pollAsyncResult<TSuccess, TError>(
     asyncResultOp: () => Promise<Result<TSuccess, TError>>,
+    additionalPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
     pollIntervalMs: number,
     timeoutMs: number
 ): Promise<Result<TSuccess, TError>>
@@ -103,13 +109,22 @@ export async function pollAsyncResult<TSuccess, TError>(
         async (iterationNum, startTime, asyncResultPromise) =>
         {
             const result = await asyncResultPromise;
-            if (succeeded(result) ||
-                (Date.now() - startTime > timeoutMs))
-            {
+            if (Date.now() - startTime > timeoutMs) {
+                // It doesn't matter whether the call succeeded.  We have
+                // exceeded the timeout.  Just return the status.
                 return continuePollingNo(result);
+            }
+            else if (succeeded(result)) {
+                let continuePolling = false;
+                if (additionalPredicate) {
+                    continuePolling = additionalPredicate(iterationNum, startTime, result.value);
+                }
+                return continuePolling ? continuePollingYes(pollIntervalMs) :
+                                         continuePollingNo(result);
             }
             else
             {
+                // The call failed.  Keep polling.
                 return continuePollingYes(pollIntervalMs);
             }
         }

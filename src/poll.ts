@@ -83,6 +83,21 @@ export async function poll<TReturn, TResult>(
 
 
 /**
+ * A class for representing polling timeout errors.
+ */
+class PollingTimeoutError<TSuccess, TError> extends Error
+{
+    public readonly lastResult: Result<TSuccess, TError>;
+
+    public constructor(message: string, lastResult: Result<TSuccess, TError>)
+    {
+        super(message);
+        this.lastResult = lastResult;
+    }
+}
+
+
+/**
  * Performs an asynchronous operation that returns a Promise for a Result until
  * the returned result is successful or a timeout period elapses.
  * @param asyncResultOp - The Result-returning asynchronous operation.
@@ -102,11 +117,12 @@ export async function pollAsyncResult<TSuccess, TError>(
     donePollingPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
     pollIntervalMs: number,
     timeoutMs: number
-): Promise<Result<TSuccess, string | TError>>
+): Promise<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>
 {
-    const result: Result<TSuccess, string | TError> = await poll(
+    const result = await poll(
         asyncResultOp,
-        async (iterationNum, startTime, asyncResultPromise): Promise<ContinuePollingResult<Result<TSuccess, string | TError>>> =>
+        // tslint:disable-next-line: max-line-length
+        async (iterationNum, startTime, asyncResultPromise): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
         {
             const result = await asyncResultPromise;
             if (succeeded(result)) {
@@ -121,7 +137,7 @@ export async function pollAsyncResult<TSuccess, TError>(
             }
 
             if (Date.now() - startTime > timeoutMs) {
-                return continuePollingNo(failedResult(`Polling timed out after ${timeoutMs} ms.`));
+                return continuePollingNo(failedResult(new PollingTimeoutError(`Polling timed out after ${timeoutMs} ms.`, result)));
             }
             else {
                 return continuePollingYes(pollIntervalMs);
@@ -130,15 +146,3 @@ export async function pollAsyncResult<TSuccess, TError>(
     );
     return result;
 }
-
-
-// class PollingTimeoutError<TSuccess, TError> extends Error
-// {
-//     public readonly lastResult: Result<TSuccess, TError>;
-//
-//     public constructor(message: string, lastResult: Result<TSuccess, TError>) {
-//         super(message);
-//         this.lastResult = lastResult;
-//     }
-// }
-

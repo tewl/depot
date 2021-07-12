@@ -85,7 +85,7 @@ describe("pollAsyncResult()", () => {
 
         const result = await pollAsyncResult(asyncResultOp, undefined, 100, 1000);
         expect(failed(result)).toBeTruthy();
-        expect(result.error).toEqual(5);
+        expect(result.error).toMatch("Polling timed out after 1000 ms.");
     });
 
 
@@ -105,6 +105,23 @@ describe("pollAsyncResult()", () => {
 
         expect(succeeded(result)).toBeTruthy();
         expect(result.value).toEqual(5);
+    });
+
+
+    it("when the operation always succeeds returns an error if the predicate is never satisfied", async () => {
+        const asyncResultOp = async () => {
+            return succeededResult(1);
+        };
+
+        const result = await pollAsyncResult(
+            asyncResultOp,
+            () => false,
+            100,
+            500
+        );
+
+        expect(failed(result)).toBeTruthy();
+        expect(typeof result.error).toEqual("string");
     });
 
 

@@ -1,5 +1,5 @@
 import { getTimerPromise } from "./promiseHelpers";
-import { ISucceededResult, Result, succeeded } from "./result";
+import { failedResult, Result, succeeded, succeededResult } from "./result";
 
 
 interface IContinuePollingYes
@@ -102,32 +102,43 @@ export async function pollAsyncResult<TSuccess, TError>(
     donePollingPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
     pollIntervalMs: number,
     timeoutMs: number
-): Promise<Result<TSuccess, TError>>
+): Promise<Result<TSuccess, string | TError>>
 {
-    const result = await poll(
+    const result: Result<TSuccess, string | TError> = await poll(
         asyncResultOp,
-        async (iterationNum, startTime, asyncResultPromise) =>
+        async (iterationNum, startTime, asyncResultPromise): Promise<ContinuePollingResult<Result<TSuccess, string | TError>>> =>
         {
             const result = await asyncResultPromise;
-            if (Date.now() - startTime > timeoutMs) {
-                // It doesn't matter whether the call succeeded.  We have
-                // exceeded the timeout.  Just return the status.
-                return continuePollingNo(result);
-            }
-            else if (succeeded(result)) {
-                let continuePolling = false;
+            if (succeeded(result)) {
+                let donePolling = true;
                 if (donePollingPredicate) {
-                    continuePolling = !donePollingPredicate(iterationNum, startTime, result.value);
+                    donePolling = donePollingPredicate(iterationNum, startTime, result.value);
                 }
-                return continuePolling ? continuePollingYes(pollIntervalMs) :
-                                         continuePollingNo(result);
+
+                if (donePolling) {
+                    return continuePollingNo(result);
+                }
             }
-            else
-            {
-                // The call failed.  Keep polling.
+
+            if (Date.now() - startTime > timeoutMs) {
+                return continuePollingNo(failedResult(`Polling timed out after ${timeoutMs} ms.`));
+            }
+            else {
                 return continuePollingYes(pollIntervalMs);
             }
         }
     );
     return result;
 }
+
+
+// class PollingTimeoutError<TSuccess, TError> extends Error
+// {
+//     public readonly lastResult: Result<TSuccess, TError>;
+//
+//     public constructor(message: string, lastResult: Result<TSuccess, TError>) {
+//         super(message);
+//         this.lastResult = lastResult;
+//     }
+// }
+

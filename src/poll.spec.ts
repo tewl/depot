@@ -98,7 +98,7 @@ describe("pollAsyncResult()", () => {
 
         const result = await pollAsyncResult(
             asyncResultOp,
-            (iterationNum, startTime, retVal) => retVal < 5,  // keep polling while less than 5
+            (iterationNum, startTime, retVal) => retVal === 5,  // keep polling while less than 5
             100,
             1000
         );

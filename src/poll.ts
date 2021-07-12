@@ -86,9 +86,9 @@ export async function poll<TReturn, TResult>(
  * Performs an asynchronous operation that returns a Promise for a Result until
  * the returned result is successful or a timeout period elapses.
  * @param asyncResultOp - The Result-returning asynchronous operation.
- * @param additionalPredicate - A function that will be called if the current
- *      iteration is successful.  This predicate should return false if polling
- *      should stop or true to continue polling.  This parameter is useful when
+ * @param donePollingPredicate - A function that will be called if the current
+ *      iteration is successful.  This predicate should return true if polling
+ *      should stop or false to stop continue.  This parameter is useful when
  *      the asynchronous operation succeeds but the desired side effects are not
  *      yet present in the returned result value.
  * @param pollIntervalMs - The number of milliseconds to delay between failed
@@ -99,7 +99,7 @@ export async function poll<TReturn, TResult>(
  */
 export async function pollAsyncResult<TSuccess, TError>(
     asyncResultOp: () => Promise<Result<TSuccess, TError>>,
-    additionalPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
+    donePollingPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
     pollIntervalMs: number,
     timeoutMs: number
 ): Promise<Result<TSuccess, TError>>
@@ -116,8 +116,8 @@ export async function pollAsyncResult<TSuccess, TError>(
             }
             else if (succeeded(result)) {
                 let continuePolling = false;
-                if (additionalPredicate) {
-                    continuePolling = additionalPredicate(iterationNum, startTime, result.value);
+                if (donePollingPredicate) {
+                    continuePolling = !donePollingPredicate(iterationNum, startTime, result.value);
                 }
                 return continuePolling ? continuePollingYes(pollIntervalMs) :
                                          continuePollingNo(result);

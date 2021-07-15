@@ -180,4 +180,44 @@ fdescribe("tokenize()", () => {
         expect(tokens[2].text).toEqual("2 5/8");
     });
 
+
+    it("successfully tokenizes an expression that contains multiple operators", () => {
+        const tokenizeResult = tokenize("3/1 + 1/2 * 4/1");
+        expect(succeeded(tokenizeResult)).toBeTruthy();
+        const tokens = tokenizeResult.value!;
+        expect(tokens.length).toEqual(5);
+
+        expect(tokens[0].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[0].originalExpression).toEqual("3/1 + 1/2 * 4/1");
+        expect(tokens[0].startIndex).toEqual(0);
+        expect(tokens[0].endIndex).toEqual(4);
+        expect(tokens[0].text).toEqual("3/1 ");
+
+        expect(tokens[1].type).toEqual("IExpressionTokenOperator");
+        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("+");
+        expect(tokens[1].originalExpression).toEqual("3/1 + 1/2 * 4/1");
+        expect(tokens[1].startIndex).toEqual(4);
+        expect(tokens[1].endIndex).toEqual(6);
+        expect(tokens[1].text).toEqual("+ ");
+
+        expect(tokens[2].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[2].originalExpression).toEqual("3/1 + 1/2 * 4/1");
+        expect(tokens[2].startIndex).toEqual(6);
+        expect(tokens[2].endIndex).toEqual(10);
+        expect(tokens[2].text).toEqual("1/2 ");
+
+        expect(tokens[3].type).toEqual("IExpressionTokenOperator");
+        expect((tokens[3] as IExpressionTokenOperator).operator).toEqual("*");
+        expect(tokens[3].originalExpression).toEqual("3/1 + 1/2 * 4/1");
+        expect(tokens[3].startIndex).toEqual(10);
+        expect(tokens[3].endIndex).toEqual(12);
+        expect(tokens[3].text).toEqual("* ");
+
+        expect(tokens[4].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[4].originalExpression).toEqual("3/1 + 1/2 * 4/1");
+        expect(tokens[4].startIndex).toEqual(12);
+        expect(tokens[4].endIndex).toEqual(15);
+        expect(tokens[4].text).toEqual("4/1");
+    });
+
 });

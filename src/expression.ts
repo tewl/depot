@@ -12,10 +12,10 @@ export interface IDuType
 
 export interface IExpressionToken
 {
-    originalExpression: string;
-    startIndex: number;
-    endIndex: number;
-    text: string;
+    originalExpression: string;     // The full original expression
+    startIndex: number;             // Starting character index in originalExpression
+    endIndex: number;               // 1 *past* the last character
+    text: string;                   // The text comprising the token
 }
 
 
@@ -25,11 +25,11 @@ export interface IExpressionTokenNumber extends IDuType, IExpressionToken
     value: Fraction;
 }
 
-
+type ExpressionOperator = "+" | "-" | "*" | "/";
 export interface IExpressionTokenOperator extends IDuType, IExpressionToken
 {
     type: "IExpressionTokenOperator";
-    operator: "+";
+    operator: "+" | "-" | "*" | "/";
     precedence: number;
 }
 
@@ -61,54 +61,74 @@ interface ITokenizer
     tokenCreatorFn: TokenCreatorFn;
 }
 
-const tokenizers: Array<ITokenizer> = [];
-const numberTokenizer = {
-    matcherFn: (remainingText: string) =>
-    {
-        const regexWhole = /^(?<leadingws>\s*)(?<whole>\d+)(?<trailingws>\s*)/;
-        const regexFrac = /^(?<leadingws>\s*)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
-        const regexWholeAndFrac = /^(?<leadingws>\s*)(?<whole>\d+)(?<reqws>\s+)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
-        return regexWholeAndFrac.exec(remainingText) ||
-            regexFrac.exec(remainingText) ||
-            regexWhole.exec(remainingText);
-    },
-    tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-    {
-        const token: IExpressionTokenNumber = {
-            type: "IExpressionTokenNumber" as const,
-            value: Fraction.from(match[0]),
-            originalExpression: fullExpression,
-            startIndex: startIndex,
-            endIndex: endIndex,
-            text: match[0]
-        };
-        return token;
-    }
-};
-tokenizers.push(numberTokenizer);
 
-const plusTokenizer = {
-    matcherFn: (remainingText: string) =>
-    {
-        const regexPlus = /^(?<leadingws>\s*)(\+)(?<trailingws>\s*)/;
-        return regexPlus.exec(remainingText);
-    },
-    tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-    {
-        const token: IExpressionTokenOperator = {
-            type: "IExpressionTokenOperator" as const,
-            operator: "+",
-            precedence: 14,
-            originalExpression: fullExpression,
-            startIndex: startIndex,
-            endIndex: endIndex,
-            text: match[0]
-        };
-        return token;
-    }
-};
-tokenizers.push(plusTokenizer);
+function getOperatorPrecedenceTable(): Map<ExpressionOperator, number>
+{
+    const operatorPrecedenceTable = new Map<ExpressionOperator, number>();
+    operatorPrecedenceTable.set("*", 15);
+    operatorPrecedenceTable.set("/", 15);
+    operatorPrecedenceTable.set("+", 14);
+    operatorPrecedenceTable.set("-", 14);
 
+    return operatorPrecedenceTable;
+}
+const operatorPrecedenceTable = getOperatorPrecedenceTable();
+
+
+function getTokenizers(): Array<ITokenizer>
+{
+    const numberTokenizer = {
+        matcherFn: (remainingText: string) =>
+        {
+            const regexWhole = /^(?<leadingws>\s*)(?<whole>\d+)(?<trailingws>\s*)/;
+            const regexFrac = /^(?<leadingws>\s*)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
+            const regexWholeAndFrac = /^(?<leadingws>\s*)(?<whole>\d+)(?<reqws>\s+)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
+            return regexWholeAndFrac.exec(remainingText) ||
+                regexFrac.exec(remainingText) ||
+                regexWhole.exec(remainingText);
+        },
+        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+        {
+            const token: IExpressionTokenNumber = {
+                type: "IExpressionTokenNumber" as const,
+                value: Fraction.from(match[0]),
+                originalExpression: fullExpression,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                text: match[0]
+            };
+            return token;
+        }
+    };
+
+    const operatorTokenizer = {
+        matcherFn: (remainingText: string) =>
+        {
+            const regexPlus = /^(?<leadingws>\s*)(?<operator>[+\-*/])(?<trailingws>\s*)/;
+            return regexPlus.exec(remainingText);
+        },
+        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+        {
+            const operator = match.groups!.operator as ExpressionOperator;
+            const precedence = operatorPrecedenceTable.get(operator)!;
+
+            const token: IExpressionTokenOperator = {
+                type: "IExpressionTokenOperator" as const,
+                operator: operator,
+                precedence: precedence,
+                originalExpression: fullExpression,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                text: match[0]
+            };
+            return token;
+        }
+    };
+
+    return [numberTokenizer, operatorTokenizer];
+}
+
+const tokenizers = getTokenizers();
 
 export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 {

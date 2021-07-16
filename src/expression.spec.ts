@@ -22,8 +22,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes an expression with leading whitespace", () =>
-    {
+    it("successfully tokenizes an expression with leading whitespace", () => {
         const tokenizeResult = tokenize("   \t  3");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
@@ -33,8 +32,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes an expression with trailing whitespace", () =>
-    {
+    it("successfully tokenizes an expression with trailing whitespace", () => {
         const tokenizeResult = tokenize("3  \t   ");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
@@ -54,8 +52,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes a fraction that contains a whole number and a fractional part", () =>
-    {
+    it("successfully tokenizes a fraction that contains a whole number and a fractional part", () => {
         const tokenizeResult = tokenize("2 1/4");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
@@ -104,8 +101,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes an expression that contains fractions and a minus operator", () =>
-    {
+    it("successfully tokenizes an expression that contains fractions and a minus operator", () => {
         const tokenizeResult = tokenize("2 3/8 - 2 5/8");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
@@ -132,8 +128,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes an expression that contains fractions and a multiplication operator", () =>
-    {
+    it("successfully tokenizes an expression that contains fractions and a multiplication operator", () => {
         const tokenizeResult = tokenize("2 3/8 * 2 5/8");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
@@ -160,8 +155,7 @@ fdescribe("tokenize()", () => {
     });
 
 
-    it("successfully tokenizes an expression that contains fractions and a division operator", () =>
-    {
+    it("successfully tokenizes an expression that contains fractions and a division operator", () => {
         const tokenizeResult = tokenize("2 3/8 / 2 5/8");
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;

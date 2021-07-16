@@ -230,7 +230,17 @@ function assert(condition: any, failureErrorMsg: string): void
 }
 
 
-export function toRpn(infixTokens: Array<ExpressionToken>): Result<Array<ExpressionToken>, string>
+/**
+ * Converts a sequence of infix tokens to the postfix version using the
+ * Shunting-yard algorithm.
+ * @param infixTokens - The infix tokens
+ * @return When successful, an array of the token reordered into postfix
+ * notation.  If unbalanced parenthesis are found, a failure with a descriptive
+ * message is returned.
+ */
+export function toPostfix(
+    infixTokens: Array<ExpressionToken>
+): Result<Array<ExpressionToken>, string>
 {
     // See https://en.wikipedia.org/wiki/Shunting-yard_algorithm.
     const input: Array<ExpressionToken> = infixTokens.slice();
@@ -255,14 +265,14 @@ export function toRpn(infixTokens: Array<ExpressionToken>): Result<Array<Express
             else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
             {
                 assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
-                let operator2 = _.last(operatorStack)!;
-                while (operator2.symbol !== "(")
+                let opStackTop = _.last(operatorStack)!;
+                while (opStackTop.symbol !== "(")
                 {
 
                     output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
                     assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
-                    operator2 = _.last(operatorStack)!;
+                    opStackTop = _.last(operatorStack)!;
                 }
 
                 const topOperator = operatorStack.pop();
@@ -271,16 +281,16 @@ export function toRpn(infixTokens: Array<ExpressionToken>): Result<Array<Express
             }
             else if (curToken.type === "IExpressionTokenOperator")
             {
-                let operator2 = _.last(operatorStack);
-                while (operator2 !== undefined &&                     // While there is an operator on the operator stack AND
-                    operator2.symbol !== "(" &&                       // it is not a left parenthesis AND
-                    (operator2.precedence > curToken.precedence ||    //  (it has greater precedence than the current token OR
+                let opStackTop = _.last(operatorStack);
+                while (opStackTop !== undefined &&                     // While there is an operator on the operator stack AND
+                    opStackTop.symbol !== "(" &&                       // it is not a left parenthesis AND
+                    (opStackTop.precedence > curToken.precedence ||    //  (it has greater precedence than the current token OR
                         //  the same precedence AND the current token is left-associative)
-                        (operator2.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
+                        (opStackTop.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
                 )
                 {
                     output.push(operatorStack.pop()!);
-                    operator2 = _.last(operatorStack);
+                    opStackTop = _.last(operatorStack);
                 }
                 operatorStack.push(curToken);
             }

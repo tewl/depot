@@ -1,4 +1,4 @@
-import {evaluate, getOperatorTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toRpn} from "./expression";
+import {evaluate, getOperatorTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toPostfix} from "./expression";
 import {Fraction} from "./fraction";
 import {succeeded, failed} from "./result";
 
@@ -336,12 +336,12 @@ fdescribe("tokenize()", () => {
 });
 
 
-fdescribe("toRpn", () => {
+fdescribe("toPostfix()", () => {
 
     it("fails when there is a mismatched left parenthesis", () => {
         const tokenizeResult = tokenize("2 * ( 3");
         expect(succeeded(tokenizeResult)).toBeTruthy();
-        const postfixResult = toRpn(tokenizeResult.value!);
+        const postfixResult = toPostfix(tokenizeResult.value!);
         expect(failed(postfixResult)).toBeTruthy();
         expect(postfixResult.error).toEqual('"(" found while emptying operator stack.  Mismatched parenthesis.');
     });
@@ -350,7 +350,7 @@ fdescribe("toRpn", () => {
     it("fails when there is a mismatched right parenthesis", () => {
         const tokenizeResult = tokenize("2 * ) 3");
         expect(succeeded(tokenizeResult)).toBeTruthy();
-        const postfixResult = toRpn(tokenizeResult.value!);
+        const postfixResult = toPostfix(tokenizeResult.value!);
         expect(failed(postfixResult)).toBeTruthy();
         expect(postfixResult.error).toEqual('Operator stack exhaused while finding "(".  Mismatched parenthesis.');
     });
@@ -359,7 +359,7 @@ fdescribe("toRpn", () => {
     it("converts an infix expression to a postfix expression", () => {
         const tokenizeResult = tokenize("(1/4 + 1 3/4) * 4");
         expect(succeeded(tokenizeResult)).toBeTruthy();
-        const postfixResult = toRpn(tokenizeResult.value!);
+        const postfixResult = toPostfix(tokenizeResult.value!);
         expect(succeeded(postfixResult)).toBeTruthy();
         expect(postfixResult.value!.length).toEqual(5);
 

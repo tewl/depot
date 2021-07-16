@@ -1,6 +1,60 @@
-import {IExpressionTokenNumber, IExpressionTokenOperator, tokenize} from "./expression";
+import {evaluate, getOperatorTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toRpn} from "./expression";
 import {Fraction} from "./fraction";
 import {succeeded, failed} from "./result";
+
+
+fdescribe("getOperatorTraits", () => {
+
+    it("left parenthesis", () => {
+        expect(getOperatorTraits("(")).toEqual({
+            symbol: "(",
+            precedence: 21,
+            associativity: "n/a"
+        });
+    });
+
+    it("right parenthesis", () => {
+        expect(getOperatorTraits(")")).toEqual({
+            symbol: ")",
+            precedence: 21,
+            associativity: "n/a"
+        });
+    });
+
+    it("multiply", () => {
+        expect(getOperatorTraits("*")).toEqual({
+            symbol: "*",
+            precedence: 15,
+            associativity: "left-to-right"
+        });
+    });
+
+    it("divide", () => {
+        expect(getOperatorTraits("/")).toEqual({
+            symbol: "/",
+            precedence: 15,
+            associativity: "left-to-right"
+        });
+    });
+
+    it("add", () => {
+        expect(getOperatorTraits("+")).toEqual({
+            symbol: "+",
+            precedence: 14,
+            associativity: "left-to-right"
+        });
+    });
+
+    it("subtract", () => {
+        expect(getOperatorTraits("-")).toEqual({
+            symbol: "-",
+            precedence: 14,
+            associativity: "left-to-right"
+        });
+    });
+
+});
+
 
 fdescribe("tokenize()", () => {
 
@@ -27,6 +81,7 @@ fdescribe("tokenize()", () => {
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
+
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
         expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3));
     });
@@ -37,6 +92,7 @@ fdescribe("tokenize()", () => {
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
+
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
         expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3));
     });
@@ -57,6 +113,7 @@ fdescribe("tokenize()", () => {
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
+
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
         expect((tokens[0] as IExpressionTokenNumber).value.equals(Fraction.from(2.25))).toEqual(true);
     });
@@ -67,9 +124,12 @@ fdescribe("tokenize()", () => {
         expect(succeeded(tokenizeResult)).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
+
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
+
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("+");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("+");
+
         expect(tokens[2].type).toEqual("IExpressionTokenNumber");
     });
 
@@ -87,7 +147,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[0].text).toEqual("2 3/8 ");
 
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("+");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("+");
         expect(tokens[1].originalExpression).toEqual("2 3/8 + 2 5/8");
         expect(tokens[1].startIndex).toEqual(6);
         expect(tokens[1].endIndex).toEqual(8);
@@ -114,7 +174,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[0].text).toEqual("2 3/8 ");
 
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("-");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("-");
         expect(tokens[1].originalExpression).toEqual("2 3/8 - 2 5/8");
         expect(tokens[1].startIndex).toEqual(6);
         expect(tokens[1].endIndex).toEqual(8);
@@ -141,7 +201,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[0].text).toEqual("2 3/8 ");
 
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("*");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("*");
         expect(tokens[1].originalExpression).toEqual("2 3/8 * 2 5/8");
         expect(tokens[1].startIndex).toEqual(6);
         expect(tokens[1].endIndex).toEqual(8);
@@ -168,7 +228,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[0].text).toEqual("2 3/8 ");
 
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("/");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("/");
         expect(tokens[1].originalExpression).toEqual("2 3/8 / 2 5/8");
         expect(tokens[1].startIndex).toEqual(6);
         expect(tokens[1].endIndex).toEqual(8);
@@ -195,7 +255,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[0].text).toEqual("3/1 ");
 
         expect(tokens[1].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[1] as IExpressionTokenOperator).operator).toEqual("+");
+        expect((tokens[1] as IExpressionTokenOperator).symbol).toEqual("+");
         expect(tokens[1].originalExpression).toEqual("3/1 + 1/2 * 4/1");
         expect(tokens[1].startIndex).toEqual(4);
         expect(tokens[1].endIndex).toEqual(6);
@@ -208,7 +268,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[2].text).toEqual("1/2 ");
 
         expect(tokens[3].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[3] as IExpressionTokenOperator).operator).toEqual("*");
+        expect((tokens[3] as IExpressionTokenOperator).symbol).toEqual("*");
         expect(tokens[3].originalExpression).toEqual("3/1 + 1/2 * 4/1");
         expect(tokens[3].startIndex).toEqual(10);
         expect(tokens[3].endIndex).toEqual(12);
@@ -228,7 +288,7 @@ fdescribe("tokenize()", () => {
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(7);
 
-        expect(tokens[0].type).toEqual("IExpressionTokenLeftParenthesis");
+        expect(tokens[0].type).toEqual("IExpressionTokenOperator");
         expect(tokens[0].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
         expect(tokens[0].startIndex).toEqual(0);
         expect(tokens[0].endIndex).toEqual(1);
@@ -241,7 +301,7 @@ fdescribe("tokenize()", () => {
         expect(tokens[1].text).toEqual("3/1 ");
 
         expect(tokens[2].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[2] as IExpressionTokenOperator).operator).toEqual("+");
+        expect((tokens[2] as IExpressionTokenOperator).symbol).toEqual("+");
         expect(tokens[2].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
         expect(tokens[2].startIndex).toEqual(5);
         expect(tokens[2].endIndex).toEqual(7);
@@ -253,14 +313,14 @@ fdescribe("tokenize()", () => {
         expect(tokens[3].endIndex).toEqual(10);
         expect(tokens[3].text).toEqual("1/2");
 
-        expect(tokens[4].type).toEqual("IExpressionTokenRightParenthesis");
+        expect(tokens[4].type).toEqual("IExpressionTokenOperator");
         expect(tokens[4].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
         expect(tokens[4].startIndex).toEqual(10);
         expect(tokens[4].endIndex).toEqual(12);
         expect(tokens[4].text).toEqual(") ");
 
         expect(tokens[5].type).toEqual("IExpressionTokenOperator");
-        expect((tokens[5] as IExpressionTokenOperator).operator).toEqual("*");
+        expect((tokens[5] as IExpressionTokenOperator).symbol).toEqual("*");
         expect(tokens[5].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
         expect(tokens[5].startIndex).toEqual(12);
         expect(tokens[5].endIndex).toEqual(14);
@@ -271,6 +331,79 @@ fdescribe("tokenize()", () => {
         expect(tokens[6].startIndex).toEqual(14);
         expect(tokens[6].endIndex).toEqual(17);
         expect(tokens[6].text).toEqual("4/1");
+    });
+
+});
+
+
+fdescribe("toRpn", () => {
+
+    it("fails when there is a mismatched left parenthesis", () => {
+        const tokenizeResult = tokenize("2 * ( 3");
+        expect(succeeded(tokenizeResult)).toBeTruthy();
+        const postfixResult = toRpn(tokenizeResult.value!);
+        expect(failed(postfixResult)).toBeTruthy();
+        expect(postfixResult.error).toEqual('"(" found while emptying operator stack.  Mismatched parenthesis.');
+    });
+
+
+    it("fails when there is a mismatched right parenthesis", () => {
+        const tokenizeResult = tokenize("2 * ) 3");
+        expect(succeeded(tokenizeResult)).toBeTruthy();
+        const postfixResult = toRpn(tokenizeResult.value!);
+        expect(failed(postfixResult)).toBeTruthy();
+        expect(postfixResult.error).toEqual('Operator stack exhaused while finding "(".  Mismatched parenthesis.');
+    });
+
+
+    it("converts an infix expression to a postfix expression", () => {
+        const tokenizeResult = tokenize("(1/4 + 1 3/4) * 4");
+        expect(succeeded(tokenizeResult)).toBeTruthy();
+        const postfixResult = toRpn(tokenizeResult.value!);
+        expect(succeeded(postfixResult)).toBeTruthy();
+        expect(postfixResult.value!.length).toEqual(5);
+
+        const postfixTokens = postfixResult.value!;
+
+        expect(postfixTokens[0].type).toEqual("IExpressionTokenNumber");
+        expect((postfixTokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from("1/4"));
+
+        expect(postfixTokens[1].type).toEqual("IExpressionTokenNumber");
+        expect((postfixTokens[1] as IExpressionTokenNumber).value).toEqual(Fraction.from("1 3/4"));
+
+        expect(postfixTokens[2].type).toEqual("IExpressionTokenOperator");
+        expect((postfixTokens[2] as IExpressionTokenOperator).symbol).toEqual("+");
+
+        expect(postfixTokens[3].type).toEqual("IExpressionTokenNumber");
+        expect((postfixTokens[3] as IExpressionTokenNumber).value).toEqual(Fraction.from("4"));
+
+        expect(postfixTokens[4].type).toEqual("IExpressionTokenOperator");
+        expect((postfixTokens[4] as IExpressionTokenOperator).symbol).toEqual("*");
+    });
+
+});
+
+
+fdescribe("evaluate()", () => {
+
+
+    xit("evaluates an empty expression to zero", () => {
+    });
+
+
+    it("fails to evaluate an expression that cannot be tokenized", () => {
+        expect(failed(evaluate("2 3/4 & 6/1"))).toBeTruthy();
+    });
+
+
+    xit("fails to evaluate an expression that can be tokenized but cannot be evaluated", () => {
+        expect(failed(evaluate("1/2 * 2 +"))).toBeTruthy();
+    });
+
+
+    xit("successfully evaluates an expression containing parenthesis", () => {
+        const res = evaluate("(3/1 + 1/2) * 4/1");
+        expect(succeeded(res)).toBeTruthy();
     });
 
 });

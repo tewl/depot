@@ -2,6 +2,8 @@ import * as _ from "lodash";
 import { Fraction } from "./fraction";
 import { Result, failedResult, succeededResult } from "./result";
 import {find} from "./collection";
+import { assertNever } from "./never";
+import { cond } from "lodash";
 
 
 export interface IDuType
@@ -10,164 +12,175 @@ export interface IDuType
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// IExpressionToken
+////////////////////////////////////////////////////////////////////////////////
 export interface IExpressionToken
 {
-    originalExpression: string;     // The full original expression
-    startIndex: number;             // Starting character index in originalExpression
-    endIndex: number;               // 1 *past* the last character
-    text: string;                   // The text comprising the token
+    /// The full original expression
+    originalExpression: string;
+    /// Starting character index in originalExpression
+    startIndex: number;
+    /// 1 *past* the last character
+    endIndex: number;
+    /// The text comprising the token
+    text: string;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// IExpressionTokenNumber
+////////////////////////////////////////////////////////////////////////////////
 export interface IExpressionTokenNumber extends IDuType, IExpressionToken
 {
     type: "IExpressionTokenNumber";
     value: Fraction;
 }
 
-type ExpressionOperator = "+" | "-" | "*" | "/";
-export interface IExpressionTokenOperator extends IDuType, IExpressionToken
+
+////////////////////////////////////////////////////////////////////////////////
+// IExpressionTokenOperator
+////////////////////////////////////////////////////////////////////////////////
+
+type OperatorAssociativity = "n/a" | "left-to-right" | "right-to-left";
+
+
+type OperatorSymbol = "(" | ")" | "*" | "/" | "+" | "-";
+
+
+interface IOperatorTraits
+{
+    symbol: OperatorSymbol;
+    precedence: number;
+    associativity: OperatorAssociativity;
+
+}
+
+
+export interface IExpressionTokenOperator extends IOperatorTraits, IDuType, IExpressionToken
 {
     type: "IExpressionTokenOperator";
-    operator: "+" | "-" | "*" | "/";
-    precedence: number;
 }
 
 
-export interface IExpressionTokenLeftParenthesis extends IDuType, IExpressionToken
+export function getOperatorTraits(symbol: OperatorSymbol): IOperatorTraits
 {
-    type: "IExpressionTokenLeftParenthesis";
+    switch (symbol) {
+        case "(":
+            return {
+                symbol: "(",
+                precedence: 21,
+                associativity: "n/a"
+            };
+
+        case ")":
+            return {
+                symbol: ")",
+                precedence: 21,
+                associativity: "n/a"
+            };
+
+        case "*":
+            return {
+                symbol: "*",
+                precedence: 15,
+                associativity: "left-to-right"
+            };
+
+        case "/":
+            return {
+                symbol: "/",
+                precedence: 15,
+                associativity: "left-to-right"
+            };
+
+        case "+":
+            return {
+                symbol: "+",
+                precedence: 14,
+                associativity: "left-to-right"
+            };
+
+        case "-":
+            return {
+                symbol: "-",
+                precedence: 14,
+                associativity: "left-to-right"
+            };
+
+        default:
+            assertNever(symbol);
+    }
 }
 
-
-export interface IExpressionTokenRightParenthesis extends IDuType, IExpressionToken
-{
-    type: "IExpressionTokenRightParenthesis";
-}
-
-
+////////////////////////////////////////////////////////////////////////////////
+// ExpressionToken
+////////////////////////////////////////////////////////////////////////////////
 export type ExpressionToken =
     IExpressionTokenNumber |
-    IExpressionTokenOperator |
-    IExpressionTokenLeftParenthesis |
-    IExpressionTokenRightParenthesis;
+    IExpressionTokenOperator;
 
 
-type MatcherFn = (remainingText: string) => RegExpExecArray | null;
-type TokenCreatorFn = (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) => ExpressionToken;
+////////////////////////////////////////////////////////////////////////////////
+
+
 interface ITokenizer
 {
-    matcherFn: MatcherFn;
-    tokenCreatorFn: TokenCreatorFn;
+    matcherFn(remainingText: string): RegExpExecArray | null;
+    tokenCreatorFn(match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number): ExpressionToken;
 }
-
-
-function getOperatorPrecedenceTable(): Map<ExpressionOperator, number>
-{
-    const operatorPrecedenceTable = new Map<ExpressionOperator, number>();
-    operatorPrecedenceTable.set("*", 15);
-    operatorPrecedenceTable.set("/", 15);
-    operatorPrecedenceTable.set("+", 14);
-    operatorPrecedenceTable.set("-", 14);
-
-    return operatorPrecedenceTable;
-}
-const operatorPrecedenceTable = getOperatorPrecedenceTable();
 
 
 function getTokenizers(): Array<ITokenizer>
 {
-    const numberTokenizer = {
-        matcherFn: (remainingText: string) =>
-        {
-            const regexWhole = /^(?<leadingws>\s*)(?<whole>\d+)(?<trailingws>\s*)/;
-            const regexFrac = /^(?<leadingws>\s*)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
-            const regexWholeAndFrac = /^(?<leadingws>\s*)(?<whole>\d+)(?<reqws>\s+)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
-            return regexWholeAndFrac.exec(remainingText) ||
-                regexFrac.exec(remainingText) ||
-                regexWhole.exec(remainingText);
-        },
-        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-        {
-            const token: IExpressionTokenNumber = {
-                type: "IExpressionTokenNumber" as const,
-                value: Fraction.from(match[0]),
-                originalExpression: fullExpression,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                text: match[0]
-            };
-            return token;
-        }
-    };
-
-    const operatorTokenizer = {
-        matcherFn: (remainingText: string) =>
-        {
-            const regexPlus = /^(?<leadingws>\s*)(?<operator>[+\-*/])(?<trailingws>\s*)/;
-            return regexPlus.exec(remainingText);
-        },
-        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-        {
-            const operator = match.groups!.operator as ExpressionOperator;
-            const precedence = operatorPrecedenceTable.get(operator)!;
-
-            const token: IExpressionTokenOperator = {
-                type: "IExpressionTokenOperator" as const,
-                operator: operator,
-                precedence: precedence,
-                originalExpression: fullExpression,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                text: match[0]
-            };
-            return token;
-        }
-    };
-
-    const leftParenthesisTokenizer = {
-        matcherFn: (remainingText: string) =>
-        {
-            const regex = /^(?<leadingws>\s*)(?<leftParen>\()(?<trailingws>\s*)/;
-            return regex.exec(remainingText);
-        },
-        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-        {
-            const token: IExpressionTokenLeftParenthesis = {
-                type: "IExpressionTokenLeftParenthesis" as const,
-                originalExpression: fullExpression,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                text: match[0]
-            };
-            return token;
-        }
-    };
-
-    const rightParenthesisTokenizer = {
-        matcherFn: (remainingText: string) =>
-        {
-            const regex = /^(?<leadingws>\s*)(?<rightParen>\))(?<trailingws>\s*)/;
-            return regex.exec(remainingText);
-        },
-        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-        {
-            const token: IExpressionTokenRightParenthesis = {
-                type: "IExpressionTokenRightParenthesis" as const,
-                originalExpression: fullExpression,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                text: match[0]
-            };
-            return token;
-        }
-    };
-
     return [
-        numberTokenizer,
-        operatorTokenizer,
-        leftParenthesisTokenizer,
-        rightParenthesisTokenizer
+
+        // Number tokenizer
+        {
+            matcherFn: (remainingText: string) =>
+            {
+                const regexWhole = /^(?<leadingws>\s*)(?<whole>\d+)(?<trailingws>\s*)/;
+                const regexFrac = /^(?<leadingws>\s*)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
+                const regexWholeAndFrac = /^(?<leadingws>\s*)(?<whole>\d+)(?<reqws>\s+)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
+                return regexWholeAndFrac.exec(remainingText) ||
+                       regexFrac.exec(remainingText) ||
+                       regexWhole.exec(remainingText);
+            },
+            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+            {
+                return {
+                    type:               "IExpressionTokenNumber" as const,
+                    value:              Fraction.from(match[0]),
+                    originalExpression: fullExpression,
+                    startIndex:         startIndex,
+                    endIndex:           endIndex,
+                    text:               match[0]
+                };
+            }
+        },
+
+        // Operator tokenizer
+        {
+            matcherFn: (remainingText: string) =>
+            {
+                const regexPlus = /^(?<leadingws>\s*)(?<operator>[()*/+\-])(?<trailingws>\s*)/;
+                return regexPlus.exec(remainingText);
+            },
+            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+            {
+                const traits = getOperatorTraits(match.groups!.operator as OperatorSymbol);
+                return {
+                    type:               "IExpressionTokenOperator" as const,
+                    symbol:             traits.symbol,
+                    associativity:      traits.associativity,
+                    precedence:         traits.precedence,
+                    originalExpression: fullExpression,
+                    startIndex:         startIndex,
+                    endIndex:           endIndex,
+                    text:               match[0]
+                };
+            }
+        }
     ];
 }
 
@@ -206,4 +219,88 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 
 
     return succeededResult(tokens);
+}
+
+
+function assert(condition: any, failureErrorMsg: string): void
+{
+    if (!condition) {
+        throw new Error(failureErrorMsg);
+    }
+}
+
+
+export function toRpn(infixTokens: Array<ExpressionToken>): Result<Array<ExpressionToken>, string>
+{
+    // See https://en.wikipedia.org/wiki/Shunting-yard_algorithm.
+    const input: Array<ExpressionToken> = infixTokens.slice();
+    input.reverse();
+
+    const output: Array<ExpressionToken> = [];
+    const operatorStack: Array<IExpressionTokenOperator> = [];
+
+    try {
+        while (!_.isEmpty(input))
+        {
+            const curToken = input.pop()!;
+
+            if (curToken.type === "IExpressionTokenNumber")
+            {
+                output.push(curToken);
+            }
+            else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === "(")
+            {
+                operatorStack.push(curToken);
+            }
+            else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
+            {
+                assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+                let operator2 = _.last(operatorStack)!;
+                while (operator2.symbol !== "(")
+                {
+
+                    output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
+
+                    assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+                    operator2 = _.last(operatorStack)!;
+                }
+
+                const topOperator = operatorStack.pop();
+                assert(topOperator !== undefined && topOperator.symbol === "(", "");
+                // We intentionally do nothing with the popped "(".  Discard it.
+            }
+            else if (curToken.type === "IExpressionTokenOperator")
+            {
+                let operator2 = _.last(operatorStack);
+                while (operator2 !== undefined &&                     // While there is an operator on the operator stack AND
+                    operator2.symbol !== "(" &&                       // it is not a left parenthesis AND
+                    (operator2.precedence > curToken.precedence ||    //  (it has greater precedence than the current token OR
+                        //  the same precedence AND the current token is left-associative)
+                        (operator2.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
+                )
+                {
+                    output.push(operatorStack.pop()!);
+                    operator2 = _.last(operatorStack);
+                }
+                operatorStack.push(curToken);
+            }
+        }
+
+        // Move the remaining operators to the output queue.
+        while (!_.isEmpty(operatorStack))
+        {
+            const curOperator = operatorStack.pop()!;
+            assert(curOperator.symbol !== "(", `"(" found while emptying operator stack.  Mismatched parenthesis.`);
+            output.push(curOperator);
+        }
+
+        return succeededResult(output);
+    } catch (error) {
+        return failedResult(error.message);
+    }
+}
+
+
+export function evaluate(input: string): Result<Fraction, string> {
+    return failedResult("foo");
 }

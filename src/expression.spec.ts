@@ -3,7 +3,7 @@ import {Fraction} from "./fraction";
 import {succeeded, failed} from "./result";
 
 
-fdescribe("getOperatorTraits", () => {
+describe("getOperatorTraits", () => {
 
     it("left parenthesis", () => {
         expect(getOperatorTraits("(")).toEqual({
@@ -56,7 +56,7 @@ fdescribe("getOperatorTraits", () => {
 });
 
 
-fdescribe("tokenize()", () => {
+describe("tokenize()", () => {
 
 
     it("fails to tokenize a string that makes no sense", () => {
@@ -336,7 +336,7 @@ fdescribe("tokenize()", () => {
 });
 
 
-fdescribe("toPostfix()", () => {
+describe("toPostfix()", () => {
 
     it("fails when there is a mismatched left parenthesis", () => {
         const tokenizeResult = tokenize("2 * ( 3");
@@ -384,7 +384,7 @@ fdescribe("toPostfix()", () => {
 });
 
 
-fdescribe("evaluate()", () => {
+describe("evaluate()", () => {
 
 
     xit("evaluates an empty expression to zero", () => {

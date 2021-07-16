@@ -505,7 +505,7 @@ export class Fraction
 
         let floorVal: Fraction;
 
-        // Find the floor value.
+        // Find the floor value by stepping down from rangeCeil.
         for (let curVal = rangeCeil;
             curVal.isGreaterThanOrEqualTo(rangeFloor);
             curVal = curVal.subtract(incr)
@@ -520,7 +520,7 @@ export class Fraction
 
         let ceilVal: Fraction;
 
-        // Find the ceil value.
+        // Find the ceil value by stepping up from rangeFloor.
         for (let curVal = rangeFloor;
              curVal.isLessThanOrEqualTo(rangeCeil);
              curVal = curVal.add(incr)

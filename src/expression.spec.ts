@@ -5,6 +5,13 @@ import {succeeded, failed} from "./result";
 fdescribe("tokenize()", () => {
 
 
+    it("fails to tokenize a string that makes no sense", () => {
+        const tokenizeResult = tokenize("&");
+        expect(failed(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.error).toEqual("Failed to parse expression at index 0 of &.");
+    });
+
+
     it("successfully tokenizes a whole number", () => {
         const tokenizeResult = tokenize("3");
         expect(succeeded(tokenizeResult)).toBeTruthy();
@@ -218,6 +225,58 @@ fdescribe("tokenize()", () => {
         expect(tokens[4].startIndex).toEqual(12);
         expect(tokens[4].endIndex).toEqual(15);
         expect(tokens[4].text).toEqual("4/1");
+    });
+
+
+    it("successfully tokenizes an expression that contains parenthesis", () => {
+        const tokenizeResult = tokenize("(3/1 + 1/2) * 4/1");
+        expect(succeeded(tokenizeResult)).toBeTruthy();
+        const tokens = tokenizeResult.value!;
+        expect(tokens.length).toEqual(7);
+
+        expect(tokens[0].type).toEqual("IExpressionTokenLeftParenthesis");
+        expect(tokens[0].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[0].startIndex).toEqual(0);
+        expect(tokens[0].endIndex).toEqual(1);
+        expect(tokens[0].text).toEqual("(");
+
+        expect(tokens[1].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[1].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[1].startIndex).toEqual(1);
+        expect(tokens[1].endIndex).toEqual(5);
+        expect(tokens[1].text).toEqual("3/1 ");
+
+        expect(tokens[2].type).toEqual("IExpressionTokenOperator");
+        expect((tokens[2] as IExpressionTokenOperator).operator).toEqual("+");
+        expect(tokens[2].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[2].startIndex).toEqual(5);
+        expect(tokens[2].endIndex).toEqual(7);
+        expect(tokens[2].text).toEqual("+ ");
+
+        expect(tokens[3].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[3].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[3].startIndex).toEqual(7);
+        expect(tokens[3].endIndex).toEqual(10);
+        expect(tokens[3].text).toEqual("1/2");
+
+        expect(tokens[4].type).toEqual("IExpressionTokenRightParenthesis");
+        expect(tokens[4].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[4].startIndex).toEqual(10);
+        expect(tokens[4].endIndex).toEqual(12);
+        expect(tokens[4].text).toEqual(") ");
+
+        expect(tokens[5].type).toEqual("IExpressionTokenOperator");
+        expect((tokens[5] as IExpressionTokenOperator).operator).toEqual("*");
+        expect(tokens[5].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[5].startIndex).toEqual(12);
+        expect(tokens[5].endIndex).toEqual(14);
+        expect(tokens[5].text).toEqual("* ");
+
+        expect(tokens[6].type).toEqual("IExpressionTokenNumber");
+        expect(tokens[6].originalExpression).toEqual("(3/1 + 1/2) * 4/1");
+        expect(tokens[6].startIndex).toEqual(14);
+        expect(tokens[6].endIndex).toEqual(17);
+        expect(tokens[6].text).toEqual("4/1");
     });
 
 });

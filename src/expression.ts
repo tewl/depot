@@ -125,7 +125,50 @@ function getTokenizers(): Array<ITokenizer>
         }
     };
 
-    return [numberTokenizer, operatorTokenizer];
+    const leftParenthesisTokenizer = {
+        matcherFn: (remainingText: string) =>
+        {
+            const regex = /^(?<leadingws>\s*)(?<leftParen>\()(?<trailingws>\s*)/;
+            return regex.exec(remainingText);
+        },
+        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+        {
+            const token: IExpressionTokenLeftParenthesis = {
+                type: "IExpressionTokenLeftParenthesis" as const,
+                originalExpression: fullExpression,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                text: match[0]
+            };
+            return token;
+        }
+    };
+
+    const rightParenthesisTokenizer = {
+        matcherFn: (remainingText: string) =>
+        {
+            const regex = /^(?<leadingws>\s*)(?<rightParen>\))(?<trailingws>\s*)/;
+            return regex.exec(remainingText);
+        },
+        tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
+        {
+            const token: IExpressionTokenRightParenthesis = {
+                type: "IExpressionTokenRightParenthesis" as const,
+                originalExpression: fullExpression,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                text: match[0]
+            };
+            return token;
+        }
+    };
+
+    return [
+        numberTokenizer,
+        operatorTokenizer,
+        leftParenthesisTokenizer,
+        rightParenthesisTokenizer
+    ];
 }
 
 const tokenizers = getTokenizers();

@@ -170,12 +170,11 @@ gulp.task("build", () => {
  */
 gulp.task("compile", () => {
     "use strict";
-    const sourceGlobs = getSrcGlobs(true);
 
     return clean()
     .then(() => {
         // Do not build if there are TSLint errors.
-        return runTslint(true, sourceGlobs);
+        return runTslint(true);
     })
     .then(() => {
         // Everything seems ok.  Go ahead and compile.

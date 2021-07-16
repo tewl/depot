@@ -284,8 +284,8 @@ export function toPostfix(
                 let opStackTop = _.last(operatorStack);
                 while (opStackTop !== undefined &&                     // While there is an operator on the operator stack AND
                     opStackTop.symbol !== "(" &&                       // it is not a left parenthesis AND
-                    (opStackTop.precedence > curToken.precedence ||    //  (it has greater precedence than the current token OR
-                        //  the same precedence AND the current token is left-associative)
+                    (opStackTop.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
+                                                                       //  the same precedence AND the current token is left-associative)
                         (opStackTop.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
                 )
                 {

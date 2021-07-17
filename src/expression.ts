@@ -309,7 +309,7 @@ export function toPostfix(
             while (firstInOperatorStack !== undefined &&                     // While there is an operator on the operator stack AND
                 firstInOperatorStack.symbol !== "(" &&                       // it is not a left parenthesis AND
                 (firstInOperatorStack.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
-                                                                    //  the same precedence AND the current token is left-associative)
+                                                                             //  the same precedence AND the current token is left-associative)
                     (firstInOperatorStack.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
             )
             {

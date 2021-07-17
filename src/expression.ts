@@ -250,14 +250,6 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 }
 
 
-function assert(condition: any, failureErrorMsg: string): void
-{
-    if (!condition) {
-        throw new Error(failureErrorMsg);
-    }
-}
-
-
 /**
  * Converts a sequence of infix tokens to the postfix version using the
  * Shunting-yard algorithm.
@@ -277,64 +269,68 @@ export function toPostfix(
     const output: Array<ExpressionToken> = [];
     const operatorStack: Array<IExpressionTokenOperator> = [];
 
-    try {
-        while (!_.isEmpty(input))
+    while (!_.isEmpty(input))
+    {
+        const curToken = input.pop()!;
+
+        if (curToken.type === "IExpressionTokenNumber")
         {
-            const curToken = input.pop()!;
-
-            if (curToken.type === "IExpressionTokenNumber")
-            {
-                output.push(curToken);
-            }
-            else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === "(")
-            {
-                operatorStack.push(curToken);
-            }
-            else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
-            {
-                assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
-                let opStackTop = _.last(operatorStack)!;
-                while (opStackTop.symbol !== "(")
-                {
-                    output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
-
-                    assert(!_.isEmpty(operatorStack), `Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
-                    opStackTop = _.last(operatorStack)!;
-                }
-
-                const topOperator = operatorStack.pop();
-                assert(topOperator !== undefined && topOperator.symbol === "(", "");
-                // We intentionally do nothing with the popped "(".  Discard it.
-            }
-            else if (curToken.type === "IExpressionTokenOperator")
-            {
-                let opStackTop = _.last(operatorStack);
-                while (opStackTop !== undefined &&                     // While there is an operator on the operator stack AND
-                    opStackTop.symbol !== "(" &&                       // it is not a left parenthesis AND
-                    (opStackTop.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
-                                                                       //  the same precedence AND the current token is left-associative)
-                        (opStackTop.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
-                )
-                {
-                    output.push(operatorStack.pop()!);
-                    opStackTop = _.last(operatorStack);
-                }
-                operatorStack.push(curToken);
-            }
+            output.push(curToken);
         }
-
-        // Move the remaining operators to the output queue.
-        while (!_.isEmpty(operatorStack))
+        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === "(")
         {
-            const curOperator = operatorStack.pop()!;
-            assert(curOperator.symbol !== "(", `"(" found while emptying operator stack.  Mismatched parenthesis.`);
-            output.push(curOperator);
+            operatorStack.push(curToken);
         }
+        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
+        {
+            if (_.isEmpty(operatorStack)) {
+                return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+            }
+            let opStackTop = _.last(operatorStack)!;
+            while (opStackTop.symbol !== "(")
+            {
+                output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
-        return succeededResult(output);
-    } catch (error) {
-        return failedResult(error.message);
+                if (_.isEmpty(operatorStack)) {
+                    return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+                }
+                opStackTop = _.last(operatorStack)!;
+            }
+
+            const topOperator = operatorStack.pop();
+            if (topOperator === undefined || topOperator.symbol !== "(") {
+                return failedResult(`Operator stack invalid after finding "(".`);
+            }
+            // We intentionally do nothing with the popped "(".  Discard it.
+        }
+        else if (curToken.type === "IExpressionTokenOperator")
+        {
+            let opStackTop = _.last(operatorStack);
+            while (opStackTop !== undefined &&                     // While there is an operator on the operator stack AND
+                opStackTop.symbol !== "(" &&                       // it is not a left parenthesis AND
+                (opStackTop.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
+                                                                    //  the same precedence AND the current token is left-associative)
+                    (opStackTop.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
+            )
+            {
+                output.push(operatorStack.pop()!);
+                opStackTop = _.last(operatorStack);
+            }
+            operatorStack.push(curToken);
+        }
     }
+
+    // Move the remaining operators to the output queue.
+    while (!_.isEmpty(operatorStack))
+    {
+        const curOperator = operatorStack.pop()!;
+        if (curOperator.symbol === "(") {
+            return failedResult(`"(" found while emptying operator stack.  Mismatched parenthesis.`);
+        }
+        output.push(curOperator);
+    }
+
+    return succeededResult(output);
 }
 
 

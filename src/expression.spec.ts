@@ -1,56 +1,62 @@
-import {evaluate, getOperatorTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toPostfix} from "./expression";
+import {evaluate, symbolToTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toPostfix} from "./expression";
 import {Fraction} from "./fraction";
 import {succeeded, failed} from "./result";
 
 
-describe("getOperatorTraits", () => {
+describe("symbolToTraits", () => {
+
 
     it("left parenthesis", () => {
-        expect(getOperatorTraits("(")).toEqual({
-            symbol: "(",
-            precedence: 21,
-            associativity: "n/a"
-        });
+        const traits = symbolToTraits("(");
+        expect(traits.symbol).toEqual("(");
+        expect(traits.precedence).toEqual(21);
+        expect(traits.associativity).toEqual("n/a");
+        expect(traits.numArguments).toBeUndefined();
     });
+
 
     it("right parenthesis", () => {
-        expect(getOperatorTraits(")")).toEqual({
-            symbol: ")",
-            precedence: 21,
-            associativity: "n/a"
-        });
+        const traits = symbolToTraits(")");
+        expect(traits.symbol).toEqual(")");
+        expect(traits.precedence).toEqual(21);
+        expect(traits.associativity).toEqual("n/a");
+        expect(traits.numArguments).toBeUndefined();
     });
+
 
     it("multiply", () => {
-        expect(getOperatorTraits("*")).toEqual({
-            symbol: "*",
-            precedence: 15,
-            associativity: "left-to-right"
-        });
+        const traits = symbolToTraits("*");
+        expect(traits.symbol).toEqual("*");
+        expect(traits.precedence).toEqual(15);
+        expect(traits.associativity).toEqual("left-to-right");
+        expect(traits.numArguments).toEqual(2);
     });
+
 
     it("divide", () => {
-        expect(getOperatorTraits("/")).toEqual({
-            symbol: "/",
-            precedence: 15,
-            associativity: "left-to-right"
-        });
+        const traits = symbolToTraits("/");
+        expect(traits.symbol).toEqual("/");
+        expect(traits.precedence).toEqual(15);
+        expect(traits.associativity).toEqual("left-to-right");
+        expect(traits.numArguments).toEqual(2);
     });
+
 
     it("add", () => {
-        expect(getOperatorTraits("+")).toEqual({
-            symbol: "+",
-            precedence: 14,
-            associativity: "left-to-right"
-        });
+        const traits = symbolToTraits("+");
+        expect(traits.symbol).toEqual("+");
+        expect(traits.precedence).toEqual(14);
+        expect(traits.associativity).toEqual("left-to-right");
+        expect(traits.numArguments).toEqual(2);
     });
 
+
     it("subtract", () => {
-        expect(getOperatorTraits("-")).toEqual({
-            symbol: "-",
-            precedence: 14,
-            associativity: "left-to-right"
-        });
+        const traits = symbolToTraits("-");
+        expect(traits.symbol).toEqual("-");
+        expect(traits.precedence).toEqual(14);
+        expect(traits.associativity).toEqual("left-to-right");
+        expect(traits.numArguments).toEqual(2);
     });
 
 });
@@ -387,7 +393,10 @@ describe("toPostfix()", () => {
 describe("evaluate()", () => {
 
 
-    xit("evaluates an empty expression to zero", () => {
+    it("fails to evaluate an empty expression", () => {
+        const res = evaluate("");
+        expect(failed(res)).toBeTruthy();
+        expect(res.error).toEqual("No expression.");
     });
 
 
@@ -396,14 +405,22 @@ describe("evaluate()", () => {
     });
 
 
-    xit("fails to evaluate an expression that can be tokenized but cannot be evaluated", () => {
+    it("fails to evaluate an expression that can be tokenized but cannot be converted to postfix", () => {
         expect(failed(evaluate("1/2 * 2 +"))).toBeTruthy();
     });
 
 
-    xit("successfully evaluates an expression containing parenthesis", () => {
+    it("successfully evaluates an expression where the order matters", () => {
+        const res = evaluate("3 - 2");
+        expect(succeeded(res)).toBeTruthy();
+        expect(res.value!.equals(1)).toBeTruthy();
+    });
+
+
+    it("successfully evaluates an expression containing parenthesis", () => {
         const res = evaluate("(3/1 + 1/2) * 4/1");
         expect(succeeded(res)).toBeTruthy();
+        expect(res.value!.equals(14)).toBeTruthy();
     });
 
 });

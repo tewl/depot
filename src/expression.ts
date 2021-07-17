@@ -286,15 +286,15 @@ export function toPostfix(
             if (_.isEmpty(operatorStack)) {
                 return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
             }
-            let opStackTop = _.last(operatorStack)!;
-            while (opStackTop.symbol !== "(")
+            let firstInOperatorStack = _.last(operatorStack)!;
+            while (firstInOperatorStack.symbol !== "(")
             {
                 output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
                 if (_.isEmpty(operatorStack)) {
                     return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
                 }
-                opStackTop = _.last(operatorStack)!;
+                firstInOperatorStack = _.last(operatorStack)!;
             }
 
             const topOperator = operatorStack.pop();
@@ -305,16 +305,16 @@ export function toPostfix(
         }
         else if (curToken.type === "IExpressionTokenOperator")
         {
-            let opStackTop = _.last(operatorStack);
-            while (opStackTop !== undefined &&                     // While there is an operator on the operator stack AND
-                opStackTop.symbol !== "(" &&                       // it is not a left parenthesis AND
-                (opStackTop.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
+            let firstInOperatorStack = _.last(operatorStack);
+            while (firstInOperatorStack !== undefined &&                     // While there is an operator on the operator stack AND
+                firstInOperatorStack.symbol !== "(" &&                       // it is not a left parenthesis AND
+                (firstInOperatorStack.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
                                                                     //  the same precedence AND the current token is left-associative)
-                    (opStackTop.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
+                    (firstInOperatorStack.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
             )
             {
                 output.push(operatorStack.pop()!);
-                opStackTop = _.last(operatorStack);
+                firstInOperatorStack = _.last(operatorStack);
             }
             operatorStack.push(curToken);
         }

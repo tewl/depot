@@ -88,3 +88,71 @@ export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): resu
 {
     return result.state === "failed";
 }
+
+
+/**
+ * If _input_ is successful, unwraps the value and passes it into _func_,
+ * returning the result.  If _input_ is not successful, returns it.
+ * @param func - The function to invoke on _input.value_ when _input_ is
+ * successful.
+ * @param input - The input Result.
+ * @return Either the passed-through failure Result or the Result returned from
+ * _func_.
+ */
+export function bindResult<TInputSuccess, TOutputSuccess, TError>(
+    func: (x: TInputSuccess) => Result<TOutputSuccess, TError>,
+    input: Result<TInputSuccess, TError>
+): Result<TOutputSuccess, TError>
+{
+    if (succeeded(input)) {
+        const funcResult = func(input.value);
+        return funcResult;
+    }
+    else {
+        return input;
+    }
+}
+
+
+/**
+ * When _input_ is successful, maps the wrapped value using _fn_.
+ * @param fn - Function that maps the wrapped success value to another value.
+ * @param input - The input Result.
+ * @return Either the mapped successful Result or the passed-through failure
+ * Result.
+ */
+export function mapSuccess<TInputSuccess, TOutputSuccess, TError>(
+    fn: (input: TInputSuccess) => TOutputSuccess,
+    input: Result<TInputSuccess, TError>
+): Result<TOutputSuccess, TError>
+{
+    if (succeeded(input)) {
+        const mappedValue = fn(input.value);
+        return succeededResult(mappedValue);
+    }
+    else {
+        return input;
+    }
+}
+
+
+/**
+ * When _input_ is a failure, maps the wrapped error using _fn_.
+ * @param fn - Function that maps the wrapped error value to another value.
+ * @param input - The input Result.
+ * @return Either the passed-through successful Result or the mapped error
+ * Result.
+ */
+export function mapError<TSuccess, TInputError, TOutputError>(
+    fn: (input: TInputError) => TOutputError,
+    input: Result<TSuccess, TInputError>
+): Result<TSuccess, TOutputError>
+{
+    if (succeeded(input)) {
+        return input;
+    }
+    else {
+        const mappedError = fn(input.error);
+        return failedResult(mappedError);
+    }
+}

@@ -102,7 +102,7 @@ describe("failed()", () => {
 });
 
 
-describe("bind", () => {
+describe("bindResult()", () => {
 
     it("with failed input the error is passed along and the function is not invoked", () =>
     {
@@ -138,7 +138,7 @@ describe("bind", () => {
     });
 
 
-    it("can be easily used with pipe()", () =>
+    it("can be used easily with pipe()", () =>
     {
 
         function parse(text: string): Result<number, string>
@@ -164,6 +164,9 @@ describe("bind", () => {
             (r) => bindResult(sqrt, r),
             (r) => bindResult(stringify, r)
         );
+
+        expect(succeeded(resultA)).toBeTruthy();
+        expect(resultA.value).toEqual("4");
     });
 
 

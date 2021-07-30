@@ -90,22 +90,25 @@ export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): resu
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+
+
 /**
- * If _input_ is successful, unwraps the value and passes it into _func_,
+ * If _input_ is successful, unwraps the value and passes it into _fn_,
  * returning the result.  If _input_ is not successful, returns it.
- * @param func - The function to invoke on _input.value_ when _input_ is
+ * @param fn - The function to invoke on _input.value_ when _input_ is
  * successful.
  * @param input - The input Result.
  * @return Either the passed-through failure Result or the Result returned from
- * _func_.
+ * _fn_.
  */
 export function bindResult<TInputSuccess, TOutputSuccess, TError>(
-    func: (x: TInputSuccess) => Result<TOutputSuccess, TError>,
+    fn: (x: TInputSuccess) => Result<TOutputSuccess, TError>,
     input: Result<TInputSuccess, TError>
 ): Result<TOutputSuccess, TError>
 {
     if (succeeded(input)) {
-        const funcResult = func(input.value);
+        const funcResult = fn(input.value);
         return funcResult;
     }
     else {

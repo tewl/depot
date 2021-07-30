@@ -9,8 +9,8 @@
  */
 export interface ISomeOption<T>
 {
-    state: "some";
-    value: T;
+    readonly state: "some";
+    readonly value: T;
 }
 
 
@@ -19,8 +19,8 @@ export interface ISomeOption<T>
  */
 export interface INoneOption
 {
-    state: "none";
-    value: undefined;
+    readonly state: "none";
+    readonly value: undefined;
 }
 
 const noneVal: INoneOption = { state: "none", value: undefined };

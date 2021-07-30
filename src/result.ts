@@ -9,9 +9,9 @@
  */
 export interface ISucceededResult<TSuccess>
 {
-    state: "succeeded";
-    value: TSuccess;
-    error: undefined;
+    readonly state: "succeeded";
+    readonly value: TSuccess;
+    readonly error: undefined;
 }
 
 
@@ -20,9 +20,9 @@ export interface ISucceededResult<TSuccess>
  */
 export interface IFailedResult<TError>
 {
-    state: "failed";
-    value: undefined;
-    error: TError;
+    readonly state: "failed";
+    readonly value: undefined;
+    readonly error: TError;
 }
 
 

@@ -46,7 +46,7 @@ export type Result<TSuccess, TError> = ISucceededResult<TSuccess> | IFailedResul
  */
 export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess>
 {
-    return { state: "succeeded", value: value, error: undefined};
+    return { state: "succeeded", value: value, error: undefined };
 }
 
 
@@ -57,7 +57,7 @@ export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSu
  */
 export function failedResult<TError>(error: TError): IFailedResult<TError>
 {
-    return {state: "failed", value: undefined, error: error};
+    return { state: "failed", value: undefined, error: error };
 }
 
 

@@ -108,9 +108,14 @@ class PollingTimeoutError<TSuccess, TError> extends Error
  *      yet present in the returned result value.
  * @param pollIntervalMs - The number of milliseconds to delay between failed
  *      invocations of _asyncResultop_.
- * @param timeoutMs - Number of milliseconds from the start time to give up
- *      and return the most recent failure result.
- * @return Description
+ * @param timeoutMs - Number of milliseconds from the start time to give up and
+ *      return the most recent failure result.
+ * @return A Result for the polling operation.  If the async operation succeeded
+ * and the donePollingPredicate returned true (if specified) the async
+ * operation's successful result is returned.  If polling times out, a
+ * PollingTimeoutError is returned.  That error will contain the async
+ * operation's last result, which may be successful in cases where the predicate
+ * returned false).
  */
 export async function pollAsyncResult<TSuccess, TError>(
     asyncResultOp: () => Promise<Result<TSuccess, TError>>,

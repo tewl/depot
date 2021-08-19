@@ -123,7 +123,7 @@ export class Directory
 
         const parentParts = _.dropRight(parts);
         const [first, ...rest] = parentParts;
-        const firstDir = new Directory(first);
+        const firstDir = new Directory(first!);
         const parentDir = new Directory(firstDir, ...rest);
         return parentDir;
     }
@@ -254,7 +254,7 @@ export class Directory
                     }
                     else
                     {
-                        const last = acc[acc.length - 1];
+                        const last = acc[acc.length - 1]!;
                         acc.push(path.join(last, curPart));
                     }
                     return acc;
@@ -318,7 +318,7 @@ export class Directory
                     acc.push(curPart);
                 }
             } else {
-                const last = acc[acc.length - 1];
+                const last = acc[acc.length - 1]!;
                 acc.push(path.join(last, curPart));
             }
             return acc;
@@ -556,8 +556,7 @@ export class Directory
                     if (dirIsEmpty) {
                         return curSubdir.delete();
                     }
-
-                    return;
+                    return undefined;
                 });
             })
             .then(() => {

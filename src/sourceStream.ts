@@ -14,7 +14,7 @@ export class SourceStream extends Readable
     }
 
 
-    public _read(): void {
+    public override _read(): void {
 
         if (this._curIndex >= this._data.length)
         {

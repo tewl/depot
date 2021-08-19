@@ -30,7 +30,7 @@ export interface ISerializableMap
  * A function type describing future work that needs to be done to complete an
  * object's deserialization.
  * @param objects - All objects that have been deserialized, including all
- *   returned from the initial `deserialize()` invocation.
+ *   returned from the initial _deserialize()_ invocation.
  * @return void if the deserialization is complete or a promise that resolves
  *   when it is complete
  */
@@ -96,6 +96,7 @@ export interface ISerializable
 }
 
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function isISerializable(obj: any): obj is ISerializable
 {
     return _.isString(obj.id) &&
@@ -109,6 +110,7 @@ export interface ISerializableWithStow<StowType> extends ISerializable
     __stow: StowType;
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function isISerializableWithStow<StowType>(obj: any): obj is ISerializableWithStow<StowType>
 {
     return isISerializable(obj) &&
@@ -183,8 +185,6 @@ export abstract class AStore<StowType>
         this._registry = registry;
     }
 
-    public abstract getIds(regexp?: RegExp): Promise<Array<IdString>>;
-
 
     public async load<T extends ISerializable>(id: IdString): Promise<ILoadResult<T>>
     {
@@ -207,7 +207,7 @@ export abstract class AStore<StowType>
         });
 
         return {
-            obj: deserialized as T,
+            obj:        deserialized as T,
             allObjects: deserializedSoFar
         };
     }
@@ -261,6 +261,9 @@ export abstract class AStore<StowType>
         //   store that do not appear in `alreadySerialized`.
 
     }
+
+
+    public abstract getIds(regexp?: RegExp): Promise<Array<IdString>>;
 
 
     /**
@@ -369,7 +372,7 @@ export abstract class AStore<StowType>
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IMemoryStow
 {
     // Intentionally left empty.
@@ -428,6 +431,7 @@ export class MemoryStore extends AStore<IMemoryStow>
     }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>>
     {
         // Transform `serialized` into the backing store's representation.

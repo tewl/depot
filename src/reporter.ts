@@ -14,13 +14,8 @@ export class Reporter
     // #region Instance Member Variables
     private readonly _listeners: Array<ReporterListenerFn> = [];
     private readonly _indentationStack: Array<number> = [];
-    private _currentIndentation: number = 0;
+    private _currentIndentation = 0;
     // #endregion
-
-
-    public constructor()
-    {
-    }
 
 
     public addListener(listener: ReporterListenerFn): RemoveListenerFunc

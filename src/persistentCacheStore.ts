@@ -4,7 +4,7 @@ import {PersistentCache} from "./persistentCache";
 import {AStore, ISerialized, IdString, IStoreGetResult, IStorePutResult} from "./serialization";
 
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IPersistentCacheStow
 {
     // Intentionally left empty.
@@ -62,6 +62,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async put(serialized: ISerialized, stow: undefined | IPersistentCacheStow): Promise<IStorePutResult<IPersistentCacheStow>>
     {
         // Transform `serialized` into the backing store's representation.

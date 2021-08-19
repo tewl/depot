@@ -41,11 +41,11 @@ describe("ActionComposite", () =>
         it("return correct number when not empty", () =>
         {
             const ac = new ActionComposite()
-                .add(
-                    new Action(() => { }),
-                    new Action(() => { }),
-                    new Action(() => { })
-                );
+            .add(
+                new Action(() => { }),
+                new Action(() => { }),
+                new Action(() => { })
+            );
             expect(ac.length).toEqual(3);
         });
 
@@ -61,10 +61,10 @@ describe("ActionComposite", () =>
         {
             const ac = new ActionComposite();
             ac.execute()
-                .then(() =>
-                {
-                    done();
-                });
+            .then(() =>
+            {
+                done();
+            });
         });
 
 
@@ -114,12 +114,12 @@ describe("ActionComposite", () =>
             }));
 
             ac.execute()
-                .then(() =>
-                {
-                    expect(action1Done).toBeTruthy();
-                    expect(action2Done).toBeTruthy();
-                    done();
-                });
+            .then(() =>
+            {
+                expect(action1Done).toBeTruthy();
+                expect(action2Done).toBeTruthy();
+                done();
+            });
         });
 
 

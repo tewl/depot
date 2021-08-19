@@ -16,8 +16,8 @@ export async function promptToContinue(
 ): Promise<boolean>
 {
     const questionConfirmation: inquirer.Question = {
-        type: "confirm",
-        name: "confirm",
+        type:    "confirm",
+        name:    "confirm",
         default: defaultToConfirm,
         message: message || "Continue?"
     };
@@ -39,8 +39,8 @@ export function promptForString(
 ): Promise<string>
 {
     const question: inquirer.Question = {
-        type: "input",
-        name: "inputValue",
+        type:    "input",
+        name:    "inputValue",
         message: message,
         default: defaultValue
     };
@@ -74,12 +74,12 @@ export async function promptForChoice(
 ): Promise<string>
 {
     const actualChoices = _.chain(choices)
-        .map((curChoice) => ({name: curChoice.name, value: curChoice.value, short: curChoice.name}))
-        .value();
+    .map((curChoice) => ({name: curChoice.name, value: curChoice.value, short: curChoice.name}))
+    .value();
 
     const question: inquirer.Question = {
-        type: "list",
-        name: "inputValue",
+        type:    "list",
+        name:    "inputValue",
         message: message,
         choices: actualChoices
     };
@@ -111,8 +111,8 @@ export async function promptForStringWithChoices(
         .value();
 
     const question: inquirer.Question = {
-        type: "list",
-        name: "inputValue",
+        type:    "list",
+        name:    "inputValue",
         message: message,
         choices: actualChoices
     };
@@ -136,8 +136,8 @@ export function promptForStringInEditor(
 ): Promise<string>
 {
     const question: inquirer.Question = {
-        type: "editor",
-        name: "editorInput",
+        type:    "editor",
+        name:    "editorInput",
         message: message,
         default: defaultValue
     };

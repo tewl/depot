@@ -71,24 +71,24 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
     switch (symbol) {
         case "(":
             return {
-                symbol: "(",
-                precedence: 21,
+                symbol:        "(",
+                precedence:    21,
                 associativity: "n/a"
             };
 
         case ")":
             return {
-                symbol: ")",
-                precedence: 21,
+                symbol:        ")",
+                precedence:    21,
                 associativity: "n/a"
             };
 
         case "*":
             return {
-                symbol: "*",
-                precedence: 15,
+                symbol:        "*",
+                precedence:    15,
                 associativity: "left-to-right",
-                numArguments: 2,
+                numArguments:  2,
                 evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
@@ -98,10 +98,10 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
 
         case "/":
             return {
-                symbol: "/",
-                precedence: 15,
+                symbol:        "/",
+                precedence:    15,
                 associativity: "left-to-right",
-                numArguments: 2,
+                numArguments:  2,
                 evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
@@ -111,10 +111,10 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
 
         case "+":
             return {
-                symbol: "+",
-                precedence: 14,
+                symbol:        "+",
+                precedence:    14,
                 associativity: "left-to-right",
-                numArguments: 2,
+                numArguments:  2,
                 evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
@@ -124,10 +124,10 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
 
         case "-":
             return {
-                symbol: "-",
-                precedence: 14,
+                symbol:        "-",
+                precedence:    14,
                 associativity: "left-to-right",
-                numArguments: 2,
+                numArguments:  2,
                 evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
@@ -191,7 +191,7 @@ function getTokenizers(): Array<ITokenizer>
         {
             matcherFn: (remainingText: string) =>
             {
-                const regexPlus = /^(?<leadingws>\s*)(?<operator>[()*/+\-])(?<trailingws>\s*)/;
+                const regexPlus = /^(?<leadingws>\s*)(?<operator>[()*/+-])(?<trailingws>\s*)/;
                 return regexPlus.exec(remainingText);
             },
             tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>

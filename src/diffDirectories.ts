@@ -52,11 +52,11 @@ export class FileCompareAction
     {
         if (this._actionType === FileCompareActionType.COPY_LEFT) {
             return this._files.rightFile.copy(this._files.leftFile)
-            .then(() => {});
+            .then(() => { return; });
         }
         else if (this._actionType === FileCompareActionType.COPY_RIGHT) {
             return this._files.leftFile.copy(this._files.rightFile)
-            .then(() => { });
+            .then(() => { return; });
         }
         else if (this._actionType === FileCompareActionType.DELETE_LEFT) {
             return this._files.leftFile.delete();
@@ -68,7 +68,7 @@ export class FileCompareAction
             return Promise.all([
                 this._files.leftFile.delete(),
                 this._files.rightFile.delete()])
-            .then(() => { });
+            .then(() => { return; });
         }
         else if (this._actionType === FileCompareActionType.SKIP) {
             return Promise.resolve();
@@ -430,7 +430,7 @@ export class DiffDirFileItem
 export async function diffDirectories(
     leftDir: Directory,
     rightDir: Directory,
-    includeIdentical: boolean = false
+    includeIdentical = false
 ): Promise<Array<DiffDirFileItem>>
 {
     //

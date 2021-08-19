@@ -233,7 +233,7 @@ export class Fraction
     }
 
 
-    public toString(improper: boolean = false): string
+    public toString(improper = false): string
     {
         if (this._num === 0) {
             return "0";
@@ -521,9 +521,7 @@ export class Fraction
         let ceilVal: Fraction;
 
         // Find the ceil value by stepping up from rangeFloor.
-        for (let curVal = rangeFloor;
-             curVal.isLessThanOrEqualTo(rangeCeil);
-             curVal = curVal.add(incr)
+        for (let curVal = rangeFloor; curVal.isLessThanOrEqualTo(rangeCeil); curVal = curVal.add(incr)
         ) {
             if (curVal.isGreaterThanOrEqualTo(this)) {
                 ceilVal = curVal;
@@ -565,7 +563,7 @@ export function greatestCommonDivisor(a: number, b: number): number
         if (b > a) {
             [a, b] = [b, a];
         }
-        while (true) {
+        while (true) {  // eslint-disable-line no-constant-condition
             if (b === 0) { return a; }
             a %= b;
             if (a === 0) { return b; }

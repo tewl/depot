@@ -30,37 +30,31 @@ export class SelfSignedCertificate
 
         const subjStr = `/C=${countryCode}/ST=${state}/L=${location}/O=${organization}/OU=${organizationalUnit}/CN=${commonName}`;
 
-        try {
-            await spawn(
-                "openssl",
-                [
-                    "req",
-                    "-nodes",
-                    "-newkey", "rsa:2048",
-                    "-keyout", keyFile.absolute().toString(),
-                    "-out", certFile.absolute().toString(),
-                    "-x509",
-                    "-days", "365",
-                    "-subj", subjStr
-                ]
-            ).closePromise;
+        await spawn(
+            "openssl",
+            [
+                "req",
+                "-nodes",
+                "-newkey", "rsa:2048",
+                "-keyout", keyFile.absolute().toString(),
+                "-out", certFile.absolute().toString(),
+                "-x509",
+                "-days", "365",
+                "-subj", subjStr
+            ]
+        ).closePromise;
 
-            // Read the key and cert data (in parallel).
-            const [keyData, certData] = await Promise.all<string, string>([keyFile.read(), certFile.read()]);
+        // Read the key and cert data (in parallel).
+        const [keyData, certData] = await Promise.all<string, string>([keyFile.read(), certFile.read()]);
 
-            // Create the new instance.
-            const instance = new SelfSignedCertificate(
-                countryCode, state, location, organization, organizationalUnit, commonName, keyData, certData);
+        // Create the new instance.
+        const instance = new SelfSignedCertificate(
+            countryCode, state, location, organization, organizationalUnit, commonName, keyData, certData);
 
-            // Cleanup
-            await Promise.all([keyFile.delete(), certFile.delete()]);
+        // Cleanup
+        await Promise.all([keyFile.delete(), certFile.delete()]);
 
-            return instance;
-        }
-        catch (err) {
-            throw err;
-        }
-
+        return instance;
     }
 
 

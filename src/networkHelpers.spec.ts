@@ -121,8 +121,10 @@ describe("selectAvailableTcpPort()", () => {
         expect(selectedPort).not.toEqual(serverInfo1.port);
         expect(selectedPort).not.toEqual(serverInfo2.port);
 
-        await Promise.all([shutdownServer(serverInfo1.server),
-                             shutdownServer(serverInfo2.server)]);
+        await Promise.all([
+            shutdownServer(serverInfo1.server),
+            shutdownServer(serverInfo2.server)
+        ]);
     });
 
 

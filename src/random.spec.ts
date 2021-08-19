@@ -19,7 +19,7 @@ describe("getRandomFloat()", () => {
 
 
     it("returns a number in [lower, upper)", () => {
-        for (let i: number = 0; i < 100; ++i) {
+        for (let i = 0; i < 100; ++i) {
             const random = getRandomFloat(2.5, 8.5);
             expect((random >= 2.5) && (random < 8.5)).toBeTruthy();
         }

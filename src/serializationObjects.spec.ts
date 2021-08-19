@@ -127,9 +127,9 @@ export class Model implements ISerializable
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IModelSerialized1 = {
-            type: (this.constructor as any).type,
-            id:   this._id,
-            schema: "1",
+            type:       (this.constructor as any).type,
+            id:         this._id,
+            schema:     "1",
             rootPerson: undefined
         };
 
@@ -280,13 +280,13 @@ export class Person implements ISerializable
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IPersonSerialized1 = {
-            type: (this.constructor as any).type,
-            id:   this._id,
-            schema: "1",
+            type:      (this.constructor as any).type,
+            id:        this._id,
+            schema:    "1",
             firstName: this._firstName,
-            lastName: this._lastName,
-            mother: undefined,
-            father: undefined
+            lastName:  this._lastName,
+            mother:    undefined,
+            father:    undefined
         };
 
         if (this._mother) {

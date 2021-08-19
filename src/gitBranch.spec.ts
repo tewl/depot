@@ -94,6 +94,7 @@ describe("GitBranch", () => {
                 }
                 catch (err)
                 {
+                    // Correctly rejected.
                 }
             });
 

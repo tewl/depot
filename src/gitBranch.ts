@@ -22,7 +22,7 @@ export class GitBranch
     // group 1: "remotes/remotename"  (not all that useful)
     // group 2: "remotename"          (the remote name)
     // group 3: "branch/name"         (the branch name)
-    private static strParserRegex: RegExp = /^(remotes\/([\w.-]+)\/)?(.*)$/;
+    private static _strParserRegex = /^(remotes\/([\w.-]+)\/)?(.*)$/;
     // endregion
 
 
@@ -107,7 +107,7 @@ export class GitBranch
             .map((curLine) => curLine.trim())
             // Create an array of GitBranch objects
             .map((longName): GitBranch => {
-                const regexResults = GitBranch.strParserRegex.exec(longName);
+                const regexResults = GitBranch._strParserRegex.exec(longName);
                 if (!regexResults)
                 {
                     throw new Error(`Error: Branch "${longName}" could not be parsed by enumerateGitRepoBranches().`);

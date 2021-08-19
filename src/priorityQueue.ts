@@ -53,7 +53,7 @@ export class PriorityQueue<PayloadType>
     public push(payload: PayloadType, priority: number): void
     {
         this._heap.push({priority: priority,
-                         payload: payload});
+                         payload:  payload});
     }
 
 

@@ -18,9 +18,9 @@ gulp.task("default", async () => {
     const usage = [
         "Gulp tasks",
         "  clean   - Delete built and temporary files",
-        "  tslint  - Run TSLint on source files",
+        "  eslint  - Run ESLint on source files",
         "  ut      - Run unit tests",
-        "  build   - Run TSLint, unit tests, and compile TypeScript",
+        "  build   - Run ESLint, unit tests, and compile TypeScript",
         "  compile - Compile TS files"
     ];
     console.log(usage.join("\n"));
@@ -45,45 +45,37 @@ function clean() {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// TSLint
+// ESLint
 ////////////////////////////////////////////////////////////////////////////////
 
-gulp.task("tslint", function ()
+gulp.task("eslint", function ()
 {
     "use strict";
-    return runTslint(true);
+    return runEslint(true);
 });
 
 
-function runTslint(emitError)
+function runEslint(emitError)
 {
-    console.log("Running TSLint...");
+    console.log("Running ESLint...");
 
     "use strict";
-    let tslintArgs = [
-        "--project", "./tsconfig.json",
-        "--format", "stylish"
+    let eslintArgs = [
+        ".",
+        // "--ext", ".js",
+        "--ext", ".ts",
     ];
 
-    // Add the globs defining source files to the list of arguments.
-    tslintArgs = tslintArgs.concat(getSrcGlobs(true));
-
-    let cmd = path.join(".", "node_modules", ".bin", "tslint");
+    let cmd = path.join(".", "node_modules", ".bin", "eslint");
     cmd = nodeBinForOs(cmd).toString();
-    return spawn(cmd, tslintArgs, {cwd: __dirname},
+    return spawn(cmd, eslintArgs, {cwd: __dirname},
                  undefined, process.stdout, process.stderr)
     .closePromise
-    .then((stdout) => {
-        console.log(stdout);
-    })
     .catch((err) => {
-        console.error(err.stdout);
-        console.error(err.stderr);
-
         // If we're supposed to emit an error, then go ahead and rethrow it.
         // Otherwise, just eat it.
         if (emitError) {
-            throw toGulpError(err, "One or more TSLint errors found.");
+            throw toGulpError(err, "One or more ESLint errors found.");
         }
     });
 }
@@ -135,7 +127,7 @@ gulp.task("build", () => {
 
     return clean()
     .then(() => {
-        return runTslint(true);
+        return runEslint(true);
     })
     .catch((err) => {
         firstError = firstError || err;
@@ -173,8 +165,8 @@ gulp.task("compile", () => {
 
     return clean()
     .then(() => {
-        // Do not build if there are TSLint errors.
-        return runTslint(true);
+        // Do not build if there are ESLint errors.
+        return runEslint(true);
     })
     .then(() => {
         // Everything seems ok.  Go ahead and compile.
@@ -208,25 +200,4 @@ function compileTypeScript() {
         console.error(_.trim(err.stdout + err.stderr));
         throw toGulpError(new Error("TypeScript compilation failed."));
     });
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Project Management
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Gets globbing patterns for source files.
- * @param includeSpecs - Whether to include unit test *.spec.ts files.
- * @return {Array<string>} An array of string globbing patterns
- */
-function getSrcGlobs(includeSpecs) {
-    "use strict";
-
-    const srcGlobs = ["src/**/*.ts"];
-    if (!includeSpecs) {
-        srcGlobs.push("!src/**/*.spec.ts");
-    }
-
-    return srcGlobs;
 }

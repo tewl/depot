@@ -38,6 +38,7 @@ describe("getFilesystemItem()", () => {
             fail("The preceding line should have rejected.");
         }
         catch (err) {
+            // Correctly rejected.
         }
     });
 

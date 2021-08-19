@@ -119,7 +119,7 @@ describe("logger", () => {
 
 
         it("log additional parameters", () => {
-            let logMsg: string = "";
+            let logMsg = "";
             logger.pushLogLevel(LogLevel.SILLY_6);
             logger.addListener((msg: string): void => {
                 logMsg = msg;

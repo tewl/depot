@@ -15,8 +15,8 @@ interface IGulpError extends Error
  * @return A Gulp error object that will not display the stack trace
  */
 export function toGulpError(
-    err: any,
-    defaultErrorMsg: string = "Gulp encountered one or more errors."
+    err: any,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    defaultErrorMsg = "Gulp encountered one or more errors."
 ): Error
 {
     const gulpError: IGulpError = new Error(err.message || defaultErrorMsg) as IGulpError;

@@ -35,8 +35,8 @@ describe("PrefixStream", () => {
         const collectorStream = new CollectorStream();
 
         sourceStream
-            .pipe(prefixStream)
-            .pipe(collectorStream);
+        .pipe(prefixStream)
+        .pipe(collectorStream);
 
         collectorStream.on("finish", () =>
         {

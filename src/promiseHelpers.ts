@@ -21,13 +21,17 @@ export function promisifyN<ResultType>(
     const promisifiedFunc = function (...args: Array<any>): Promise<ResultType> {
 
         return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
-            func.apply(undefined, args.concat((err: any, result: ResultType) => {
-                if (err) {
+            const allArgs = args.concat((err: any, result: ResultType) =>
+            {
+                if (err)
+                {
                     reject(err);
-                } else {
+                } else
+                {
                     resolve(result);
                 }
-            }));
+            });
+            func(...allArgs);
         });
     };
     return promisifiedFunc;
@@ -139,7 +143,7 @@ export type Task<ResolveType> = () => Promise<ResolveType>;
  */
 export function sequence(
     tasks: Array<(previousValue: any) => any>,
-    initialValue: any
+    initialValue: any  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
 ): Promise<any> {
     "use strict";
 
@@ -192,7 +196,7 @@ export function getTimerPromise<ResolveType>(
  * `falseResolveValue`.
  */
 export function conditionalTask<ResolveType>(
-    condition: any,
+    condition: any,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
     task: Task<ResolveType>,
     falseResolveValue: ResolveType
 ): Promise<ResolveType> {
@@ -313,7 +317,7 @@ export function retryWhile<ResolveType>(
  * The value that will be multiplied by successively higher powers of 2 when
  * calculating delay time during exponential back off.
  */
-const BACKOFF_MULTIPLIER: number = 20;
+const BACKOFF_MULTIPLIER = 20;
 
 
 /**
@@ -568,7 +572,7 @@ export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curV
     for (let i = pairs.length - 1; i >= 0; i--)
     {
         const [item, predicateResult] = pairs[i]!;
-        if (!!predicateResult)
+        if (predicateResult)
         {
             // Remove the current item.
             removed.push(item);

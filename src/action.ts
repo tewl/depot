@@ -1,4 +1,4 @@
-export type actionFunc<TResolve> = () => (TResolve | Promise<TResolve>);
+export type ActionFunc<TResolve> = () => (TResolve | Promise<TResolve>);
 
 
 /**
@@ -21,12 +21,12 @@ export interface IAction<TResolve>
 export class Action<TResolve> implements IAction<TResolve>
 {
     // #region Instance Data Members
-    private readonly _theFunc:     actionFunc<TResolve>;
+    private readonly _theFunc:     ActionFunc<TResolve>;
     private readonly _description: undefined | string;
     // #endregion
 
 
-    public constructor(func: actionFunc<TResolve>, description?: string)
+    public constructor(func: ActionFunc<TResolve>, description?: string)
     {
         this._theFunc = func;
         this._description = description;

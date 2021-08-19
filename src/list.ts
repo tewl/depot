@@ -488,7 +488,7 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
             this._curNode = this._curNode.next;
 
             return {
-                done: false,
+                done:  false,
                 value: val
             };
         }

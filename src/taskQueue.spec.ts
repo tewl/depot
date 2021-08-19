@@ -20,7 +20,7 @@ interface ITaskInfo<ResolveType> {
  * resolve or reject.
  *
  */
-function createTask<ResolveType>(name: string = ""): ITaskInfo<ResolveType>
+function createTask<ResolveType>(): ITaskInfo<ResolveType>
 {
     const dfd = new Deferred<ResolveType>();
 
@@ -173,7 +173,7 @@ describe("TaskQueue", () => {
 
 
     it("will emit a drained event when the queue is drained", (done) => {
-        let numDrainedEvents: number = 0;
+        let numDrainedEvents = 0;
         const queue: TaskQueue = new TaskQueue(1);
 
         queue.on(TaskQueue.EVENT_DRAINED, () => {
@@ -203,10 +203,9 @@ describe("TaskQueue", () => {
             // event should fire.
         })
         .then(() => {
-                expect(numDrainedEvents).toEqual(1);
-                done();
-            }
-        );
+            expect(numDrainedEvents).toEqual(1);
+            done();
+        });
 
         taskInfo1.deferred.resolve(1);
     });
@@ -254,7 +253,7 @@ describe("TaskQueue", () => {
 
     it("drain() will return a Promise that is fulfilled when the TaskQueue is emptied", (done) => {
         const queue = new TaskQueue(1);
-        let numDrainedEvents: number = 0;
+        let numDrainedEvents = 0;
         queue.on(TaskQueue.EVENT_DRAINED, () => {
             numDrainedEvents++;
         });
@@ -441,7 +440,7 @@ describe("TaskQueue", () => {
 
 
     it("when run() is called (repeatedly) on an empty queue, it will remain in the paused state", (done) => {
-        let taskHasRun: boolean = false;
+        let taskHasRun = false;
         const task = (): Promise<void> => {
             taskHasRun = true;
             return Promise.resolve();

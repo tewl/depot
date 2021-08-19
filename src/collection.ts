@@ -1,6 +1,3 @@
-import * as _ from "lodash";
-
-
 export interface IFindResult<TCollectionItem, TPredicateReturn> {
     item: TCollectionItem;
     predicateReturn: TPredicateReturn;

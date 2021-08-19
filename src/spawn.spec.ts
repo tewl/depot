@@ -23,7 +23,7 @@ describe("spawn", () => {
             cmd = "dir";
         }
         const testFilePath = path.join(tmpDir.absPath(), "foo.txt");
-        spawn("dir", [">", "foo.txt"], options).closePromise
+        spawn(cmd, [">", "foo.txt"], options).closePromise
         .then(() => {
             const stats = fs.statSync(testFilePath);
             expect(stats.isFile()).toBeTruthy();

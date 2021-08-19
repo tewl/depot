@@ -15,7 +15,7 @@ export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: str
     const networkInterfaces = os.networkInterfaces();
 
     for (const curInterfaceName in networkInterfaces) {
-        if (networkInterfaces.hasOwnProperty(curInterfaceName)) {
+        if (Object.prototype.hasOwnProperty.call(networkInterfaces, curInterfaceName)) {
             const addrArray = networkInterfaces[curInterfaceName]!;
             for (const curAddr of addrArray) {
                 if ((curAddr.family === "IPv4") && (!curAddr.internal)) {

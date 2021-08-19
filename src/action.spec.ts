@@ -1,4 +1,3 @@
-import { iteratee } from "lodash";
 import {Action} from "./action";
 import { getTimerPromise } from "./promiseHelpers";
 
@@ -7,7 +6,7 @@ describe("Action", () => {
 
 
     it("can be constructed", () => {
-        const action = new Action(() => {});
+        new Action(() => {});
     });
 
 
@@ -15,7 +14,7 @@ describe("Action", () => {
 
         it("can be read after creation", () =>
         {
-            const action = new Action(() => { }, "Do something interesting.");
+            const action = new Action(() => {}, "Do something interesting.");
             expect(action.description).toEqual("Do something interesting.");
         });
 

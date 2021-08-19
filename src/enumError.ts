@@ -33,7 +33,7 @@ class EnumError<T> extends Error
  * @return A class whose instances will wrap error values from the specified
  * enumeration
  */
-export let getEnumErrorClass = <T>(enumObject: T) => {
+export const getEnumErrorClass = <T>(enumObject: T) => { // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
 
     // tslint:disable-next-line:max-classes-per-file
     return class SpecificEnumError extends EnumError<T> {

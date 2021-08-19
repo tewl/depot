@@ -39,7 +39,7 @@ export function numInitial(str: string, padStr: string): number
 export function indent(
     src: string,
     numSpacesOrPad: number | string,
-    skipFirstLine: boolean = false
+    skipFirstLine = false
 ): string
 {
     if (numSpacesOrPad === 0) {
@@ -56,7 +56,7 @@ export function indent(
         // The only way replace() will replace all instances is to use the "g"
         // flag with replace(). Use the m flag so that ^ and $ match within the
         // string.
-        const replaceRegex: RegExp = /^(.*?)$/gm;
+        const replaceRegex = /^(.*?)$/gm;
         const replaceFunc = function replaceFunc(
             match: any,
             group1: string,
@@ -81,7 +81,7 @@ export function indent(
  *     possible.  If `false`, only one occurrence will be removed.
  * @return A new version of str without the indentations
  */
-export function outdent(str: string, padStr: string = " ", greedy: boolean = true): string
+export function outdent(str: string, padStr = " ", greedy = true): string
 {
     const lines = splitIntoLines(str, true);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
@@ -190,7 +190,7 @@ export function removeWhitespace(str: string): string
  * @param retainLineEndings - Whether each line should include the original line endings
  * @return An array containing the individual lines from `text`.
  */
-export function splitIntoLines(text: string, retainLineEndings: boolean = false): Array<string>
+export function splitIntoLines(text: string, retainLineEndings = false): Array<string>
 {
     if (text.length === 0)
     {
@@ -253,7 +253,7 @@ export function padLeft(src: string, pad: string, desiredLength: number): string
         return src;
     }
 
-    let fullPad: string = "";
+    let fullPad = "";
     while (fullPad.length < numPadChars)
     {
         fullPad = fullPad + pad;
@@ -272,7 +272,7 @@ export function padRight(src: string, pad: string, desiredLength: number): strin
         return src;
     }
 
-    let fullPad: string = "";
+    let fullPad = "";
     while (fullPad.length < numPadChars)
     {
         fullPad = fullPad + pad;

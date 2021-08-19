@@ -12,7 +12,7 @@ export function advance<ValueType>(it: Iterator<ValueType>, offset: number): voi
     const fn: () => void = offset < 0 ? it.prev.bind(it) : it.next.bind(it);
     const numIterations: number = Math.abs(offset);
 
-    for (let i: number = 0; i < numIterations; ++i) {
+    for (let i = 0; i < numIterations; ++i) {
         fn();
     }
 }
@@ -27,7 +27,7 @@ export function advance<ValueType>(it: Iterator<ValueType>, offset: number): voi
 export function distance<ValueType>(itA: Iterator<ValueType>, itB: Iterator<ValueType>): number {
     "use strict";
 
-    let distance: number = 0;
+    let distance = 0;
     const itCur: Iterator<ValueType> = itA.offset(0);
 
     while (!itCur.equals(itB)) {

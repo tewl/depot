@@ -70,31 +70,31 @@ export function comment(
         // The amount of indentation will be determined by the line with the
         // least indentation characters at the beginning.
         const numIndentChars = _.chain(linesToConsider)
-            .map((curLine) => numInitial(curLine, indentChar))
-            .min()
-            .value();
+        .map((curLine) => numInitial(curLine, indentChar))
+        .min()
+        .value();
 
         indentStr = _.repeat(indentChar, numIndentChars);
     }
 
     const result: string = _.chain(sourceLines)
-        .map((curLine) =>
-        {
-            // The original text that will follow the comment token.
-            // If the current line is a blank one, it may be zero-length, so we will
-            // use the whole line in order to get the EOL.  If it is not blank, it
-            // will be everything following the common indent.
-            const blank = isBlank(curLine);
-            const sourceText = blank ? getEol(curLine) :
-                                       curLine.slice(indentStr.length);
+    .map((curLine) =>
+    {
+        // The original text that will follow the comment token.
+        // If the current line is a blank one, it may be zero-length, so we will
+        // use the whole line in order to get the EOL.  If it is not blank, it
+        // will be everything following the common indent.
+        const blank = isBlank(curLine);
+        const sourceText = blank ? getEol(curLine) :
+                                   curLine.slice(indentStr.length);
 
-            // The whitespace that will follow the comment token.
-            const postCommentSpace = blank ? "" : " ";
+        // The whitespace that will follow the comment token.
+        const postCommentSpace = blank ? "" : " ";
 
-            return `${indentStr}${getCommentToken()}${postCommentSpace}${sourceText}`;
-        })
-        .join("")
-        .value();
+        return `${indentStr}${getCommentToken()}${postCommentSpace}${sourceText}`;
+    })
+    .join("")
+    .value();
 
     return result;
 }

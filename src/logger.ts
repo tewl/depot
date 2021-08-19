@@ -45,11 +45,6 @@ export class Logger
     // endregion
 
 
-    public constructor()
-    {
-    }
-
-
     public addListener(listener: LogListenerFunc): RemoveListenerFunc
     {
         this._listeners.push(listener);

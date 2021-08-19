@@ -364,7 +364,7 @@ export class GitRepo
      * @return A Promise for this GitRepo instance (so that other calls may be
      * chained).
      */
-    public createTag(tagName: string, message: string = "", force: boolean = false): Promise<GitRepo>
+    public createTag(tagName: string, message = "", force = false): Promise<GitRepo>
     {
         let args = ["tag"];
 
@@ -422,7 +422,7 @@ export class GitRepo
     public pushTag(
         tagName: string,
         remoteName: string,
-        force: boolean = false
+        force = false
     ): Promise<GitRepo>
     {
         let args = ["push"];
@@ -447,7 +447,7 @@ export class GitRepo
      * available); true to retrieve the latest list of branches.
      * @return A Promise for the branches found
      */
-    public getBranches(forceUpdate: boolean = false): Promise<Array<GitBranch>>
+    public getBranches(forceUpdate = false): Promise<Array<GitBranch>>
     {
         if (forceUpdate)
         {
@@ -540,7 +540,9 @@ export class GitRepo
 
             return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
-        .then(() => {});
+        .then(() => {
+            return;
+        });
     }
 
 
@@ -552,7 +554,7 @@ export class GitRepo
     public checkoutCommit(commit: CommitHash): Promise<void>
     {
         return spawn("git", ["checkout", commit.toString()], {cwd: this._dir.toString()}).closePromise
-        .then(() => {});
+        .then(() => { return; });
     }
 
 
@@ -579,7 +581,7 @@ export class GitRepo
      * @return A Promise that is resolved when the push has completed.  The
      * promise will reject when working in a detached head state.
      */
-    public pushCurrentBranch(remoteName: string = "origin", setUpstream: boolean = false): Promise<void>
+    public pushCurrentBranch(remoteName = "origin", setUpstream = false): Promise<void>
     {
         return this.getCurrentBranch()
         .then((curBranch) => {
@@ -597,6 +599,7 @@ export class GitRepo
             return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
         .then(() => {
+            return;
         })
         .catch((err) => {
             console.log(`Error pushing current branch: ${JSON.stringify(err)}`);
@@ -610,7 +613,7 @@ export class GitRepo
      * @param trackingRemote - The remote containing the tracking branch
      * @return A Promise for an object containing the result
      */
-    public getCommitDeltas(trackingRemote: string = "origin"): Promise<{ahead: number, behind: number}>
+    public getCommitDeltas(trackingRemote = "origin"): Promise<{ahead: number, behind: number}>
     {
         // TODO: Write unit tests for this method.
 
@@ -641,7 +644,7 @@ export class GitRepo
         })
         .then((results) => {
             return {
-                ahead: parseInt(results[0], 10),
+                ahead:  parseInt(results[0], 10),
                 behind: parseInt(results[1], 10)
             };
         });
@@ -657,7 +660,7 @@ export class GitRepo
      * @param msg - The commit message
      * @return A Promise for the newly created Git log entry
      */
-    public commit(msg: string = ""): Promise<IGitLogEntry>
+    public commit(msg = ""): Promise<IGitLogEntry>
     {
         // TODO: Add unit tests for this method.
 
@@ -695,7 +698,7 @@ export class GitRepo
      * @return A promise that is resolved when the command completes
      * successfully
      */
-    public fetch(remoteName: string = "origin", fetchTags: boolean = false): Promise<void>
+    public fetch(remoteName = "origin", fetchTags = false): Promise<void>
     {
         const args = [
             "fetch",
@@ -705,7 +708,7 @@ export class GitRepo
 
         return spawn("git", args, {cwd: this._dir.toString()}).closePromise
         .then(
-            () => {},
+            () => { return; },
             (err) => {
                 console.log(`Error fetching from ${remoteName} remote: ${JSON.stringify(err)}`);
                 throw err;

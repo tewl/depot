@@ -14,6 +14,7 @@ export interface ISystemError
     code?: string;    // The string error code
     dest?: string;    // If present, the file path destination when reporting a file system error
     errno?: number;   // The system-provided error number
+    // eslint-disable-next-line @typescript-eslint/ban-types
     info?: object;    // If present, extra details about the error condition
     message?: string; // A system-provided human - readable description of the error
     path?: string;    // If present, the file path when reporting a file system error
@@ -38,6 +39,7 @@ export interface ISpawnResult
 
 
 export type SpawnCloseError = ISpawnSystemError | ISpawnExitError;
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function isSpawnCloseError(a: any): a is SpawnCloseError
 {
     return (a as SpawnCloseError).type === "ISpawnSystemError" ||
@@ -140,10 +142,10 @@ export function spawn(
                         console.log(`Child process failed: ${cmdLineRepresentation}`);
                     }
                     reject({
-                        type: "ISpawnExitError",
+                        type:     "ISpawnExitError",
                         exitCode: exitCode,
-                        stderr: stderrCollector.collected,
-                        stdout: stdoutCollector.collected
+                        stderr:   stderrCollector.collected,
+                        stdout:   stdoutCollector.collected
                     });
                 }
             });

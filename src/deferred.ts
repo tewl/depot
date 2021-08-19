@@ -9,8 +9,8 @@ export class Deferred<ResolveType>
         // The following temporary assignments are here to get rid of a bogus TS
         // error: "TS2564: Property 'resolve' has no initializer and is not
         // definitely assigned in the constructor."
-        this.resolve = (): void => {};
-        this.reject = (): void => {};
+        this.resolve = (): void => { return; };
+        this.reject = (): void => { return; };
 
         this.promise = new Promise((resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
             this.resolve = resolve;

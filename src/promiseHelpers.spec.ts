@@ -190,8 +190,8 @@ describe("getTimerPromise()", () => {
 
 
     it("should resolve after the specified amount of time", (done) => {
-        const start: number = Date.now();
-        const delayMs: number = 200;
+        const start = Date.now();
+        const delayMs = 200;
 
         getTimerPromise(delayMs, "foo")
         .then((val) => {
@@ -442,7 +442,7 @@ describe("promiseWhile()", () => {
 
 
     it("will loop until the predicate returns false", (done) => {
-        let val: string = "";
+        let val = "";
         promiseWhile(
             () => {
                 return val.length < 5;
@@ -465,7 +465,7 @@ describe("promiseWhile()", () => {
 
 
     it("the returned promise will reject with the same error the body function rejects with", (done) => {
-        let val: string = "";
+        let val = "";
         promiseWhile(
             (): boolean => val.length < 5,
             (): Promise<void> => {
@@ -804,19 +804,19 @@ describe("mapAsync()", () =>
             else
             {
                 return getTimerPromise(curNum, true)
-                    .then(() =>
-                    {
-                        throw new Error(`${curNum} rejected.`);
-                    });
+                .then(() =>
+                {
+                    throw new Error(`${curNum} rejected.`);
+                });
             }
         };
 
         mapAsync(src, valueFunc)
-            .catch((err) =>
-            {
-                expect(err.message).toEqual("31 rejected.");
-                done();
-            });
+        .catch((err) =>
+        {
+            expect(err.message).toEqual("31 rejected.");
+            done();
+        });
     });
 });
 
@@ -849,19 +849,19 @@ describe("zipWithAsyncValues()", () => {
             else
             {
                 return getTimerPromise(curNum, true)
-                    .then(() =>
-                    {
-                        throw new Error(`${curNum} rejected.`);
-                    });
+                .then(() =>
+                {
+                    throw new Error(`${curNum} rejected.`);
+                });
             }
         };
 
         zipWithAsyncValues(src, valueFunc)
-            .catch((err) =>
-            {
-                expect(err.message).toEqual("31 rejected.");
-                done();
-            });
+        .catch((err) =>
+        {
+            expect(err.message).toEqual("31 rejected.");
+            done();
+        });
     });
 });
 
@@ -899,11 +899,11 @@ describe("filterAsync", () => {
         };
 
         filterAsync(src, asyncRejectIfOdd)
-            .catch((err) =>
-            {
-                expect(err.message).toEqual("31 rejected.");
-                done();
-            });
+        .catch((err) =>
+        {
+            expect(err.message).toEqual("31 rejected.");
+            done();
+        });
     });
 
 });
@@ -950,11 +950,11 @@ describe("partitionAsync", () =>
         };
 
         partitionAsync(src, asyncRejectIfOdd)
-            .catch((err) =>
-            {
-                expect(err.message).toEqual("31 rejected.");
-                done();
-            });
+        .catch((err) =>
+        {
+            expect(err.message).toEqual("31 rejected.");
+            done();
+        });
     });
 
 });
@@ -1002,13 +1002,13 @@ describe("removeAsync", () =>
         };
 
         removeAsync(src, asyncRejectIfOdd)
-            .catch((err) =>
-            {
-                expect(err.message).toEqual("31 rejected.");
-                // `src` should be unmodified.
-                expect(src.length).toEqual(3);
-                done();
-            });
+        .catch((err) =>
+        {
+            expect(err.message).toEqual("31 rejected.");
+            // `src` should be unmodified.
+            expect(src.length).toEqual(3);
+            done();
+        });
     });
 
 });

@@ -46,7 +46,7 @@ export function makeNodeScriptExecutable(file: File): Promise<File>
  * @return A promise that resolves with an array of files that were made
  * executable.
  */
-export function makeAllJsScriptsExecutable(dir: Directory, recursive: boolean = false): Promise<Array<File>>
+export function makeAllJsScriptsExecutable(dir: Directory, recursive = false): Promise<Array<File>>
 {
     return dir.contents(recursive)
     .then((contents) => {

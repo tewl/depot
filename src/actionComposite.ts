@@ -32,6 +32,6 @@ export class ActionComposite implements IAction<void>
     public async execute(): Promise<void>
     {
         return Promise.all(_.map(this._actions, (curAction) => curAction.execute()))
-        .then(() => { });
+        .then(() => { return; });
     }
 }

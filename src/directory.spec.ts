@@ -1212,6 +1212,7 @@ describe("Directory", () => {
         describe("walk()", () => {
 
             beforeEach(() => {
+                /* eslint-disable no-irregular-whitespace */
                 tmpDir.emptySync();
 
                 // Create the following directory structure under tmpDir.

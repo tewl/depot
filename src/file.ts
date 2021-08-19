@@ -550,7 +550,9 @@ export class File
      * @param data - The data to be stringified and written
      * @return A Promise that is resolved when the file has been written
      */
-    public writeJson(data: object): Promise<void>
+    public writeJson(
+        data: object  // eslint-disable-line @typescript-eslint/ban-types
+    ): Promise<void>
     {
         const jsonText = JSON.stringify(data, undefined, 4);
         return this.write(jsonText);
@@ -562,7 +564,9 @@ export class File
      * parent directories do not exist, they are created.
      * @param data - The data to be stringified and written
      */
-    public writeJsonSync(data: object): void
+    public writeJsonSync(
+        data: object  // eslint-disable-line @typescript-eslint/ban-types
+    ): void
     {
         const jsonText = JSON.stringify(data, undefined, 4);
         return this.writeSync(jsonText);
@@ -576,7 +580,7 @@ export class File
      * `openssl list-message-digest-algorithms`.
      * @return A Promise for a hexadecimal string containing the hash
      */
-    public getHash(algorithm: string = "md5"): Promise<string>
+    public getHash(algorithm = "md5"): Promise<string>
     {
         return new Promise<string>((resolve, reject) => {
             const input = fs.createReadStream(this._filePath);
@@ -606,7 +610,7 @@ export class File
      * `openssl list-message-digest-algorithms`.
      * @return A hexadecimal string containing the hash
      */
-    public getHashSync(algorithm: string = "md5"): string
+    public getHashSync(algorithm = "md5"): string
     {
         const fileData = fs.readFileSync(this._filePath);
         const hash = crypto.createHash(algorithm);

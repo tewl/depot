@@ -31,7 +31,10 @@ export class Directory
      * @param to - The ending directory
      * @return A directory representing the relative path from `from` to `to`
      */
-    public static relative(from: Directory, to: Directory): Directory
+    public static relative(
+        from: Directory,
+        to:   Directory
+    ): Directory
     {
         const relPath = path.relative(from.toString(), to.toString());
         return new Directory(relPath);
@@ -440,7 +443,7 @@ export class Directory
      * File and Directory objects will be determined by the relative/absolute
      * nature of this Directory object.
      */
-    public contents(recursive: boolean = false): Promise<IDirectoryContents>
+    public contents(recursive = false): Promise<IDirectoryContents>
     {
         const parentDirPath = this.toString();
 
@@ -462,7 +465,7 @@ export class Directory
                     }
                     // Note: We are ignoring symbolic links here.
                 })
-                .catch((err) => {
+                .catch(() => {
                     // We failed to stat the current item.  This is probably a
                     // permissions error.  Pretend like it's not here.
                 });
@@ -498,7 +501,7 @@ export class Directory
      * @return The contents of the directory, separated into a list of files and a
      * list of subdirectories.  All paths returned are absolute paths.
      */
-    public contentsSync(recursive: boolean = false): IDirectoryContents
+    public contentsSync(recursive = false): IDirectoryContents
     {
         const parentDirPath = this.toString();
 
@@ -560,6 +563,7 @@ export class Directory
                 });
             })
             .then(() => {
+                return;
             });
         });
     }

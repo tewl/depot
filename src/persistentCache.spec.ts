@@ -248,7 +248,8 @@ describe("PersistentCache", () => {
                 .then((cache) => {
                     return Promise.all([cache.put(key1, generateUuid()),
                                         cache.put(key2, generateUuid()),
-                                        cache.put(key3, generateUuid())]);
+                                        cache.put(key3, generateUuid())
+                    ]);
                 })
                 .then(() => {
                     return PersistentCache.create(cacheName, {dir: tmpDir.toString()});

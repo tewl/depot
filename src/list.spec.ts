@@ -238,7 +238,7 @@ describe("List", () => {
 
             expect(list.length).toEqual(1000);
 
-            for (let i: number = 0; i < 1000; ++i) {
+            for (let i = 0; i < 1000; ++i) {
                 expect(list.getAt(i)).toEqual(i);
             }
         });

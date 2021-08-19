@@ -13,7 +13,7 @@ interface ITaskInfo<ResolveType> {
 export class TaskQueue extends EventEmitter
 {
     // region Events
-    public static EVENT_DRAINED: string = "drained";
+    public static EVENT_DRAINED = "drained";
     // endregion
 
 
@@ -37,7 +37,7 @@ export class TaskQueue extends EventEmitter
      *   run automatically.
      * @return The new TaskQueue instance
      */
-    public constructor(numConcurrent: number | undefined, pauseWhenDrained: boolean = false)
+    public constructor(numConcurrent: number | undefined, pauseWhenDrained = false)
     {
         super();
 
@@ -51,8 +51,8 @@ export class TaskQueue extends EventEmitter
         this._tasks = new PriorityQueue<ITaskInfo<any>>();
         this._numRunning = 0;
         this._isProcessingLastFulfillment = false;
-        this._isRunning = !Boolean(pauseWhenDrained);
-        this._pauseWhenDrained = Boolean(pauseWhenDrained);
+        this._isRunning = !pauseWhenDrained;
+        this._pauseWhenDrained = pauseWhenDrained;
         this._lastSettledInternalRunPromise = undefined;
 
         Object.seal(this);
@@ -76,7 +76,7 @@ export class TaskQueue extends EventEmitter
      * @returns A promise that will be resolved or rejected once
      * the task eventually executes.
      */
-    public push<ResolveType>(task: Task<ResolveType>, priority: number = 0): Promise<ResolveType>
+    public push<ResolveType>(task: Task<ResolveType>, priority = 0): Promise<ResolveType>
     {
         const dfd = new Deferred<ResolveType>();
         this._tasks.push({task: task, deferred: dfd}, priority);
@@ -89,7 +89,7 @@ export class TaskQueue extends EventEmitter
      * Cancels all pending tasks that have not been started.
      * @param err - The error that pending tasks will reject with
      */
-    public cancelAllPending(err?: any): void
+    public cancelAllPending(err?: any): void  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
     {
         err = err || new Error("Task cancelled because its TaskQueue was cancelled.");
 

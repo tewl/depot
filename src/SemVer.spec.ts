@@ -81,7 +81,8 @@ describe("SemVer", () => {
                     SemVer.fromString("1.1.2")!
                 ];
 
-                const sorted = SemVer.sort(semvers)
+                const sorted =
+                    SemVer.sort(semvers)
                     .map((curSemVer) => curSemVer.toString());
 
                 expect(sorted).toEqual([

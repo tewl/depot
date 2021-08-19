@@ -116,7 +116,7 @@ export class PersistentCache<T> {
      */
     public get(key: string): Promise<T> {
         // If the requested key is in the memory cache, use it.
-        if (this._memCache.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(this._memCache, key)) {
             return Promise.resolve(this._memCache[key].payload);
         }
 

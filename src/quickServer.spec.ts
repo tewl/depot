@@ -32,7 +32,7 @@ describe("QuickServer", () => {
                 });
             }
 
-            public numDerivedHandlerInvocations: number = 0;
+            public numDerivedHandlerInvocations = 0;
 
         }
 

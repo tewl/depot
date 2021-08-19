@@ -1,4 +1,4 @@
-// tslint:disable-next-line:no-submodule-imports no-var-requires no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const uuidv4: () => string = require("uuid/v4");
 
 // This class is a simple wrapper around the uuid package's uuid generator.

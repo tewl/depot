@@ -4,7 +4,7 @@ export class SourceStream extends Readable
 {
     // region Private Data Members
     private readonly _data: Array<string>;
-    private _curIndex: number = 0;
+    private _curIndex = 0;
     // endregion
 
 

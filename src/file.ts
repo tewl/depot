@@ -750,6 +750,8 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
                 });
             });
         }
+
+        return;
     });
 }
 

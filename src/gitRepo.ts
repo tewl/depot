@@ -288,6 +288,8 @@ export class GitRepo
                     return gitUrlToProjectName(remoteUrl);
                 }
             }
+
+            return undefined;
         })
         .then((projName) => {
             if (projName) {
@@ -299,6 +301,8 @@ export class GitRepo
             if (packageJson) {
                 return packageJson.name;
             }
+
+            return undefined;
         })
         .then((projName) => {
             if (projName) {

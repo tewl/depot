@@ -24,7 +24,7 @@ export class CombinedStream extends PassThrough
         });
     }
 
-    public pipe<T extends NodeJS.WritableStream>(dest: T, options?: { end?: boolean; }): T
+    public override pipe<T extends NodeJS.WritableStream>(dest: T, options?: { end?: boolean; }): T
     {
         if (!this._streamEnd) {
             throw new Error("Internal error: combinedStream.pipe() called before 'pipe' event.");

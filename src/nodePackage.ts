@@ -222,6 +222,8 @@ export class NodePackage
                 return publishDir.empty()
                 .then(() => {});   // To make resolve type undefined in all cases
             }
+
+            return undefined;
         })
         .then(() => {
             return unpackedPackageDir.copy(publishDir, false);

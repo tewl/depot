@@ -556,6 +556,8 @@ export class Directory
                     if (dirIsEmpty) {
                         return curSubdir.delete();
                     }
+
+                    return;
                 });
             })
             .then(() => {

@@ -61,7 +61,7 @@ export class ListenerTracker {
     public removeAll(): void {
         Object.keys(this._listenerMap).forEach((eventName) => {
 
-            const listeners = this._listenerMap[eventName];
+            const listeners = this._listenerMap[eventName]!;
             listeners.forEach((curListener) => {
                 this._emitter.removeListener(eventName, curListener);
             });

@@ -430,7 +430,7 @@ export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Prom
 
     _.forEach(inputPromises, (curInputPromise) => {
         const previousPromise: Promise<any> = outputPromises.length > 0 ?
-                                              outputPromises[outputPromises.length - 1] :
+                                              outputPromises[outputPromises.length - 1]! :
                                               Promise.resolve();
 
         const promise: Promise<any> = delaySettle(curInputPromise, previousPromise);
@@ -502,7 +502,7 @@ export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueF
     const pairs: Array<[T, V]> = [];
     _.forEach(collection, (curItem, index) =>
     {
-        pairs.push([curItem, values[index]]);
+        pairs.push([curItem, values[index]!]);
     });
 
     return pairs;
@@ -567,11 +567,11 @@ export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curV
     const removed: Array<T> = [];
     for (let i = pairs.length - 1; i >= 0; i--)
     {
-        const curPair = pairs[i];
-        if (!!curPair[1])
+        const [item, predicateResult] = pairs[i]!;
+        if (!!predicateResult)
         {
             // Remove the current item.
-            removed.push(curPair[0]);
+            removed.push(item);
             collection.splice(i, 1);
         }
     }

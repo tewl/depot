@@ -80,7 +80,7 @@ export class ListenerTracker {
         if (!this._listenerMap[eventName]) {
             this._listenerMap[eventName] = [];
         }
-        this._listenerMap[eventName].push(listenerCallback);
+        this._listenerMap[eventName]!.push(listenerCallback);
     }
 
 }

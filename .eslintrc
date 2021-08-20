@@ -64,6 +64,10 @@
                 }
             }
         ],
+        "semi": [
+            2,
+            "always"
+        ],
         "@typescript-eslint/naming-convention": [
             2,
             {

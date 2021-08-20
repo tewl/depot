@@ -57,9 +57,8 @@ gulp.task("eslint", function ()
 
 function runEslint(emitError)
 {
-    console.log("Running ESLint...");
-
     "use strict";
+    console.log("Running ESLint...");
     let eslintArgs = [
         ".",
         // "--ext", ".js",

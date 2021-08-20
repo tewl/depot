@@ -3,7 +3,7 @@ import { failed, Result, succeeded, succeededResult } from "./result";
 
 
 /**
- * Maps values from a source collection until a failed mapping occurs.  In a
+ * Maps values from a source collection until a failed mapping occurs.  If a
  * failure occurs, the mapping stops immediately.
  * @param srcCollection - The source collection
  * @param mappingFunc - The mapping function. Each element from _srcCollection_

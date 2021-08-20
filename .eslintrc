@@ -6,6 +6,7 @@
     ],
     "extends": [
         "eslint:recommended",
+        // "eslint:all",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
@@ -62,6 +63,20 @@
                     "on": "value",
                     "mode": "strict"
                 }
+            }
+        ],
+        "linebreak-style": 0,
+        "max-len": [
+            2,
+            {
+                "code": 120,
+                "tabWidth": 4,
+                "comments": 160,
+                "ignoreComments": true,
+                "ignoreUrls": true,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true,
+                "ignoreRegExpLiterals": true
             }
         ],
         "semi": [

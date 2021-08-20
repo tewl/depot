@@ -401,7 +401,10 @@ export class DiffDirFileItem
 
         // Both files exist.  Return a value indicating whether they are
         // identical.
-        const [leftHash, rightHash] = await Promise.all([this._files.leftFile.getHash(), this._files.rightFile.getHash()]);
+        const [leftHash, rightHash] = await Promise.all([
+            this._files.leftFile.getHash(),
+            this._files.rightFile.getHash()
+        ]);
         return leftHash === rightHash;
     }
 
@@ -444,8 +447,9 @@ export async function diffDirectories(
     .then((leftFiles) => {
         return _.map(
             leftFiles,
-            (curLeftFile) => DiffDirFileItem.create(leftDir, rightDir, path.relative(leftDir.toString(), curLeftFile.toString()))
-        );
+            (curLeftFile) => DiffDirFileItem.create(leftDir,
+                                                    rightDir,
+                                                    path.relative(leftDir.toString(), curLeftFile.toString())));
     });
 
     //
@@ -459,7 +463,9 @@ export async function diffDirectories(
     .then((rightFiles) => {
         return _.map(
             rightFiles,
-            (curRightFile) => DiffDirFileItem.create(leftDir, rightDir, path.relative(rightDir.toString(), curRightFile.toString()))
+            (curRightFile) => DiffDirFileItem.create(leftDir,
+                                                     rightDir,
+                                                     path.relative(rightDir.toString(), curRightFile.toString()))
         );
     });
 
@@ -476,7 +482,8 @@ export async function diffDirectories(
     //
     if (!includeIdentical)
     {
-        const identicalPromises = _.map(diffDirFileItems, (curDiffDirFileItem) => curDiffDirFileItem.bothExistAndIdentical());
+        const identicalPromises = _.map(diffDirFileItems,
+                                        (curDiffDirFileItem) => curDiffDirFileItem.bothExistAndIdentical());
         const isIdenticalValues = await Promise.all(identicalPromises);
 
         // Zip each DiffDirFileItem with the boolean indicating whether its files are identical.

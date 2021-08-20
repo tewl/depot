@@ -63,7 +63,9 @@ export function permutations<T>(vals: Array<T>): Array<Array<T>> {
     for (let curIndex = 0; curIndex < vals.length; ++curIndex) {
         const rest = _.filter(vals, (val, index) => index !== curIndex);
         const restPermutations = permutations(rest);
-        allPermutations = allPermutations.concat(_.map(restPermutations, (curRestPermutation) => [vals[curIndex], ...curRestPermutation]));
+        allPermutations = allPermutations.concat(
+            _.map(restPermutations, (curRestPermutation) => [vals[curIndex], ...curRestPermutation])
+        );
     }
 
     return allPermutations;

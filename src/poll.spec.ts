@@ -28,7 +28,8 @@ describe("poll()", () => {
 
         // A predicate that will instruct the polling to continue while the
         // function rejects or the resolved value is less than or equal to 6.
-        const predicate: ContinuePollingPredicate<Promise<number>, string> = async (iterationNum, startTime, retVal) => {
+        const predicate: ContinuePollingPredicate<Promise<number>, string> = async (iterationNum, startTime, retVal) =>
+        {
             try {
                 logger.debug(`Iteration ${iterationNum} was started at t=${Date.now() - startTime} ms`);
                 const num = await retVal;

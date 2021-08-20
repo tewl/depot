@@ -33,7 +33,8 @@ type ContinuePollingResult<TResult> = IContinuePollingYes | IContinuePollingNo<T
  * polling should continue.
  */
 export type ContinuePollingPredicate<TReturn, TResult> =
-    (iterationNum: number, startTime: number, retVal: TReturn) => ContinuePollingResult<TResult> | Promise<ContinuePollingResult<TResult>>;
+    (iterationNum: number, startTime: number, retVal: TReturn) =>
+        ContinuePollingResult<TResult> | Promise<ContinuePollingResult<TResult>>;
 
 type Func<TReturn> = (() => TReturn);
 
@@ -128,7 +129,11 @@ export async function pollAsyncResult<TSuccess, TError>(
     const result = await poll(
         asyncResultOp,
         // tslint:disable-next-line: max-line-length
-        async (iterationNum, startTime, asyncResultPromise): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
+        async (
+            iterationNum,
+            startTime,
+            asyncResultPromise)
+        : Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
         {
             const result = await asyncResultPromise;
             if (succeeded(result)) {

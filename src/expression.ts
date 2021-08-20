@@ -155,7 +155,11 @@ export type ExpressionToken =
 interface ITokenizer
 {
     matcherFn(remainingText: string): RegExpExecArray | null;
-    tokenCreatorFn(match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number): ExpressionToken;
+    tokenCreatorFn(
+        match: RegExpExecArray,
+        fullExpression: string,
+        startIndex: number,
+        endIndex: number): ExpressionToken;
 }
 
 

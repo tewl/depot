@@ -239,7 +239,9 @@ export abstract class AStore<StowType>
                 }
 
                 const serializeResult = curObj.serialize();
-                const stow: undefined | StowType = isISerializableWithStow<StowType>(curObj) ? curObj.__stow : undefined;
+                const stow: undefined | StowType = isISerializableWithStow<StowType>(curObj) ?
+                    curObj.__stow :
+                    undefined;
 
                 const putPromise = this.put(serializeResult.serialized, stow);
 

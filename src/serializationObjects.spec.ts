@@ -189,7 +189,9 @@ export class Person implements ISerializable
             throw new Error(`Unsupported serialized Person: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
-        const deserialized                                 = new Person(serialized.id, serialized.firstName, serialized.lastName);
+        const deserialized                                 = new Person(serialized.id,
+                                                                        serialized.firstName,
+                                                                        serialized.lastName);
         const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 

@@ -131,7 +131,8 @@ describe("PersistentCache", () => {
 
                     allSettled(promises)
                     .then((inspections) => {
-                        const numRejections = _.sumBy(inspections, (curInspection) => curInspection.isRejected() ? 1 : 0);
+                        const numRejections = _.sumBy(inspections,
+                                                      (curInspection) => curInspection.isRejected() ? 1 : 0);
                         expect(numRejections).toEqual(illegalChars.length);
                         done();
                     });

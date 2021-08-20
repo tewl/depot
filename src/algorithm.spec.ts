@@ -112,7 +112,8 @@ describe("partition()", () => {
     it("can partition a range with an even number of elements", () => {
         const list: List<number> = List.fromArray([8, 3, 6, 1, 5, 4, 9, 2, 7]);
         // First element is not included in range to partition.
-        const itSecondRange: Iterator<number> = partition(list.begin().offset(1), list.end(), (curElem) => curElem <= 5);
+        const itSecondRange: Iterator<number> =
+            partition(list.begin().offset(1), list.end(), (curElem) => curElem <= 5);
 
         expect(list.getAt(0)).toEqual(8);
         expect(list.getAt(1)).toEqual(3);
@@ -130,7 +131,8 @@ describe("partition()", () => {
     it("can partition a range with an odd number of elements", () => {
         const list: List<number> = List.fromArray([8, 3, 10, 6, 1, 5, 4, 9, 2, 7]);
         // First element is not included in range to partition.
-        const itSecondRange: Iterator<number> = partition(list.begin().offset(1), list.end(), (curElem) => curElem <= 5);
+        const itSecondRange: Iterator<number> =
+            partition(list.begin().offset(1), list.end(), (curElem) => curElem <= 5);
 
         expect(list.getAt(0)).toEqual(8);
         expect(list.getAt(1)).toEqual(3);

@@ -454,9 +454,10 @@ export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Prom
  * @returns A Promise wrapping thePromise, but will be settled after waitFor is
  * settled
  */
-export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitFor: Promise<any>): Promise<ResolveType> {
-    "use strict";
-
+export function delaySettle<ResolveType>(
+    thePromise: Promise<ResolveType>,
+    waitFor:    Promise<any>)
+: Promise<ResolveType> {
     return thePromise
     .then((result: ResolveType) => {
         // Whether waitFor resolved or rejected, we should resolve
@@ -481,7 +482,10 @@ export function delaySettle<ResolveType>(thePromise: Promise<ResolveType>, waitF
  * @param asyncValueFunc - The async mapping function.
  * @return A promise for an array of the resulting mapped values.
  */
-export async function mapAsync<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<V>>
+export async function mapAsync<T, V>(
+    collection:     Array<T>,
+    asyncValueFunc: (curItem: T) => Promise<V>
+): Promise<Array<V>>
 {
     const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
     const values = await Promise.all(promises);
@@ -499,7 +503,10 @@ export async function mapAsync<T, V>(collection: Array<T>, asyncValueFunc: (curI
  * item from `collection` and the second item is the resolved value returned
  * from `asyncValueFunction`.
  */
-export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueFunc: (curItem: T) => Promise<V>): Promise<Array<[T, V]>>
+export async function zipWithAsyncValues<T, V>(
+    collection:     Array<T>,
+    asyncValueFunc: (curItem: T) => Promise<V>
+): Promise<Array<[T, V]>>
 {
     const values = await mapAsync(collection, (curItem) => asyncValueFunc(curItem));
 
@@ -522,7 +529,10 @@ export async function zipWithAsyncValues<T, V>(collection: Array<T>, asyncValueF
  * @return A promise for an array of collection items for which the async
  * predicate returned a truthy value.
  */
-export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+export async function filterAsync<T>(
+    collection:     Array<T>,
+    asyncPredicate: (curVal: T) => Promise<any>)
+: Promise<Array<T>>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
     return _.chain(pairs)
@@ -543,7 +553,10 @@ export async function filterAsync<T>(collection: Array<T>, asyncPredicate: (curV
  * the predicate resolved to a truthy value.  The second item is an array for
  * which the predicate resolved to a falsy value.
  */
-export async function partitionAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<[Array<T>, Array<T>]>
+export async function partitionAsync<T>(
+    collection:     Array<T>,
+    asyncPredicate: (curVal: T) => Promise<any>)
+: Promise<[Array<T>, Array<T>]>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 
@@ -564,7 +577,10 @@ export async function partitionAsync<T>(collection: Array<T>, asyncPredicate: (c
  * collection item should be removed.
  * @return A promise for an array of collection items that have been removed.
  */
-export async function removeAsync<T>(collection: Array<T>, asyncPredicate: (curVal: T) => Promise<any>): Promise<Array<T>>
+export async function removeAsync<T>(
+    collection:     Array<T>,
+    asyncPredicate: (curVal: T) => Promise<any>
+): Promise<Array<T>>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 

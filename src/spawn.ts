@@ -39,8 +39,8 @@ export interface ISpawnResult
 
 
 export type SpawnCloseError = ISpawnSystemError | ISpawnExitError;
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function isSpawnCloseError(a: any): a is SpawnCloseError
+
+export function isSpawnCloseError(a: unknown): a is SpawnCloseError
 {
     return (a as SpawnCloseError).type === "ISpawnSystemError" ||
            (a as SpawnCloseError).type === "ISpawnExitError";

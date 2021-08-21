@@ -1,6 +1,6 @@
 export class Deferred<ResolveType>
 {
-    public promise: Promise<ResolveType>;
+    public readonly promise: Promise<ResolveType>;
     public resolve: (result: ResolveType) => void;
     public reject: (err: any) => void;
 

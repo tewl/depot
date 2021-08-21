@@ -456,8 +456,8 @@ export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Prom
  */
 export function delaySettle<ResolveType>(
     thePromise: Promise<ResolveType>,
-    waitFor:    Promise<any>)
-: Promise<ResolveType> {
+    waitFor:    Promise<any>
+): Promise<ResolveType> {
     return thePromise
     .then((result: ResolveType) => {
         // Whether waitFor resolved or rejected, we should resolve
@@ -531,8 +531,8 @@ export async function zipWithAsyncValues<T, V>(
  */
 export async function filterAsync<T>(
     collection:     Array<T>,
-    asyncPredicate: (curVal: T) => Promise<any>)
-: Promise<Array<T>>
+    asyncPredicate: (curVal: T) => Promise<any>
+): Promise<Array<T>>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
     return _.chain(pairs)
@@ -555,8 +555,8 @@ export async function filterAsync<T>(
  */
 export async function partitionAsync<T>(
     collection:     Array<T>,
-    asyncPredicate: (curVal: T) => Promise<any>)
-: Promise<[Array<T>, Array<T>]>
+    asyncPredicate: (curVal: T) => Promise<any>
+): Promise<[Array<T>, Array<T>]>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 

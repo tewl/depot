@@ -146,7 +146,7 @@ export class File
             return stats.isFile() ? stats : undefined;
         }
         catch (err) {
-            if (err.code === "ENOENT")
+            if ((err as any).code === "ENOENT")
             {
                 return undefined;
             }

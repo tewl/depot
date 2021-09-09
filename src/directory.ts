@@ -196,7 +196,7 @@ export class Directory
             return stats.isDirectory() ? stats : undefined;
         }
         catch (err) {
-            if (err.code === "ENOENT")
+            if ((err as any).code === "ENOENT")
             {
                 return undefined;
             }
@@ -338,7 +338,7 @@ export class Directory
             }
             catch (err) {
                 // If the directory already exists, just keep going.
-                if (err.code !== "EEXIST") {
+                if ((err as any).code !== "EEXIST") {
                     throw err;
                 }
             }

@@ -40,7 +40,7 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
  * if `condition` is falsy.
  */
 export function insertIf<ItemType>(
-    condition: any,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    condition: unknown,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
     ...items: Array<ItemType>
 ): Array<ItemType> {
     return condition ? items : [];

@@ -428,17 +428,17 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
  * @returns A new array of Promises that will settle sequentially,
  * starting at index 0.
  */
-export function sequentialSettle(inputPromises: Array<Promise<unknown>>): Array<Promise<unknown>> {
+export function sequentialSettle<TResolve>(inputPromises: Array<Promise<TResolve>>): Array<Promise<TResolve>> {
     "use strict";
 
-    const outputPromises: Array<Promise<unknown>> = [];
+    const outputPromises: Array<Promise<TResolve>> = [];
 
     _.forEach(inputPromises, (curInputPromise) => {
         const previousPromise: Promise<unknown> = outputPromises.length > 0 ?
                                                   outputPromises[outputPromises.length - 1]! :
                                                   Promise.resolve();
 
-        const promise: Promise<unknown> = delaySettle(curInputPromise, previousPromise);
+        const promise: Promise<TResolve> = delaySettle(curInputPromise, previousPromise);
         outputPromises.push(promise);
     });
 

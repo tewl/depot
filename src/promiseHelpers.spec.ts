@@ -22,7 +22,7 @@ describe("promisifyN()", () => {
     it("will reject with the expected error object", (done) => {
         const promisifiedStat = promisifyN<Stats>(stat);
         promisifiedStat("a_file_that_does_not_exist.txt")
-        .catch((err: any) => {
+        .catch((err) => {
             expect(err.toString()).toContain("ENOENT");
             done();
         });
@@ -36,7 +36,7 @@ describe("promisify1()", () => {
 
 
     it("will invoke the wrapped function and provide a successful result", (done) => {
-        const promisifiedStat = promisify1/*<Stats, string>*/(stat);
+        const promisifiedStat = promisify1<Stats, string>(stat);
 
         promisifiedStat(__filename)
         .then((stats: Stats) => {
@@ -50,7 +50,7 @@ describe("promisify1()", () => {
     it("will reject with the expected error object", (done) => {
         const promisifiedStat = promisify1<Stats, string>(stat);
         promisifiedStat("a_file_that_does_not_exist.txt")
-        .catch((err: any) => {
+        .catch((err) => {
             expect(err.toString()).toContain("ENOENT");
             done();
         });
@@ -65,7 +65,7 @@ describe("promisify2()", () => {
 
     it("will invoke the wrapped function and provide a successful result", (done) => {
 
-        const nodeFunc = (param1: string, param2: number, cb: (err: any, result?: number) => void) => {
+        const nodeFunc = (param1: string, param2: number, cb: (err: unknown, result?: number) => void) => {
             // This function always succeeds.
             cb(undefined, param1.length + param2);
         };
@@ -81,14 +81,14 @@ describe("promisify2()", () => {
 
 
     it("will reject with the expected error object", (done) => {
-        const nodeFunc = (param1: string, param2: number, cb: (err: any, result?: number) => void) => {
+        const nodeFunc = (param1: string, param2: number, cb: (err: unknown, result?: number) => void) => {
             // This function always succeeds.
             cb("Error: xyzzy");
         };
 
         const promisifiedFunc = promisify2<number, string, number>(nodeFunc);
         promisifiedFunc("foo", 4)
-        .catch((err: any) => {
+        .catch((err) => {
             expect(err.toString()).toContain("xyzzy");
             done();
         });
@@ -103,7 +103,7 @@ describe("sequence()", () => {
 
     it("should execute the functions in order", (done) => {
 
-        const tasks: Array<(previousValue: any) => Promise<any>> = [
+        const tasks: Array<(previousValue: number) => Promise<number>> = [
             (previousResult) => {
                 expect(previousResult).toEqual(100);
                 return Promise.resolve(200);
@@ -351,7 +351,7 @@ describe("retry()", () => {
             () => {
                 fail("The promise should not have resolved.");
             },
-            (err: any) => {
+            (err) => {
                 expect(err).toEqual("rejected");
                 done();
             }
@@ -404,7 +404,7 @@ describe("retryWhile()", () => {
             () => {
                 fail("The promise should not have resolved.");
             },
-            (err: any) => {
+            (err) => {
                 expect(err).toEqual("rejected");
                 done();
             }
@@ -417,7 +417,7 @@ describe("retryWhile()", () => {
 
         retryWhile(
             theFunc,
-            (err: string) => {
+            (err) => {
                 expect(err).toEqual("rejected");
                 return true;
             },
@@ -503,7 +503,7 @@ describe("sequentialSettle()", () => {
 
         const settledFlags = [false, false, false];
 
-        let promises: Array<Promise<any>> = [
+        let promises: Array<Promise<number>> = [
             getTimerPromise<number>(400, 1),
             getTimerPromise<number>(200, 2),
             getTimerPromise<number>(100, 3)

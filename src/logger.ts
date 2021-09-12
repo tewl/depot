@@ -114,7 +114,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public error(msg: string, ...optionalParams: Array<any>): boolean
+    public error(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.ERROR_1, msg, ...optionalParams);
     }
@@ -126,7 +126,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public warn(msg: string, ...optionalParams: Array<any>): boolean
+    public warn(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.WARN_2, msg, ...optionalParams);
     }
@@ -138,7 +138,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public info(msg: string, ...optionalParams: Array<any>): boolean
+    public info(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.INFO_3, msg, ...optionalParams);
     }
@@ -150,7 +150,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public verbose(msg: string, ...optionalParams: Array<any>): boolean
+    public verbose(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.VERBOSE_4, msg, ...optionalParams);
     }
@@ -162,7 +162,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public debug(msg: string, ...optionalParams: Array<any>): boolean
+    public debug(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.DEBUG_5, msg, ...optionalParams);
     }
@@ -174,7 +174,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public silly(msg: string, ...optionalParams: Array<any>): boolean
+    public silly(msg: string, ...optionalParams: Array<unknown>): boolean
     {
         return this.log(LogLevel.SILLY_6, msg, ...optionalParams);
     }
@@ -189,7 +189,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged.
      */
-    private log(level: LogLevel, msg: string, ...optionalParams: Array<any>): boolean
+    private log(level: LogLevel, msg: string, ...optionalParams: Array<unknown>): boolean
     {
         const curLogLevel: LogLevel = this.getCurrentLevel();
 

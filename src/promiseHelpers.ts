@@ -307,7 +307,7 @@ export function retry<ResolveType>(
  */
 export function retryWhile<ResolveType>(
     theFunc: () => Promise<ResolveType>,
-    whilePredicate: (err: any) => boolean,
+    whilePredicate: (err: unknown) => boolean,
     maxNumAttempts: number
 ): Promise<ResolveType> {
     "use strict";
@@ -332,13 +332,13 @@ const BACKOFF_MULTIPLIER = 20;
  */
 function retryWhileImpl<ResolveType>(
     theFunc:         () => Promise<ResolveType>,
-    whilePredicate:  (err: any) => boolean,
+    whilePredicate:  (err: unknown) => boolean,
     maxNumAttempts:  number,
     attemptsSoFar:   number
 ): Promise<ResolveType> {
     "use strict";
     return new Promise(
-        (resolve: (value: ResolveType|Promise<ResolveType>) => void, reject: (err: any) => void) => {
+        (resolve: (value: ResolveType|Promise<ResolveType>) => void, reject: (err: unknown) => void) => {
 
             ++attemptsSoFar;
             theFunc()
@@ -348,7 +348,7 @@ function retryWhileImpl<ResolveType>(
                     // immediately.
                     resolve(value);
                 },
-                (err: any): void => {
+                (err: unknown): void => {
                     // The promise was rejected.
                     if (attemptsSoFar >= maxNumAttempts) {
                         // logger.error("Retry operation failed after " + maxNumAttempts + " attempts.");
@@ -428,17 +428,17 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
  * @returns A new array of Promises that will settle sequentially,
  * starting at index 0.
  */
-export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Promise<any>> {
+export function sequentialSettle(inputPromises: Array<Promise<unknown>>): Array<Promise<unknown>> {
     "use strict";
 
-    const outputPromises: Array<Promise<any>> = [];
+    const outputPromises: Array<Promise<unknown>> = [];
 
     _.forEach(inputPromises, (curInputPromise) => {
-        const previousPromise: Promise<any> = outputPromises.length > 0 ?
-                                              outputPromises[outputPromises.length - 1]! :
-                                              Promise.resolve();
+        const previousPromise: Promise<unknown> = outputPromises.length > 0 ?
+                                                  outputPromises[outputPromises.length - 1]! :
+                                                  Promise.resolve();
 
-        const promise: Promise<any> = delaySettle(curInputPromise, previousPromise);
+        const promise: Promise<unknown> = delaySettle(curInputPromise, previousPromise);
         outputPromises.push(promise);
     });
 
@@ -457,7 +457,7 @@ export function sequentialSettle(inputPromises: Array<Promise<any>>): Array<Prom
  */
 export function delaySettle<ResolveType>(
     thePromise: Promise<ResolveType>,
-    waitFor:    Promise<any>
+    waitFor:    Promise<unknown>
 ): Promise<ResolveType> {
     return thePromise
     .then((result: ResolveType) => {
@@ -467,7 +467,7 @@ export function delaySettle<ResolveType>(
         .then(() => result )
         .catch(() => result );
     })
-    .catch((err: any) => {
+    .catch((err: unknown) => {
         // Whether waitFor resolved or rejected, we should reject with the
         // original error.
         return waitFor
@@ -532,7 +532,7 @@ export async function zipWithAsyncValues<T, V>(
  */
 export async function filterAsync<T>(
     collection:     Array<T>,
-    asyncPredicate: (curVal: T) => Promise<any>
+    asyncPredicate: (curVal: T) => Promise<unknown>
 ): Promise<Array<T>>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
@@ -556,7 +556,7 @@ export async function filterAsync<T>(
  */
 export async function partitionAsync<T>(
     collection:     Array<T>,
-    asyncPredicate: (curVal: T) => Promise<any>
+    asyncPredicate: (curVal: T) => Promise<unknown>
 ): Promise<[Array<T>, Array<T>]>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
@@ -580,7 +580,7 @@ export async function partitionAsync<T>(
  */
 export async function removeAsync<T>(
     collection:     Array<T>,
-    asyncPredicate: (curVal: T) => Promise<any>
+    asyncPredicate: (curVal: T) => Promise<unknown>
 ): Promise<Array<T>>
 {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);

@@ -1,10 +1,12 @@
 import * as _ from "lodash";
+import * as os from "os";
 import {CollectorStream} from "./collectorStream";
 import * as cp from "child_process";
 import * as stream from "stream";
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
 import { failedResult, Result, succeededResult } from "./result";
+import { assertNever } from "./never";
 
 
 /**
@@ -63,6 +65,26 @@ export function isISpawnExitError(a: unknown): a is ISpawnExitError
  * A union type of all spawn failures.
  */
 export type SpawnError = ISpawnSystemError | ISpawnExitError;
+
+
+/**
+ * Converts a SpawnError to its string representation.
+ * @param err - The error to convert
+ * @return The string representation
+ */
+export function SpawnErrorToString(err: SpawnError): string
+{
+    switch (err.type) {
+        case "ISpawnSystemError":
+            return `System error: ${JSON.stringify(err)}`;
+
+        case "ISpawnExitError":
+            return `Process failed with code ${err.exitCode}.${os.EOL}${err.stdout}${err.stderr}`;
+
+        default:
+            return assertNever(err);
+    }
+}
 
 
 /**

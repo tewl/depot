@@ -58,7 +58,7 @@ export function indent(
         // string.
         const replaceRegex = /^(.*?)$/gm;
         const replaceFunc = function replaceFunc(
-            match: any,
+            match: string,
             group1: string,
             offset: number
         ): string {

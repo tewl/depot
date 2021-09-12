@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
 
 
-export type CallBackType<ResultType> = (err: any, result?: ResultType) => void;
+export type CallBackType<ResultType> = (err: unknown, result?: ResultType) => void;
 
 
 /**
@@ -15,13 +15,13 @@ export type CallBackType<ResultType> = (err: any, result?: ResultType) => void;
  * @return A function that takes the arguments and returns a Promise for the result.
  */
 export function promisifyN<ResultType>(
-    func: (...args: Array<any>) => void
-): (...args: Array<any>) => Promise<ResultType> {
+    func: (...args: Array<unknown>) => void
+): (...args: Array<unknown>) => Promise<ResultType> {
 
-    const promisifiedFunc = function (...args: Array<any>): Promise<ResultType> {
+    const promisifiedFunc = function (...args: Array<unknown>): Promise<ResultType> {
 
-        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
-            const allArgs = args.concat((err: any, result: ResultType) =>
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: unknown) => void) => {
+            const allArgs = args.concat((err: unknown, result: ResultType) =>
             {
                 if (err)
                 {
@@ -52,8 +52,8 @@ export function promisify1<ResultType, Arg1Type>(
 ): (arg1: Arg1Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type): Promise<ResultType> {
-        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
-            func(arg1, (err: any, result?: ResultType) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: unknown) => void) => {
+            func(arg1, (err: unknown, result?: ResultType) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -81,8 +81,8 @@ export function promisify2<ResultType, Arg1Type, Arg2Type>(
 ): (arg1: Arg1Type, arg2: Arg2Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type, arg2: Arg2Type): Promise<ResultType> {
-        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
-            func(arg1, arg2, (err: any, result?: ResultType) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: unknown) => void) => {
+            func(arg1, arg2, (err: unknown, result?: ResultType) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -109,8 +109,8 @@ export function promisify3<ResultType, Arg1Type, Arg2Type, Arg3Type>(
 ): (arg1: Arg1Type, arg2: Arg2Type, arg3: Arg3Type) => Promise<ResultType> {
 
     const promisifiedFunc = function (arg1: Arg1Type, arg2: Arg2Type, arg3: Arg3Type): Promise<ResultType> {
-        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: any) => void) => {
-            func(arg1, arg2, arg3, (err: any, result?: ResultType) => {
+        return new Promise<ResultType>((resolve: (result: ResultType) => void, reject: (err: unknown) => void) => {
+            func(arg1, arg2, arg3, (err: unknown, result?: ResultType) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -142,16 +142,17 @@ export type Task<ResolveType> = () => Promise<ResolveType>;
  * of the last function.
  */
 export function sequence(
-    tasks: Array<(previousValue: any) => any>,
-    initialValue: any  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
-): Promise<any> {
+    tasks: Array<(previousValue: unknown) => unknown>,
+    initialValue: unknown
+): Promise<unknown> {
     "use strict";
 
     return tasks.reduce(
         (accumulator, curTask) => {
             return accumulator.then(curTask);
         },
-        Promise.resolve(initialValue));
+        Promise.resolve(initialValue)
+    );
 }
 
 
@@ -196,7 +197,7 @@ export function getTimerPromise<ResolveType>(
  * `falseResolveValue`.
  */
 export function conditionalTask<ResolveType>(
-    condition: any,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    condition: unknown,
     task: Task<ResolveType>,
     falseResolveValue: ResolveType
 ): Promise<ResolveType> {
@@ -223,7 +224,7 @@ export function eventToPromise<ResolveType>(
 ): Promise<ResolveType>
 {
     return new Promise<ResolveType>(
-        (resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
+        (resolve: (result: ResolveType) => void, reject: (err: unknown) => void) => {
             const tracker = new ListenerTracker(emitter);
 
             tracker.once(resolveEventName, (result: ResolveType) => {
@@ -233,7 +234,7 @@ export function eventToPromise<ResolveType>(
 
             if (rejectEventName)
             {
-                tracker.once(rejectEventName, (err: any) => {
+                tracker.once(rejectEventName, (err: unknown) => {
                     tracker.removeAll();
                     reject(err);
                 });

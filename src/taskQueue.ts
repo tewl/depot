@@ -19,7 +19,7 @@ export class TaskQueue extends EventEmitter
 
     // region Private Members
     private readonly _numConcurrentTasks: number | undefined;
-    private _tasks: PriorityQueue<ITaskInfo<any>>;
+    private _tasks: PriorityQueue<ITaskInfo<any>>;  // eslint-disable-line @typescript-eslint/no-explicit-any
     private _numRunning: number;
     private _isProcessingLastFulfillment: boolean;
     private _isRunning: boolean;
@@ -48,7 +48,7 @@ export class TaskQueue extends EventEmitter
         }
 
         this._numConcurrentTasks = numConcurrent;
-        this._tasks = new PriorityQueue<ITaskInfo<any>>();
+        this._tasks = new PriorityQueue<ITaskInfo<any>>(); // eslint-disable-line @typescript-eslint/no-explicit-any
         this._numRunning = 0;
         this._isProcessingLastFulfillment = false;
         this._isRunning = !pauseWhenDrained;
@@ -205,7 +205,7 @@ export class TaskQueue extends EventEmitter
                 ++this._numRunning;
 
                 const curRunPromise: Promise<void> = curTask.task()
-                .then((value: any) => {
+                .then((value) => {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.resolve(value);
                     --this._numRunning;

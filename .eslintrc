@@ -15,24 +15,24 @@
     },
     "rules": {
         "arrow-parens": [
-            2,
+            "error",
             "always"
         ],
         // "brace-style": [
-        //     2,
+        //     "error",
         //     "allman",
         //     {
         //         "allowSingleLine": true
         //     }
         // ],
         "indent": [
-            2,
+            "error",
             4,
             {
                 "ignoredNodes": [
                     "ConditionalExpression"
                 ],
-                "MemberExpression": 0,
+                "MemberExpression": 0,   // Chaining methods does not require indentation
                 "SwitchCase": 1,
                 "flatTernaryExpressions": true,
                 "ignoreComments": true,
@@ -48,14 +48,9 @@
                 "ArrayExpression": "first",
                 "ObjectExpression": "first"
             }
-            // {
-            //     "FunctionDeclaration": {
-            //         "parameters": "first"
-            //     }
-            // }
         ],
         "key-spacing": [
-            2,
+            "error",
             {
                 "align": {
                     "beforeColon": false,
@@ -65,9 +60,9 @@
                 }
             }
         ],
-        "linebreak-style": 0,
+        "linebreak-style": "off",
         "max-len": [
-            2,
+            "error",
             {
                 "code": 120,
                 "tabWidth": 4,
@@ -79,12 +74,20 @@
                 "ignoreRegExpLiterals": true
             }
         ],
+        "quotes": [
+            "error",
+            "double",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
         "semi": [
-            2,
+            "error",
             "always"
         ],
         "@typescript-eslint/naming-convention": [
-            2,
+            "error",
             {
                 "selector": "typeLike",
                 "format": [ "PascalCase" ]
@@ -101,9 +104,17 @@
                 "leadingUnderscore": "require"
             }
         ],
-        "@typescript-eslint/no-unused-vars": [2],
+        "no-unused-vars": "off",  // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "none", // It's ok to have unused args to b/c they provide signature documentation
+                "caughtErrors": "none"
+            }
+        ],
         "@typescript-eslint/member-ordering": [
-            2,
+            "error",
             {
                 "default": [
                     // Index signature
@@ -146,8 +157,8 @@
                 ]
             }
         ],
-        "@typescript-eslint/no-non-null-assertion": 0,
-        "@typescript-eslint/no-explicit-any": 0
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-explicit-any": "warn"
     },
     "overrides": [
         {
@@ -155,8 +166,8 @@
                 "*.spec.ts",
             ],
             "rules": {
-                "@typescript-eslint/no-empty-function": 0,
-                "@typescript-eslint/no-unused-vars": 0
+                "@typescript-eslint/no-empty-function": "off",
+                "@typescript-eslint/no-unused-vars": "off"
             }
         }
     ]

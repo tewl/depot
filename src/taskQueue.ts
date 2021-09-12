@@ -199,7 +199,7 @@ export class TaskQueue extends EventEmitter
         )
         {
             // Run another task.
-            const curTask: ITaskInfo<any> | undefined = this._tasks.pop();
+            const curTask = this._tasks.pop();
 
             if (curTask) {
                 ++this._numRunning;
@@ -211,7 +211,7 @@ export class TaskQueue extends EventEmitter
                     --this._numRunning;
                     this.startTasks(false);
                 })
-                .catch((err: any) => {
+                .catch((err: unknown) => {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.reject(err);
                     --this._numRunning;

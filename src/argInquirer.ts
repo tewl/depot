@@ -30,25 +30,29 @@ import * as inquirer from "inquirer";
 const argv = yargs.help(false).argv;
 
 
-class ArgInquirer {
-
+class ArgInquirer
+{
     // region Data Members
     private readonly _questions: Array<inquirer.Question>;
     // endregion
 
 
-    public constructor(questions: _.ListOfRecursiveArraysOrValues<inquirer.Question>) {
+    public constructor(questions: _.ListOfRecursiveArraysOrValues<inquirer.Question>)
+    {
         this._questions = _.flattenDeep<inquirer.Question>(questions);
     }
 
 
-    public getArgNames(): Array<string> {
+    public getArgNames(): Array<string>
+    {
         const argNames = _.map<inquirer.Question, string>(this._questions, (curQuestion) => curQuestion.name!);
         return _.uniq<string>(argNames);
     }
 
 
-    public getArgs(): Promise<{[key: string]: any} | undefined> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public getArgs(): Promise<{[key: string]: any} | undefined>
+    {
         const argNames = this.getArgNames();
 
         if (argv.help) {
@@ -93,8 +97,8 @@ class ArgInquirer {
         }
     }
 
-    public printUsage(): void {
-
+    public printUsage(): void
+    {
         // Typically argv[1] is the full path to the main module.  We only want
         // to show the last part of this path, so split it by the OS's directory
         // separator then take the last part.
@@ -132,7 +136,8 @@ class ArgInquirer {
  */
 export function getArgs(
     argQuestions: _.ListOfRecursiveArraysOrValues<inquirer.Question>
-): Promise<{[key: string]: any} | undefined> {
+): Promise<{ [key: string]: any; } | undefined>  // eslint-disable-line @typescript-eslint/no-explicit-any
+{
     const argInquirer = new ArgInquirer(argQuestions);
     return argInquirer.getArgs();
 }

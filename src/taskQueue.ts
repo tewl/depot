@@ -89,7 +89,7 @@ export class TaskQueue extends EventEmitter
      * Cancels all pending tasks that have not been started.
      * @param err - The error that pending tasks will reject with
      */
-    public cancelAllPending(err?: any): void  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    public cancelAllPending(err?: unknown): void
     {
         err = err || new Error("Task cancelled because its TaskQueue was cancelled.");
 

@@ -1,6 +1,26 @@
 import * as _ from "lodash";
 import { Result, succeeded, succeededResult } from "./result";
 
+
+/**
+ * Converts a Promise<Result<>> to a Promise.
+ * @param pr - The Promise<Result<>> to be converted.
+ * @return Either a resolved promise or a rejected promise based on the input
+ */
+export async function toPromise<TSuccess, TError>(
+    pr: Promise<Result<TSuccess, TError>>
+): Promise<TSuccess>
+{
+    const result = await pr;
+    return succeeded(result) ?
+        Promise.resolve(result.value) :
+        Promise.reject(result.error);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// all()
+////////////////////////////////////////////////////////////////////////////////
 export async function all<SA, FA, SB, FB>(
     a: Promise<Result<SA, FA>>,
     b: Promise<Result<SB, FB>>

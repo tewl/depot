@@ -24,7 +24,7 @@ export function objToStrMap<TValue>(obj: {[key: string]: TValue}): Map<string, T
 
 export function strMapToJson(
     strMap: Map<string, unknown>,
-    replacer?: (this: any, key: string, value: any) => any,
+    replacer?: (this: any, key: string, value: any) => any,    // eslint-disable-line @typescript-eslint/no-explicit-any
     space?: string | number
 ): string
 {
@@ -72,7 +72,7 @@ export function mapToStrMap<TKey, TValue>(
 export function mapToJson<TKey, TValue>(
     srcMap: Map<TKey, TValue>,
     keyMapper: (key: TKey) => string,
-    replacer?: (this: any, key: string, value: any) => any,
+    replacer?: (this: any, key: string, value: any) => any,  // eslint-disable-line @typescript-eslint/no-explicit-any
     space?: string | number
 ): string
 {

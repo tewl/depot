@@ -8,7 +8,7 @@ export class NullStream extends Writable
     }
 
 
-    public override _write(chunk: string | Buffer, encoding: string, callback: () => any): void
+    public override _write(chunk: string | Buffer, encoding: string, callback: () => unknown): void
     {
         callback();
     }

@@ -22,7 +22,7 @@ export class PrefixStream extends Transform
     }
 
 
-    public override _transform(chunk: Buffer | string, encoding: string, done: () => any): void
+    public override _transform(chunk: Buffer | string, encoding: string, done: () => unknown): void
     {
         // Convert to a Buffer.
         const chunkBuf: Buffer = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
@@ -44,7 +44,7 @@ export class PrefixStream extends Transform
     }
 
 
-    public override _flush(done: () => any): void
+    public override _flush(done: () => unknown): void
     {
         if (this._partial && this._partial.length)
         {

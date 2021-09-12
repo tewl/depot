@@ -173,7 +173,7 @@ export class Directory
     public exists(): Promise<fs.Stats | undefined>
     {
         return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
-            fs.stat(this._dirPath, (err: any, stats: fs.Stats) => {
+            fs.stat(this._dirPath, (err: unknown, stats: fs.Stats) => {
 
                 if (!err && stats.isDirectory())
                 {
@@ -196,7 +196,7 @@ export class Directory
             return stats.isDirectory() ? stats : undefined;
         }
         catch (err) {
-            if ((err as any).code === "ENOENT")
+            if ((err as NodeJS.ErrnoException).code === "ENOENT")
             {
                 return undefined;
             }
@@ -338,7 +338,7 @@ export class Directory
             }
             catch (err) {
                 // If the directory already exists, just keep going.
-                if ((err as any).code !== "EEXIST") {
+                if ((err as NodeJS.ErrnoException).code !== "EEXIST") {
                     throw err;
                 }
             }
@@ -630,7 +630,7 @@ export class Directory
                 return curSubdir.copy(destDir, true);
             });
 
-            return Promise.all(_.concat<any>(fileCopyPromises, dirCopyPromises));
+            return Promise.all(_.concat<Array<Promise<File | Directory>>>(fileCopyPromises, dirCopyPromises));
         })
         .then(() => {
             return destDir;

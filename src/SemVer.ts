@@ -78,6 +78,7 @@ export class SemVer
         // in order to make this more strongly typed we will convert it into an
         // object.  In order to do the conversion, we must temporarily treat the
         // returned array as an Array<any>.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const prereleaseParts: Array<any> = this._semver.prerelease;
 
         if (prereleaseParts.length === 0)

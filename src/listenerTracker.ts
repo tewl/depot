@@ -12,10 +12,12 @@ import {EventEmitter} from "events";
  * client must keep track of each listener and remove each one individually.
  * This class helps facilitate that bookkeeping.
  */
-export class ListenerTracker {
+export class ListenerTracker
+{
 
     private _emitter: EventEmitter;
-    private _listenerMap: {[eventName: string]: Array<(...args: Array<any>) => void>};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private _listenerMap: { [eventName: string]: Array<(...args: Array<any>) => void>; };
 
     /**
      * Creates a new ListenerTracker that can be used to track listeners for the
@@ -23,7 +25,10 @@ export class ListenerTracker {
      * this instance will be tracked.
      * @param emitter - The EventEmitter to be wrapped
      */
-    public constructor(emitter: EventEmitter) {
+    public constructor(
+        emitter: EventEmitter
+    )
+    {
         this._emitter = emitter;
         this._listenerMap = {};
     }
@@ -34,7 +39,11 @@ export class ListenerTracker {
      * @param listenerCallback - The callback function/listener
      * @return This ListenerTracker instance so that calls can be chained.
      */
-    public on(eventName: string, listenerCallback: (...args: Array<any>) => void): this {
+    public on(
+        eventName: string,
+        listenerCallback: (...args: Array<any>) => void  // eslint-disable-line @typescript-eslint/no-explicit-any
+    ): this
+    {
         this._emitter.on(eventName, listenerCallback);
         this.addListener(eventName, listenerCallback);
         return this;
@@ -47,7 +56,11 @@ export class ListenerTracker {
      * @param listenerCallback - The callback function/listener
      * @return This ListenerTracker instance so that calls can be chained.
      */
-    public once(eventName: string, listenerCallback: (...args: Array<any>) => void): this {
+    public once(
+        eventName: string,
+        listenerCallback: (...args: Array<any>) => void  // eslint-disable-line @typescript-eslint/no-explicit-any
+    ): this
+    {
         this._emitter.once(eventName, listenerCallback);
         this.addListener(eventName, listenerCallback);
         return this;
@@ -58,7 +71,8 @@ export class ListenerTracker {
      * ListenerTracker object.  Note, if the client registered listeners
      * directly with the wrapped emitter, those listeners will not be removed.
      */
-    public removeAll(): void {
+    public removeAll(): void
+    {
         Object.keys(this._listenerMap).forEach((eventName) => {
 
             const listeners = this._listenerMap[eventName]!;
@@ -76,7 +90,11 @@ export class ListenerTracker {
      * @param eventName - The name of the event being subscribed to
      * @param listenerCallback - The callback function/listener
      */
-    private addListener(eventName: string, listenerCallback: (...args: Array<any>) => void): void {
+    private addListener(
+        eventName: string,
+        listenerCallback: (...args: Array<any>) => void  // eslint-disable-line @typescript-eslint/no-explicit-any
+    ): void
+    {
         if (!this._listenerMap[eventName]) {
             this._listenerMap[eventName] = [];
         }

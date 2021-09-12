@@ -123,7 +123,7 @@ export class File
     public exists(): Promise<fs.Stats | undefined>
     {
         return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
-            fs.stat(this._filePath, (err: any, stats: fs.Stats) => {
+            fs.stat(this._filePath, (err: unknown, stats: fs.Stats) => {
 
                 if (!err && stats.isFile())
                 {
@@ -146,7 +146,7 @@ export class File
             return stats.isFile() ? stats : undefined;
         }
         catch (err) {
-            if ((err as any).code === "ENOENT")
+            if ((err as NodeJS.ErrnoException).code === "ENOENT")
             {
                 return undefined;
             }
@@ -588,8 +588,8 @@ export class File
             hash.setEncoding("hex");
 
             input
-            .on("error", (error: any) => {
-                reject(new Error(error));
+            .on("error", (error: Error) => {
+                reject(error);
             })
             .on("end", () => {
                 hash.end();
@@ -626,7 +626,7 @@ export class File
      */
     public read(): Promise<string>
     {
-        return new Promise<string>((resolve: (text: string) => void, reject: (err: any) => void) => {
+        return new Promise<string>((resolve: (text: string) => void, reject: (err: unknown) => void) => {
             fs.readFile(this._filePath, {encoding: "utf8"}, (err, data) => {
                 if (err)
                 {
@@ -700,7 +700,7 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
     // streams can read and write smaller chunks of the data.
     //
 
-    return new Promise<void>((resolve: () => void, reject: (err: any) => void) => {
+    return new Promise<void>((resolve: () => void, reject: (err: unknown) => void) => {
 
         const readStream = fs.createReadStream(sourceFilePath);
         const readListenerTracker = new ListenerTracker(readStream);

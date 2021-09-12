@@ -1147,7 +1147,7 @@ describe("File", () => {
 
                 file.writeJson({foo: "bar"})
                 .then(() => {
-                    return file.readJson<any>();
+                    return file.readJson<unknown>();
                 })
                 .then((data) => {
                     expect(data.foo).toEqual("bar");
@@ -1177,7 +1177,7 @@ describe("File", () => {
 
                 file.writeJsonSync({foo: "bar"});
 
-                expect(file.readJsonSync<any>().foo).toEqual("bar");
+                expect(file.readJsonSync<{foo: string}>().foo).toEqual("bar");
             });
 
 

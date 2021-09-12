@@ -5,7 +5,7 @@ import {IAction} from "./action";
 export class ActionComposite implements IAction<void>
 {
     // #region Instance Data Members
-    private _actions: Array<IAction<any>> = [];
+    private _actions: Array<IAction<unknown>> = [];
     // #endregion
 
 
@@ -22,7 +22,7 @@ export class ActionComposite implements IAction<void>
     }
 
 
-    public add(...newActions: Array<IAction<any>>): ActionComposite
+    public add(...newActions: Array<IAction<unknown>>): ActionComposite
     {
         this._actions = _.concat(this._actions, newActions);
         return this;

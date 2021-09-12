@@ -60,5 +60,5 @@ export function numericEnumValToString<T>(enumObject: T, val: T[keyof T]): strin
     // Leverage the fact that the TS compiler puts the reverse mappings in
     // the generated enumeration object too.  These reverse mappings have a key
     // that is the value and a value that is the string symbol name.
-    return (enumObject as any)[val];
+    return (enumObject as any)[val];  // eslint-disable-line @typescript-eslint/no-explicit-any
 }

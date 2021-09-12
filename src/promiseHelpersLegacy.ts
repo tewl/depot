@@ -24,12 +24,12 @@ import * as BBPromise from "bluebird";
  * @returns A promise that will be resolved with an inspection object for each
  * input promise.
  */
-export function allSettled(promises: Array<Promise<any>>): Promise<Array<BBPromise.Inspection<any>>>
+export function allSettled(promises: Array<Promise<unknown>>): Promise<Array<BBPromise.Inspection<unknown>>>
 {
     "use strict";
 
-    const wrappedPromises: Array<BBPromise.Inspection<any>> = _.map(
+    const wrappedPromises: Array<BBPromise.Inspection<unknown>> = _.map(
         promises,
-        (curPromise: Promise<any>) => BBPromise.resolve(curPromise).reflect());
+        (curPromise: Promise<unknown>) => BBPromise.resolve(curPromise).reflect());
     return Promise.all(wrappedPromises);
 }

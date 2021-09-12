@@ -15,7 +15,7 @@ interface IGulpError extends Error
  * @return A Gulp error object that will not display the stack trace
  */
 export function toGulpError(
-    err: Error,
+    err: {message?: string},
     defaultErrorMsg = "Gulp encountered one or more errors."
 ): Error
 {

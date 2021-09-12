@@ -96,12 +96,13 @@ export interface ISerializable
 }
 
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function isISerializable(obj: any): obj is ISerializable
+export function isISerializable(obj: unknown): obj is ISerializable
 {
-    return _.isString(obj.id) &&
-           _.isFunction(obj.serialize) &&
-           _.isFunction(obj.constructor.deserialize);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const candidate = (obj as any);
+    return _.isString(candidate.id) &&
+           _.isFunction(candidate.serialize) &&
+           _.isFunction(candidate.constructor.deserialize);
 }
 
 
@@ -110,14 +111,16 @@ export interface ISerializableWithStow<StowType> extends ISerializable
     __stow: StowType;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function isISerializableWithStow<StowType>(obj: any): obj is ISerializableWithStow<StowType>
+export function isISerializableWithStow<StowType>(obj: unknown): obj is ISerializableWithStow<StowType>
 {
-    return isISerializable(obj) &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const candidate = obj as any;
+    return isISerializable(candidate) &&
            // FUTURE: The following is pretty bogus.  Just because __stow is not
            //   undefined does not mean that it is of type StowType.  Fix this
            //   in the future.
-           (obj as any).__stow !== undefined;
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           (candidate as any).__stow !== undefined;
 }
 
 

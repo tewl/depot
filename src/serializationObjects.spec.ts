@@ -127,7 +127,7 @@ export class Model implements ISerializable
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IModelSerialized1 = {
-            type:       (this.constructor as any).type,
+            type:       (this.constructor as any).type, // eslint-disable-line @typescript-eslint/no-explicit-any
             id:         this._id,
             schema:     "1",
             rootPerson: undefined
@@ -282,7 +282,7 @@ export class Person implements ISerializable
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IPersonSerialized1 = {
-            type:      (this.constructor as any).type,
+            type:      (this.constructor as any).type, // eslint-disable-line @typescript-eslint/no-explicit-any
             id:        this._id,
             schema:    "1",
             firstName: this._firstName,

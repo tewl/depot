@@ -2,7 +2,7 @@ export class Deferred<ResolveType>
 {
     public readonly promise: Promise<ResolveType>;
     public resolve: (result: ResolveType) => void;
-    public reject: (err: any) => void;
+    public reject: (err: unknown) => void;
 
     constructor()
     {
@@ -12,7 +12,7 @@ export class Deferred<ResolveType>
         this.resolve = (): void => { return; };
         this.reject = (): void => { return; };
 
-        this.promise = new Promise((resolve: (result: ResolveType) => void, reject: (err: any) => void) => {
+        this.promise = new Promise((resolve: (result: ResolveType) => void, reject: (err: unknown) => void) => {
             this.resolve = resolve;
             this.reject = reject;
         });

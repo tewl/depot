@@ -20,7 +20,8 @@ export function toGulpError(
     defaultErrorMsg = "Gulp encountered one or more errors."
 ): Error
 {
-    const gulpError: IGulpError = new Error(err.message || defaultErrorMsg) as IGulpError;
+    const errMsg = err?.message ?? defaultErrorMsg;
+    const gulpError: IGulpError = new Error(errMsg) as IGulpError;
     // Don't show the stack trace.
     gulpError.showStack = false;
     return gulpError;

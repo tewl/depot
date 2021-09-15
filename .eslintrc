@@ -25,6 +25,7 @@
         //         "allowSingleLine": true
         //     }
         // ],
+        "curly": ["error"],
         "indent": [
             "error",
             4,

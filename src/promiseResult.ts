@@ -132,7 +132,7 @@ export async function all(
                     }
                 }
                 else {
-                    // It failed.  Return the failed result.
+                    // It failed.  Return the failed result immediately.
                     resolve(curResult);
                 }
             })

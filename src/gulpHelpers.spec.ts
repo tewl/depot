@@ -1,11 +1,11 @@
-import {toGulpError} from "./gulpHelpers";
+import {toGulpError, IGulpError} from "./gulpHelpers";
 
 
 describe("toGulpError", () => {
 
 
     it("sets showStack to false", () => {
-        const err = new Error("foo");
+        const err = new Error("foo") as IGulpError;
         expect(toGulpError(err).showStack).toEqual(false);
     });
 

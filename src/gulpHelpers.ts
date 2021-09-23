@@ -14,16 +14,19 @@ export interface IGulpError extends Error
  * @return A Gulp error object that will not display the stack trace
  */
 export function toGulpError(
-    err: Error | {message: string} | undefined,
-    defaultErrorMsg = "Gulp encountered one or more errors."
+    err: Error | string | {message: string} | undefined
 ): IGulpError
 {
+    const defaultErrorMsg = "Gulp encountered one or more errors.";
     let gulpError: IGulpError;
     if (err === undefined) {
         gulpError = new Error(defaultErrorMsg) as IGulpError;
     }
     else if (err instanceof Error && err.message.trim()) {
         gulpError = err as IGulpError;
+    }
+    else if (typeof err === "string") {
+        gulpError = new Error(err) as IGulpError;
     }
     else if (err.message.trim()) {
         gulpError = new Error(err.message) as IGulpError;

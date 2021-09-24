@@ -46,7 +46,7 @@ describe("all()", () =>
     });
 
 
-    it("when one result fails, the returned promise resolves with a Result containing the first error", async () =>
+    it("when one result fails, the returned promise resolves with a Result containing the index of the item that failed and its error", async () =>
     {
         const op1 = async () => getTimerPromise(25, succeededResult(25));
         const op2 = async () => getTimerPromise(50, failedResult("Error 1"));
@@ -54,7 +54,8 @@ describe("all()", () =>
 
         const result = await promiseResult.all(op1(), op2(), op3());
         expect(failed(result)).toBeTruthy();
-        expect(result.error).toEqual("Error 1");
+        expect(result.error!.index).toEqual(1);
+        expect(result.error!.item).toEqual("Error 1");
     });
 
 

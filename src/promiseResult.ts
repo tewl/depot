@@ -1,5 +1,7 @@
 import * as _ from "lodash";
+import { failedResult } from ".";
 import { Result, succeeded, succeededResult } from "./result";
+import { IIndexedItem } from "./utilityTypes";
 
 
 /**
@@ -24,20 +26,29 @@ export async function toPromise<TSuccess, TError>(
 export async function all<SA, FA, SB, FB>(
     a: Promise<Result<SA, FA>>,
     b: Promise<Result<SB, FB>>
-): Promise<Result<[SA, SB], FA | FB>>;
+): Promise<Result<
+    [SA, SB],
+    IIndexedItem<FA | FB>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC>(
     a: Promise<Result<SA, FA>>,
     b: Promise<Result<SB, FB>>,
     c: Promise<Result<SC, FC>>
-): Promise<Result<[SA, SB, SC], FA | FB | FC>>;
+): Promise<Result<
+    [SA, SB, SC],
+    IIndexedItem<FA | FB | FC>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD>(
     a: Promise<Result<SA, FA>>,
     b: Promise<Result<SB, FB>>,
     c: Promise<Result<SC, FC>>,
     d: Promise<Result<SD, FD>>
-): Promise<Result<[SA, SB, SC, SD], FA | FB | FC | FD>>;
+): Promise<Result<
+    [SA, SB, SC, SD],
+    IIndexedItem<FA | FB | FC | FD>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE>(
     a: Promise<Result<SA, FA>>,
@@ -45,7 +56,10 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE>(
     c: Promise<Result<SC, FC>>,
     d: Promise<Result<SD, FD>>,
     e: Promise<Result<SE, FE>>
-): Promise<Result<[SA, SB, SC, SD, SE], FA | FB | FC | FD | FE>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE],
+    IIndexedItem<FA | FB | FC | FD | FE>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF>(
     a: Promise<Result<SA, FA>>,
@@ -54,7 +68,10 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF>(
     d: Promise<Result<SD, FD>>,
     e: Promise<Result<SE, FE>>,
     f: Promise<Result<SF, FF>>
-): Promise<Result<[SA, SB, SC, SD, SE, SF], FA | FB | FC | FD | FE | FF>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE, SF],
+    IIndexedItem<FA | FB | FC | FD | FE | FF>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG>(
     a: Promise<Result<SA, FA>>,
@@ -64,7 +81,10 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG
     e: Promise<Result<SE, FE>>,
     f: Promise<Result<SF, FF>>,
     g: Promise<Result<SG, FG>>
-): Promise<Result<[SA, SB, SC, SD, SE, SF, SG], FA | FB | FC | FD | FE | FF | FG>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE, SF, SG],
+    IIndexedItem<FA | FB | FC | FD | FE | FF | FG>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH>(
     a: Promise<Result<SA, FA>>,
@@ -75,7 +95,10 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG
     f: Promise<Result<SF, FF>>,
     g: Promise<Result<SG, FG>>,
     h: Promise<Result<SH, FH>>
-): Promise<Result<[SA, SB, SC, SD, SE, SF, SG, SH], FA | FB | FC | FD | FE | FF | FG | FH>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE, SF, SG, SH],
+    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH, SI, FI>(
     a: Promise<Result<SA, FA>>,
@@ -87,7 +110,10 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG
     g: Promise<Result<SG, FG>>,
     h: Promise<Result<SH, FH>>,
     i: Promise<Result<SI, FI>>
-): Promise<Result<[SA, SB, SC, SD, SE, SF, SG, SH, SI], FA | FB | FC | FD | FE | FF | FG | FH | FI>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE, SF, SG, SH, SI],
+    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH | FI>
+>>;
 
 export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH, SI, FI, SJ, FJ>(
     a: Promise<Result<SA, FA>>,
@@ -100,14 +126,17 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG
     h: Promise<Result<SH, FH>>,
     i: Promise<Result<SI, FI>>,
     j: Promise<Result<SJ, FJ>>
-): Promise<Result<[SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ], FA | FB | FC | FD | FE | FF | FG | FH | FI | FJ>>;
+): Promise<Result<
+    [SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ],
+    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH | FI | FJ>
+>>;
 
 //
 // Implementation
 //
 export async function all(
     ...promises: Array<Promise<Result<unknown, unknown>>>
-): Promise<Result<Array<unknown>, unknown>>
+): Promise<Result<Array<unknown>, IIndexedItem<unknown>>>
 {
     return new Promise((resolve, reject) => {
 
@@ -133,7 +162,12 @@ export async function all(
                 }
                 else {
                     // It failed.  Return the failed result immediately.
-                    resolve(curResult);
+                    // resolve(curResult);
+                    const indexed: IIndexedItem<unknown> = {
+                        index: index,
+                        item:  curResult.error
+                    };
+                    resolve(failedResult(indexed));
                 }
             })
             .catch((err) =>

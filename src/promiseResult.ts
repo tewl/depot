@@ -138,17 +138,35 @@ export async function all(
     ...promises: Array<Promise<Result<unknown, unknown>>>
 ): Promise<Result<Array<unknown>, IIndexedItem<unknown>>>
 {
-    return new Promise((resolve, reject) => {
+    return allArray<unknown, unknown>(promises);
+}
+
+
+/**
+ * A version of all() that accepts the input Promise-Result objects as an array.
+ * This has the advantage that higher order functions can be used to create the
+ * array (i.e. _.map()), but has the disadvantage that there can only be one
+ * Result success type and one Result failure type.
+ * @param param - Description
+ * @return Description
+ */
+export async function allArray<TSuccess, TFail>(
+    promises: Array<Promise<Result<TSuccess, TFail>>>
+): Promise<Result<Array<TSuccess>, IIndexedItem<TFail>>>
+{
+    return new Promise((resolve, reject) =>
+    {
 
         const numPromises = promises.length;
         let numSuccesses = 0;
-        const successfulResults: Array<unknown> = [];
+        const successfulResults: Array<TSuccess> = [];
         _.forEach(promises, (curPromise, index) =>
         {
             curPromise
             .then((curResult) =>
             {
-                if (succeeded(curResult)) {
+                if (succeeded(curResult))
+                {
                     // The current async operation succeeded.
                     successfulResults[index] = curResult.value;
                     numSuccesses++;
@@ -156,14 +174,16 @@ export async function all(
                     // If this is the last successful async operation, resolve
                     // with an array of all the success values.  Otherwise, keep
                     // waiting.
-                    if (numSuccesses === numPromises) {
+                    if (numSuccesses === numPromises)
+                    {
                         resolve(succeededResult(successfulResults));
                     }
                 }
-                else {
+                else
+                {
                     // It failed.  Return the failed result immediately.
                     // resolve(curResult);
-                    const indexed: IIndexedItem<unknown> = {
+                    const indexed: IIndexedItem<TFail> = {
                         index: index,
                         item:  curResult.error
                     };

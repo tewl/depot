@@ -192,8 +192,8 @@ export function spawn(
                         resolve(failedResult({
                             type:     "ISpawnExitError",
                             exitCode: exitCode,
-                            stderr:   stderrCollector.collected,
-                            stdout:   stdoutCollector.collected
+                            stderr:   _.trim(stderrCollector.collected),
+                            stdout:   _.trim(stdoutCollector.collected)
                         }));
                     }
                 });

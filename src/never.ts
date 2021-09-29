@@ -1,7 +1,7 @@
 /**
  * A function that can be called to verify that code is exhaustive in testing
  * for all possible variants.  A compiler error will result if not exhaustive.
- * See: http://www.typescriptlang.org/docs/handbook/advanced-types.html
+ * See: https://basarat.gitbooks.io/typescript/docs/types/discriminated-unions.html
  *
  * @example
  * function area(s: Shape) {
@@ -14,8 +14,8 @@
  * }
  *
  * @param x - The value to be tested for exhaustiveness
- * @return description
+ * @return Nothing is returned.  This function always throws an Error.
  */
 export function assertNever(x: never): never {
-    throw new Error("Unexpected object: " + x);
+    throw new Error("Object failed exhaustiveness check: " + x);
 }

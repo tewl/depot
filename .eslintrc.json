@@ -18,13 +18,13 @@
             "error",
             "always"
         ],
-        "brace-style": [
-            "error",
-            "allman",
-            {
-                "allowSingleLine": true
-            }
-        ],
+        // "brace-style": [
+        //     "error",
+        //     "allman",
+        //     {
+        //         "allowSingleLine": true
+        //     }
+        // ],
         "curly": ["error"],
         "indent": [
             "error",

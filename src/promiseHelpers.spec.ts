@@ -1,8 +1,8 @@
 import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
 import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
-    retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-    delaySettle, mapAsync, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
+        retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
+        delaySettle, mapAsync, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
 
 
 describe("promisifyN()", () => {

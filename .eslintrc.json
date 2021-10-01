@@ -14,18 +14,105 @@
         "node": true
     },
     "rules": {
+        "@typescript-eslint/member-ordering": [
+            "error",
+            {
+                "default": [
+                    // Index signature
+                    "signature",
+                    // Static
+                    "private-static-field",
+                    "protected-static-field",
+                    "public-static-field",
+                    "private-static-method",
+                    "protected-static-method",
+                    "public-static-method",
+                    // Private fields
+                    "private-decorated-field",
+                    "private-instance-field",
+                    "private-abstract-field",
+                    "protected-decorated-field",
+                    "protected-instance-field",
+                    "protected-abstract-field",
+                    "public-decorated-field",
+                    "public-instance-field",
+                    // Constructors
+                    "public-constructor",
+                    "protected-constructor",
+                    "private-constructor",
+                    "public-abstract-field",
+                    // Methods
+                    "public-decorated-method",
+                    "public-instance-method",
+                    "public-abstract-method",
+                    // Protected helper methods
+                    "protected-decorated-method",
+                    "protected-instance-method",
+                    "protected-abstract-method",
+                    // Private helper methods
+                    "private-decorated-method",
+                    "private-instance-method",
+                    "private-abstract-method"
+                ]
+            }
+        ],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "typeLike",
+                "format": [
+                    "PascalCase"
+                ]
+            },
+            {
+                "selector": "interface",
+                "format": [
+                    "PascalCase"
+                ],
+                "prefix": [
+                    "I"
+                ]
+            },
+            {
+                "selector": "classProperty",
+                "format": [
+                    "camelCase"
+                ],
+                "modifiers": [
+                    "private"
+                ],
+                "leadingUnderscore": "require"
+            }
+        ],
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "none", // It's ok to have unused args to b/c they provide signature documentation
+                "caughtErrors": "none"
+            }
+        ],
+        "@typescript-eslint/quotes": [
+            "error",
+            "double",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "@typescript-eslint/semi": [
+            "error",
+            "always"
+        ],
         "arrow-parens": [
             "error",
             "always"
         ],
-        // "brace-style": [
-        //     "error",
-        //     "allman",
-        //     {
-        //         "allowSingleLine": true
-        //     }
-        // ],
-        "curly": ["error"],
+        "curly": [
+            "error"
+        ],
         "indent": [
             "error",
             4,
@@ -33,7 +120,7 @@
                 "ignoredNodes": [
                     "ConditionalExpression"
                 ],
-                "MemberExpression": 0,   // Chaining methods does not require indentation
+                "MemberExpression": 0, // Chaining methods does not require indentation
                 "SwitchCase": 1,
                 "flatTernaryExpressions": true,
                 "ignoreComments": true,
@@ -47,7 +134,8 @@
                     "arguments": "first"
                 },
                 "ArrayExpression": "first",
-                "ObjectExpression": "first"
+                "ObjectExpression": "first",
+                "ImportDeclaration": "first"
             }
         ],
         "key-spacing": [
@@ -75,93 +163,9 @@
                 "ignoreRegExpLiterals": true
             }
         ],
-        "quotes": "off",
-        "semi": "off",
-        "@typescript-eslint/naming-convention": [
-            "error",
-            {
-                "selector": "typeLike",
-                "format": [ "PascalCase" ]
-            },
-            {
-                "selector": "interface",
-                "format": [ "PascalCase" ],
-                "prefix": [ "I" ]
-            },
-            {
-                "selector": "classProperty",
-                "format": [ "camelCase" ],
-                "modifiers": ["private"],
-                "leadingUnderscore": "require"
-            }
-        ],
-        "no-unused-vars": "off",  // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
-        "@typescript-eslint/no-unused-vars": [
-            "error",
-            {
-                "vars": "all",
-                "args": "none", // It's ok to have unused args to b/c they provide signature documentation
-                "caughtErrors": "none"
-            }
-        ],
-        "@typescript-eslint/member-ordering": [
-            "error",
-            {
-                "default": [
-                    // Index signature
-                    "signature",
-                    // Static
-                    "private-static-field",
-                    "protected-static-field",
-                    "public-static-field",
-                    "private-static-method",
-                    "protected-static-method",
-                    "public-static-method",
-                    // Private fields
-                    "private-decorated-field",
-                    "private-instance-field",
-                    "private-abstract-field",
-                    "protected-decorated-field",
-                    "protected-instance-field",
-                    "protected-abstract-field",
-
-                    "public-decorated-field",
-                    "public-instance-field",
-                    // Constructors
-                    "public-constructor",
-                    "protected-constructor",
-                    "private-constructor",
-
-                    "public-abstract-field",
-                    // Methods
-                    "public-decorated-method",
-                    "public-instance-method",
-                    "public-abstract-method",
-                    // Protected helper methods
-                    "protected-decorated-method",
-                    "protected-instance-method",
-                    "protected-abstract-method",
-                    // Private helper methods
-                    "private-decorated-method",
-                    "private-instance-method",
-                    "private-abstract-method"
-                ]
-            }
-        ],
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-explicit-any": "warn",
-        "@typescript-eslint/quotes": [
-            "error",
-            "double",
-            {
-                "avoidEscape": true,
-                "allowTemplateLiterals": true
-            }
-        ],
-        "@typescript-eslint/semi": [
-            "error",
-            "always"
-        ]
+        "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
+        "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
+        "semi": "off" // Needs to be off when @typescript-eslint/semi is on
     },
     "overrides": [
         {

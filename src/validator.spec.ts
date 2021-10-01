@@ -1,9 +1,9 @@
 import {Validator} from "./validator";
 
 
-async function dotNotAllowedAsync(subject: string): Promise<boolean> {
+function dotNotAllowedAsync(subject: string): Promise<boolean> {
     const dotFound = subject.indexOf(".") >= 0;
-    return !dotFound;
+    return Promise.resolve(!dotFound);
 }
 
 
@@ -13,9 +13,9 @@ function dollarNotAllowedSync(subject: string): boolean {
 }
 
 
-async function containsSecretAsync(subject: string): Promise<boolean> {
+function containsSecretAsync(subject: string): Promise<boolean> {
     const containsSecret = subject.indexOf("xyzzy") >= 0;
-    return containsSecret;
+    return Promise.resolve(containsSecret);
 }
 
 

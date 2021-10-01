@@ -56,6 +56,8 @@ export function indent(
         // The only way replace() will replace all instances is to use the "g"
         // flag with replace(). Use the m flag so that ^ and $ match within the
         // string.
+        // TODO: Convert the following regex to use named capture groups.
+        // eslint-disable-next-line prefer-named-capture-group
         const replaceRegex = /^(.*?)$/gm;
         const replaceFunc = function replaceFunc(
             match: string,

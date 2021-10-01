@@ -22,6 +22,8 @@ export class GitBranch
     // group 1: "remotes/remotename"  (not all that useful)
     // group 2: "remotename"          (the remote name)
     // group 3: "branch/name"         (the branch name)
+    // TODO: Convert the following regex to use named capture groups.
+    // eslint-disable-next-line prefer-named-capture-group
     private static _strParserRegex = /^(remotes\/([\w.-]+)\/)?(.*)$/;
     // endregion
 
@@ -230,6 +232,8 @@ export class GitBranch
                     // - 7 characters making up the commit hash (group 2)
                     // - whitespace
                     // - the remainder of the line (group 3)
+                    // TODO: Convert the following regex to use named capture groups.
+                    // eslint-disable-next-line prefer-named-capture-group
                     const matches = /^[*]?\s+([\w/.-]+)\s+([0-9a-fA-F]{7})\s+(.*)$/.exec(curLine);
                     if (matches && matches[1] === this.name) {
                         acc.push(matches[3]);
@@ -258,6 +262,8 @@ export class GitBranch
             //   - "]"
             // - optional whitespace
             // - commit message (group 4)
+            // TODO: Convert the following regex to use named capture groups.
+            // eslint-disable-next-line prefer-named-capture-group
             const lastColRegex = /^(\[([\w/.-]+):?(.*)\])?\s*(.*)$/;
             let matches = lastColRegex.exec(lastCol);
 
@@ -271,6 +277,8 @@ export class GitBranch
                 // - A non-greedy bunch of stuff = remote name (group 1)
                 // - "/"
                 // - A bunch of stuff = remote branch name (group 2)
+                // TODO: Convert the following regex to use named capture groups.
+                // eslint-disable-next-line prefer-named-capture-group
                 const remoteBranchRegex = /^(.*?)\/(.*)$/;
                 matches = remoteBranchRegex.exec(remoteBranchStr);
                 if (matches) {

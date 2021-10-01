@@ -28,6 +28,8 @@ interface IGitLogEntry
 // match[3]: commit timestamp
 // match[4]: commit message (a sequence of lines that are either blank or start with whitespace)
 //
+// TODO: Convert the following regex to use named capture groups.
+// eslint-disable-next-line prefer-named-capture-group
 const GIT_LOG_ENTRY_REGEX = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:\s*(.*?)$\s((?:(?:^\s*$\n?)|(?:^\s+(?:.*)$\s?))+)/gm;
 
 
@@ -256,6 +258,8 @@ export class GitRepo
             const lines = splitIntoLines(stdout);
             const remotes: {[name: string]: string} = {};
             lines.forEach((curLine) => {
+                // TODO: Convert the following regex to use named capture groups.
+                // eslint-disable-next-line prefer-named-capture-group
                 const match = curLine.match(/^(\w+)\s+(.*)\s+\(\w+\)$/);
                 if (match)
                 {

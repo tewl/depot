@@ -3,6 +3,8 @@ import {Directory} from "./directory";
 
 // A regular expression to match valid Git repo URLs.
 // match[1]: project name
+// TODO: Convert the following regex to use named capture groups.
+// eslint-disable-next-line prefer-named-capture-group
 const gitUrlRegexp = /.*\/(.*)\.git$/;
 
 

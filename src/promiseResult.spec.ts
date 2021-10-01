@@ -36,9 +36,9 @@ describe("all()", () =>
 {
     it("when all are successful, the returned promise resolves with a Result containing an array of all the successful values", async () =>
     {
-        const op1 = async () => getTimerPromise(25, succeededResult(25));
-        const op2 = async () => getTimerPromise(50, succeededResult(50));
-        const op3 = async () => getTimerPromise(75, succeededResult(75));
+        const op1 = () => getTimerPromise(25, succeededResult(25));
+        const op2 = () => getTimerPromise(50, succeededResult(50));
+        const op3 = () => getTimerPromise(75, succeededResult(75));
 
         const result = await promiseResult.all(op1(), op2(), op3());
         expect(succeeded(result)).toBeTruthy();
@@ -48,9 +48,9 @@ describe("all()", () =>
 
     it("when one result fails, the returned promise resolves with a Result containing the index of the item that failed and its error", async () =>
     {
-        const op1 = async () => getTimerPromise(25, succeededResult(25));
-        const op2 = async () => getTimerPromise(50, failedResult("Error 1"));
-        const op3 = async () => getTimerPromise(75, succeededResult(75));
+        const op1 = () => getTimerPromise(25, succeededResult(25));
+        const op2 = () => getTimerPromise(50, failedResult("Error 1"));
+        const op3 = () => getTimerPromise(75, succeededResult(75));
 
         const result = await promiseResult.all(op1(), op2(), op3());
         expect(failed(result)).toBeTruthy();
@@ -61,9 +61,9 @@ describe("all()", () =>
 
     it("when one result fails, the returned promise resolves *immediately* with the failure", async () =>
     {
-        const op1 = async () => getTimerPromise(25, succeededResult(25));
-        const op2 = async () => getTimerPromise(50, failedResult("Error 1"));
-        const op3 = async () => getTimerPromise(75, succeededResult(75));
+        const op1 = () => getTimerPromise(25, succeededResult(25));
+        const op2 = () => getTimerPromise(50, failedResult("Error 1"));
+        const op3 = () => getTimerPromise(75, succeededResult(75));
 
         const startTime = Date.now();
         const result = await promiseResult.all(op1(), op2(), op3());

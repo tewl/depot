@@ -23,6 +23,8 @@ export function comment(
     precedingLine?: string
 ): string | undefined
 {
+    // TODO: Convert the regex to used named captures.
+    // eslint-disable-next-line prefer-named-capture-group
     const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
 
     if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
@@ -114,6 +116,8 @@ export function uncomment(linesToUncomment: string): string | undefined
     }
 
     const sourceLines = splitIntoLines(linesToUncomment, true);
+    // TODO: Convert the following regex to use named capture groups.
+    // eslint-disable-next-line prefer-named-capture-group
     const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
 
     const resultLines = _.chain(sourceLines)
@@ -150,6 +154,8 @@ export function uncomment(linesToUncomment: string): string | undefined
  */
 export function toggleComment(linesToToggle: string, precedingLine?: string): string | undefined
 {
+    // TODO: Convert the following regex to use named capture groups.
+    // eslint-disable-next-line prefer-named-capture-group
     const firstNonWhitespace = /\s*(\S\S)/m;
     const match = firstNonWhitespace.exec(linesToToggle);
     if (match && match[1] === "//") {

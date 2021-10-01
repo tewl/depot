@@ -88,7 +88,7 @@ describe("succeeded()", () => {
 
 describe("failed()", () => {
 
-    it("returns true when given a failure result", async () => {
+    it("returns true when given a failure result", () => {
         const result = failureOperation();
         expect(failed(result)).toBeTruthy();
     });
@@ -203,7 +203,7 @@ describe("mapSuccess()", () =>
 
 describe("mapError()", () =>
 {
-    it("with successful input the value is passed along and the function is not invoked", async () =>
+    it("with successful input the value is passed along and the function is not invoked", () =>
     {
         let numInvocations = 0;
         const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
@@ -215,7 +215,7 @@ describe("mapError()", () =>
     });
 
 
-    it("with failed input the function is invoked and its result is wrapped in a failed Result", async () =>
+    it("with failed input the function is invoked and its result is wrapped in a failed Result", () =>
     {
         let numInvocations = 0;
         const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };

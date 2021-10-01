@@ -68,10 +68,12 @@ describe("outdent()", () => {
             "    line 2",
             "    line 3"
         ];
-        expect(outdent(lines.join("\n"))).toEqual([
-            "line 1",
-            "line 2",
-            "line 3"].join("\n"));
+        expect(outdent(lines.join("\n"))).toEqual(
+            [
+                "line 1",
+                "line 2",
+                "line 3"
+            ].join("\n"));
     });
 
 
@@ -81,10 +83,12 @@ describe("outdent()", () => {
             "   line 2",
             "  line 3"
         ];
-        expect(outdent(lines.join("\n"))).toEqual([
-            "  line 1",
-            " line 2",
-            "line 3"].join("\n"));
+        expect(outdent(lines.join("\n"))).toEqual(
+            [
+                "  line 1",
+                " line 2",
+                "line 3"
+            ].join("\n"));
     });
 
 
@@ -236,7 +240,7 @@ describe("splitIntoLines", () => {
     });
 
 
-    it("splits on CRLF", async () => {
+    it("splits on CRLF", () => {
         const text = "\r\none\r\ntwo\r\nthree\r\n";
         const result = splitIntoLines(text, false);
         expect(result).toEqual([
@@ -249,7 +253,7 @@ describe("splitIntoLines", () => {
     });
 
 
-    it("splits on LF", async () => {
+    it("splits on LF", () => {
         const text = "\none\ntwo\nthree\n";
         const result = splitIntoLines(text, false);
         expect(result).toEqual([
@@ -322,7 +326,7 @@ describe("padLeft()", () =>
     });
 
 
-    it("Will insert correct pad when the pad string is one character", async () =>
+    it("Will insert correct pad when the pad string is one character", () =>
     {
         const padded = padLeft("123", "x", 5);
         expect(padded).toEqual("xx123");
@@ -362,7 +366,7 @@ describe("padRight()", () =>
     });
 
 
-    it("Will insert correct pad when the pad string is one character", async () =>
+    it("Will insert correct pad when the pad string is one character", () =>
     {
         const padded = padRight("123", "x", 5);
         expect(padded).toEqual("123xx");

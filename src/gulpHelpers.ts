@@ -28,7 +28,7 @@ export function toGulpError(
     else if (typeof err === "string") {
         gulpError = new Error(err) as IGulpError;
     }
-    else if (err.message.trim()) {
+    else if (typeof err.message === "string" &&  err.message.trim()) {
         gulpError = new Error(err.message) as IGulpError;
     }
     else {

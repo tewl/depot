@@ -105,7 +105,7 @@ describe("bindOption", () =>
     });
 
 
-    it("with some input the function is invoked and the returned option is returned", async () =>
+    it("with some input the function is invoked and the returned option is returned", () =>
     {
         let numInvocations = 0;
         const fn = (x: number) => { numInvocations++; return someOption(x + 1); };
@@ -117,7 +117,7 @@ describe("bindOption", () =>
     });
 
 
-    it("can be used easily with pipe()", async () =>
+    it("can be used easily with pipe()", () =>
     {
         const subtract1 = (x: number) => x <= 0 ? noneOption() : someOption(x - 1);
 

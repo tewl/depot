@@ -6,7 +6,7 @@ import {ISerialized} from "./serialization";
 import {Model, Person} from "./serializationObjects.spec";
 
 
-describe("PersistentCacheStore", async () => {
+describe("PersistentCacheStore", () => {
 
     const tmpDir = new Directory(__dirname, "..", "tmp");
 

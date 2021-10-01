@@ -7,7 +7,7 @@ describe("ActionComposite", () =>
 {
 
 
-    it("can be constructed", async () =>
+    it("can be constructed", () =>
     {
         const ac = new ActionComposite();
         expect(ac).not.toBeNull();
@@ -68,15 +68,15 @@ describe("ActionComposite", () =>
         });
 
 
-        it("returns a rejected promise when one of the actions rejects", async (done) =>
+        it("returns a rejected promise when one of the actions rejects", (done) =>
         {
             const ac = new ActionComposite();
-            ac.add(new Action(async () => {
+            ac.add(new Action(() => {
                 return getTimerPromise(20, 1)
                 .then(() => {});
             }));
 
-            ac.add(new Action(async () => {
+            ac.add(new Action(() => {
                 return getTimerPromise(10, 2)
                 .then(() => {
                     throw new Error("Error message.");
@@ -91,12 +91,12 @@ describe("ActionComposite", () =>
         });
 
 
-        it("returns a resolved promise when all actions resolve", async (done) =>
+        it("returns a resolved promise when all actions resolve", (done) =>
         {
             const ac = new ActionComposite();
 
             let action1Done = false;
-            ac.add(new Action(async () =>
+            ac.add(new Action(() =>
             {
                 return getTimerPromise(20, 1)
                 .then(() => {
@@ -105,7 +105,7 @@ describe("ActionComposite", () =>
             }));
 
             let action2Done = false;
-            ac.add(new Action(async () =>
+            ac.add(new Action(() =>
             {
                 return getTimerPromise(10, 2)
                 .then(() => {

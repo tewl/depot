@@ -264,17 +264,17 @@ describe("TaskQueue", () => {
 
         const task1: Task<boolean> = () => {
             return getTimerPromise(10, undefined)
-            .then(() => t1HasResolved = true);
+            .then(() => (t1HasResolved = true));
         };
 
         const task2: Task<boolean> = () => {
             return getTimerPromise(10, undefined)
-            .then(() => t2HasResolved = true);
+            .then(() => (t2HasResolved = true));
         };
 
         const task3: Task<boolean> = () => {
             return getTimerPromise(10, undefined)
-            .then(() => t3HasResolved = true);
+            .then(() => (t3HasResolved = true));
         };
 
         queue.push(task1)
@@ -309,14 +309,14 @@ describe("TaskQueue", () => {
 
         const t1Prom = queue.push(t1)
         .then(
-            (val) => t1Value = val,
-            (err) => t1Error = err
+            (val) => (t1Value = val),
+            (err) => (t1Error = err)
         );
 
         const t2Prom = queue.push(t2)
         .then(
-            (val) => t2Value = val,
-            (err) => t2Error = err
+            (val) => (t2Value = val),
+            (err) => (t2Error = err)
         );
 
         // Cancel the tasks before they have a chance to complete.
@@ -353,14 +353,14 @@ describe("TaskQueue", () => {
 
         const t1Prom = queue.push(t1)
         .then(
-            (val) => t1Value = val,
-            (err) => t1Error = err
+            (val) => (t1Value = val),
+            (err) => (t1Error = err)
         );
 
         const t2Prom = queue.push(t2)
         .then(
-            (val) => t2Value = val,
-            (err) => t2Error = err
+            (val) => (t2Value = val),
+            (err) => (t2Error = err)
         );
 
         // Cancel the tasks before they have a chance to complete.

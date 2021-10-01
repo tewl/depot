@@ -113,12 +113,27 @@
             "always"
         ],
         "accessor-pairs": "error",
+        "array-bracket-newline": [
+            "error",
+            "consistent"
+        ],
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
         "array-callback-return": "error",
         "arrow-parens": [
             "error",
             "always"
         ],
         "block-scoped-var": "error",
+        "block-spacing": "error",
+        "camelcase": "error",
+        "comma-dangle": [
+            "error",
+            "only-multiline"
+        ],
+        "comma-spacing": "error",
         "curly": "error",
         "default-case-last": "error",
         "dot-location": [
@@ -195,8 +210,27 @@
             }
         ],
         "no-extend-native": "error",
+        "no-extra-bind": "error",
+        "no-implicit-coercion": [
+            "error",
+            {
+                "boolean": false,
+                "number": true,
+                "string": true
+            }
+        ],
+        "no-implied-eval": "error",
+        "no-lone-blocks": "error",
+        "no-loop-func": "error",
+        "no-new-func": "error",
+        "no-new-wrappers": "error",
         "no-promise-executor-return": "error",
+        "no-return-assign": "error",
+        "no-return-await": "error",
+        "no-self-compare": "error",
+        "no-sequences": "error",
         "no-template-curly-in-string": "error",
+        "no-unmodified-loop-condition": "error",
         "no-unreachable-loop": "error",
         "no-unsafe-optional-chaining": [
             "error",
@@ -204,11 +238,24 @@
                 "disallowArithmeticOperators": true
             }
         ],
+        "no-unused-expressions": "error",
         "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
         "no-useless-backreference": "error",
+        "no-useless-call": "error",
+        "no-void": "error",
+        "prefer-named-capture-group": "error",
         "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
+        "radix": [
+            "error",
+            "always"
+        ],
         "require-atomic-updates": "error",
-        "semi": "off" // Needs to be off when @typescript-eslint/semi is on
+        "require-await": "error",
+        "semi": "off", // Needs to be off when @typescript-eslint/semi is on
+        "wrap-iife": [
+            "error",
+            "any"
+        ]
     },
     "overrides": [
         {

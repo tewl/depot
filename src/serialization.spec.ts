@@ -3,7 +3,7 @@ import {Model, Person} from "./serializationObjects.spec";
 import {MemoryStore} from "./serialization";
 
 
-describe("MemoryStore", async () => {
+describe("MemoryStore", () => {
 
 
     describe("instance", () => {

@@ -7,7 +7,7 @@ import { diffDirectories, ActionPriority, FileCompareActionType } from "./diffDi
 import {mapAsync} from "./promiseHelpers";
 
 
-describe("diffDirectories()", async () => {
+describe("diffDirectories()", () => {
 
 
     describe("", () => {

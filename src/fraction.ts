@@ -2,8 +2,14 @@ import * as _ from "lodash";
 
 
 // Regular expressions used to parse fraction strings.
+// TODO: Convert the following regex to use named capture groups.
+// eslint-disable-next-line prefer-named-capture-group
 const justWhole = /^(\d+)$/;
+// TODO: Convert the following regex to use named capture groups.
+// eslint-disable-next-line prefer-named-capture-group
 const justFrac  = /^(\d+)\/(\d+)$/;
+// TODO: Convert the following regex to use named capture groups.
+// eslint-disable-next-line prefer-named-capture-group
 const allParts  = /^(\d+) (\d+)\/(\d+)$/;
 
 
@@ -163,9 +169,11 @@ export class Fraction
 
         // A regular expression for a number that may be negative and always has
         // a fractional part.
+        // TODO: Convert the following regex to use named capture groups.
+        // eslint-disable-next-line prefer-named-capture-group
         const numRegex = /^(-?)(\d+)\.(\d+)$/;
 
-        const numStr = "" + num;
+        const numStr = String(num);
         const negativeAdjuster = num < 0 ? -1 : 1;
         const whole = Math.floor(Math.abs(num)) * negativeAdjuster;
 

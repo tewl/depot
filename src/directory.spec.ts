@@ -15,7 +15,7 @@ describe("Directory", () => {
         describe("relative()", () => {
 
 
-            it("will return a Directory representing the path from `from` to `to`", async () => {
+            it("will return a Directory representing the path from `from` to `to`", () => {
 
                 const dirA = new Directory(tmpDir, "dirA");
                 const dirB = new Directory(tmpDir, "dirB");

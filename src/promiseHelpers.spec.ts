@@ -779,7 +779,7 @@ describe("mapAsync()", () =>
     {
         const src = [10, 30, 15];
 
-        const mappedValues = await mapAsync(src, async (curNum) =>
+        const mappedValues = await mapAsync(src, (curNum) =>
         {
             return getTimerPromise(curNum, curNum + 1);
         });
@@ -826,7 +826,7 @@ describe("zipWithAsyncValues()", () => {
     it("will resolve with the expected tuples when all async values are successfully gotten.", async () => {
         const src = [10, 30, 15];
 
-        const pairs = await zipWithAsyncValues(src, async (curNum) => {
+        const pairs = await zipWithAsyncValues(src, (curNum) => {
             return getTimerPromise(curNum, curNum + 1);
         });
 
@@ -871,7 +871,7 @@ describe("filterAsync", () => {
     it("will include values with truthy async values", async () => {
         const src = [10, 31, 16];
 
-        const asyncIsEven = async (curNum: number): Promise<boolean> =>
+        const asyncIsEven = (curNum: number): Promise<boolean> =>
         {
             return getTimerPromise(curNum, curNum % 2 === 0);
         };
@@ -916,7 +916,7 @@ describe("partitionAsync", () =>
     {
         const src = [10, 31, 16];
 
-        const asyncIsEven = async (curNum: number): Promise<boolean> =>
+        const asyncIsEven = (curNum: number): Promise<boolean> =>
         {
             return getTimerPromise(curNum, curNum % 2 === 0);
         };

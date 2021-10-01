@@ -66,10 +66,12 @@ describe("pollAsyncResult()", () => {
         let numInvocations = 0;
         const pollingInterval = 100;
 
-        const asyncResultOp = async () =>
+        const asyncResultOp = () =>
         {
             numInvocations++;
-            return numInvocations === 4 ? succeededResult(4) : failedResult(0);
+            return numInvocations === 4 ?
+                Promise.resolve(succeededResult(4)) :
+                Promise.resolve(failedResult(0));
         };
 
         const result = await pollAsyncResult(asyncResultOp, undefined, pollingInterval, 1000);
@@ -80,8 +82,8 @@ describe("pollAsyncResult()", () => {
 
 
     it("when timing out returns the most recent failure", async () => {
-        const asyncResultOp = async () => {
-            return failedResult(5);
+        const asyncResultOp = () => {
+            return Promise.resolve(failedResult(5));
         };
 
         const result = await pollAsyncResult(asyncResultOp, undefined, 100, 1000);
@@ -93,9 +95,9 @@ describe("pollAsyncResult()", () => {
 
     it("will not stop polling until additional predicate also returns true", async () => {
         let numInvocations = 0;
-        const asyncResultOp = async () => {
+        const asyncResultOp = () => {
             numInvocations++;
-            return succeededResult(numInvocations);
+            return Promise.resolve(succeededResult(numInvocations));
         };
 
         const result = await pollAsyncResult(
@@ -111,8 +113,8 @@ describe("pollAsyncResult()", () => {
 
 
     it("when the operation always succeeds but predicate always fails, returns an error with successful lastResult", async () => {
-        const asyncResultOp = async () => {
-            return succeededResult(3);
+        const asyncResultOp = () => {
+            return Promise.resolve(succeededResult(3));
         };
 
         const result = await pollAsyncResult(

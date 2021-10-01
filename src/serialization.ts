@@ -360,7 +360,7 @@ export abstract class AStore<StowType>
             // result in references to different objects where we need to have
             // references that point to the same object.
             const tasks = _.map(deserializeResult.neededIds, (curNeededId) => {
-                return async () => {
+                return () => {
                     return this.doFirstPassDeserialize(curNeededId, deserializedSoFar, completionFuncs);
                 };
             });
@@ -410,21 +410,21 @@ export class MemoryStore extends AStore<IMemoryStow>
     }
 
 
-    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
+    public getIds(regexp?: RegExp): Promise<Array<IdString>>
     {
         let ids: Array<IdString> = _.keys(this._store);
         if (regexp === undefined) {
-            return ids;
+            return Promise.resolve(ids);
         }
 
         // A regular express has been specified, so filter for the ids that
         // match.
         ids = _.filter(ids, (curId) => regexp.test(curId));
-        return ids;
+        return Promise.resolve(ids);
     }
 
 
-    protected async get(id: IdString): Promise<IStoreGetResult<IMemoryStow>>
+    protected get(id: IdString): Promise<IStoreGetResult<IMemoryStow>>
     {
         // Read the specified data from the backing store.
         const serialized = this._store[id];
@@ -434,12 +434,12 @@ export class MemoryStore extends AStore<IMemoryStow>
         // an ISerialized.
 
         // There is no stowed data for MemoryStore.
-        return {serialized, stow: {}};
+        return Promise.resolve({serialized, stow: {}});
     }
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected async put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>>
+    protected put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>>
     {
         // Transform `serialized` into the backing store's representation.
         // This is not needed for MemoryStore, because it stores the data as
@@ -450,6 +450,6 @@ export class MemoryStore extends AStore<IMemoryStow>
 
         // Return the new stow data that should be placed on the original
         // object. This is not needed for MemoryStore.
-        return {stow: {}};
+        return Promise.resolve({stow: {}});
     }
 }

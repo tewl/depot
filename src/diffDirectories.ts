@@ -65,9 +65,12 @@ export class FileCompareAction
             return this._files.rightFile.delete();
         }
         else if (this._actionType === FileCompareActionType.DELETE_BOTH) {
-            return Promise.all([
-                this._files.leftFile.delete(),
-                this._files.rightFile.delete()])
+            return Promise.all(
+                [
+                    this._files.leftFile.delete(),
+                    this._files.rightFile.delete()
+                ]
+            )
             .then(() => { return; });
         }
         else if (this._actionType === FileCompareActionType.SKIP) {
@@ -409,7 +412,7 @@ export class DiffDirFileItem
     }
 
 
-    public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
+    public actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
     {
         const actions = this._files.actions(actionPriority);
         return actions;

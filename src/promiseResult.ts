@@ -133,7 +133,7 @@ export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG
 //
 // Implementation
 //
-export async function all(
+export function all(
     ...promises: Array<Promise<Result<unknown, unknown>>>
 ): Promise<Result<Array<unknown>, IIndexedItem<unknown>>>
 {
@@ -149,7 +149,7 @@ export async function all(
  * @param param - Description
  * @return Description
  */
-export async function allArray<TSuccess, TFail>(
+export function allArray<TSuccess, TFail>(
     promises: Array<Promise<Result<TSuccess, TFail>>>
 ): Promise<Result<Array<TSuccess>, IIndexedItem<TFail>>>
 {

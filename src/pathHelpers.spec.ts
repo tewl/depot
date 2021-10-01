@@ -13,10 +13,13 @@ describe("reducePathParts()", () => {
 
 
     it("will discard items preceding any Directory object", () => {
-        const result: string = pathHelpers.reducePathParts([
-            "foo",
-            new Directory("bar"),
-            "baz.txt"]);
+        const result: string = pathHelpers.reducePathParts(
+            [
+                "foo",
+                new Directory("bar"),
+                "baz.txt"
+            ]
+        );
         expect(result).toEqual(path.join("bar", "baz.txt"));
     });
 

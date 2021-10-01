@@ -40,7 +40,7 @@ export class Action<TResolve> implements IAction<TResolve>
     }
 
 
-    public async execute(): Promise<TResolve>
+    public execute(): Promise<TResolve>
     {
         return Promise.resolve(this._theFunc());
     }

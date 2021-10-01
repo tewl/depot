@@ -335,6 +335,8 @@ export abstract class AStore<StowType>
         // The object that will eventually be returned.
         const deserialized: ISerializable = deserializeResult.deserializedObj;
         // Add the object to the map of objects that we have deserialized.
+        // TODO: Seems like ESLint has found a problem here.
+        // eslint-disable-next-line require-atomic-updates
         deserializedSoFar[deserialized.id] = deserialized;
 
         // Now that we have the real object, apply the stow data.

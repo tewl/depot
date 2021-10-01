@@ -1,6 +1,9 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": ["tsconfig.json"]
+    },
     "plugins": [
         "@typescript-eslint"
     ],
@@ -14,6 +17,9 @@
         "node": true
     },
     "rules": {
+        "@typescript-eslint/dot-notation": [
+            "error"
+        ],
         "@typescript-eslint/member-ordering": [
             "error",
             {
@@ -106,13 +112,25 @@
             "error",
             "always"
         ],
+        "accessor-pairs": "error",
+        "array-callback-return": "error",
         "arrow-parens": [
             "error",
             "always"
         ],
-        "curly": [
-            "error"
+        "block-scoped-var": "error",
+        "curly": "error",
+        "default-case-last": "error",
+        "dot-location": [
+            "error",
+            "property"
         ],
+        "dot-notation": "off", // Needs to be off when @typescript-eslint/dot-notation is on
+        "grouped-accessor-pairs": [
+            "error",
+            "getBeforeSet"
+        ],
+        "guard-for-in": "error",
         "indent": [
             "error",
             4,
@@ -137,6 +155,11 @@
                 "ObjectExpression": "first",
                 "ImportDeclaration": "first"
             }
+        ],
+        "default-param-last": "error",
+        "eqeqeq": [
+            "error",
+            "always"
         ],
         "key-spacing": [
             "error",
@@ -163,8 +186,28 @@
                 "ignoreRegExpLiterals": true
             }
         ],
+        "no-constructor-return": "error",
+        "no-eq-null": "error",
+        "no-eval": [
+            "error",
+            {
+                "allowIndirect": true
+            }
+        ],
+        "no-extend-native": "error",
+        "no-promise-executor-return": "error",
+        "no-template-curly-in-string": "error",
+        "no-unreachable-loop": "error",
+        "no-unsafe-optional-chaining": [
+            "error",
+            {
+                "disallowArithmeticOperators": true
+            }
+        ],
         "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
+        "no-useless-backreference": "error",
         "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
+        "require-atomic-updates": "error",
         "semi": "off" // Needs to be off when @typescript-eslint/semi is on
     },
     "overrides": [

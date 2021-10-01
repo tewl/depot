@@ -166,7 +166,7 @@
     "overrides": [
         {
             "files": [
-                "*.spec.ts",
+                "*.spec.ts"
             ],
             "rules": {
                 "@typescript-eslint/no-empty-function": "off",

@@ -117,10 +117,7 @@
             "error",
             "consistent"
         ],
-        "array-bracket-spacing": [
-            "error",
-            "never"
-        ],
+        "array-bracket-spacing": ["error", "never"],
         "array-callback-return": "error",
         "arrow-parens": [
             "error",
@@ -129,22 +126,13 @@
         "block-scoped-var": "error",
         "block-spacing": "error",
         "camelcase": "error",
-        "comma-dangle": [
-            "error",
-            "only-multiline"
-        ],
+        "comma-dangle": ["error", "only-multiline"],
         "comma-spacing": "error",
         "curly": "error",
         "default-case-last": "error",
-        "dot-location": [
-            "error",
-            "property"
-        ],
-        "dot-notation": "off", // Needs to be off when @typescript-eslint/dot-notation is on
-        "grouped-accessor-pairs": [
-            "error",
-            "getBeforeSet"
-        ],
+        "dot-location": ["error", "property"],
+        "dot-notation": "off",      // Needs to be off when @typescript-eslint/dot-notation is on
+        "grouped-accessor-pairs": ["error", "getBeforeSet"],
         "guard-for-in": "error",
         "indent": [
             "error",
@@ -172,10 +160,7 @@
             }
         ],
         "default-param-last": "error",
-        "eqeqeq": [
-            "error",
-            "always"
-        ],
+        "eqeqeq": ["error", "always"],
         "key-spacing": [
             "error",
             {
@@ -203,9 +188,7 @@
         ],
         "no-constructor-return": "error",
         "no-eq-null": "error",
-        "no-eval": [
-            "error",
-            {
+        "no-eval": ["error", {
                 "allowIndirect": true
             }
         ],
@@ -232,30 +215,21 @@
         "no-template-curly-in-string": "error",
         "no-unmodified-loop-condition": "error",
         "no-unreachable-loop": "error",
-        "no-unsafe-optional-chaining": [
-            "error",
-            {
+        "no-unsafe-optional-chaining": ["error", {
                 "disallowArithmeticOperators": true
-            }
-        ],
+            }],
         "no-unused-expressions": "error",
-        "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
+        "no-unused-vars": "off",     // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
         "no-useless-backreference": "error",
         "no-useless-call": "error",
         "no-void": "error",
         "prefer-named-capture-group": "error",
         "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
-        "radix": [
-            "error",
-            "always"
-        ],
+        "radix": ["error", "always"],
         "require-atomic-updates": "error",
         "require-await": "error",
-        "semi": "off", // Needs to be off when @typescript-eslint/semi is on
-        "wrap-iife": [
-            "error",
-            "any"
-        ]
+        "semi": "off",               // Needs to be off when @typescript-eslint/semi is on
+        "wrap-iife": ["error", "any"]
     },
     "overrides": [
         {

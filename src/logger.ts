@@ -203,7 +203,7 @@ export class Logger
         }
 
         if (msg.length > 0) {
-            const logMessage = getTimestamp() + " (" + levelLabels[level] + ") " + msg;
+            const logMessage = `${getTimestamp()} (${levelLabels[level]}) ${msg}`;
             _.forEach(this._listeners, (curListener) => {
                 curListener(logMessage);
             });

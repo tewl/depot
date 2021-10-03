@@ -126,6 +126,13 @@
             "error",
             "always"
         ],
+        "arrow-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
         "block-scoped-var": "error",
         "block-spacing": "error",
         "camelcase": "error",
@@ -249,6 +256,7 @@
         "new-parens": "error",
         "no-array-constructor": "error",
         "no-constructor-return": "error",
+        "no-duplicate-imports": "error",
         "no-eq-null": "error",
         "no-eval": [
             "error",
@@ -290,6 +298,14 @@
         "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
         "no-useless-backreference": "error",
         "no-useless-call": "error",
+        "no-useless-computed-key": [
+            "error",
+            {
+                "enforceForClassMembers": true
+            }
+        ],
+        "no-useless-rename": "error",
+        "no-var": "error",
         "no-void": "error",
         "no-whitespace-before-property": "error",
         "object-curly-newline": [
@@ -317,8 +333,16 @@
             "error",
             "always"
         ],
+        "prefer-const": [
+            "error",
+            {
+                "destructuring": "all"
+            }
+        ],
         "prefer-named-capture-group": "error",
         "prefer-object-spread": "error",
+        "prefer-rest-params": "error",
+        "prefer-spread": "error",
         "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
         "radix": [
             "error",
@@ -326,6 +350,7 @@
         ],
         "require-atomic-updates": "error",
         "require-await": "error",
+        "rest-spread-spacing": "error",
         "semi": "off", // Needs to be off when @typescript-eslint/semi is on
         "semi-spacing": [
             "error",
@@ -373,6 +398,7 @@
                 ]
             }
         ],
+        "switch-colon-spacing": "error",
         "wrap-iife": [
             "error",
             "any"

@@ -107,11 +107,11 @@ class ArgInquirer
 
         // Create a string for each argument in the form <name>.
         const argStrings = _.map(this.getArgNames(), (curArgName) => {
-            return "<" + curArgName + ">";
+            return `<${curArgName}>`;
         });
 
         console.log("Usage:");
-        console.log("node " + execName + " " + argStrings.join(" "));
+        console.log(`node ${execName} ${argStrings.join(" ")}`);
     }
 
 }

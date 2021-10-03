@@ -73,7 +73,8 @@ describe("outdent()", () => {
                 "line 1",
                 "line 2",
                 "line 3"
-            ].join("\n"));
+            ].join("\n")
+        );
     });
 
 
@@ -88,7 +89,8 @@ describe("outdent()", () => {
                 "  line 1",
                 " line 2",
                 "line 3"
-            ].join("\n"));
+            ].join("\n")
+        );
     });
 
 

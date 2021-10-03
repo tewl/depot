@@ -239,7 +239,8 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
                 foundTokenizer.predicateReturn,
                 originalExpression,
                 remainingExpressionStartIndex,
-                remainingExpressionStartIndex + matchedLength);
+                remainingExpressionStartIndex + matchedLength
+            );
             tokens.push(token);
 
             remainingExpression = remainingExpression.slice(endIndex);

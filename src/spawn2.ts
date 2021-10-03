@@ -153,7 +153,8 @@ export function spawn(
             const spawnOptions: cp.SpawnOptions = _.defaults(
                 {},
                 options,
-                {stdio: [process.stdin, "pipe", "pipe"]});
+                {stdio: [process.stdin, "pipe", "pipe"]}
+            );
 
             childProcess = cp.spawn(cmd, args, spawnOptions);
 

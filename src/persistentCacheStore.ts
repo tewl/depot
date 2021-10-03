@@ -17,7 +17,8 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
 
     public static create(
         registry: SerializationRegistry,
-        persistentCache: PersistentCache<ISerialized>)
+        persistentCache: PersistentCache<ISerialized>
+    )
     : Promise<PersistentCacheStore>
     {
         const instance = new PersistentCacheStore(registry, persistentCache);
@@ -67,8 +68,8 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
 
     protected async put(
         serialized: ISerialized,
-        stow: undefined | IPersistentCacheStow)// eslint-disable-line @typescript-eslint/no-unused-vars
-    : Promise<IStorePutResult<IPersistentCacheStow>>
+        stow: undefined | IPersistentCacheStow
+    ) : Promise<IStorePutResult<IPersistentCacheStow>>
     {
         // Transform `serialized` into the backing store's representation.
         // This is not needed for PersistentCache, because it stores the data as

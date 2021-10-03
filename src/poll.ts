@@ -132,8 +132,8 @@ export async function pollAsyncResult<TSuccess, TError>(
         async (
             iterationNum,
             startTime,
-            asyncResultPromise)
-        : Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
+            asyncResultPromise
+        ): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
         {
             const result = await asyncResultPromise;
             if (succeeded(result)) {

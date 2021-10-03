@@ -99,7 +99,8 @@ describe("QuickServer", () => {
                 const ipAddress = getFirstExternalIpv4Address();
 
                 const selfSignedCertificate = await SelfSignedCertificate.create(
-                    CertificateCountryCode.US, "Ohio", "Aurora", "Kwp Inc.", "Headquarters", ipAddress);
+                    CertificateCountryCode.US, "Ohio", "Aurora", "Kwp Inc.", "Headquarters", ipAddress
+                );
 
                 const sslConfig: ISslConfig = {
                     key:          selfSignedCertificate.keyData,
@@ -119,7 +120,8 @@ describe("QuickServer", () => {
                 const ipAddress = getFirstExternalIpv4Address();
 
                 const selfSignedCertificate = await SelfSignedCertificate.create(
-                    CertificateCountryCode.US, "Ohio", "Aurora", "Kwp Inc.", "Headquarters", ipAddress);
+                    CertificateCountryCode.US, "Ohio", "Aurora", "Kwp Inc.", "Headquarters", ipAddress
+                );
 
                 const sslConfig: ISslConfig = {
                     key:          selfSignedCertificate.keyData,

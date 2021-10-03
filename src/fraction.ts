@@ -157,7 +157,8 @@ export class Fraction
         }
 
         throw new Error(
-            `The string '${str}' cannot be converted into a Fraction.`);
+            `The string '${str}' cannot be converted into a Fraction.`
+        );
     }
 
 

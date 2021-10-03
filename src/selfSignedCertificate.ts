@@ -49,7 +49,8 @@ export class SelfSignedCertificate
 
         // Create the new instance.
         const instance = new SelfSignedCertificate(
-            countryCode, state, location, organization, organizationalUnit, commonName, keyData, certData);
+            countryCode, state, location, organization, organizationalUnit, commonName, keyData, certData
+        );
 
         // Cleanup
         await Promise.all([keyFile.delete(), certFile.delete()]);

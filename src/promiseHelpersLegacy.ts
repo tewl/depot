@@ -30,6 +30,7 @@ export function allSettled(promises: Array<Promise<unknown>>): Promise<Array<BBP
 
     const wrappedPromises: Array<BBPromise.Inspection<unknown>> = _.map(
         promises,
-        (curPromise: Promise<unknown>) => BBPromise.resolve(curPromise).reflect());
+        (curPromise: Promise<unknown>) => BBPromise.resolve(curPromise).reflect()
+    );
     return Promise.all(wrappedPromises);
 }

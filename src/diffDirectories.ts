@@ -450,9 +450,9 @@ export async function diffDirectories(
     .then((leftFiles) => {
         return _.map(
             leftFiles,
-            (curLeftFile) => DiffDirFileItem.create(leftDir,
-                                                    rightDir,
-                                                    path.relative(leftDir.toString(), curLeftFile.toString())));
+            (curLeftFile) => DiffDirFileItem.create(leftDir, rightDir,
+                                                    path.relative(leftDir.toString(), curLeftFile.toString()))
+        );
     });
 
     //

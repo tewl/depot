@@ -454,7 +454,8 @@ describe("promiseWhile()", () => {
                             val = val + "a";
                             resolve();
                         },
-                        0);
+                        0
+                    );
                 });
             }
         ).then(() => {

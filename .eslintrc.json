@@ -16,8 +16,35 @@
         "node": true
     },
     "rules": {
+        "@typescript-eslint/comma-dangle": [
+            "error",
+            "only-multiline"
+        ],
+        "@typescript-eslint/comma-spacing": "error",
         "@typescript-eslint/dot-notation": [
             "error"
+        ],
+        "@typescript-eslint/func-call-spacing": [
+            "error"
+        ],
+        "@typescript-eslint/default-param-last": [
+            "error"
+        ],
+        "@typescript-eslint/indent": "off", // Docs say this rule is broken. Use eslint one.
+        "@typescript-eslint/keyword-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "@typescript-eslint/lines-between-class-members": [
+            "error",
+            "always",
+            {
+                "exceptAfterSingleLine": true,
+                "exceptAfterOverload": true
+            }
         ],
         "@typescript-eslint/member-ordering": [
             "error",
@@ -90,7 +117,11 @@
             }
         ],
         "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-loop-func": [
+            "error"
+        ],
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unused-expressions": "error",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {
@@ -107,9 +138,18 @@
                 "allowTemplateLiterals": true
             }
         ],
+        "@typescript-eslint/require-await": "error",
         "@typescript-eslint/semi": [
             "error",
             "always"
+        ],
+        "@typescript-eslint/space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "always"
+            }
         ],
         "accessor-pairs": "error",
         "array-bracket-newline": [
@@ -135,11 +175,8 @@
         "block-scoped-var": "error",
         "block-spacing": "error",
         "camelcase": "error",
-        "comma-dangle": [
-            "error",
-            "only-multiline"
-        ],
-        "comma-spacing": "error",
+        "comma-dangle": "off", // Must be off when @typescript-eslint/comma-dangle is on
+        "comma-spacing": "off", // Must be off when @typescript-eslint/comma-spacing is on
         "comma-style": [
             "error",
             "last"
@@ -154,13 +191,18 @@
         ],
         "curly": "error",
         "default-case-last": "error",
+        "default-param-last": "off", // Must be off when @typescript-eslint/default-param-last is on
         "dot-location": [
             "error",
             "property"
         ],
-        "dot-notation": "off", // Needs to be off when @typescript-eslint/dot-notation is on
+        "dot-notation": "off", // Must be off when @typescript-eslint/dot-notation is on
         "eol-last": "error",
-        "func-call-spacing": "error",
+        "eqeqeq": [
+            "error",
+            "always"
+        ],
+        "func-call-spacing": "off", // Must be off when @typescript-eslint/func-call-spacing is on
         "func-name-matching": [
             "error",
             "always",
@@ -208,11 +250,6 @@
                 "ImportDeclaration": "first"
             }
         ],
-        "default-param-last": "error",
-        "eqeqeq": [
-            "error",
-            "always"
-        ],
         "key-spacing": [
             "error",
             {
@@ -224,21 +261,9 @@
                 }
             }
         ],
-        "keyword-spacing": [
-            "error",
-            {
-                "before": true,
-                "after": true
-            }
-        ],
+        "keyword-spacing": "off", // Must be off when @typescript-eslint/keyword-spacing is on
         "linebreak-style": "off",
-        "lines-between-class-members": [
-            "error",
-            "always",
-            {
-                "exceptAfterSingleLine": true
-            }
-        ],
+        "lines-between-class-members": "off", // Must be off when @typescript-eslint/lines-between-class-members is on
         "max-len": [
             "error",
             {
@@ -253,7 +278,6 @@
             }
         ],
         "new-parens": "error",
-        "no-array-constructor": "error",
         "no-constructor-return": "error",
         "no-duplicate-imports": "error",
         "no-eq-null": "error",
@@ -275,7 +299,7 @@
         ],
         "no-implied-eval": "error",
         "no-lone-blocks": "error",
-        "no-loop-func": "error",
+        "no-loop-func": "off", // Must be off when @typescript-eslint/no-loop-func is on
         "no-new-func": "error",
         "no-new-wrappers": "error",
         "no-promise-executor-return": "error",
@@ -293,8 +317,8 @@
                 "disallowArithmeticOperators": true
             }
         ],
-        "no-unused-expressions": "error",
-        "no-unused-vars": "off", // Must be turned off when the following @typescript-eslint/no-unused-vars is defined.
+        "no-unused-expressions": "off", // Must be off when @typescript-eslint/no-unused-expressions is on
+        "no-unused-vars": "off", // Must be off when @typescript-eslint/no-unused-vars is on
         "no-useless-backreference": "error",
         "no-useless-call": "error",
         "no-useless-computed-key": [
@@ -348,9 +372,9 @@
             "always"
         ],
         "require-atomic-updates": "error",
-        "require-await": "error",
+        "require-await": "off", // Must be off when @typescript-eslint/require-await is on
         "rest-spread-spacing": "error",
-        "semi": "off", // Needs to be off when @typescript-eslint/semi is on
+        "semi": "off", // Must be off when @typescript-eslint/semi is on
         "semi-spacing": [
             "error",
             {
@@ -366,14 +390,7 @@
             "error",
             "always"
         ],
-        "space-before-function-paren": [
-            "error",
-            {
-                "anonymous": "always",
-                "named": "never",
-                "asyncArrow": "always"
-            }
-        ],
+        "space-before-function-paren": "off", // Must be off when @typescript-eslint/space-before-function-paren is on
         "space-unary-ops": [
             "error",
             {

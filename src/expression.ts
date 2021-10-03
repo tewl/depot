@@ -228,7 +228,7 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 
     while (remainingExpression.length > 0) {
 
-        // eslint-disable-next-line no-loop-func
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
         const foundTokenizer = find(tokenizers, (curTokenizer) => curTokenizer.matcherFn(remainingExpression));
         if (foundTokenizer) {
             const matchedText = foundTokenizer.predicateReturn[0];

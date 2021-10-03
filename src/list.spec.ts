@@ -415,7 +415,7 @@ describe("List", () => {
 
             it = list.end();
             expect(() => {
-                it.value;   // eslint-disable-line no-unused-expressions
+                it.value;   // eslint-disable-line @typescript-eslint/no-unused-expressions
             }).toThrowError("Attempted to get value from an iterator at end().");
 
             it.prev();

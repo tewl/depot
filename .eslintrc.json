@@ -342,6 +342,37 @@
             "error",
             "always"
         ],
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
+        "space-unary-ops": [
+            "error",
+            {
+                "words": true,
+                "nonwords": false
+            }
+        ],
+        "spaced-comment": [
+            "error",
+            "always",
+            {
+                "exceptions": [
+                    "-",
+                    "+",
+                    "=",
+                    "/",
+                    "*"
+                ],
+                "markers": [
+                    "/"
+                ]
+            }
+        ],
         "wrap-iife": [
             "error",
             "any"

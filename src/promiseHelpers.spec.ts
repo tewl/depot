@@ -428,7 +428,7 @@ describe("retryWhile()", () => {
                 expect(value).toEqual("bar");
                 done();
             },
-            (/*err: any*/) => {
+            () => {
                 fail("The promise should not have rejected.");
             }
         );
@@ -448,7 +448,7 @@ describe("promiseWhile()", () => {
                 return val.length < 5;
             },
             () => {
-                return new Promise<void>((resolve: () => void/*, reject: () => void*/) => {
+                return new Promise<void>((resolve: () => void) => {
                     setTimeout(
                         () => {
                             val = val + "a";

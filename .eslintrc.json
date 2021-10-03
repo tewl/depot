@@ -163,10 +163,7 @@
                 "includeCommonJSModuleExports": true
             }
         ],
-        "func-names": [
-            "error",
-            "as-needed"
-        ],
+        "func-names": "off", // Nameless functions are used frequently in many frameworks such as Express
         "function-paren-newline": [
             "error",
             "consistent"

@@ -229,6 +229,13 @@
             }
         ],
         "linebreak-style": "off",
+        "lines-between-class-members": [
+            "error",
+            "always",
+            {
+                "exceptAfterSingleLine": true
+            }
+        ],
         "max-len": [
             "error",
             {
@@ -242,6 +249,8 @@
                 "ignoreRegExpLiterals": true
             }
         ],
+        "new-parens": "error",
+        "no-array-constructor": "error",
         "no-constructor-return": "error",
         "no-eq-null": "error",
         "no-eval": [
@@ -270,7 +279,9 @@
         "no-self-compare": "error",
         "no-sequences": "error",
         "no-template-curly-in-string": "error",
+        "no-trailing-spaces": "error",
         "no-unmodified-loop-condition": "error",
+        "no-unneeded-ternary": "error",
         "no-unreachable-loop": "error",
         "no-unsafe-optional-chaining": [
             "error",

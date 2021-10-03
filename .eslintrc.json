@@ -291,7 +291,34 @@
         "no-useless-backreference": "error",
         "no-useless-call": "error",
         "no-void": "error",
+        "no-whitespace-before-property": "error",
+        "object-curly-newline": [
+            "error",
+            {
+                "consistent": true
+            }
+        ],
+        "object-property-newline": [
+            "error",
+            {
+                "allowAllPropertiesOnSameLine": true
+            }
+        ],
+        "one-var": [
+            "error",
+            {
+                "var": "never",
+                "let": "never",
+                "const": "never",
+                "separateRequires": true
+            }
+        ],
+        "one-var-declaration-per-line": [
+            "error",
+            "always"
+        ],
         "prefer-named-capture-group": "error",
+        "prefer-object-spread": "error",
         "quotes": "off", // Needs to be off when @typescript-eslint/quotes is on
         "radix": [
             "error",
@@ -300,6 +327,21 @@
         "require-atomic-updates": "error",
         "require-await": "error",
         "semi": "off", // Needs to be off when @typescript-eslint/semi is on
+        "semi-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "semi-style": [
+            "error",
+            "last"
+        ],
+        "space-before-blocks": [
+            "error",
+            "always"
+        ],
         "wrap-iife": [
             "error",
             "any"

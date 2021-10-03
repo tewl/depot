@@ -2,7 +2,8 @@ import * as net from "net";
 import * as _ from "lodash";
 import {
     getExternalIpv4Addresses, isTcpPortAvailable, getAvailableTcpPort,
-    selectAvailableTcpPort, determinePort} from "./networkHelpers";
+    selectAvailableTcpPort, determinePort
+} from "./networkHelpers";
 
 
 interface IServerInfo {

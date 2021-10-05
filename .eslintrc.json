@@ -191,6 +191,9 @@
                 "asyncArrow": "always"
             }
         ],
+        "@typescript-eslint/type-annotation-spacing": [
+            "error"
+        ],
         "accessor-pairs": "error",
         "array-bracket-newline": [
             "error",

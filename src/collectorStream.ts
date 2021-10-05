@@ -6,7 +6,7 @@ export class CollectorStream extends Transform
 {
     // region Private Members
     private _collected: Buffer;
-    private _flushedDeferred: Deferred<void>;
+    private readonly _flushedDeferred: Deferred<void>;
     // endregion
 
 

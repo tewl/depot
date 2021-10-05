@@ -125,6 +125,9 @@
             "error"
         ],
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": [
+            "error"
+        ],
         "@typescript-eslint/no-unused-expressions": "error",
         "@typescript-eslint/no-unused-vars": [
             "error",
@@ -133,6 +136,39 @@
                 "args": "none", // It's ok to have unused args to b/c they provide signature documentation
                 "caughtErrors": "none"
             }
+        ],
+        "@typescript-eslint/prefer-for-of": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-function-type": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-includes": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-literal-enum-member": [
+            "error",
+            {
+                "allowBitwiseExpressions": true
+            }
+        ],
+        "@typescript-eslint/prefer-optional-chain": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-readonly": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-reduce-type-parameter": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-return-this-type": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-string-starts-ends-with": [
+            "error"
+        ],
+        "@typescript-eslint/prefer-ts-expect-error": [
+            "error"
         ],
         "@typescript-eslint/quotes": [
             "error",

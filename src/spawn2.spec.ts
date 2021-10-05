@@ -101,9 +101,12 @@ describe("spawn", () => {
         }
 
         expect(result.error.exitCode).not.toEqual(0);
-        const windowsMsgRegex = /File Not Found/;
-        const macMsgRegex = /No such file or directory/;
-        expect(windowsMsgRegex.test(result.error.stderr) || macMsgRegex.test(result.error.stderr)).toBeTruthy();
+        const windowsMsgRegex = "File Not Found";
+        const macMsgRegex = "No such file or directory";
+        expect(
+            result.error.stderr.includes(windowsMsgRegex) ||
+            result.error.stderr.includes(macMsgRegex)
+        ).toBeTruthy();
     });
 
 

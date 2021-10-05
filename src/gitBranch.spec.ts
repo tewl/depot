@@ -257,7 +257,7 @@ describe("GitBranch", () => {
                 const tracked = await featureBranch.getTrackedBranch();
                 expect(tracked).toBeTruthy();
                 expect(tracked!.isRemote()).toEqual(true);
-            });
+            }, 1000 * 10);
 
         });
 

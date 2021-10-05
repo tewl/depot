@@ -24,7 +24,7 @@ export class GitBranch
     // group 3: "branch/name"         (the branch name)
     // TODO: Convert the following regex to use named capture groups.
     // eslint-disable-next-line prefer-named-capture-group
-    private static _strParserRegex = /^(remotes\/([\w.-]+)\/)?(.*)$/;
+    private static readonly _strParserRegex = /^(remotes\/([\w.-]+)\/)?(.*)$/;
     // endregion
 
 

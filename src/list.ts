@@ -195,7 +195,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @param value - The value to be appended
      * @returns This list (to allow chaining)
      */
-    public push(value: ValueType): List<ValueType> {
+    public push(value: ValueType): this {
         this.insertNode(this._end, value);
 
         // Return this to allow chaining.

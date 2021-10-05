@@ -297,7 +297,7 @@ export class Directory
     }
 
 
-    public ensureExistsSync(): Directory
+    public ensureExistsSync(): this
     {
         if (this.existsSync())
         {
@@ -357,7 +357,7 @@ export class Directory
     }
 
 
-    public emptySync(): Directory
+    public emptySync(): this
     {
         this.deleteSync();
         return this.ensureExistsSync();

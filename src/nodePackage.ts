@@ -73,7 +73,7 @@ export class NodePackage
 
 
     // region Data members
-    private _pkgDir: Directory;
+    private readonly _pkgDir: Directory;
     private _config: undefined | IPackageJson;
     // endregion
 

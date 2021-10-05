@@ -729,7 +729,7 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
         readStream.pipe(writeStream);
     })
     .then(() => {
-        if (options && options.preserveTimestamps)
+        if (options?.preserveTimestamps)
         {
             //
             // The caller wants to preserve the source file's timestamps.  Copy
@@ -771,7 +771,7 @@ function copyFileSync(sourceFilePath: string, destFilePath: string, options?: IC
     const data: Buffer = fs.readFileSync(sourceFilePath);
     fs.writeFileSync(destFilePath, data);
 
-    if (options && options.preserveTimestamps)
+    if (options?.preserveTimestamps)
     {
         const srcStats = fs.statSync(sourceFilePath);
         fs.utimesSync(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000);

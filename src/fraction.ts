@@ -126,7 +126,7 @@ export class Fraction
         str = _.trim(str);
 
         let negativeAdjuster = 1;   // If positive, multiply by 1
-        if (str[0] === "-") {
+        if (str.startsWith("-")) {
             negativeAdjuster = -1;  // If negative, will multiply by -1
             str = str.slice(1);
         }

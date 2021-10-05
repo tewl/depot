@@ -1288,7 +1288,7 @@ describe("Directory", () => {
                 const handler = (item: Directory | File) => {
                     encountered.push(item.toString());
                     // Do not recurse into dirAA.
-                    return !/dirAA$/.test(item.toString());
+                    return !item.toString().endsWith("dirAA");
                 };
 
                 await tmpDir.walk(handler);

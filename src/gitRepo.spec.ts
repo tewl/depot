@@ -412,7 +412,7 @@ describe("GitRepo", () => {
                 // the fetchTags parameter only needs to be set when getting
                 // tags that point to commits that would not normally be
                 // downloaded.
-            });
+            }, 1000 * 10);
 
         });
 

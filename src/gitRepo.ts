@@ -353,7 +353,7 @@ export class GitRepo
     {
         return this.tags()
         .then((tags) => {
-            return tags.indexOf(tagName) >= 0;
+            return tags.includes(tagName);
         });
     }
 

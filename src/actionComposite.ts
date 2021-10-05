@@ -22,7 +22,7 @@ export class ActionComposite implements IAction<void>
     }
 
 
-    public add(...newActions: Array<IAction<unknown>>): ActionComposite
+    public add(...newActions: Array<IAction<unknown>>): this
     {
         this._actions = _.concat(this._actions, newActions);
         return this;

@@ -126,7 +126,7 @@ export class QuickServer
         // be able to walk the certificate chain back to a root CA.  Typically,
         // this would cause a "self signed certificate" error.  To get around
         // this, we will not require this authorization.
-        if (this._sslConfig && this._sslConfig.isSelfSigned) {
+        if (this._sslConfig?.isSelfSigned) {
             requestOptions.rejectUnauthorized = false;
         }
 

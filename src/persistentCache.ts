@@ -236,7 +236,7 @@ function isValidFilesystemName(name: string): boolean {
     const illegalChars = getIllegalChars();
 
     for (const curIllegalChar of illegalChars) {
-        if (name.indexOf(curIllegalChar) >= 0) {
+        if (name.includes(curIllegalChar)) {
             return false;
         }
     }

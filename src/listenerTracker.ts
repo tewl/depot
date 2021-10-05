@@ -15,7 +15,7 @@ import {EventEmitter} from "events";
 export class ListenerTracker
 {
 
-    private _emitter: EventEmitter;
+    private readonly _emitter: EventEmitter;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _listenerMap: { [eventName: string]: Array<(...args: Array<any>) => void>; };
 

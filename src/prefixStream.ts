@@ -10,7 +10,7 @@ export class PrefixStream extends Transform
     // region Private Members
     private readonly _prefixBuf: Buffer;
     private _partial: Buffer | undefined;
-    private _flushedDeferred: Deferred<void>;
+    private readonly _flushedDeferred: Deferred<void>;
     // endregion
 
 
@@ -27,7 +27,7 @@ export class PrefixStream extends Transform
         // Convert to a Buffer.
         const chunkBuf: Buffer = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
 
-        this._partial = (this._partial && this._partial.length) ?
+        this._partial = (this._partial?.length) ?
             Buffer.concat([this._partial, chunkBuf]) :
             chunkBuf;
 
@@ -46,7 +46,7 @@ export class PrefixStream extends Transform
 
     public override _flush(done: () => unknown): void
     {
-        if (this._partial && this._partial.length)
+        if (this._partial?.length)
         {
             this.push(Buffer.concat([this._prefixBuf, this._partial]));
         }

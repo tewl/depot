@@ -28,7 +28,7 @@ export class PriorityQueue<PayloadType>
 {
 
     // region Data Members
-    private _heap: Heap<IPriorityQueueItem<PayloadType>>;
+    private readonly _heap: Heap<IPriorityQueueItem<PayloadType>>;
     // endregion
 
 

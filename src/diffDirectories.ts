@@ -24,8 +24,8 @@ export enum FileCompareActionType
 export class FileCompareAction
 {
 
-    private _files: IFilesToCompare;
-    private _actionType: FileCompareActionType;
+    private readonly _files: IFilesToCompare;
+    private readonly _actionType: FileCompareActionType;
 
     public constructor(
         files: IFilesToCompare,
@@ -100,8 +100,8 @@ export class FileComparer implements IFilesToCompare
 
 
     // #region Data Members
-    private _leftFile: File;
-    private _rightFile: File;
+    private readonly _leftFile: File;
+    private readonly _rightFile: File;
     // #endregion
 
 
@@ -306,10 +306,10 @@ export class DiffDirFileItem
 
 
     // #region Data Members
-    private _leftRootDir:           Directory;
-    private _rightRootDir:          Directory;
-    private _relativeFilePath:      string;
-    private _files:                 IFilesToCompare;
+    private readonly _leftRootDir:           Directory;
+    private readonly _rightRootDir:          Directory;
+    private readonly _relativeFilePath:      string;
+    private readonly _files:                 IFilesToCompare;
     // #endregion
 
 

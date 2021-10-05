@@ -19,7 +19,7 @@ export class TaskQueue extends EventEmitter
 
     // region Private Members
     private readonly _numConcurrentTasks: number | undefined;
-    private _tasks: PriorityQueue<ITaskInfo<any>>;  // eslint-disable-line @typescript-eslint/no-explicit-any
+    private readonly _tasks: PriorityQueue<ITaskInfo<any>>;  // eslint-disable-line @typescript-eslint/no-explicit-any
     private _numRunning: number;
     private _isProcessingLastFulfillment: boolean;
     private _isRunning: boolean;

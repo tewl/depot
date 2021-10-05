@@ -27,7 +27,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
 
 
     // region Data Members
-    private _pcache: PersistentCache<ISerialized>;
+    private readonly _pcache: PersistentCache<ISerialized>;
     // endregion
 
 

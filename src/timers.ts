@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 export class Timeout extends EventEmitter
 {
     // region Events
-    public static readonly EVENT_EXPIRED: string = "expired";
+    public static readonly eventNameExpired: "expired" = "expired";
     // endregion
 
     private readonly _periodMs: number;
@@ -39,7 +39,7 @@ export class Timeout extends EventEmitter
 
         this._timeoutId = setTimeout(() => {
             this._timeoutId = undefined;
-            this.emit(Timeout.EVENT_EXPIRED);
+            this.emit(Timeout.eventNameExpired);
         }, this._periodMs);
     }
 

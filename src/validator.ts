@@ -7,7 +7,7 @@ import {mapAsync} from "./promiseHelpers";
  * function accepts the subject as its only parameter and returns a boolean or a
  * Promise for a boolean.
  */
-type ValidatorFunc<SubjectType> = (subject: SubjectType) => boolean | Promise<boolean>;
+type ValidatorFunc<TSubject> = (subject: TSubject) => boolean | Promise<boolean>;
 
 
 /**
@@ -15,10 +15,10 @@ type ValidatorFunc<SubjectType> = (subject: SubjectType) => boolean | Promise<bo
  * invoking an array of validator functions on that subject.  This class is
  * templated on the type of the subject to be validated.
  */
-export class Validator<SubjectType>
+export class Validator<TSubject>
 {
     // region Data Members
-    private readonly _validatorFuncs: Array<ValidatorFunc<SubjectType>>;
+    private readonly _validatorFuncs: Array<ValidatorFunc<TSubject>>;
     // endregion
 
 
@@ -30,7 +30,7 @@ export class Validator<SubjectType>
      * boolean or Promise<boolean> (true=valid, false=invalid).  If an async
      * function rejects, the subject is assumed to be invalid.
      */
-    public constructor(validatorFuncs: Array<ValidatorFunc<SubjectType>>)
+    public constructor(validatorFuncs: Array<ValidatorFunc<TSubject>>)
     {
         this._validatorFuncs = validatorFuncs;
     }
@@ -42,7 +42,7 @@ export class Validator<SubjectType>
      * @return A promise for the validity of subject.  This promise will never
      * reject.
      */
-    public isValid(subject: SubjectType): Promise<boolean>
+    public isValid(subject: TSubject): Promise<boolean>
     {
         return mapAsync(this._validatorFuncs, (curValidatorFunc) => {
             const result: Promise<boolean> | boolean = curValidatorFunc(subject);

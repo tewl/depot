@@ -1,16 +1,16 @@
 import {Heap, CompareResult} from "./heap";
 
 
-interface IPriorityQueueItem<PayloadType>
+interface IPriorityQueueItem<TPayload>
 {
     priority: number;
-    payload:  PayloadType;
+    payload:  TPayload;
 }
 
 
-function comparePriority<PayloadType>(
-    itemA: IPriorityQueueItem<PayloadType>,
-    itemB: IPriorityQueueItem<PayloadType>
+function comparePriority<TPayload>(
+    itemA: IPriorityQueueItem<TPayload>,
+    itemB: IPriorityQueueItem<TPayload>
 ): CompareResult {
     if (itemA.priority < itemB.priority) {
         return CompareResult.LESS;
@@ -24,17 +24,17 @@ function comparePriority<PayloadType>(
 }
 
 
-export class PriorityQueue<PayloadType>
+export class PriorityQueue<TPayload>
 {
 
     // region Data Members
-    private readonly _heap: Heap<IPriorityQueueItem<PayloadType>>;
+    private readonly _heap: Heap<IPriorityQueueItem<TPayload>>;
     // endregion
 
 
     public constructor()
     {
-        this._heap = new Heap<IPriorityQueueItem<PayloadType>>(comparePriority);
+        this._heap = new Heap<IPriorityQueueItem<TPayload>>(comparePriority);
     }
 
 
@@ -50,21 +50,21 @@ export class PriorityQueue<PayloadType>
     }
 
 
-    public push(payload: PayloadType, priority: number): void
+    public push(payload: TPayload, priority: number): void
     {
         this._heap.push({priority: priority,
                          payload:  payload});
     }
 
 
-    public peak(): PayloadType | undefined
+    public peak(): TPayload | undefined
     {
         const item = this._heap.peak();
         return item === undefined ? undefined : item.payload;
     }
 
 
-    public pop(): PayloadType | undefined
+    public pop(): TPayload | undefined
     {
         const item = this._heap.pop();
         return item === undefined ? undefined : item.payload;

@@ -95,10 +95,40 @@
         "@typescript-eslint/naming-convention": [
             "error",
             {
+                "selector": "default",
+                "format": [
+                    "camelCase"
+                ],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            },
+            {
+                "selector": "variable",
+                "format": [
+                    "camelCase",
+                    "UPPER_CASE"
+                ],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            },
+            {
                 "selector": "typeLike",
                 "format": [
                     "PascalCase"
                 ]
+            },
+            {
+                // Angular module variables (ending in "Module") should be PascalCase
+                "selector": [
+                    "variable"
+                ],
+                "format": [
+                    "PascalCase"
+                ],
+                "filter": {
+                    "regex": "^.*Module$",
+                    "match": true
+                }
             },
             {
                 "selector": "interface",
@@ -110,6 +140,15 @@
                 ]
             },
             {
+                "selector": "typeParameter",
+                "format": [
+                    "PascalCase"
+                ],
+                "prefix": [
+                    "T"
+                ]
+            },
+            {
                 "selector": "classProperty",
                 "format": [
                     "camelCase"
@@ -118,9 +157,20 @@
                     "private"
                 ],
                 "leadingUnderscore": "require"
+            },
+            {
+                "selector": "enumMember",
+                "format": [
+                    "camelCase",
+                    "UPPER_CASE"
+                ]
             }
         ],
         "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-inferrable-types": [
+            // There's nothing wrong about being explicit.
+            "off"
+        ],
         "@typescript-eslint/no-loop-func": [
             "error"
         ],
@@ -204,6 +254,8 @@
             "never"
         ],
         "array-callback-return": "error",
+        // Sometimes adding curly braces to an arrow function can help, especially when the returned expression is complicated.
+        "arrow-body-style": "off",
         "arrow-parens": [
             "error",
             "always"
@@ -351,6 +403,9 @@
         "no-sequences": "error",
         "no-template-curly-in-string": "error",
         "no-trailing-spaces": "error",
+        "no-underscore-dangle": [
+            "off"
+        ],
         "no-unmodified-loop-condition": "error",
         "no-unneeded-ternary": "error",
         "no-unreachable-loop": "error",
@@ -399,6 +454,8 @@
             "error",
             "always"
         ],
+        // Sometimes regular named functions are preferrable because their name shows up in call stacks.
+        "prefer-arrow/prefer-arrow-functions": "off",
         "prefer-const": [
             "error",
             {

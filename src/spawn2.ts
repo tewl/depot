@@ -72,7 +72,7 @@ export type SpawnError = ISpawnSystemError | ISpawnExitError;
  * @param err - The error to convert
  * @return The string representation
  */
-export function SpawnErrorToString(err: SpawnError): string
+export function spawnErrorToString(err: SpawnError): string
 {
     switch (err.type) {
         case "ISpawnSystemError":

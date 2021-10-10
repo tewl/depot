@@ -255,8 +255,8 @@ class CacheEntry<T> {
      * @param serialized - The serialized CacheEntry
      * @return A CacheEntry instance
      */
-    public static deserialize<U>(serialized: {payload: U}): CacheEntry<U> {
-        return new CacheEntry<U>(serialized.payload);
+    public static deserialize<TPayload>(serialized: {payload: TPayload}): CacheEntry<TPayload> {
+        return new CacheEntry<TPayload>(serialized.payload);
     }
 
 

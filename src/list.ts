@@ -1,16 +1,16 @@
 import {advance, partition} from "./algorithm";
 
-function link<ValueType>(prev: DLNodeAny<ValueType>, next: DLNodeAny<ValueType>): void {
+function link<TValue>(prev: DLNodeAny<TValue>, next: DLNodeAny<TValue>): void {
     prev.next = next;
     next.prev = prev;
 }
 
 
-class DLNodeEnd<ValueType> {
+class DLNodeEnd<TValue> {
 
     // region Data Members
-    private _prev: DLNodeAny<ValueType>;
-    private _next: DLNodeAny<ValueType>;
+    private _prev: DLNodeAny<TValue>;
+    private _next: DLNodeAny<TValue>;
     // endregion
 
 
@@ -25,26 +25,26 @@ class DLNodeEnd<ValueType> {
     }
 
 
-    public get prev(): DLNodeAny<ValueType> {
+    public get prev(): DLNodeAny<TValue> {
         if (this._prev === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a previous node.");
         }
         return this._prev;
     }
 
-    public set prev(prev: DLNodeAny<ValueType>) {
+    public set prev(prev: DLNodeAny<TValue>) {
         this._prev = prev;
     }
 
 
-    public get next(): DLNodeAny<ValueType> {
+    public get next(): DLNodeAny<TValue> {
         if (this._next === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a next node.");
         }
         return this._next;
     }
 
-    public set next(next: DLNodeAny<ValueType>) {
+    public set next(next: DLNodeAny<TValue>) {
         this._next = next;
     }
 }
@@ -54,12 +54,12 @@ class DLNodeEnd<ValueType> {
  * Class that represents a node in a doubly linked list.  The nodes form a
  * circle where there is one special "end" node that has a value of undefined.
  */
-class DLNodeValue<ValueType>  // tslint:disable-line:max-classes-per-file
+class DLNodeValue<TValue>  // tslint:disable-line:max-classes-per-file
 {
     // region Data Members
-    private _prev: DLNodeAny<ValueType> | undefined;
-    private _next: DLNodeAny<ValueType> | undefined;
-    private _value: ValueType;
+    private _prev: DLNodeAny<TValue> | undefined;
+    private _next: DLNodeAny<TValue> | undefined;
+    private _value: TValue;
     // endregion
 
 
@@ -67,7 +67,7 @@ class DLNodeValue<ValueType>  // tslint:disable-line:max-classes-per-file
      * Constructs a new DLNode with the specified value.
      * @param value - The payload to be stored at this node
      */
-    constructor(value: ValueType) {
+    constructor(value: TValue) {
         this._value = value;
     }
 
@@ -77,36 +77,36 @@ class DLNodeValue<ValueType>  // tslint:disable-line:max-classes-per-file
     }
 
 
-    public get prev(): DLNodeAny<ValueType> {
+    public get prev(): DLNodeAny<TValue> {
         if (this._prev === undefined) {
             throw new Error("DLNodeValue instance has not been linked to a previous node.");
         }
         return this._prev;
     }
 
-    public set prev(prev: DLNodeAny<ValueType>) {
+    public set prev(prev: DLNodeAny<TValue>) {
         this._prev = prev;
     }
 
 
-    public get next(): DLNodeAny<ValueType> {
+    public get next(): DLNodeAny<TValue> {
         if (this._next === undefined) {
             throw new Error("DLNodeValue instance has not been linked to a next node.");
         }
         return this._next;
     }
 
-    public set next(next: DLNodeAny<ValueType>) {
+    public set next(next: DLNodeAny<TValue>) {
         this._next = next;
     }
 
 
-    public get value(): ValueType {
+    public get value(): TValue {
         return this._value;
     }
 
 
-    public set value(val: ValueType) {
+    public set value(val: TValue) {
         this._value = val;
     }
 
@@ -116,7 +116,7 @@ class DLNodeValue<ValueType>  // tslint:disable-line:max-classes-per-file
 
 // A union type of all possible node types.
 // The discriminant is the `nodeType` property.
-type DLNodeAny<ValueType> = DLNodeEnd<ValueType> | DLNodeValue<ValueType>;
+type DLNodeAny<TValue> = DLNodeEnd<TValue> | DLNodeValue<TValue>;
 
 
 /**
@@ -125,17 +125,17 @@ type DLNodeAny<ValueType> = DLNodeEnd<ValueType> | DLNodeValue<ValueType>;
  * This linked list is implemented as a circular linked list with one node being
  * the "end" node.
  */
-export class List<ValueType> // tslint:disable-line:max-classes-per-file
+export class List<TValue> // tslint:disable-line:max-classes-per-file
 {
-    public static fromArray<ValueType>(arr: Array<ValueType>): List<ValueType> {
-        const newList = new List<ValueType>();
+    public static fromArray<TValue>(arr: Array<TValue>): List<TValue> {
+        const newList = new List<TValue>();
         arr.forEach((curVal) => newList.push(curVal));
         return newList;
     }
 
 
     // region Data Members
-    private readonly _end: DLNodeEnd<ValueType>;
+    private readonly _end: DLNodeEnd<TValue>;
     private _length: number;
     // endregion
 
@@ -144,7 +144,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * Creates a new List object.
      */
     constructor() {
-        this._end = new DLNodeEnd<ValueType>();
+        this._end = new DLNodeEnd<TValue>();
         this._length = 0;
     }
 
@@ -172,7 +172,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns An Iterator pointing to the first element in this List.  If this
      * List is empty, the returned iterator will be pointing to end().
      */
-    public begin(): Iterator<ValueType> {
+    public begin(): Iterator<TValue> {
         return this._length === 0 ?
                new Iterator(this._end, this._end) :
                new Iterator(this._end.next, this._end);
@@ -185,7 +185,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns An Iterator pointing to an element one past the end of this
      * list.
      */
-    public end(): Iterator<ValueType> {
+    public end(): Iterator<TValue> {
         return new Iterator(this._end, this._end);
     }
 
@@ -195,7 +195,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @param value - The value to be appended
      * @returns This list (to allow chaining)
      */
-    public push(value: ValueType): this {
+    public push(value: TValue): this {
         this.insertNode(this._end, value);
 
         // Return this to allow chaining.
@@ -208,15 +208,15 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns The value associated with the removed element, or undefined if
      * this List is empty.
      */
-    public pop(): ValueType {
+    public pop(): TValue {
         if (this._length === 0) {
             throw new Error("Attempted to pop() an empty List.");
         }
 
         // Because this List is not empty, we know for sure that the node
         // before the end node contains a value.
-        const lastValueNode = this._end.prev as DLNodeValue<ValueType>;
-        const val: ValueType = lastValueNode.value;
+        const lastValueNode = this._end.prev as DLNodeValue<TValue>;
+        const val: TValue = lastValueNode.value;
 
         // Remove the node from the list.
         this.removeNode(lastValueNode);
@@ -232,15 +232,15 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns An iterator pointing to the element following the removed
      * element, which may be end().
      */
-    public remove(it: Iterator<ValueType>): Iterator<ValueType> {
+    public remove(it: Iterator<TValue>): Iterator<TValue> {
         const itEnd = this.end();
         if (it.equals(itEnd)) {
             throw new Error("Attempted to remove List elment at end().");
         }
 
-        const nodeToRemove: DLNodeValue<ValueType> = it._getDLNode() as DLNodeValue<ValueType>;
-        const nextNode: DLNodeAny<ValueType> = this.removeNode(nodeToRemove);
-        return new Iterator<ValueType>(nextNode, this._end);
+        const nodeToRemove: DLNodeValue<TValue> = it._getDLNode() as DLNodeValue<TValue>;
+        const nextNode: DLNodeAny<TValue> = this.removeNode(nodeToRemove);
+        return new Iterator<TValue>(nextNode, this._end);
     }
 
 
@@ -249,7 +249,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @param index - The index of the value to retrieve
      * @returns The value at the specified index
      */
-    public getAt(index: number): ValueType {
+    public getAt(index: number): TValue {
         if (index < 0) {
             // FUTURE: Allow negative indices that are relative to the end.
             throw new Error("Index cannot be negative.");
@@ -260,7 +260,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
             throw new Error("Index out of range.");
         }
 
-        const it: Iterator<ValueType> = this.begin();
+        const it: Iterator<TValue> = this.begin();
         advance(it, index);
 
         // Because the index was checked previously, we know we are going to
@@ -277,9 +277,9 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns An Iterator pointing to the first inserted element, or `insertInFrontOf` if
      * no values were specified.
      */
-    public insert(insertInFrontOf: Iterator<ValueType>, ...values: Array<ValueType>): Iterator<ValueType> {
+    public insert(insertInFrontOf: Iterator<TValue>, ...values: Array<TValue>): Iterator<TValue> {
 
-        const firstInsertedNode: DLNodeAny<ValueType> = this.insertNode(insertInFrontOf._getDLNode(), ...values);
+        const firstInsertedNode: DLNodeAny<TValue> = this.insertNode(insertInFrontOf._getDLNode(), ...values);
         return new Iterator(firstInsertedNode, this._end);
     }
 
@@ -288,9 +288,9 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * Converts this List to an array with the same values.
      * @returns The converted array
      */
-    public toArray(): Array<ValueType> {
-        const arr: Array<ValueType> = [];
-        const itEnd: Iterator<ValueType> = this.end();
+    public toArray(): Array<TValue> {
+        const arr: Array<TValue> = [];
+        const itEnd: Iterator<TValue> = this.end();
         for (const it = this.begin(); !it.equals(itEnd); it.next()) {
             // This for loop ensures that it will only point to value nodes (not
             // the end node), so reading the value here will never throw an
@@ -312,9 +312,9 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * DLNodeValue<ValueType> because the end node cannot be removed.
      * @returns The node after the removed node
      */
-    private removeNode(removeNode: DLNodeValue<ValueType>): DLNodeAny<ValueType> {
-        const prevNode: DLNodeAny<ValueType> = removeNode.prev;
-        const nextNode: DLNodeAny<ValueType> = removeNode.next;
+    private removeNode(removeNode: DLNodeValue<TValue>): DLNodeAny<TValue> {
+        const prevNode: DLNodeAny<TValue> = removeNode.prev;
+        const nextNode: DLNodeAny<TValue> = removeNode.next;
 
         // Remove the element from the list.
         link(prevNode, nextNode);
@@ -332,17 +332,17 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @returns The first inserted DLNode, or `insertInFrontOf` if no values
      * were specified.
      */
-    private insertNode(insertInFrontOf: DLNodeAny<ValueType>, ...values: Array<ValueType>): DLNodeAny<ValueType> {
+    private insertNode(insertInFrontOf: DLNodeAny<TValue>, ...values: Array<TValue>): DLNodeAny<TValue> {
 
         if (values.length === 0) {
             return insertInFrontOf;
         }
 
-        let nodeRet: DLNodeAny<ValueType> | undefined;
+        let nodeRet: DLNodeAny<TValue> | undefined;
 
         for (const curVal of values) {
-            const prevNode: DLNodeAny<ValueType> = insertInFrontOf.prev;
-            const nextNode: DLNodeAny<ValueType> = insertInFrontOf;
+            const prevNode: DLNodeAny<TValue> = insertInFrontOf.prev;
+            const nextNode: DLNodeAny<TValue> = insertInFrontOf;
 
             const newNode = new DLNodeValue(curVal);
 
@@ -369,8 +369,8 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
      * @param itLast - The last element of the range to be sorted (excluded)
      */
     private quicksortImpl(
-        itFirst: Iterator<ValueType>,
-        itLast: Iterator<ValueType>
+        itFirst: Iterator<TValue>,
+        itLast: Iterator<TValue>
     ): void {
         // Normally, a random element would be selected as the pivot.  This,
         // however, would require calculating how many elements are in [itFirst,
@@ -389,7 +389,7 @@ export class List<ValueType> // tslint:disable-line:max-classes-per-file
         // Set the pivot.
         const pivotIndex = 0;
         const itPivot = itFirst.offset(pivotIndex);
-        const pivotValue: ValueType = itPivot.value;
+        const pivotValue: TValue = itPivot.value;
 
         // Because the pivot element is always the first, we will always have to
         // adjust itFirst.
@@ -440,10 +440,10 @@ export type MoveIteratorRetType<T> = {done: false, value: T} | {done: true};
 /**
  * Implements the iterator protocol for List.
  */
-export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
+export class Iterator<TValue>     // tslint:disable-line:max-classes-per-file
 {
-    private          _curNode: DLNodeAny<ValueType>;
-    private readonly _endNode: DLNodeEnd<ValueType>;
+    private          _curNode: DLNodeAny<TValue>;
+    private readonly _endNode: DLNodeEnd<TValue>;
 
 
     /**
@@ -451,18 +451,18 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
      * @param curNode - The node the Iterator should be pointing to
      * @param endNode - The end node of the linked list
      */
-    constructor(curNode: DLNodeAny<ValueType>, endNode: DLNodeEnd<ValueType>) {
+    constructor(curNode: DLNodeAny<TValue>, endNode: DLNodeEnd<TValue>) {
         this._curNode = curNode;
         this._endNode = endNode;
     }
 
 
-    public _getDLNode(): DLNodeAny<ValueType> {
+    public _getDLNode(): DLNodeAny<TValue> {
         return this._curNode;
     }
 
 
-    public equals(otherIter: Iterator<ValueType>): boolean {
+    public equals(otherIter: Iterator<TValue>): boolean {
         return this._curNode === otherIter._curNode;
     }
 
@@ -476,13 +476,13 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
     }
 
 
-    public next(): MoveIteratorRetType<ValueType> {
+    public next(): MoveIteratorRetType<TValue> {
         if (this._curNode.nodeType === "DLNodeEnd") {
             return {done: true};
         }
         else {
             // Get the value to be returned.
-            const val: ValueType = this._curNode.value;
+            const val: TValue = this._curNode.value;
 
             // Advance the iterator.
             this._curNode = this._curNode.next;
@@ -495,7 +495,7 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
     }
 
 
-    public get value(): ValueType {
+    public get value(): TValue {
 
         if (this._curNode.nodeType === "DLNodeEnd") {
             throw new Error("Attempted to get value from an iterator at end().");
@@ -504,7 +504,7 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
         return this._curNode.value;
     }
 
-    public set value(val: ValueType) {
+    public set value(val: TValue) {
         if (this._curNode.nodeType === "DLNodeEnd") {
             throw new Error("Cannot set value of end element.");
         }
@@ -514,9 +514,9 @@ export class Iterator<ValueType>     // tslint:disable-line:max-classes-per-file
     }
 
 
-    public offset(offset: number): Iterator<ValueType> {
+    public offset(offset: number): Iterator<TValue> {
         // Make a copy of this iterator and then advance it.
-        const it: Iterator<ValueType> = new Iterator<ValueType>(this._curNode, this._endNode);
+        const it: Iterator<TValue> = new Iterator<TValue>(this._curNode, this._endNode);
         advance(it, offset);
         return it;
     }

@@ -39,10 +39,10 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
  * @return An array containing `items` if `condition` is truthy.  An empty array
  * if `condition` is falsy.
  */
-export function insertIf<ItemType>(
+export function insertIf<TItem>(
     condition: unknown,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
-    ...items: Array<ItemType>
-): Array<ItemType> {
+    ...items: Array<TItem>
+): Array<TItem> {
     return condition ? items : [];
 }
 

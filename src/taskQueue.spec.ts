@@ -5,9 +5,9 @@ import {TaskQueue} from "./taskQueue";
 import {Deferred} from "./deferred";
 
 
-interface ITaskInfo<ResolveType> {
-    task: Task<ResolveType>;
-    deferred: Deferred<ResolveType>;
+interface ITaskInfo<TResolve> {
+    task: Task<TResolve>;
+    deferred: Deferred<TResolve>;
 }
 
 
@@ -20,9 +20,9 @@ interface ITaskInfo<ResolveType> {
  * resolve or reject.
  *
  */
-function createTask<ResolveType>(): ITaskInfo<ResolveType>
+function createTask<TResolve>(): ITaskInfo<TResolve>
 {
-    const dfd = new Deferred<ResolveType>();
+    const dfd = new Deferred<TResolve>();
 
     // Create a task that will return the Promise we just created (which is
     // controlled by the deferred's resolve() and reject()).
@@ -49,13 +49,13 @@ function createTask<ResolveType>(): ITaskInfo<ResolveType>
  * @param resolveValue - The value that the returned Promise will be fulfilled
  * with
  */
-function createTimerTask<ResolveType>(
+function createTimerTask<TResolve>(
     delayMs: number,
-    resolveValue: ResolveType
-): Task<ResolveType>
+    resolveValue: TResolve
+): Task<TResolve>
 {
-    const theTask = (): Promise<ResolveType> => {
-        return getTimerPromise<ResolveType>(delayMs, resolveValue);
+    const theTask = (): Promise<TResolve> => {
+        return getTimerPromise<TResolve>(delayMs, resolveValue);
     };
     return theTask;
 }
@@ -176,7 +176,7 @@ describe("TaskQueue", () => {
         let numDrainedEvents = 0;
         const queue: TaskQueue = new TaskQueue(1);
 
-        queue.on(TaskQueue.EVENT_DRAINED, () => {
+        queue.on(TaskQueue.eventNameDrained, () => {
             numDrainedEvents++;
         });
 
@@ -217,7 +217,7 @@ describe("TaskQueue", () => {
         // been emitted.
         const queue = new TaskQueue(1);
         let numDrainedEvents = 0;
-        queue.on(TaskQueue.EVENT_DRAINED, () => {
+        queue.on(TaskQueue.eventNameDrained, () => {
             numDrainedEvents++;
         });
 
@@ -254,7 +254,7 @@ describe("TaskQueue", () => {
     it("drain() will return a Promise that is fulfilled when the TaskQueue is emptied", (done) => {
         const queue = new TaskQueue(1);
         let numDrainedEvents = 0;
-        queue.on(TaskQueue.EVENT_DRAINED, () => {
+        queue.on(TaskQueue.eventNameDrained, () => {
             numDrainedEvents++;
         });
 

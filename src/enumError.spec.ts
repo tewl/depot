@@ -6,7 +6,7 @@ enum CastleErrors {
     FELL_OVER,
     SANK_INTO_SWAMP
 }
-const CastleError = getEnumErrorClass(CastleErrors);
+const castleError = getEnumErrorClass(CastleErrors);
 
 
 describe("getEnumErrorClass()", () => {
@@ -14,7 +14,7 @@ describe("getEnumErrorClass()", () => {
 
     it("returns a class that can be used to throw enumerated errors", () => {
 
-        const err = new CastleError(CastleErrors.BURNED_DOWN);
+        const err = new castleError(CastleErrors.BURNED_DOWN);
         expect(err.errorNum).toEqual(1);
         expect(err.message).toEqual("Error 1 (BURNED_DOWN)");
     });

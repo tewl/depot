@@ -1,7 +1,7 @@
-export class Deferred<ResolveType>
+export class Deferred<TResolve>
 {
-    public readonly promise: Promise<ResolveType>;
-    public resolve: (result: ResolveType) => void;
+    public readonly promise: Promise<TResolve>;
+    public resolve: (result: TResolve) => void;
     public reject: (err: unknown) => void;
 
     constructor()
@@ -12,7 +12,7 @@ export class Deferred<ResolveType>
         this.resolve = (): void => { return; };
         this.reject = (): void => { return; };
 
-        this.promise = new Promise((resolve: (result: ResolveType) => void, reject: (err: unknown) => void) => {
+        this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) => {
             this.resolve = resolve;
             this.reject = reject;
         });
@@ -29,14 +29,14 @@ export class Deferred<ResolveType>
  * @param theDeferred - The Deferred that will sink the output from `thePromise`
  * @return description
  */
-export function connectPromiseToDeferred<ResolveType>(
-    thePromise: Promise<ResolveType>,
-    theDeferred: Deferred<ResolveType>
+export function connectPromiseToDeferred<TResolve>(
+    thePromise: Promise<TResolve>,
+    theDeferred: Deferred<TResolve>
 ): void
 {
     thePromise
     .then(
-        (result: ResolveType) => { theDeferred.resolve(result); },
+        (result: TResolve) => { theDeferred.resolve(result); },
         (err) => { theDeferred.reject(err); }
     );
 }

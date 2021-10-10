@@ -22,112 +22,113 @@ export async function toPromise<TSuccess, TError>(
 ////////////////////////////////////////////////////////////////////////////////
 // all()
 ////////////////////////////////////////////////////////////////////////////////
-export async function all<SA, FA, SB, FB>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>
+export async function all<TSA, TFA, TSB, TFB>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>
 ): Promise<Result<
-    [SA, SB],
-    IIndexedItem<FA | FB>
+    [TSA, TSB],
+    IIndexedItem<TFA | TFB>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>
 ): Promise<Result<
-    [SA, SB, SC],
-    IIndexedItem<FA | FB | FC>
+    [TSA, TSB, TSC],
+    IIndexedItem<TFA | TFB | TFC>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>
 ): Promise<Result<
-    [SA, SB, SC, SD],
-    IIndexedItem<FA | FB | FC | FD>
+    [TSA, TSB, TSC, TSD],
+    IIndexedItem<TFA | TFB | TFC | TFD>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE],
-    IIndexedItem<FA | FB | FC | FD | FE>
+    [TSA, TSB, TSC, TSD, TSE],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>,
-    f: Promise<Result<SF, FF>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>,
+    f: Promise<Result<TSF, TFF>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE, SF],
-    IIndexedItem<FA | FB | FC | FD | FE | FF>
+    [TSA, TSB, TSC, TSD, TSE, TSF],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>,
-    f: Promise<Result<SF, FF>>,
-    g: Promise<Result<SG, FG>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>,
+    f: Promise<Result<TSF, TFF>>,
+    g: Promise<Result<TSG, TFG>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE, SF, SG],
-    IIndexedItem<FA | FB | FC | FD | FE | FF | FG>
+    [TSA, TSB, TSC, TSD, TSE, TSF, TSG],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>,
-    f: Promise<Result<SF, FF>>,
-    g: Promise<Result<SG, FG>>,
-    h: Promise<Result<SH, FH>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>,
+    f: Promise<Result<TSF, TFF>>,
+    g: Promise<Result<TSG, TFG>>,
+    h: Promise<Result<TSH, TFH>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE, SF, SG, SH],
-    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH>
+    [TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH, SI, FI>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>,
-    f: Promise<Result<SF, FF>>,
-    g: Promise<Result<SG, FG>>,
-    h: Promise<Result<SH, FH>>,
-    i: Promise<Result<SI, FI>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>,
+    f: Promise<Result<TSF, TFF>>,
+    g: Promise<Result<TSG, TFG>>,
+    h: Promise<Result<TSH, TFH>>,
+    i: Promise<Result<TSI, TFI>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE, SF, SG, SH, SI],
-    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH | FI>
+    [TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH, TSI],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI>
 >>;
 
-export async function all<SA, FA, SB, FB, SC, FC, SD, FD, SE, FE, SF, FF, SG, FG, SH, FH, SI, FI, SJ, FJ>(
-    a: Promise<Result<SA, FA>>,
-    b: Promise<Result<SB, FB>>,
-    c: Promise<Result<SC, FC>>,
-    d: Promise<Result<SD, FD>>,
-    e: Promise<Result<SE, FE>>,
-    f: Promise<Result<SF, FF>>,
-    g: Promise<Result<SG, FG>>,
-    h: Promise<Result<SH, FH>>,
-    i: Promise<Result<SI, FI>>,
-    j: Promise<Result<SJ, FJ>>
+export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI,
+                          TSJ, TFJ>(
+    a: Promise<Result<TSA, TFA>>,
+    b: Promise<Result<TSB, TFB>>,
+    c: Promise<Result<TSC, TFC>>,
+    d: Promise<Result<TSD, TFD>>,
+    e: Promise<Result<TSE, TFE>>,
+    f: Promise<Result<TSF, TFF>>,
+    g: Promise<Result<TSG, TFG>>,
+    h: Promise<Result<TSH, TFH>>,
+    i: Promise<Result<TSI, TFI>>,
+    j: Promise<Result<TSJ, TFJ>>
 ): Promise<Result<
-    [SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ],
-    IIndexedItem<FA | FB | FC | FD | FE | FF | FG | FH | FI | FJ>
+    [TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH, TSI, TSJ],
+    IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI | TFJ>
 >>;
 
 //

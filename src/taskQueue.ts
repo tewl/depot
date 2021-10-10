@@ -4,16 +4,16 @@ import {Task} from "./promiseHelpers";
 import {Deferred} from "./deferred";
 
 
-interface ITaskInfo<ResolveType> {
-    task: Task<ResolveType>;
-    deferred: Deferred<ResolveType>;
+interface ITaskInfo<TResolve> {
+    task: Task<TResolve>;
+    deferred: Deferred<TResolve>;
 }
 
 
 export class TaskQueue extends EventEmitter
 {
     // region Events
-    public static EVENT_DRAINED = "drained";
+    public static eventNameDrained: "drained" = "drained";
     // endregion
 
 
@@ -76,9 +76,9 @@ export class TaskQueue extends EventEmitter
      * @returns A promise that will be resolved or rejected once
      * the task eventually executes.
      */
-    public push<ResolveType>(task: Task<ResolveType>, priority = 0): Promise<ResolveType>
+    public push<TResolve>(task: Task<TResolve>, priority = 0): Promise<TResolve>
     {
-        const dfd = new Deferred<ResolveType>();
+        const dfd = new Deferred<TResolve>();
         this._tasks.push({task: task, deferred: dfd}, priority);
         this.startTasks(true);
         return dfd.promise;
@@ -125,7 +125,7 @@ export class TaskQueue extends EventEmitter
         // Return a Promise that will be resolved when this TaskQueue eventually
         // drains.
         return new Promise<void>((resolve: () => void) => {
-            this.once(TaskQueue.EVENT_DRAINED, resolve);
+            this.once(TaskQueue.eventNameDrained, resolve);
         });
     }
 
@@ -181,7 +181,7 @@ export class TaskQueue extends EventEmitter
                     if (this._pauseWhenDrained) {
                         this.pause();
                     }
-                    this.emit(TaskQueue.EVENT_DRAINED);
+                    this.emit(TaskQueue.eventNameDrained);
                     this._isProcessingLastFulfillment = false;
                 }
             });

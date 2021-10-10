@@ -6,7 +6,7 @@ import {Iterator} from "./list";
  * @param it - The Iterator to advance
  * @param offset - The number of times the iterator should be advanced.
  */
-export function advance<ValueType>(it: Iterator<ValueType>, offset: number): void {
+export function advance<TValue>(it: Iterator<TValue>, offset: number): void {
     "use strict";
 
     const fn: () => void = offset < 0 ? it.prev.bind(it) : it.next.bind(it);
@@ -24,11 +24,11 @@ export function advance<ValueType>(it: Iterator<ValueType>, offset: number): voi
  * @param itB - The upper Iterator
  * @returns The distance from itA to itB
  */
-export function distance<ValueType>(itA: Iterator<ValueType>, itB: Iterator<ValueType>): number {
+export function distance<TValue>(itA: Iterator<TValue>, itB: Iterator<TValue>): number {
     "use strict";
 
     let distance = 0;
-    const itCur: Iterator<ValueType> = itA.offset(0);
+    const itCur: Iterator<TValue> = itA.offset(0);
 
     while (!itCur.equals(itB)) {
         itCur.next();
@@ -48,14 +48,14 @@ export function distance<ValueType>(itA: Iterator<ValueType>, itB: Iterator<Valu
  * [itBegin, itEnd) whose value equals value.  If a matching element was not
  * found, itEnd is returned.
  */
-export function find<ValueType>(
-    itBegin: Iterator<ValueType>,
-    itEnd: Iterator<ValueType>,
-    value: ValueType
-): Iterator<ValueType> {
+export function find<TValue>(
+    itBegin: Iterator<TValue>,
+    itEnd: Iterator<TValue>,
+    value: TValue
+): Iterator<TValue> {
     "use strict";
 
-    const itCur: Iterator<ValueType> = itBegin;
+    const itCur: Iterator<TValue> = itBegin;
 
     while (!itCur.equals(itEnd)) {
         if (itCur.value === value) {
@@ -70,7 +70,7 @@ export function find<ValueType>(
 
 /**
  * Partitions the range [itFirst, itLast) so that all values in the range for
- * which the unary predicate pred returns true will precede all the values for
+ * which the unary predicate _pred_ returns true will precede all the values for
  * which it returns false.  This is not a stable partition.
  * @param itFirst - The first element in the range to be partitioned (inclusive)
  * @param itLast - The end of the range to be partitioned (exclusive)
@@ -78,11 +78,11 @@ export function find<ValueType>(
  * @returns An Iterator pointing to the beginning of the range of false yielding
  * elements.
  */
-export function partition<ValueType>(
-    itFirst: Iterator<ValueType>,
-    itLast:  Iterator<ValueType>,
-    pred:    (val: ValueType) => boolean
-): Iterator<ValueType> {
+export function partition<TValue>(
+    itFirst: Iterator<TValue>,
+    itLast:  Iterator<TValue>,
+    pred:    (val: TValue) => boolean
+): Iterator<TValue> {
     "use strict";
 
     // If the range specified has 0 size, just return.
@@ -90,8 +90,8 @@ export function partition<ValueType>(
         return itFirst;
     }
 
-    const itLeft: Iterator<ValueType> = itFirst.offset(0);
-    const itRight: Iterator<ValueType> = itLast.offset(-1);
+    const itLeft: Iterator<TValue> = itFirst.offset(0);
+    const itRight: Iterator<TValue> = itLast.offset(-1);
 
     while (!itLeft.equals(itRight)) {
 
@@ -116,8 +116,8 @@ export function partition<ValueType>(
         return itRight;
     }
 
-    function swap(itA: Iterator<ValueType>, itB: Iterator<ValueType>): void {
-        const tmpVal: ValueType = itA.value;
+    function swap(itA: Iterator<TValue>, itB: Iterator<TValue>): void {
+        const tmpVal: TValue = itA.value;
         itA.value = itB.value;
         itB.value = tmpVal;
     }

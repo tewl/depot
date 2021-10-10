@@ -106,12 +106,13 @@ export function isISerializable(obj: unknown): obj is ISerializable
 }
 
 
-export interface ISerializableWithStow<StowType> extends ISerializable
+export interface ISerializableWithStow<TStow> extends ISerializable
 {
-    __stow: StowType;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    __stow: TStow;
 }
 
-export function isISerializableWithStow<StowType>(obj: unknown): obj is ISerializableWithStow<StowType>
+export function isISerializableWithStow<TStow>(obj: unknown): obj is ISerializableWithStow<TStow>
 {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const candidate = obj as any;
@@ -129,7 +130,7 @@ export function isISerializableWithStow<StowType>(obj: unknown): obj is ISeriali
 ////////////////////////////////////////////////////////////////////////////////
 
 
-export interface IStoreGetResult<StowType>
+export interface IStoreGetResult<TStow>
 {
     /**
      * The serialized form of the saved data.
@@ -140,17 +141,17 @@ export interface IStoreGetResult<StowType>
      * The stowed data that should be applied to the object once `serialized`
      * has been deserialized.
      */
-    stow: StowType;
+    stow: TStow;
 }
 
 
-export interface IStorePutResult<StowType>
+export interface IStorePutResult<TStow>
 {
     /**
      * The new stow data that must be applied to the original object following
      * this put() operation.
      */
-    stow: StowType;
+    stow: TStow;
 }
 
 
@@ -176,7 +177,7 @@ export interface ILoadResult<T extends ISerializable>
 ////////////////////////////////////////////////////////////////////////////////
 
 // tslint:disable-next-line: max-classes-per-file
-export abstract class AStore<StowType>
+export abstract class AStore<TStow>
 {
     // region Data Members
     protected readonly _registry: SerializationRegistry;
@@ -242,7 +243,7 @@ export abstract class AStore<StowType>
                 }
 
                 const serializeResult = curObj.serialize();
-                const stow: undefined | StowType = isISerializableWithStow<StowType>(curObj) ?
+                const stow: undefined | TStow = isISerializableWithStow<TStow>(curObj) ?
                     curObj.__stow :
                     undefined;
 
@@ -257,7 +258,7 @@ export abstract class AStore<StowType>
                 const putResult = await putPromise;
 
                 // Assign the stowed data back to the original object.
-                const objWithStow = curObj as ISerializableWithStow<StowType>;
+                const objWithStow = curObj as ISerializableWithStow<TStow>;
                 objWithStow.__stow = putResult.stow;
             }
         );
@@ -278,7 +279,7 @@ export abstract class AStore<StowType>
      *   serialized form of the object and the stowed data that should be
      *   applied to the object once the serialized form is deserialized.
      */
-    protected abstract get(id: IdString): Promise<IStoreGetResult<StowType>>;
+    protected abstract get(id: IdString): Promise<IStoreGetResult<TStow>>;
 
 
     /**
@@ -288,7 +289,7 @@ export abstract class AStore<StowType>
      * @return When successfully written, the returned promise resolves with the
      *   object's new stowed data.
      */
-    protected abstract put(serialized: ISerialized, stow: undefined | StowType): Promise<IStorePutResult<StowType>>;
+    protected abstract put(serialized: ISerialized, stow: undefined | TStow): Promise<IStorePutResult<TStow>>;
 
 
     /**
@@ -322,7 +323,7 @@ export abstract class AStore<StowType>
             return deserializedSoFar[id];
         }
 
-        const getResult: IStoreGetResult<StowType> = await this.get(id);
+        const getResult: IStoreGetResult<TStow> = await this.get(id);
         const serialized = getResult.serialized;
 
         const foundClass = this._registry.getClass(serialized.type);
@@ -340,7 +341,7 @@ export abstract class AStore<StowType>
         deserializedSoFar[deserialized.id] = deserialized;
 
         // Now that we have the real object, apply the stow data.
-        const objWithStow = deserialized as ISerializableWithStow<StowType>;
+        const objWithStow = deserialized as ISerializableWithStow<TStow>;
         objWithStow.__stow = getResult.stow;
 
         // If needed, update the list of completion functions that need to be run.

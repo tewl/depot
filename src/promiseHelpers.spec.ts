@@ -378,7 +378,12 @@ describe("retry()", () => {
  * @returns A function that will return a rejected promise the first n times it
  * is called.
  */
-function getFuncThatWillRejectNTimes<T, U>(numFailures: number, resolveValue: T, rejectValue: U): () => Promise<T> {
+function getFuncThatWillRejectNTimes<TResolve, TReject>(
+    numFailures: number,
+    resolveValue: TResolve,
+    rejectValue: TReject
+): () => Promise<TResolve>
+{
     "use strict";
 
     let numFailuresRemaining: number = numFailures;

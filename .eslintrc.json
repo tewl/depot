@@ -2,7 +2,9 @@
     "root": true,
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": ["tsconfig.json"]
+        "project": [
+            "tsconfig.json"
+        ]
     },
     "plugins": [
         "@typescript-eslint"
@@ -20,6 +22,9 @@
             "error",
             "only-multiline"
         ],
+        "@typescript-eslint/ban-types": [
+            "error"
+        ],
         "@typescript-eslint/comma-spacing": "error",
         "@typescript-eslint/consistent-type-definitions": [
             "error",
@@ -29,6 +34,14 @@
             "error"
         ],
         "@typescript-eslint/dot-notation": [
+            "error",
+            {
+                // Allow unit tests to make assertions about private and protected fields.
+                "allowPrivateClassPropertyAccess": true,
+                "allowProtectedClassPropertyAccess": true
+            }
+        ],
+        "@typescript-eslint/explicit-module-boundary-types": [
             "error"
         ],
         "@typescript-eslint/func-call-spacing": [
@@ -108,11 +121,17 @@
                     "camelCase",
                     "UPPER_CASE"
                 ],
-                "leadingUnderscore": "allow",
+                "leadingUnderscore": "allowSingleOrDouble",
                 "trailingUnderscore": "allow"
             },
             {
                 "selector": "typeLike",
+                "format": [
+                    "PascalCase"
+                ]
+            },
+            {
+                "selector": "enumMember",
                 "format": [
                     "PascalCase"
                 ]
@@ -157,13 +176,6 @@
                     "private"
                 ],
                 "leadingUnderscore": "require"
-            },
-            {
-                "selector": "enumMember",
-                "format": [
-                    "camelCase",
-                    "UPPER_CASE"
-                ]
             }
         ],
         "@typescript-eslint/no-explicit-any": "warn",
@@ -183,6 +195,7 @@
             "error",
             {
                 "vars": "all",
+                "varsIgnorePattern": "^[_]{2,}\\w*$", // Unused variables should start with __
                 "args": "none", // It's ok to have unused args to b/c they provide signature documentation
                 "caughtErrors": "none"
             }
@@ -244,7 +257,8 @@
         "@typescript-eslint/type-annotation-spacing": [
             "error"
         ],
-        "accessor-pairs": "error",
+        // When using Angular it is common to have @ViewChildren that only have a setter.
+        "accessor-pairs": "off",
         "array-bracket-newline": [
             "error",
             "consistent"
@@ -441,6 +455,9 @@
                 "allowAllPropertiesOnSameLine": true
             }
         ],
+        "object-shorthand": [
+            "off"
+        ],
         "one-var": [
             "error",
             {
@@ -471,7 +488,9 @@
             "error",
             "always"
         ],
-        "require-atomic-updates": "error",
+        "require-atomic-updates": [
+            "error"
+        ],
         "require-await": "off", // Must be off when @typescript-eslint/require-await is on
         "rest-spread-spacing": "error",
         "semi": "off", // Must be off when @typescript-eslint/semi is on
@@ -491,6 +510,10 @@
             "always"
         ],
         "space-before-function-paren": "off", // Must be off when @typescript-eslint/space-before-function-paren is on
+        "space-in-parens": [
+            // Sometimes space is inserted in order for similar lines to line up.
+            "off"
+        ],
         "space-unary-ops": [
             "error",
             {

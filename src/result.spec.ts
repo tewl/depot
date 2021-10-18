@@ -9,8 +9,8 @@ import {Result, succeededResult, failedResult, succeeded, failed, bindResult, ma
 
 enum OperationError
 {
-    TIMEOUT,
-    SERVICE_NOT_AVAILABLE
+    Timeout,
+    ServiceNotAvailable
 }
 
 const successfulOperation = (): Result<number, OperationError> =>
@@ -20,7 +20,7 @@ const successfulOperation = (): Result<number, OperationError> =>
 
 const failureOperation = (): Result<number, OperationError> =>
 {
-    return failedResult(OperationError.SERVICE_NOT_AVAILABLE);
+    return failedResult(OperationError.ServiceNotAvailable);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ const failureOperation = (): Result<number, OperationError> =>
 
 describe("example", () => {
 
-    it("of exhaustiveness checking", () =>
+    it("of exhaustiveness checking", (): void =>
     {
         const result = successfulOperation();
         switch (result.state)

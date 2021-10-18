@@ -11,12 +11,12 @@ describe("logger", () => {
 
 
     it("has a default logging level of 'warning'", () => {
-        expect(logger.getCurrentLevel()).toEqual(LogLevel.WARN_2);
+        expect(logger.getCurrentLevel()).toEqual(LogLevel.Warn2);
     });
 
 
     it("when logging is disabled, nothing will be logged", () => {
-        logger.pushLogLevel(LogLevel.OFF_0);
+        logger.pushLogLevel(LogLevel.Off0);
         expect(logger.error("test")).toBeFalsy();
     });
 
@@ -92,9 +92,9 @@ describe("logger", () => {
 
 
         it("sets the current level to WARN_2", () => {
-            logger.pushLogLevel(LogLevel.VERBOSE_4);
+            logger.pushLogLevel(LogLevel.Verbose4);
             logger.reset();
-            expect(logger.getCurrentLevel()).toEqual(LogLevel.WARN_2);
+            expect(logger.getCurrentLevel()).toEqual(LogLevel.Warn2);
         });
 
 
@@ -105,10 +105,10 @@ describe("logger", () => {
 
 
         it("restores the previous logging level.", () => {
-            logger.pushLogLevel(LogLevel.VERBOSE_4);
-            logger.pushLogLevel(LogLevel.INFO_3);
+            logger.pushLogLevel(LogLevel.Verbose4);
+            logger.pushLogLevel(LogLevel.Info3);
             logger.pop();
-            expect(logger.getCurrentLevel()).toEqual(LogLevel.VERBOSE_4);
+            expect(logger.getCurrentLevel()).toEqual(LogLevel.Verbose4);
         });
 
 
@@ -120,7 +120,7 @@ describe("logger", () => {
 
         it("log additional parameters", () => {
             let logMsg = "";
-            logger.pushLogLevel(LogLevel.SILLY_6);
+            logger.pushLogLevel(LogLevel.Silly6);
             logger.addListener((msg: string): void => {
                 logMsg = msg;
             });
@@ -155,8 +155,3 @@ describe("logger", () => {
 
 
 });
-
-
-
-
-

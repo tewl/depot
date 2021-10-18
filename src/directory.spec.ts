@@ -1,4 +1,4 @@
-import {tmpDir} from "../test/ut/spechelpers";
+import {tmpDir} from "../test/ut/specHelpers";
 import * as path from "path";
 import {File} from "./file";
 import {Directory, IDirectoryContents} from "./directory";
@@ -948,9 +948,9 @@ describe("Directory", () => {
                     expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest", "src"));
 
                     expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
-                    expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
+                    expect(new File(destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "src", "dirA", "dirB").existsSync()).toBeTruthy();
-                    expect(new File(     destDir, "src", "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
+                    expect(new File(destDir, "src", "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "src", "dirA", "dirC").existsSync()).toBeTruthy();
                     done();
                 });
@@ -995,9 +995,9 @@ describe("Directory", () => {
                     expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest"));
 
                     expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
-                    expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
+                    expect(new File(destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "dirA", "dirB").existsSync()).toBeTruthy();
-                    expect(new File(     destDir, "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
+                    expect(new File(destDir, "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
                     expect(new Directory(destDir, "dirA", "dirC").existsSync()).toBeTruthy();
                     done();
                 });
@@ -1050,9 +1050,9 @@ describe("Directory", () => {
                 const counterpartDestDir = srcDir.copySync(destDir, true);
                 expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest", "src"));
                 expect(new Directory(destDir, "src", "dirA").existsSync()).toBeTruthy();
-                expect(new File(     destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
+                expect(new File(destDir, "src", "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "src", "dirA", "dirB").existsSync()).toBeTruthy();
-                expect(new File(     destDir, "src", "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
+                expect(new File(destDir, "src", "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "src", "dirA", "dirC").existsSync()).toBeTruthy();
             });
 
@@ -1092,9 +1092,9 @@ describe("Directory", () => {
                 const counterpartDestDir = srcDir.copySync(destDir, false);
                 expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest"));
                 expect(new Directory(destDir, "dirA").existsSync()).toBeTruthy();
-                expect(new File(     destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
+                expect(new File(destDir, "dirA", "a.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "dirA", "dirB").existsSync()).toBeTruthy();
-                expect(new File(     destDir, "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
+                expect(new File(destDir, "dirA", "dirB", "b.txt").existsSync()).toBeTruthy();
                 expect(new Directory(destDir, "dirA", "dirC").existsSync()).toBeTruthy();
             });
 

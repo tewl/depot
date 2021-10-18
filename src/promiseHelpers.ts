@@ -48,7 +48,7 @@ export function promisifyN<TResult>(
  * result.
  */
 export function promisify1<TResult, TArg1>(
-    func: (arg1: TArg1, cb: CallBackType<TResult> ) => void
+    func: (arg1: TArg1, cb: CallBackType<TResult>) => void
 ): (arg1: TArg1) => Promise<TResult> {
 
     const promisifiedFunc = function (arg1: TArg1): Promise<TResult> {
@@ -77,7 +77,7 @@ export function promisify1<TResult, TArg1>(
  * result.
  */
 export function promisify2<TResult, TArg1, TArg2>(
-    func: (arg1: TArg1, arg2: TArg2, cb: CallBackType<TResult> ) => void
+    func: (arg1: TArg1, arg2: TArg2, cb: CallBackType<TResult>) => void
 ): (arg1: TArg1, arg2: TArg2) => Promise<TResult> {
 
     const promisifiedFunc = function (arg1: TArg1, arg2: TArg2): Promise<TResult> {
@@ -105,7 +105,7 @@ export function promisify2<TResult, TArg1, TArg2>(
  * result.
  */
 export function promisify3<TResult, TArg1, TArg2, TArg3>(
-    func: (arg1: TArg1, arg2: TArg2, arg3: TArg3, cb: CallBackType<TResult> ) => void
+    func: (arg1: TArg1, arg2: TArg2, arg3: TArg3, cb: CallBackType<TResult>) => void
 ): (arg1: TArg1, arg2: TArg2, arg3: TArg3) => Promise<TResult> {
 
     const promisifiedFunc = function (arg1: TArg1, arg2: TArg2, arg3: TArg3): Promise<TResult> {
@@ -464,8 +464,8 @@ export function delaySettle<TResolve>(
         // Whether waitFor resolved or rejected, we should resolve
         // with the original resolved value.
         return waitFor
-        .then(() => result )
-        .catch(() => result );
+        .then(() => result)
+        .catch(() => result);
     })
     .catch((err: unknown) => {
         // Whether waitFor resolved or rejected, we should reject with the

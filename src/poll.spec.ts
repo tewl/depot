@@ -9,7 +9,7 @@ describe("poll()", () => {
 
     it("polls until the predicate says to stop", async () => {
         const logger = new Logger();
-        logger.pushLogLevel(LogLevel.DEBUG_5);
+        logger.pushLogLevel(LogLevel.Debug5);
         // logger.addListener(console.log);
 
         let nextReturnVal = 1;

@@ -2,9 +2,9 @@ import {getEnumErrorClass} from "./enumError";
 
 
 enum CastleErrors {
-    BURNED_DOWN = 1,
-    FELL_OVER,
-    SANK_INTO_SWAMP
+    BurnedDown = 1,
+    FellOver,
+    SankIntoSwamp
 }
 const castleError = getEnumErrorClass(CastleErrors);
 
@@ -14,7 +14,7 @@ describe("getEnumErrorClass()", () => {
 
     it("returns a class that can be used to throw enumerated errors", () => {
 
-        const err = new castleError(CastleErrors.BURNED_DOWN);
+        const err = new castleError(CastleErrors.BurnedDown);
         expect(err.errorNum).toEqual(1);
         expect(err.message).toEqual("Error 1 (BURNED_DOWN)");
     });

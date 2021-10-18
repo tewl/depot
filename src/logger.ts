@@ -10,13 +10,13 @@ export type RemoveListenerFunc = () => void;
  * Levels controlling what log messages are written to stdout.
  */
 export enum LogLevel {
-    OFF_0     = 0,
-    ERROR_1   = 1,
-    WARN_2    = 2,
-    INFO_3    = 3,
-    VERBOSE_4 = 4,
-    DEBUG_5   = 5,
-    SILLY_6   = 6
+    Off0     = 0,
+    Error1   = 1,
+    Warn2    = 2,
+    Info3    = 3,
+    Verbose4 = 4,
+    Debug5   = 5,
+    Silly6   = 6
 }
 Object.freeze(LogLevel);
 
@@ -40,7 +40,7 @@ export class Logger
 {
     // region Private Data Members
     private readonly _logLevelStack: Array<LogLevel>    = [];
-    private readonly _defaultLogLevel: LogLevel         = LogLevel.WARN_2;
+    private readonly _defaultLogLevel: LogLevel         = LogLevel.Warn2;
     private readonly _listeners: Array<LogListenerFunc> = [];
     // endregion
 
@@ -116,7 +116,7 @@ export class Logger
      */
     public error(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.ERROR_1, msg, ...optionalParams);
+        return this.log(LogLevel.Error1, msg, ...optionalParams);
     }
 
 
@@ -128,7 +128,7 @@ export class Logger
      */
     public warn(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.WARN_2, msg, ...optionalParams);
+        return this.log(LogLevel.Warn2, msg, ...optionalParams);
     }
 
 
@@ -140,7 +140,7 @@ export class Logger
      */
     public info(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.INFO_3, msg, ...optionalParams);
+        return this.log(LogLevel.Info3, msg, ...optionalParams);
     }
 
 
@@ -152,7 +152,7 @@ export class Logger
      */
     public verbose(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.VERBOSE_4, msg, ...optionalParams);
+        return this.log(LogLevel.Verbose4, msg, ...optionalParams);
     }
 
 
@@ -164,7 +164,7 @@ export class Logger
      */
     public debug(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.DEBUG_5, msg, ...optionalParams);
+        return this.log(LogLevel.Debug5, msg, ...optionalParams);
     }
 
 
@@ -176,7 +176,7 @@ export class Logger
      */
     public silly(msg: string, ...optionalParams: Array<unknown>): boolean
     {
-        return this.log(LogLevel.SILLY_6, msg, ...optionalParams);
+        return this.log(LogLevel.Silly6, msg, ...optionalParams);
     }
 
 

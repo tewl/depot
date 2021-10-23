@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import * as net from "net";
 import {getFirstExternalIpv4Address} from "./networkHelpers";
 import {RequestType} from "./requestHelpers";
-import * as request from "request-promise";
+import request = require("request-promise");
 
 
 type RequestListener = (request: http.IncomingMessage, response: http.ServerResponse) => void;

@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import * as BBPromise from "bluebird";
+import BBPromise = require("bluebird");
 
 
 // This file contains functions that rely upon the non-native Promise

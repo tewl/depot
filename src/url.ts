@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
-import * as URLParse from "url-parse";
+import URLParse = require("url-parse");
 
 
 export class Url
@@ -121,4 +121,3 @@ export class Url
 
 
 }
-

@@ -1,4 +1,4 @@
-import * as request from "request-promise";
+import request = require("request-promise");
 
 export type RequestType = typeof request;   // Does this work?
 

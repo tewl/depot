@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import * as express from "express";
+import express = require("express");
 import {ISslConfig, QuickServer} from "./quickServer";
 import {determinePort, getFirstExternalIpv4Address, IPortConfig} from "./networkHelpers";
 import {Deferred} from "./deferred";

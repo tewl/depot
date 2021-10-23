@@ -180,8 +180,8 @@ describe("TaskQueue", () => {
             numDrainedEvents++;
         });
 
-        const taskInfo1 = createTask<number>("1");
-        const taskInfo2 = createTask<number>("2");
+        const taskInfo1 = createTask<number>();
+        const taskInfo2 = createTask<number>();
         queue.push(taskInfo1.task)
         .then(() => {
             // The drained event should not have fired, because handlers should

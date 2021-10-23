@@ -1,101 +1,9 @@
-import {stat, Stats} from "fs";
 import {EventEmitter} from "events";
-import {promisifyN, promisify1, promisify2, sequence, getTimerPromise, retry,
-        retryWhile, promiseWhile, eventToPromise, conditionalTask, sequentialSettle,
-        delaySettle, mapAsync, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync} from "./promiseHelpers";
-
-
-describe("promisifyN()", () => {
-
-
-    it("will invoke the wrapped function and provide a successful result", (done) => {
-        const promisifiedStat = promisifyN<Stats>(stat);
-        promisifiedStat(__filename)
-        .then((stats: Stats) => {
-            expect(stats).toBeTruthy();
-            expect(stats.size).toBeGreaterThan(0);
-            done();
-        });
-    });
-
-
-    it("will reject with the expected error object", (done) => {
-        const promisifiedStat = promisifyN<Stats>(stat);
-        promisifiedStat("a_file_that_does_not_exist.txt")
-        .catch((err) => {
-            expect(err.toString()).toContain("ENOENT");
-            done();
-        });
-    });
-
-
-});
-
-
-describe("promisify1()", () => {
-
-
-    it("will invoke the wrapped function and provide a successful result", (done) => {
-        const promisifiedStat = promisify1<Stats, string>(stat);
-
-        promisifiedStat(__filename)
-        .then((stats: Stats) => {
-            expect(stats).toBeTruthy();
-            expect(stats.size).toBeGreaterThan(0);
-            done();
-        });
-    });
-
-
-    it("will reject with the expected error object", (done) => {
-        const promisifiedStat = promisify1<Stats, string>(stat);
-        promisifiedStat("a_file_that_does_not_exist.txt")
-        .catch((err) => {
-            expect(err.toString()).toContain("ENOENT");
-            done();
-        });
-    });
-
-
-});
-
-
-describe("promisify2()", () => {
-
-
-    it("will invoke the wrapped function and provide a successful result", (done) => {
-
-        const nodeFunc = (param1: string, param2: number, cb: (err: unknown, result?: number) => void) => {
-            // This function always succeeds.
-            cb(undefined, param1.length + param2);
-        };
-
-        const promisifiedFunc = promisify2<number, string, number>(nodeFunc);
-
-        promisifiedFunc("foo", 4)
-        .then((result: number) => {
-            expect(result).toEqual(7);
-            done();
-        });
-    });
-
-
-    it("will reject with the expected error object", (done) => {
-        const nodeFunc = (param1: string, param2: number, cb: (err: unknown, result?: number) => void) => {
-            // This function always succeeds.
-            cb("Error: xyzzy");
-        };
-
-        const promisifiedFunc = promisify2<number, string, number>(nodeFunc);
-        promisifiedFunc("foo", 4)
-        .catch((err) => {
-            expect(err.toString()).toContain("xyzzy");
-            done();
-        });
-    });
-
-
-});
+import {
+    sequence, getTimerPromise, retry, retryWhile, promiseWhile,
+    eventToPromise, conditionalTask, sequentialSettle, delaySettle,
+    mapAsync, zipWithAsyncValues, filterAsync, removeAsync, partitionAsync
+} from "./promiseHelpers";
 
 
 describe("sequence()", () => {
@@ -103,7 +11,7 @@ describe("sequence()", () => {
 
     it("should execute the functions in order", (done) => {
 
-        const tasks: Array<(previousValue: number) => Promise<number>> = [
+        const tasks: Array<(previousValue: unknown) => Promise<number>> = [
             (previousResult) => {
                 expect(previousResult).toEqual(100);
                 return Promise.resolve(200);
@@ -128,7 +36,7 @@ describe("sequence()", () => {
 
 
     it("will wrap the returned values in a Promise if the functions do not", (done) => {
-        const tasks: Array<(previousValue: number) => number> = [
+        const tasks: Array<(previousValue: unknown) => number> = [
             (previousResult) => {
                 expect(previousResult).toEqual(100);
                 return 200;
@@ -152,12 +60,12 @@ describe("sequence()", () => {
 
 
     it("will reject the returned promise whenever a function throws", (done) => {
-        const tasks: Array<(previousValue: number) => number> = [
-            (previousResult: number): number => {
+        const tasks: Array<(previousValue: unknown) => number> = [
+            (previousResult): number => {
                 expect(previousResult).toEqual(100);
                 return 200;
             },
-            (previousResult: number): number => {
+            (previousResult): number => {
                 expect(previousResult).toEqual(200);
                 if (previousResult === 200) {
                     throw new Error("error message");

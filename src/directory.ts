@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as _ from "lodash";
 import {File} from "./file";
-import {promisify1, sequence, mapAsync} from "./promiseHelpers";
+import {promisify1} from "./promisify";
+import {sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
 
 

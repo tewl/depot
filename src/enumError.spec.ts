@@ -16,7 +16,7 @@ describe("getEnumErrorClass()", () => {
 
         const err = new castleError(CastleErrors.BurnedDown);
         expect(err.errorNum).toEqual(1);
-        expect(err.message).toEqual("Error 1 (BURNED_DOWN)");
+        expect(err.message).toEqual("Error 1 (BurnedDown)");
     });
 
 

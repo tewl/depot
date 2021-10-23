@@ -3,7 +3,7 @@ import * as path from "path";
 import * as crypto from "crypto";
 import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
-import {promisify1} from "./promiseHelpers";
+import {promisify1} from "./promisify";
 import {Directory} from "./directory";
 import {PathPart, reducePathParts} from "./pathHelpers";
 

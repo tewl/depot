@@ -18,8 +18,17 @@ function startServerAtFirstAvailablePort(): Promise<IServerInfo> {
         server.unref();    // So the server will not prevent the process from exiting
         server.on("error", reject);
         server.listen({port: 0}, () => {
-            const {port} = server.address();
-            resolve({server, port});
+            const address = server.address();
+
+            if (!address ||
+                typeof address === "string")
+            {
+                reject(new Error(`Server is listening but has invalid address ${address}.`));
+            }
+            else
+            {
+                resolve({server, port: address.port});
+            }
         });
     });
 }
@@ -143,7 +152,7 @@ describe("determinePort()", () => {
             fail("The above line should have rejected.");
         }
         catch (err) {
-            expect(err.message).toMatch(/Required port .* is not available./);
+            expect((err as Error).message).toMatch(/Required port .* is not available./);
         }
     });
 

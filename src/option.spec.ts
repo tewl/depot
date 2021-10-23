@@ -27,6 +27,8 @@ describe("example", () =>
         const opt = someOperation();
         switch (opt.state)
         {
+            // If this switch is made non-exhaustive, this code will no longer
+            // compile.
             case "some":
                 break;
 
@@ -36,6 +38,8 @@ describe("example", () =>
             default:
                 return assertNever(opt);
         }
+
+        return undefined;
     });
 });
 

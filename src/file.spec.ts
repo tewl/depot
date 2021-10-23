@@ -1,7 +1,7 @@
 import * as path from "path";
 import {constants} from "fs";
 import * as _ from "lodash";
-import {tmpDir} from "../test/ut/spechelpers";
+import {tmpDir} from "../test/ut/specHelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
 import {getOs, OperatingSystem} from "./os";
@@ -441,7 +441,7 @@ describe("File", () => {
 
                 expect(fileA.existsSync()).toBeFalsy();
 
-                return fileA.delete()
+                fileA.delete()
                 .then(() => {
                     done();
                 });
@@ -1147,7 +1147,7 @@ describe("File", () => {
 
                 file.writeJson({foo: "bar"})
                 .then(() => {
-                    return file.readJson<unknown>();
+                    return file.readJson<{foo: string}>();
                 })
                 .then((data) => {
                     expect(data.foo).toEqual("bar");

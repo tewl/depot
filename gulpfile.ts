@@ -233,7 +233,8 @@ export async function build(): Promise<void>
 
         if (resultsWithoutOutput.length > 0) {
             const taskNames = _.map(resultsWithoutOutput, (curIndexedResult) => tasks[curIndexedResult.index]!.name);
-            console.log(`Tasks with no output: ${taskNames.join(", ")}`);
+            const header = headerText("Tasks with no output:");
+            console.log(`${header} ${taskNames.join(", ")}`);
         }
         _.forEach(resultsWithOutput, (curIndexedResult) => {
             const header = headerText(`Output from ${tasks[curIndexedResult.index]!.name}`);

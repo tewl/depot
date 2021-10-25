@@ -314,3 +314,19 @@ export function concatStrings(strings: Array<string>, sep: string = os.EOL): str
 {
     return strings.join(sep);
 }
+
+
+/**
+ * Repeats _str_ to build a new string containing `numChars` characters.
+ * @param str - The string to repeat until the given length is achieved
+ * @param numChars - The desired length of the returned string.
+ * @return A new string containing _str_ repeated until the specified length is
+ * achieved.
+ */
+export function repeat(str: string, numChars: number): string
+{
+    const repeatCount = Math.ceil(numChars / str.length);
+    const tooLong = _.repeat(str, repeatCount);
+    const res = tooLong.substr(0, numChars);
+    return res;
+}

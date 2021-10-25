@@ -1,6 +1,7 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
-    removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight
+    removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight,
+    repeat
 } from "./stringHelpers";
 
 
@@ -388,4 +389,19 @@ describe("padRight()", () =>
         expect(padded).toEqual("123xyx");
     });
 
+});
+
+
+describe("repeat()", () =>
+{
+    it("repeats the string as expected when the number of chars requested is a whole multiple", () =>
+    {
+        expect(repeat("123", 6)).toEqual("123123");
+    });
+
+
+    it("repeats the string as expected when the number of chars requested is not a whole multiple", () =>
+    {
+        expect(repeat("123", 10)).toEqual("1231231231");
+    });
 });

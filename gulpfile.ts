@@ -1,15 +1,17 @@
 import * as path from "path";
 import * as _ from "lodash";
-import del from "del";
-import chalk from "chalk";
-import { nodeBinForOs } from "./src/nodeUtil";
+import del = require("del");
+import chalk = require("chalk");
+import { nodeBinForOs, createCmdLaunchScript, makeNodeScriptExecutable } from "./src/nodeUtil";
 import { Directory } from "./src/directory";
 import { toGulpError } from "./src/gulpHelpers";
 import { File } from "./src/file";
+import { getOs, OperatingSystem } from "./src/os";
 import { spawn, SpawnError, spawnErrorToString } from "./src/spawn2";
 import { failed, failedResult, Result, succeeded, succeededResult } from "./src/result";
 import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
+import { mapAsync } from "./src/promiseHelpers";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +20,14 @@ import * as promiseResult from "./src/promiseResult";
 
 const distDir = new Directory(__dirname, "dist");
 const tmpDir  = new Directory(__dirname, "tmp");
+
+//
+// The executable scripts build by this project.
+// These scripts will be made executable.
+//
+const scripts: Array<string> = [
+    // The project does not contain any executable scripts.
+];
 
 const sep = hr("-");
 
@@ -231,6 +241,46 @@ export async function build(): Promise<void>
             console.log(sep);
         });
 
+        await makeExecutable();
+
         console.log("✅ " + successStyle("Build succeeded."));
     }
+}
+
+
+/**
+ * Configures the scripts this project builds so that they can be easily
+ * executed.
+ * @return A promise that resolves when all operations have completed.
+ */
+function makeExecutable(): Promise<void>
+{
+    const scriptFiles = _.map(scripts, (curScript) => new File(distDir, curScript));
+
+    //
+    // Insert a shebang line into each script and turn on the executable
+    // permission on each script file. 
+    //
+    const makeExecutablePromises = mapAsync(scriptFiles, (curJsScriptFile) => {
+        console.log(`Making executable:  ${curJsScriptFile.toString()}`);
+        return makeNodeScriptExecutable(curJsScriptFile);
+    });
+
+    //
+    // If running on Windows, create .cmd files that will launch the executable
+    // scripts.
+    //
+    let createCmdPromises: Promise<void> = Promise.resolve();
+    if (getOs() === OperatingSystem.Windows) {
+        createCmdPromises = mapAsync(scriptFiles, (curJsScriptFile) => {
+            return createCmdLaunchScript(curJsScriptFile)
+            .then((cmdFile) => {
+                console.log(`Created Windows cmd file:  ${cmdFile.fileName}`);
+            });
+        })
+        .then(() => {});
+    }
+
+    return Promise.all([ makeExecutablePromises, createCmdPromises])
+    .then(() => {});
 }

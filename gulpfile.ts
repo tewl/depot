@@ -19,9 +19,9 @@ const tmpDir  = new Directory(__dirname, "tmp");
 
 const sep = "--------------------------------------------------------------------------------";
 
-const successText = chalk.green.bold;
-const failText    = chalk.red.bold;
-const headerText  = chalk.bold;
+const successStyle = chalk.green.bold;
+const failStyle    = chalk.red.bold;
+const headerStyle  = chalk.bold;
 
 ////////////////////////////////////////////////////////////////////////////////
 // clean
@@ -107,23 +107,6 @@ async function runUnitTests(
 ): Promise<Result<string, SpawnError>>
 {
     const jasmineConfigFile = new File(".", "jasmine.json");
-
-    // const cmd = nodeBinForOs(path.join(".", "node_modules", ".bin", "jasmine")).toString();
-    // const args = [
-    //     "--color",
-    //     `--config=${jasmineConfigFile.toString()}`
-    // ];
-    //
-    // return spawn(
-    //     cmd,
-    //     args,
-    //     { cwd: __dirname },
-    //     undefined,
-    //     allowOutput ? process.stdout : undefined,
-    //     allowOutput ? process.stderr : undefined
-    // )
-    // .closePromise;
-
 
     // A typical command line looks something like:
     // .\node_modules\.bin\ts-node.cmd --project .\tsconfig.json .\node_modules\jasmine\bin\jasmine.js --color --config=.\jasmine.json
@@ -214,11 +197,11 @@ export async function build(): Promise<void>
     const results = await promiseResult.allArray(_.map(tasks, (curTask) => curTask.promiseResult));
 
     if (failed(results)) {
-        console.error(failText(sep));
-        console.error(failText(`❌ Task failed: ${tasks[results.error.index]!.name}`));
-        console.error(failText(sep));
+        console.error(failStyle(sep));
+        console.error(failStyle(`❌ Task failed: ${tasks[results.error.index]!.name}`));
+        console.error(failStyle(sep));
         console.error(spawnErrorToString(results.error.item));
-        throw toGulpError("❌ " + failText("Build failed."));
+        throw toGulpError("❌ " + failStyle("Build failed."));
     }
     else {
 
@@ -233,11 +216,11 @@ export async function build(): Promise<void>
 
         if (resultsWithoutOutput.length > 0) {
             const taskNames = _.map(resultsWithoutOutput, (curIndexedResult) => tasks[curIndexedResult.index]!.name);
-            const header = headerText("Tasks with no output:");
+            const header = headerStyle("Tasks with no output:");
             console.log(`${header} ${taskNames.join(", ")}`);
         }
         _.forEach(resultsWithOutput, (curIndexedResult) => {
-            const header = headerText(`Output from ${tasks[curIndexedResult.index]!.name}`);
+            const header = headerStyle(`Output from ${tasks[curIndexedResult.index]!.name}`);
             console.log(header);
             console.log();
             console.log(curIndexedResult.result);
@@ -245,6 +228,6 @@ export async function build(): Promise<void>
             console.log(sep);
         });
 
-        console.log("✅ " + successText("Build succeeded."));
+        console.log("✅ " + successStyle("Build succeeded."));
     }
 }

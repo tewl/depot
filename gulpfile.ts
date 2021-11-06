@@ -11,7 +11,7 @@ import { failed, failedResult, Result, succeeded, succeededResult } from "./src/
 import * as promiseResult from "./src/promiseResult";
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constants
+// Project Configuration
 ////////////////////////////////////////////////////////////////////////////////
 
 const distDir = new Directory(__dirname, "dist");
@@ -22,6 +22,7 @@ const sep = "-------------------------------------------------------------------
 const successStyle = chalk.green.bold;
 const failStyle    = chalk.red.bold;
 const headerStyle  = chalk.bold;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // clean

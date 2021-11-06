@@ -8,7 +8,9 @@ import { toGulpError } from "./src/gulpHelpers";
 import { File } from "./src/file";
 import { spawn, SpawnError, spawnErrorToString } from "./src/spawn2";
 import { failed, failedResult, Result, succeeded, succeededResult } from "./src/result";
+import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Project Configuration
@@ -17,7 +19,7 @@ import * as promiseResult from "./src/promiseResult";
 const distDir = new Directory(__dirname, "dist");
 const tmpDir  = new Directory(__dirname, "tmp");
 
-const sep = "--------------------------------------------------------------------------------";
+const sep = hr("-");
 
 const successStyle = chalk.green.bold;
 const failStyle    = chalk.red.bold;

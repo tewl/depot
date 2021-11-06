@@ -47,7 +47,31 @@
         "@typescript-eslint/func-call-spacing": [
             "error"
         ],
-        "@typescript-eslint/indent": "off", // Docs say this rule is broken. Use eslint one.
+        "@typescript-eslint/indent": [
+            "error",
+            4,
+            {
+                "ignoredNodes": [
+                    "ConditionalExpression"
+                ],
+                "MemberExpression": 0, // Chaining methods does not require indentation
+                "SwitchCase": 1,
+                "flatTernaryExpressions": true,
+                "ignoreComments": true,
+                "FunctionDeclaration": {
+                    "parameters": "first"
+                },
+                "FunctionExpression": {
+                    "parameters": "first"
+                },
+                "CallExpression": {
+                    "arguments": "first"
+                },
+                "ArrayExpression": "first",
+                "ObjectExpression": "first",
+                "ImportDeclaration": "first"
+            }
+        ],
         "@typescript-eslint/keyword-spacing": [
             "error",
             {
@@ -335,29 +359,7 @@
             "beside"
         ],
         "indent": [
-            "error",
-            4,
-            {
-                "ignoredNodes": [
-                    "ConditionalExpression"
-                ],
-                "MemberExpression": 0, // Chaining methods does not require indentation
-                "SwitchCase": 1,
-                "flatTernaryExpressions": true,
-                "ignoreComments": true,
-                "FunctionDeclaration": {
-                    "parameters": "first"
-                },
-                "FunctionExpression": {
-                    "parameters": "first"
-                },
-                "CallExpression": {
-                    "arguments": "first"
-                },
-                "ArrayExpression": "first",
-                "ObjectExpression": "first",
-                "ImportDeclaration": "first"
-            }
+            "off"      // Must be turned off when @typescript-eslint/indent is enabled
         ],
         "key-spacing": [
             "error",

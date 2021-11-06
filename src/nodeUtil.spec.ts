@@ -35,7 +35,7 @@ describe("makeNodeScriptExecutable()", () => {
         // The Node.js documentation states "on Windows only the write
         // permission can be changed."  Therefore, this test will not be run on
         // Windows.
-        if (getOs() === OperatingSystem.WINDOWS)
+        if (getOs() === OperatingSystem.Windows)
         {
             done();
         }

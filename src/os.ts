@@ -6,9 +6,9 @@ import { Directory } from "./directory";
  * An enumeration of operating systems supported by this tool.
  */
 export enum OperatingSystem {
-    UNKNOWN = "UNKNOWN",
-    MAC = "MAC",
-    WINDOWS = "WINDOWS"
+    Unknown = "UNKNOWN",
+    Mac = "MAC",
+    Windows = "WINDOWS"
 }
 
 
@@ -20,13 +20,13 @@ export function getOs(): OperatingSystem {
     const platform = os.platform();
 
     if (platform.startsWith("win")) {
-        return OperatingSystem.WINDOWS;
+        return OperatingSystem.Windows;
     }
     else if (platform === "darwin") {
-        return OperatingSystem.MAC;
+        return OperatingSystem.Mac;
     }
     else {
-        return OperatingSystem.UNKNOWN;
+        return OperatingSystem.Unknown;
     }
 }
 

@@ -18,7 +18,7 @@ describe("spawn", () => {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let cmd = "ls";
-        if (os === OperatingSystem.WINDOWS) {
+        if (os === OperatingSystem.Windows) {
             options.shell = true;
             cmd = "dir";
         }
@@ -36,7 +36,7 @@ describe("spawn", () => {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let lsCmd = "ls";
-        if (os === OperatingSystem.WINDOWS)
+        if (os === OperatingSystem.Windows)
         {
             options.shell = true;
             lsCmd = "dir";
@@ -58,7 +58,7 @@ describe("spawn", () => {
         let cmd: string;
         let args: Array<string>;
 
-        if (getOs() === OperatingSystem.WINDOWS) {
+        if (getOs() === OperatingSystem.Windows) {
             cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
             args = ["-c ", "sleep 10"];
         }
@@ -145,8 +145,8 @@ describe("spawn", () => {
     it("provides the exit code and stderr when the command fails", (done) => {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
         const os = getOs();
-        const lsCmd = os === OperatingSystem.WINDOWS ? "dir" : "ls";
-        const options = os === OperatingSystem.WINDOWS ? {shell: true} : undefined;
+        const lsCmd = os === OperatingSystem.Windows ? "dir" : "ls";
+        const options = os === OperatingSystem.Windows ? {shell: true} : undefined;
         spawn(lsCmd, [nonExistantFilePath], options).closePromise
         .catch((err) => {
             expect(err).toBeTruthy();

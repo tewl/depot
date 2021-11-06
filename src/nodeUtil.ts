@@ -71,7 +71,7 @@ export function nodeBinForOs(nodeBinFile: File | string): File
 {
     const inputFile: File = nodeBinFile instanceof File ? nodeBinFile : new File(nodeBinFile);
 
-    if (getOs() === OperatingSystem.WINDOWS)
+    if (getOs() === OperatingSystem.Windows)
     {
         return new File(inputFile.directory, inputFile.baseName + ".cmd");
     }

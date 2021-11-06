@@ -22,7 +22,7 @@ describe("spawn", () => {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let cmd = "ls";
-        if (os === OperatingSystem.WINDOWS)
+        if (os === OperatingSystem.Windows)
         {
             options.shell = true;
             cmd = "dir";
@@ -43,7 +43,7 @@ describe("spawn", () => {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let lsCmd = "ls";
-        if (os === OperatingSystem.WINDOWS)
+        if (os === OperatingSystem.Windows)
         {
             options.shell = true;
             lsCmd = "dir";
@@ -60,7 +60,7 @@ describe("spawn", () => {
         let cmd: string;
         let args: Array<string>;
 
-        if (getOs() === OperatingSystem.WINDOWS) {
+        if (getOs() === OperatingSystem.Windows) {
             cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
             args = [
                 "-c ",
@@ -90,8 +90,8 @@ describe("spawn", () => {
     {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
         const os = getOs();
-        const lsCmd = os === OperatingSystem.WINDOWS ? "dir" : "ls";
-        const options = os === OperatingSystem.WINDOWS ? {shell: true} : undefined;
+        const lsCmd = os === OperatingSystem.Windows ? "dir" : "ls";
+        const options = os === OperatingSystem.Windows ? {shell: true} : undefined;
         const result = await spawn(lsCmd, [nonExistantFilePath], options).closePromise;
         expect(failed(result)).toBeTruthy();
 

@@ -267,7 +267,7 @@ describe("File", () => {
 
             it("will change the mode bits to the specified value (non-Windows)", (done) => {
 
-                if (getOs() !== OperatingSystem.WINDOWS)
+                if (getOs() !== OperatingSystem.Windows)
                 {
                     testFile.chmod(
                         constants.S_IRWXU |
@@ -297,7 +297,7 @@ describe("File", () => {
 
             it("will change the mode bits to the specified value (Windows)", (done) =>
             {
-                if (getOs() === OperatingSystem.WINDOWS)
+                if (getOs() === OperatingSystem.Windows)
                 {
 
                     // chmod() is implemented very strangely on Windows.
@@ -357,7 +357,7 @@ describe("File", () => {
 
 
             it("will change the mode bits to the specified value (non-Windows)", () => {
-                if (getOs() !== OperatingSystem.WINDOWS) {
+                if (getOs() !== OperatingSystem.Windows) {
                     testFile.chmodSync(
                         constants.S_IRWXU |
                         constants.S_IRGRP | constants.S_IXGRP |
@@ -387,7 +387,7 @@ describe("File", () => {
                 const file = new File(__filename);
                 const absPath = file.absPath();
 
-                if (getOs() === OperatingSystem.WINDOWS) {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
                 }
                 else {
@@ -409,7 +409,7 @@ describe("File", () => {
                 expect(_.startsWith(relFile.toString(), ".." + path.sep)).toBeTruthy();
 
                 const absFile = relFile.absolute();
-                if (getOs() === OperatingSystem.WINDOWS) {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(absFile.toString(), "C:\\")).toBeTruthy();
                 }
                 else {

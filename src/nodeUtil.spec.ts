@@ -2,7 +2,7 @@ import {constants} from "fs";
 import * as _ from "lodash";
 import {tmpDir} from "../test/ut/specHelpers";
 import {File} from "./file";
-import {makeNodeScriptExecutable} from "./nodeUtil";
+import {makeNodeScriptExecutable, createCmdLaunchScript} from "./nodeUtil";
 import {splitIntoLines} from "./stringHelpers";
 import {getOs, OperatingSystem} from "./os";
 
@@ -60,6 +60,58 @@ describe("makeNodeScriptExecutable()", () => {
                 done();
             });
         }
+    });
+
+
+});
+
+
+describe("createCmdLaunchScript()", () =>
+{
+
+    const jsScriptFile = new File(tmpDir, "nodeScript.js");
+
+
+    beforeEach(() => {
+        tmpDir.emptySync();
+        jsScriptFile.writeSync("console.log(\"hello\");");
+    });
+
+
+    it("will create the associated .cmd file", async () =>
+    {
+        const cmdFile = await createCmdLaunchScript(jsScriptFile);
+        expect(cmdFile.existsSync()).toBeDefined();
+    });
+
+
+    it("will create a .cmd file that contains code to launch the specified js file", async () =>
+    {
+        const cmdFile = await createCmdLaunchScript(jsScriptFile);
+        const cmdContents = cmdFile.readSync();
+
+        expect(_.includes(cmdContents, jsScriptFile.fileName)).toBeTruthy();
+    });
+
+
+    it("returns a file representing the newly created .cmd file", async () =>
+    {
+        const cmdFile = await createCmdLaunchScript(jsScriptFile);
+        expect(cmdFile).toBeDefined();
+        expect(cmdFile.directory.toString()).toEqual(jsScriptFile.directory.toString());
+        expect(cmdFile.fileName).toEqual(jsScriptFile.baseName + ".cmd");
+    });
+
+
+    it("will overwrite and existing .cmd file", async () =>
+    {
+        const preexistingCmdFile = new File(jsScriptFile.directory, jsScriptFile.baseName + ".cmd");
+        const preexistingText = "preexisting";
+        preexistingCmdFile.writeSync(preexistingText);
+
+        const newCmdFile = await createCmdLaunchScript(jsScriptFile);
+        const newText = newCmdFile.readSync();
+        expect(newText).not.toEqual(preexistingText);
     });
 
 

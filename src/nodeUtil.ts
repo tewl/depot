@@ -81,3 +81,39 @@ export function nodeBinForOs(nodeBinFile: File | string): File
     }
 }
 
+
+/**
+ * Creates a Windows .cmd file that will launch the specified .js file using
+ * Node.
+ * @param jsFile - The JavaScript file to be launched by node.exe
+ * @return A File object representing the created .cmd file
+ */
+export function createCmdLaunchScript(jsFile: File): Promise<File>
+{
+    const cmdFileName =  jsFile.baseName + ".cmd";
+    const cmdFile = new File(jsFile.directory, cmdFileName);
+    const cmdContents = getCmdLauncherCode(jsFile);
+    return cmdFile.write(cmdContents)
+    .then(() => {
+        return cmdFile;
+    });
+}
+
+
+/**
+ * Gets the .cmd file code needed to launch the specified .js file using node.
+ * @param jsFile - The .js file that will be run
+ * @return The .cmd file code needed to launch the specified .js file using node
+ */
+function getCmdLauncherCode(jsFile: File): string {
+
+    const cmdCode = `@IF EXIST "%~dp0\\node.exe" (` + EOL +
+                    `    "%~dp0\\node.exe"  "%~dp0\\${jsFile.fileName}" %*` + EOL +
+                    `) ELSE (` + EOL +
+                    `    @SETLOCAL` + EOL +
+                    `    @SET PATHEXT=%PATHEXT:;.JS;=;%` + EOL +
+                    `    node  "%~dp0\\${jsFile.fileName}" %*` + EOL +
+                    `)` + EOL;
+
+    return cmdCode;
+}

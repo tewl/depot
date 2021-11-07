@@ -324,6 +324,16 @@ export class Fraction
     }
 
 
+    /**
+     * Determines whether this Fraction is in its reduced form.
+     * @return Whether this fraction is in reduced form.
+     */
+    public isReduced(): boolean
+    {
+        const gcd = greatestCommonDivisor(this._num, this._den);
+        return gcd === 1;
+    }
+
     public reduce(): Fraction
     {
         const gcd = greatestCommonDivisor(this._num, this._den);

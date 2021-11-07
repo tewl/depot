@@ -308,6 +308,20 @@ describe("Fraction", () => {
         });
 
 
+        describe("isReduced()", () =>
+        {
+            it("returns false when the fraction cannot be reduced", () => {
+                expect(Fraction.fromParts(3, 8).isReduced()).toBeTrue();
+            });
+
+
+            it("returns true when the fraction can be reduced", () => {
+                expect(Fraction.fromParts(2, 8).isReduced()).toBeFalse();
+            });
+
+        });
+
+
         describe("reduce()", () => {
 
 
@@ -583,7 +597,7 @@ describe("Fraction", () => {
 
             it("will return equal floor and ceil values when the value falls on an increment", () =>
             {
-                const val = Fraction.from("1/2").add(Fraction.from("1/32"));
+                const val = Fraction.from("1/2").add(Fraction.from("1/32"));  // 17/32
                 const increment = Fraction.from("1/32");
                 const bracketResult = val.bracket(increment);
                 expect(bracketResult.floor.toString()).toEqual("17/32");
@@ -593,7 +607,7 @@ describe("Fraction", () => {
 
 
             it("will return equal floor and ceil values when the value is negative and falls on an increment", () => {
-                const val = Fraction.from("-1/2").add(Fraction.from("-1/32"));
+                const val = Fraction.from("-1/2").add(Fraction.from("-1/32"));  // -17/32
                 const increment = Fraction.from("1/32");
                 const bracketResult = val.bracket(increment);
                 expect(bracketResult.floor.toString()).toEqual("-17/32");
@@ -604,7 +618,7 @@ describe("Fraction", () => {
 
             it("will return the expected floor and ceil values when the value does not fall on an increment", () =>
             {
-                const val = Fraction.from("1/2").add(Fraction.from("1/32"));
+                const val = Fraction.from("1/2").add(Fraction.from("1/32"));  // 17/32, 4.25/8
                 const increment = Fraction.from("1/8");
                 const bracketResult = val.bracket(increment);
                 expect(bracketResult.floor.toString()).toEqual("4/8");

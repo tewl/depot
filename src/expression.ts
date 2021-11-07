@@ -247,7 +247,7 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
             remainingExpressionStartIndex = token.endIndex;
         }
         else {
-            return failedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of ${originalExpression}.`);
+            return failedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of "${originalExpression}".`);
         }
     }
 

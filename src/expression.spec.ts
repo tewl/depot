@@ -68,7 +68,7 @@ describe("tokenize()", () => {
     it("fails to tokenize a string that makes no sense", () => {
         const tokenizeResult = tokenize("&");
         expect(failed(tokenizeResult)).toBeTruthy();
-        expect(tokenizeResult.error).toEqual("Failed to parse expression at index 0 of &.");
+        expect(tokenizeResult.error).toEqual('Failed to parse expression at index 0 of "&".');
     });
 
 

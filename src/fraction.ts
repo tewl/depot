@@ -223,7 +223,12 @@ export class Fraction
 
 
     // region Instance Data Members
+
+    /**
+     * The numerator always has the sign for the value.
+     */
     private readonly _num: number;
+
     private readonly _den: number;
     // endregion
 
@@ -262,6 +267,36 @@ export class Fraction
                 return str;
             }
         }
+    }
+
+
+    public stringRepresentations(): Array<string>
+    {
+        let lastUsedValue: Fraction = Fraction.from(this);
+
+        // First, get the standard (possibly improper) form of this fraction.
+        const representations = [lastUsedValue.toString(true)];
+
+        // Second, if possible get the reduced (possibly improper) form of this
+        // fraction.
+        const reduced = this.reduce();
+        if (reduced.wasReduced) {
+            representations.push(reduced.reducedFraction.toString(true));
+            lastUsedValue = reduced.reducedFraction;
+        }
+
+        // Third, if possible get the mixed number form of this fraction.
+        if (lastUsedValue.isImproper()) {
+            representations.push(lastUsedValue.toString(false));
+        }
+
+        return representations;
+    }
+
+
+    public isImproper(): boolean
+    {
+        return Math.abs(this._num) > this._den;
     }
 
 

@@ -217,6 +217,85 @@ describe("Fraction", () => {
         });
 
 
+        describe("stringRepresentations()", () =>
+        {
+
+            it("returns a single string when it cannot be reduced and is not improper", () =>
+            {
+                const frac = Fraction.fromParts(5, 8);
+                const representations = frac.stringRepresentations();
+                expect(representations).toEqual(["5/8"]);
+            });
+
+
+            it("returns two strings when it can be reduced and is not improper", () =>
+            {
+                const frac = Fraction.fromParts(4, 8);
+                const representations = frac.stringRepresentations();
+                expect(representations).toEqual(["4/8", "1/2"]);
+            });
+
+
+            it("returns two string when it cannot be reduced and is improper", () =>
+            {
+                const frac = Fraction.fromParts(12, 8);
+                const representations = frac.stringRepresentations();
+                expect(representations).toEqual(["12/8", "3/2", "1 1/2"]);
+            });
+
+
+            it("returns three strings when it can be reduced and is improper", () =>
+            {
+                const frac = Fraction.fromParts(28, 26);
+                const representations = frac.stringRepresentations();
+                expect(representations).toEqual(["28/26", "14/13", "1 1/13"]);
+            });
+
+
+        });
+
+
+        describe("isImproper()", () =>
+        {
+
+            it("returns true when the numerator is greater than the denominator", () =>
+            {
+                expect(Fraction.fromParts(4, 3).isImproper()).toBeTrue();
+            });
+
+
+            it("returns false when the numerator equals the denominator", () =>
+            {
+                expect(Fraction.fromParts(5, 5).isImproper()).toBeFalse();
+            });
+
+
+            it("returns false when the numerator is less than the denominator", () =>
+            {
+                expect(Fraction.fromParts(5, 6).isImproper()).toBeFalse();
+            });
+
+
+            it("returns true when the numerator is a greater negative number than the denominator", () =>
+            {
+                expect(Fraction.fromParts(-7, 6).isImproper()).toBeTrue();
+            });
+
+
+            it("returns false when the numerator is equal to the negative of the denominator", () =>
+            {
+                expect(Fraction.fromParts(-6, 6).isImproper()).toBeFalse();
+            });
+
+
+            it("returns false when the numerator is a lesser negative number than the denominator", () =>
+            {
+                expect(Fraction.fromParts(-5, 6).isImproper()).toBeFalse();
+            });
+
+        });
+
+
         describe("wholePart()", () => {
 
 

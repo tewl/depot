@@ -105,7 +105,8 @@ export async function ut(): Promise<void>
 {
     const result = await runUnitTests(true);
     if (succeeded(result)) {
-        console.log(result.value);
+        // Since we allowed output while running the unit test task, we don't
+        // have to print it out again.
     }
     else {
         // Since we allowed output while running the unit test task, we don't

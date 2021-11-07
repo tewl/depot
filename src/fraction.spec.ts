@@ -308,36 +308,44 @@ describe("Fraction", () => {
         });
 
 
-        describe("isReduced()", () =>
-        {
-            it("returns false when the fraction cannot be reduced", () => {
-                expect(Fraction.fromParts(3, 8).isReduced()).toBeTrue();
-            });
-
-
-            it("returns true when the fraction can be reduced", () => {
-                expect(Fraction.fromParts(2, 8).isReduced()).toBeFalse();
-            });
-
-        });
-
-
         describe("reduce()", () => {
 
 
             it("returns an identical value when it cannot be reduced", () => {
-                expect(Fraction.fromParts(3, 4).reduce().toString()).toEqual("3/4");
+                const result = Fraction.fromParts(3, 4).reduce();
+                expect(result.reducedFraction.toString()).toEqual("3/4");
+                expect(result.wasReduced).toBeFalse();
             });
 
 
             it("returns a reduced value", () => {
-                expect(Fraction.fromParts(4, 4).reduce().toString()).toEqual("1");
-                expect(Fraction.fromParts(6, 4).reduce().toString()).toEqual("1 1/2");
-                expect(Fraction.fromParts(6, 8).reduce().toString()).toEqual("3/4");
-                expect(Fraction.fromParts(14, 8).reduce().toString()).toEqual("1 3/4");
-                expect(Fraction.fromParts(-14, 8).reduce().toString()).toEqual("-1 3/4");
-                expect(Fraction.fromParts(0, 8).reduce().toString()).toEqual("0");
-                expect(Fraction.fromParts(-0, 8).reduce().toString()).toEqual("0");
+                let result = Fraction.fromParts(4, 4).reduce();
+                expect(result.reducedFraction.toString()).toEqual("1");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(6, 4).reduce();
+                expect(result.reducedFraction.toString()).toEqual("1 1/2");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(6, 8).reduce();
+                expect(result.reducedFraction.toString()).toEqual("3/4");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(14, 8).reduce();
+                expect(result.reducedFraction.toString()).toEqual("1 3/4");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(-14, 8).reduce();
+                expect(result.reducedFraction.toString()).toEqual("-1 3/4");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(0, 8).reduce();
+                expect(result.reducedFraction.toString()).toEqual("0");
+                expect(result.wasReduced).toBeTrue();
+
+                result = Fraction.fromParts(-0, 8).reduce();
+                expect(result.reducedFraction.toString()).toEqual("0");
+                expect(result.wasReduced).toBeTrue();
             });
 
 

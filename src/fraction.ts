@@ -305,7 +305,7 @@ export class Fraction
             throw new Error("When changing the denominator, the new value must be a positive integer.");
         }
 
-        const reduced = this.reduce();
+        const reduced = this.reduce().reducedFraction;
         if (newDenominator % reduced._den) {
             throw new Error(`Cannot change fraction denominator to ${newDenominator} without modifying value.`);
         }
@@ -324,20 +324,16 @@ export class Fraction
     }
 
 
-    /**
-     * Determines whether this Fraction is in its reduced form.
-     * @return Whether this fraction is in reduced form.
-     */
-    public isReduced(): boolean
+    public reduce(): {reducedFraction: Fraction, wasReduced: boolean}
     {
         const gcd = greatestCommonDivisor(this._num, this._den);
-        return gcd === 1;
-    }
-
-    public reduce(): Fraction
-    {
-        const gcd = greatestCommonDivisor(this._num, this._den);
-        return new Fraction(this._num / gcd, this._den / gcd);
+        if (gcd === 1) {
+            return {reducedFraction: this, wasReduced: false};
+        }
+        else {
+            const reducedFration = new Fraction(this._num / gcd, this._den / gcd);
+            return {reducedFraction: reducedFration, wasReduced: true};
+        }
     }
 
 
@@ -424,7 +420,7 @@ export class Fraction
         const num = this._num * otherFrac._num;
         const den = this._den * otherFrac._den;
         const product = new Fraction(num, den);
-        const result = product.reduce();
+        const result = product.reduce().reducedFraction;
         return result;
     }
 
@@ -515,7 +511,7 @@ export class Fraction
 
         // 1 must be evenly divisible by the specified increment value (since we
         // will be stepping from floor() to ceil()).
-        if (incr.reduce()._num !== 1) {
+        if (incr.reduce().reducedFraction._num !== 1) {
             throw new Error("bracket() 1 must be divisible by the specified increment.");
         }
 

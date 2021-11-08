@@ -2,15 +2,9 @@ import * as _ from "lodash";
 
 
 // Regular expressions used to parse fraction strings.
-// TODO: Convert the following regex to use named capture groups.
-// eslint-disable-next-line prefer-named-capture-group
-const justWhole = /^(\d+)$/;
-// TODO: Convert the following regex to use named capture groups.
-// eslint-disable-next-line prefer-named-capture-group
-const justFrac  = /^(\d+)\/(\d+)$/;
-// TODO: Convert the following regex to use named capture groups.
-// eslint-disable-next-line prefer-named-capture-group
-const allParts  = /^(\d+) (\d+)\/(\d+)$/;
+const justWhole = /^(?<whole>\d+)$/;
+const justFrac  = /^(?<num>\d+)\/(?<den>\d+)$/;
+const allParts  = /^(?<whole>\d+) (?<num>\d+)\/(?<den>\d+)$/;
 
 
 export class Fraction
@@ -135,24 +129,24 @@ export class Fraction
         matches = justWhole.exec(str);
         if (matches)
         {
-            const whole = parseInt(matches[1], 10) * negativeAdjuster;
+            const whole = parseInt(matches.groups!.whole, 10) * negativeAdjuster;
             return Fraction.fromParts(whole);
         }
 
         matches = justFrac.exec(str);
         if (matches)
         {
-            const num = parseInt(matches[1], 10) * negativeAdjuster;
-            const den = parseInt(matches[2], 10);
+            const num = parseInt(matches.groups!.num, 10) * negativeAdjuster;
+            const den = parseInt(matches.groups!.den, 10);
             return Fraction.fromParts(num, den);
         }
 
         matches = allParts.exec(str);
         if (matches)
         {
-            const whole = parseInt(matches[1], 10) * negativeAdjuster;
-            const num   = parseInt(matches[2], 10);
-            const den   = parseInt(matches[3], 10);
+            const whole = parseInt(matches.groups!.whole, 10) * negativeAdjuster;
+            const num   = parseInt(matches.groups!.num,   10);
+            const den   = parseInt(matches.groups!.den,   10);
             return Fraction.fromParts(whole, num, den);
         }
 

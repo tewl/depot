@@ -1,6 +1,5 @@
 import * as _ from "lodash";
-import { failed, failedResult, succeededResult } from ".";
-import { Result } from "./result";
+import { Result, failed, failedResult, succeededResult } from "./result";
 
 
 // Regular expressions used to parse fraction strings.

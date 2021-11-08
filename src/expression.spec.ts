@@ -78,7 +78,7 @@ describe("tokenize()", () => {
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3));
+        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3).value!);
     });
 
 
@@ -89,7 +89,7 @@ describe("tokenize()", () => {
         expect(tokens.length).toEqual(1);
 
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3));
+        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3).value!);
     });
 
 
@@ -100,7 +100,7 @@ describe("tokenize()", () => {
         expect(tokens.length).toEqual(1);
 
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3));
+        expect((tokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from(3).value!);
     });
 
 
@@ -110,7 +110,7 @@ describe("tokenize()", () => {
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((tokens[0] as IExpressionTokenNumber).value.equals(Fraction.from(0.25))).toEqual(true);
+        expect((tokens[0] as IExpressionTokenNumber).value.equals(Fraction.from(0.25).value!)).toEqual(true);
     });
 
 
@@ -121,7 +121,7 @@ describe("tokenize()", () => {
         expect(tokens.length).toEqual(1);
 
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((tokens[0] as IExpressionTokenNumber).value.equals(Fraction.from(2.25))).toEqual(true);
+        expect((tokens[0] as IExpressionTokenNumber).value.equals(Fraction.from(2.25).value!)).toEqual(true);
     });
 
 
@@ -372,16 +372,16 @@ describe("toPostfix()", () => {
         const postfixTokens = postfixResult.value!;
 
         expect(postfixTokens[0].type).toEqual("IExpressionTokenNumber");
-        expect((postfixTokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from("1/4"));
+        expect((postfixTokens[0] as IExpressionTokenNumber).value).toEqual(Fraction.from("1/4").value!);
 
         expect(postfixTokens[1].type).toEqual("IExpressionTokenNumber");
-        expect((postfixTokens[1] as IExpressionTokenNumber).value).toEqual(Fraction.from("1 3/4"));
+        expect((postfixTokens[1] as IExpressionTokenNumber).value).toEqual(Fraction.from("1 3/4").value!);
 
         expect(postfixTokens[2].type).toEqual("IExpressionTokenOperator");
         expect((postfixTokens[2] as IExpressionTokenOperator).symbol).toEqual("+");
 
         expect(postfixTokens[3].type).toEqual("IExpressionTokenNumber");
-        expect((postfixTokens[3] as IExpressionTokenNumber).value).toEqual(Fraction.from("4"));
+        expect((postfixTokens[3] as IExpressionTokenNumber).value).toEqual(Fraction.from("4").value!);
 
         expect(postfixTokens[4].type).toEqual("IExpressionTokenOperator");
         expect((postfixTokens[4] as IExpressionTokenOperator).symbol).toEqual("*");

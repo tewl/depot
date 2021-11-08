@@ -171,6 +171,9 @@ function getTokenizers(): Array<ITokenizer>
         {
             matcherFn: (remainingText: string) =>
             {
+                //
+                // TODO: Replace the following regular expressions with those in fraction.ts
+                //
                 const regexWhole = /^(?<leadingws>\s*)(?<whole>\d+)(?<trailingws>\s*)/;
                 const regexFrac = /^(?<leadingws>\s*)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
                 const regexWholeAndFrac = /^(?<leadingws>\s*)(?<whole>\d+)(?<reqws>\s+)(?<num>\d+)\/(?<den>\d+)(?<trailingws>\s*)/;
@@ -182,7 +185,7 @@ function getTokenizers(): Array<ITokenizer>
             {
                 return {
                     type:               "IExpressionTokenNumber" as const,
-                    value:              Fraction.from(match[0]),
+                    value:              Fraction.from(match[0]).value!,
                     originalExpression: fullExpression,
                     startIndex:         startIndex,
                     endIndex:           endIndex,

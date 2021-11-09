@@ -3,12 +3,7 @@ import { Fraction } from "./fraction";
 import { Result, failedResult, succeededResult, failed } from "./result";
 import {find} from "./collection";
 import { assertNever } from "./never";
-
-
-export interface IDuType
-{
-    type: string;
-}
+import { IDuMember } from "./discriminatedUnion";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +25,7 @@ export interface IExpressionToken
 ////////////////////////////////////////////////////////////////////////////////
 // IExpressionTokenNumber
 ////////////////////////////////////////////////////////////////////////////////
-export interface IExpressionTokenNumber extends IDuType, IExpressionToken
+export interface IExpressionTokenNumber extends IDuMember, IExpressionToken
 {
     type: "IExpressionTokenNumber";
     value: Fraction;
@@ -57,7 +52,7 @@ interface IOperatorTraits
 }
 
 
-export interface IExpressionTokenOperator extends IDuType, IExpressionToken
+export interface IExpressionTokenOperator extends IDuMember, IExpressionToken
 {
     type: "IExpressionTokenOperator";
     symbol: OperatorSymbol;

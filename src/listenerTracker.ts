@@ -73,10 +73,11 @@ export class ListenerTracker
      */
     public removeAll(): void
     {
-        Object.keys(this._listenerMap).forEach((eventName) => {
-
+        Object.keys(this._listenerMap).forEach((eventName) =>
+        {
             const listeners = this._listenerMap[eventName]!;
-            listeners.forEach((curListener) => {
+            listeners.forEach((curListener) =>
+            {
                 this._emitter.removeListener(eventName, curListener);
             });
 
@@ -95,7 +96,8 @@ export class ListenerTracker
         listenerCallback: (...args: Array<any>) => void  // eslint-disable-line @typescript-eslint/no-explicit-any
     ): void
     {
-        if (!this._listenerMap[eventName]) {
+        if (!this._listenerMap[eventName])
+        {
             this._listenerMap[eventName] = [];
         }
         this._listenerMap[eventName]!.push(listenerCallback);

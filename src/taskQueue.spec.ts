@@ -26,7 +26,8 @@ function createTask<TResolve>(): ITaskInfo<TResolve>
 
     // Create a task that will return the Promise we just created (which is
     // controlled by the deferred's resolve() and reject()).
-    const theTask = () => {
+    const theTask = () =>
+    {
         // Uncomment the following lines to assist debugging.
         // const msg = name ? `Running task ${name}.` : "Running task.";
         // console.log(msg);
@@ -54,17 +55,19 @@ function createTimerTask<TResolve>(
     resolveValue: TResolve
 ): Task<TResolve>
 {
-    const theTask = (): Promise<TResolve> => {
+    const theTask = (): Promise<TResolve> =>
+    {
         return getTimerPromise<TResolve>(delayMs, resolveValue);
     };
     return theTask;
 }
 
 
-describe("TaskQueue", () => {
+describe("TaskQueue", () =>
+{
 
-
-    it("will run all tasks concurrently when configured to do so", (done) => {
+    it("will run all tasks concurrently when configured to do so", (done) =>
+    {
         const ti1: ITaskInfo<number> = createTask<number>();
         const ti2: ITaskInfo<number> = createTask<number>();
 
@@ -79,12 +82,14 @@ describe("TaskQueue", () => {
         expect(queue.length).toEqual(0);
 
         t1Prom
-        .then((value: number) => {
+        .then((value: number) =>
+        {
             expect(value).toEqual(1);
             expect(queue.length).toEqual(0);
             ti2.deferred.resolve(2);
 
-            t2Prom.then((value) => {
+            t2Prom.then((value) =>
+            {
                 expect(value).toEqual(2);
                 expect(queue.length).toEqual(0);
                 done();
@@ -95,7 +100,8 @@ describe("TaskQueue", () => {
     });
 
 
-    it("will pause and resume running tasks as expected", (done) => {
+    it("will pause and resume running tasks as expected", (done) =>
+    {
         const ti1: ITaskInfo<number> = createTask<number>();
         const ti2: ITaskInfo<number> = createTask<number>();
 
@@ -118,7 +124,8 @@ describe("TaskQueue", () => {
         // Let the first task complete.
         ti1.deferred.resolve(1);
         t1Prom
-        .then(() => {
+        .then(() =>
+        {
             queue.run();                // Let the second task run
             queue.pause();
             expect(queue.length).toEqual(0);   // No more tasks in the queue
@@ -127,14 +134,15 @@ describe("TaskQueue", () => {
             ti2.deferred.resolve(2);
             return t2Prom;
         })
-        .then(() => {
+        .then(() =>
+        {
             done();
         });
     });
 
 
-    it("will only run the correct number of tasks concurrently", (done) => {
-
+    it("will only run the correct number of tasks concurrently", (done) =>
+    {
         const ti1: ITaskInfo<number> = createTask<number>();
         const ti2: ITaskInfo<number> = createTask<number>();
 
@@ -149,13 +157,15 @@ describe("TaskQueue", () => {
         expect(queue.length).toEqual(1);
 
         t1Prom
-        .then((value: number) => {
+        .then((value: number) =>
+        {
             expect(value).toEqual(1);
             expect(queue.length).toEqual(0);
             ti2.deferred.resolve(2);
 
             t2Prom
-            .then((value) => {
+            .then((value) =>
+            {
                 expect(value).toEqual(2);
                 expect(queue.length).toEqual(0);
                 done();
@@ -166,24 +176,28 @@ describe("TaskQueue", () => {
     });
 
 
-    it("is an EventEmitter", () => {
+    it("is an EventEmitter", () =>
+    {
         const queue: TaskQueue = new TaskQueue(1);
         expect(queue instanceof EventEmitter).toBeTruthy();
     });
 
 
-    it("will emit a drained event when the queue is drained", (done) => {
+    it("will emit a drained event when the queue is drained", (done) =>
+    {
         let numDrainedEvents = 0;
         const queue: TaskQueue = new TaskQueue(1);
 
-        queue.on(TaskQueue.eventNameDrained, () => {
+        queue.on(TaskQueue.eventNameDrained, () =>
+        {
             numDrainedEvents++;
         });
 
         const taskInfo1 = createTask<number>();
         const taskInfo2 = createTask<number>();
         queue.push(taskInfo1.task)
-        .then(() => {
+        .then(() =>
+        {
             // The drained event should not have fired, because handlers should
             // have the opportunity to queue more work.  If they do, the queue
             // should not emit the drained event.
@@ -194,7 +208,8 @@ describe("TaskQueue", () => {
 
             return queue.push(taskInfo2.task);
         })
-        .then(() => {
+        .then(() =>
+        {
             // Again, the drained event should not have fired, because this
             // handler has the ability to queue more work.
             expect(numDrainedEvents).toEqual(0);
@@ -202,7 +217,8 @@ describe("TaskQueue", () => {
             // Once this handler returns without queuing more work, the drained
             // event should fire.
         })
-        .then(() => {
+        .then(() =>
+        {
             expect(numDrainedEvents).toEqual(1);
             done();
         });
@@ -211,13 +227,14 @@ describe("TaskQueue", () => {
     });
 
 
-    it("will not emit a drained event if the last task's fulfillment handler enqueues more work", (done) => {
-
+    it("will not emit a drained event if the last task's fulfillment handler enqueues more work", (done) =>
+    {
         // Setup a TaskQueue and a means to tell whether the "drained" event has
         // been emitted.
         const queue = new TaskQueue(1);
         let numDrainedEvents = 0;
-        queue.on(TaskQueue.eventNameDrained, () => {
+        queue.on(TaskQueue.eventNameDrained, () =>
+        {
             numDrainedEvents++;
         });
 
@@ -225,7 +242,8 @@ describe("TaskQueue", () => {
         const task2 = createTimerTask(200, undefined);
 
         queue.push(task1)
-        .then(() => {
+        .then(() =>
+        {
             // task1 is now complete.  The client should always be given the
             // opportunity to enqueue more work (before the TaskQueue can
             // officially say that it has been drained).  So we will queue task2
@@ -233,17 +251,19 @@ describe("TaskQueue", () => {
             expect(numDrainedEvents).toEqual(0);
             return queue.push(task2);
         })
-        .then(() => {
+        .then(() =>
+        {
             // task2 is now complete and the client should be given yet another
             // opportunity to queue more work (before the TaskQueue can
-            // officailly say that it has been drained).  This time, we will not
+            // officially say that it has been drained).  This time, we will not
             // queue more work.
             expect(numDrainedEvents).toEqual(0);
 
             // Once we return from this handler without queuing more work, the
             // drained event should fire.
         })
-        .then(() => {
+        .then(() =>
+        {
             expect(numDrainedEvents).toEqual(1);
             done();
         });
@@ -251,10 +271,12 @@ describe("TaskQueue", () => {
     });
 
 
-    it("drain() will return a Promise that is fulfilled when the TaskQueue is emptied", (done) => {
+    it("drain() will return a Promise that is fulfilled when the TaskQueue is emptied", (done) =>
+    {
         const queue = new TaskQueue(1);
         let numDrainedEvents = 0;
-        queue.on(TaskQueue.eventNameDrained, () => {
+        queue.on(TaskQueue.eventNameDrained, () =>
+        {
             numDrainedEvents++;
         });
 
@@ -262,31 +284,37 @@ describe("TaskQueue", () => {
         let t2HasResolved = false;
         let t3HasResolved = false;
 
-        const task1: Task<boolean> = () => {
+        const task1: Task<boolean> = () =>
+        {
             return getTimerPromise(10, undefined)
             .then(() => (t1HasResolved = true));
         };
 
-        const task2: Task<boolean> = () => {
+        const task2: Task<boolean> = () =>
+        {
             return getTimerPromise(10, undefined)
             .then(() => (t2HasResolved = true));
         };
 
-        const task3: Task<boolean> = () => {
+        const task3: Task<boolean> = () =>
+        {
             return getTimerPromise(10, undefined)
             .then(() => (t3HasResolved = true));
         };
 
         queue.push(task1)
-        .then(() => {
+        .then(() =>
+        {
             return queue.push(task2);
         })
-        .then(() => {
+        .then(() =>
+        {
             return queue.push(task3);
         });
 
         queue.drain()
-        .then(() => {
+        .then(() =>
+        {
             expect(t1HasResolved).toBeTruthy();
             expect(t2HasResolved).toBeTruthy();
             expect(t3HasResolved).toBeTruthy();
@@ -296,7 +324,8 @@ describe("TaskQueue", () => {
     });
 
 
-    it("cancelAllPending() will cancel pending tasks with the specified error", (done) => {
+    it("cancelAllPending() will cancel pending tasks with the specified error", (done) =>
+    {
         const queue: TaskQueue = new TaskQueue(1);
 
         const t1 = createTimerTask(50, 1);
@@ -324,7 +353,8 @@ describe("TaskQueue", () => {
         queue.cancelAllPending(new Error("queue is cancelled"));
 
         allSettled([t1Prom, t2Prom])
-        .then(() => {
+        .then(() =>
+        {
             // In-progress tasks should complete normally and return their
             // normal value.
             expect(t1Value).toEqual(1);
@@ -340,7 +370,8 @@ describe("TaskQueue", () => {
     });
 
 
-    it("cancelAllPending() will cancel pending tasks with the default error if not specified", (done) => {
+    it("cancelAllPending() will cancel pending tasks with the default error if not specified", (done) =>
+    {
         const queue: TaskQueue = new TaskQueue(1);
 
         const t1 = createTimerTask(50, 1);
@@ -368,7 +399,8 @@ describe("TaskQueue", () => {
         queue.cancelAllPending();
 
         allSettled([t1Prom, t2Prom])
-        .then(() => {
+        .then(() =>
+        {
             // In-progress tasks should complete normally and return their
             // normal value.
             expect(t1Value).toEqual(1);
@@ -384,11 +416,13 @@ describe("TaskQueue", () => {
     });
 
 
-    it("will start paused when configured to pause when drained", () => {
+    it("will start paused when configured to pause when drained", () =>
+    {
         const queue = new TaskQueue(1, true);
         let taskHasRun = false;
 
-        const task = (): Promise<number> => {
+        const task = (): Promise<number> =>
+        {
             taskHasRun = true;
             return Promise.resolve(1);
         };
@@ -399,7 +433,8 @@ describe("TaskQueue", () => {
     });
 
 
-    it("will pause when drained when configured to do so", (done) => {
+    it("will pause when drained when configured to do so", (done) =>
+    {
         const queue = new TaskQueue(1, true);
 
         const ti1: ITaskInfo<number> = createTask<number>();
@@ -412,7 +447,8 @@ describe("TaskQueue", () => {
         expect(queue.length).toEqual(0);
 
         queue.drain()
-        .then(() => {
+        .then(() =>
+        {
             // The queue has now drained and should have paused itself.
             // So if another task is pushed, it should not start running
             // immediately.
@@ -422,7 +458,8 @@ describe("TaskQueue", () => {
             expect(queue.length).toEqual(0);
 
             queue.drain()
-            .then(() => {
+            .then(() =>
+            {
                 // The queue has now drained and should have paused itself.
                 // So if another task is pushed, it should not start running
                 // immediately.
@@ -439,9 +476,11 @@ describe("TaskQueue", () => {
     });
 
 
-    it("when run() is called (repeatedly) on an empty queue, it will remain in the paused state", (done) => {
+    it("when run() is called (repeatedly) on an empty queue, it will remain in the paused state", (done) =>
+    {
         let taskHasRun = false;
-        const task = (): Promise<void> => {
+        const task = (): Promise<void> =>
+        {
             taskHasRun = true;
             return Promise.resolve();
         };
@@ -453,7 +492,8 @@ describe("TaskQueue", () => {
         const taskProm = queue.push(task);
 
         taskProm
-        .then(() => {
+        .then(() =>
+        {
             expect(taskHasRun).toBeTruthy();
             done();
         });
@@ -463,21 +503,24 @@ describe("TaskQueue", () => {
     });
 
 
-    it("will run tasks according to their priority", (done) => {
-
+    it("will run tasks according to their priority", (done) =>
+    {
         const log: Array<number> = [];
 
-        const task1 = () => {
+        const task1 = () =>
+        {
             log.push(1);      // Log that task 1 has run
             return Promise.resolve();
         };
 
-        const task2 = () => {
+        const task2 = () =>
+        {
             log.push(2);      // Log that task 2 has run
             return Promise.resolve();
         };
 
-        const task3 = () => {
+        const task3 = () =>
+        {
             log.push(3);      // Log that task 3 has run
             return Promise.resolve();
         };
@@ -491,7 +534,8 @@ describe("TaskQueue", () => {
 
         // Setup code that will check the results.
         Promise.all([t1Prom, t2Prom, t3Prom])
-        .then(() => {
+        .then(() =>
+        {
             expect(log).toEqual([3, 2, 1]);
             done();
         });

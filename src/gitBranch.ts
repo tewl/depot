@@ -53,11 +53,13 @@ export class GitBranch
 
         return spawn("git", ["check-ref-format", "--allow-onelevel", branchName])
         .closePromise
-        .then(() => {
+        .then(() =>
+        {
             // Exit code === 0 means branchName is valid.
             return true;
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // Exit code !== 0 means branchName is invalid.
             return false;
         });
@@ -78,8 +80,10 @@ export class GitBranch
         const validator = new Validator<string>([this.isValidBranchName]);
 
         return validator.isValid(branchName)
-        .then((branchNameIsValid) => {
-            if (!branchNameIsValid) {
+        .then((branchNameIsValid) =>
+        {
+            if (!branchNameIsValid)
+            {
                 throw new Error(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
             }
 
@@ -97,7 +101,8 @@ export class GitBranch
     public static enumerateGitRepoBranches(repo: GitRepo): Promise<Array<GitBranch>>
     {
         return spawn("git", ["branch", "-a"], {cwd: repo.directory.toString()}).closePromise
-        .then((stdout) => {
+        .then((stdout) =>
+        {
             return _.chain(splitIntoLines(stdout))
             // Get rid of leading and trailing whitespace
             .map((curLine) => curLine.trim())
@@ -108,7 +113,8 @@ export class GitBranch
             // Get rid of leading and trailing whitespace
             .map((curLine) => curLine.trim())
             // Create an array of GitBranch objects
-            .map((longName): GitBranch => {
+            .map((longName): GitBranch =>
+            {
                 const regexResults = GitBranch._strParserRegex.exec(longName);
                 if (!regexResults)
                 {
@@ -192,8 +198,8 @@ export class GitBranch
     }
 
 
-    public getTrackedBranch(): Promise<GitBranch | undefined> {
-
+    public getTrackedBranch(): Promise<GitBranch | undefined>
+    {
         //
         // A full example:
         // $ git branch -vv
@@ -217,13 +223,15 @@ export class GitBranch
         // TODO: Make sure this GitBranch instance is a local branch.
 
         return spawn("git", ["branch", "-vv"], {cwd: this._repo.directory.toString()}).closePromise
-        .then((output) => {
+        .then((output) =>
+        {
             const outputLines = splitLinesOsIndependent(output);
 
             // The last column for lines matching the specified local branch.
             const lastCols = _.reduce<string, Array<string>>(
                 outputLines,
-                (acc, curLine) => {
+                (acc, curLine) =>
+                {
                     // A regex for matching lines output from "git branch -vv"
                     // - an optional "*" (indicating the current branch)
                     // - whitespace
@@ -235,7 +243,8 @@ export class GitBranch
                     // TODO: Convert the following regex to use named capture groups.
                     // eslint-disable-next-line prefer-named-capture-group
                     const matches = /^[*]?\s+([\w/.-]+)\s+([0-9a-fA-F]{7})\s+(.*)$/.exec(curLine);
-                    if (matches && matches[1] === this.name) {
+                    if (matches && matches[1] === this.name)
+                    {
                         acc.push(matches[3]);
                     }
                     return acc;
@@ -243,10 +252,12 @@ export class GitBranch
                 []
             );
 
-            if (lastCols.length === 0) {
+            if (lastCols.length === 0)
+            {
                 return Promise.resolve(undefined);
             }
-            else if (lastCols.length > 1) {
+            else if (lastCols.length > 1)
+            {
                 // We should never get more than 1 matching line.
                 return Promise.reject(new Error(`Unexpectedly got multiple results for ${this.name}.`));
             }
@@ -267,9 +278,11 @@ export class GitBranch
             const lastColRegex = /^(\[([\w/.-]+):?(.*)\])?\s*(.*)$/;
             let matches = lastColRegex.exec(lastCol);
 
-            if (matches) {
+            if (matches)
+            {
                 const remoteBranchStr = matches[2];
-                if (remoteBranchStr === undefined) {
+                if (remoteBranchStr === undefined)
+                {
                     return Promise.resolve(undefined);
                 }
 
@@ -281,15 +294,18 @@ export class GitBranch
                 // eslint-disable-next-line prefer-named-capture-group
                 const remoteBranchRegex = /^(.*?)\/(.*)$/;
                 matches = remoteBranchRegex.exec(remoteBranchStr);
-                if (matches) {
+                if (matches)
+                {
                     return GitBranch.create(this.repo, matches[2], matches[1]);
                 }
-                else {
+                else
+                {
                     return Promise.reject(new Error(`Could not parse remote branch string ${remoteBranchStr}.`));
                 }
 
             }
-            else {
+            else
+            {
                 // The specified branch is not tracking a remote branch.
                 return Promise.resolve(undefined);
             }

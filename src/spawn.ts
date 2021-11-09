@@ -85,7 +85,8 @@ export function spawn(
     description?: string,
     stdoutStream?: stream.Writable,
     stderrStream?: stream.Writable
-): ISpawnResult {
+): ISpawnResult
+{
     const cmdLineRepresentation = getCommandLineRepresentation(cmd, args);
 
     if (description)
@@ -100,59 +101,68 @@ export function spawn(
     const stderrCollector = new CollectorStream();
     let childProcess: cp.ChildProcess;
 
-    const closePromise = new Promise((resolve: (output: string) => void,
-                                      reject: (err: SpawnCloseError) => void) => {
-        const spawnOptions: cp.SpawnOptions = _.defaults(
-            {},
-            options,
-            {stdio: [process.stdin, "pipe", "pipe"]}
-        );
+    const closePromise = new Promise(
+        (resolve: (output: string) => void,
+         reject: (err: SpawnCloseError) => void) =>
+        {
+            const spawnOptions: cp.SpawnOptions = _.defaults(
+                {},
+                options,
+                {stdio: [process.stdin, "pipe", "pipe"]}
+            );
 
-        childProcess = cp.spawn(cmd, args, spawnOptions);
+            childProcess = cp.spawn(cmd, args, spawnOptions);
 
-        const outputStream = stdoutStream || new NullStream();
+            const outputStream = stdoutStream || new NullStream();
 
-        childProcess.stdout!
-        .pipe(stdoutCollector)
-        .pipe(outputStream);
+            childProcess.stdout!
+            .pipe(stdoutCollector)
+            .pipe(outputStream);
 
-        const errorStream = stderrStream || new NullStream();
+            const errorStream = stderrStream || new NullStream();
 
-        childProcess.stderr!
-        .pipe(stderrCollector)  // to capture stderr in case child process errors
-        .pipe(errorStream);
+            childProcess.stderr!
+            .pipe(stderrCollector)  // to capture stderr in case child process errors
+            .pipe(errorStream);
 
-        childProcess.once("error", (err: ISystemError) => {
-            reject({type: "ISpawnSystemError", ...err});
-        });
-
-        childProcess.once("exit", (exitCode: number) => {
-            // Wait for all steams to flush before reporting that the child
-            // process has finished.
-            eventToPromise(childProcess, "close")
-            .then(() => {
-                if (exitCode === 0) {
-                    if (description)
-                    {
-                        console.log(`Child process succeeded: ${cmdLineRepresentation}`);
-                    }
-                    resolve(_.trim(stdoutCollector.collected));
-                } else {
-                    if (description)
-                    {
-                        console.log(`Child process failed: ${cmdLineRepresentation}`);
-                    }
-                    reject({
-                        type:     "ISpawnExitError",
-                        exitCode: exitCode,
-                        stderr:   stderrCollector.collected,
-                        stdout:   stdoutCollector.collected
-                    });
-                }
+            childProcess.once("error", (err: ISystemError) =>
+            {
+                reject({type: "ISpawnSystemError", ...err});
             });
-        });
 
-    });
+            childProcess.once("exit", (exitCode: number) =>
+            {
+                // Wait for all steams to flush before reporting that the child
+                // process has finished.
+                eventToPromise(childProcess, "close")
+                .then(() =>
+                {
+                    if (exitCode === 0)
+                    {
+                        if (description)
+                        {
+                            console.log(`Child process succeeded: ${cmdLineRepresentation}`);
+                        }
+                        resolve(_.trim(stdoutCollector.collected));
+                    }
+                    else
+                    {
+                        if (description)
+                        {
+                            console.log(`Child process failed: ${cmdLineRepresentation}`);
+                        }
+                        reject({
+                            type:     "ISpawnExitError",
+                            exitCode: exitCode,
+                            stderr:   stderrCollector.collected,
+                            stdout:   stdoutCollector.collected
+                        });
+                    }
+                });
+            });
+
+        }
+    );
 
     return {
         childProcess: childProcess!,
@@ -168,7 +178,8 @@ function getCommandLineRepresentation(cmd: string, args: Array<string>): string
         if (_.includes(curArg, " "))
         {
             return `"${curArg}"`;
-        } else
+        }
+        else
         {
             return curArg;
         }

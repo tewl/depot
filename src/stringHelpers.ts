@@ -42,7 +42,8 @@ export function indent(
     skipFirstLine = false
 ): string
 {
-    if (numSpacesOrPad === 0) {
+    if (numSpacesOrPad === 0)
+    {
         return src;
     }
     else
@@ -63,7 +64,8 @@ export function indent(
             match: string,
             group1: string,
             offset: number
-        ): string {
+        ): string
+        {
             // If told to skip the first line and this is the first line, skip it.
             return skipFirstLine && (offset === 0) ?
                    group1 :
@@ -88,7 +90,8 @@ export function outdent(str: string, padStr = " ", greedy = true): string
     const lines = splitIntoLines(str, true);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
     let numToRemove = _.min(initOccurrences);
-    if (!greedy) {
+    if (!greedy)
+    {
         // We should not be greedy, so only remove (at most) 1 occurrence of
         // `padStr`.
         numToRemove = _.min([numToRemove, 1]);
@@ -141,7 +144,8 @@ export function trimBlankLines(str: string): string
  */
 export function removeBlankLines(str: string): string
 {
-    if (str.length === 0) {
+    if (str.length === 0)
+    {
         return "";
     }
 
@@ -149,7 +153,8 @@ export function removeBlankLines(str: string): string
     lines = _.filter(lines, (curLine) => !isBlank(curLine));
 
     // If all processed lines were blank, just return an empty string.
-    if (lines.length === 0) {
+    if (lines.length === 0)
+    {
         return "";
     }
 
@@ -241,14 +246,16 @@ export function splitIntoLines(text: string, retainLineEndings = false): Array<s
 export function splitLinesOsIndependent(src: string): Array<string>
 {
     let lines = _.split(src, "\n");
-    lines = _.map(lines, (curLine) => {
+    lines = _.map(lines, (curLine) =>
+    {
         return _.trimEnd(curLine, "\r");
     });
     return lines;
 }
 
 
-export function padLeft(src: string, pad: string, desiredLength: number): string {
+export function padLeft(src: string, pad: string, desiredLength: number): string
+{
     const numPadChars = desiredLength - src.length;
     if (numPadChars <= 0)
     {
@@ -294,10 +301,12 @@ export function padRight(src: string, pad: string, desiredLength: number): strin
 export function getEol(text: string): string
 {
     const match = createEolRegex().exec(text);
-    if (!match) {
+    if (!match)
+    {
         return "";
     }
-    else {
+    else
+    {
         return match[0];
     }
 }

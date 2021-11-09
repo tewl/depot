@@ -68,7 +68,8 @@ export interface IExpressionTokenOperator extends IDuType, IExpressionToken
 
 export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
 {
-    switch (symbol) {
+    switch (symbol)
+    {
         case "(":
             return {
                 symbol:        "(",
@@ -89,7 +90,8 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    15,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction {
+                evaluate(args: Array<Fraction>): Fraction
+                {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.multiply(first);
@@ -102,7 +104,8 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    15,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction {
+                evaluate(args: Array<Fraction>): Fraction
+                {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.divide(first);
@@ -115,7 +118,8 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    14,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction {
+                evaluate(args: Array<Fraction>): Fraction
+                {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.add(first);
@@ -128,7 +132,8 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    14,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction {
+                evaluate(args: Array<Fraction>): Fraction
+                {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.subtract(first);
@@ -229,11 +234,13 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
 
     const tokens: Array<ExpressionToken> = [];
 
-    while (remainingExpression.length > 0) {
+    while (remainingExpression.length > 0)
+    {
 
         // eslint-disable-next-line @typescript-eslint/no-loop-func
         const foundTokenizer = find(tokenizers, (curTokenizer) => curTokenizer.matcherFn(remainingExpression));
-        if (foundTokenizer) {
+        if (foundTokenizer)
+        {
             const matchedText = foundTokenizer.predicateReturn[0];
             const matchedLength = matchedText.length;
             const endIndex = foundTokenizer.predicateReturn.index + matchedLength;
@@ -249,7 +256,8 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
             remainingExpression = remainingExpression.slice(endIndex);
             remainingExpressionStartIndex = token.endIndex;
         }
-        else {
+        else
+        {
             return failedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of "${originalExpression}".`);
         }
     }
@@ -292,7 +300,8 @@ export function toPostfix(
         }
         else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
         {
-            if (_.isEmpty(operatorStack)) {
+            if (_.isEmpty(operatorStack))
+            {
                 return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
             }
             let firstInOperatorStack = _.last(operatorStack)!;
@@ -300,14 +309,16 @@ export function toPostfix(
             {
                 output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
-                if (_.isEmpty(operatorStack)) {
+                if (_.isEmpty(operatorStack))
+                {
                     return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
                 }
                 firstInOperatorStack = _.last(operatorStack)!;
             }
 
             const topOperator = operatorStack.pop();
-            if (topOperator === undefined || topOperator.symbol !== "(") {
+            if (topOperator === undefined || topOperator.symbol !== "(")
+            {
                 return failedResult(`Operator stack invalid after finding "(".`);
             }
             // We intentionally do nothing with the popped "(".  Discard it.
@@ -333,7 +344,8 @@ export function toPostfix(
     while (!_.isEmpty(operatorStack))
     {
         const curOperator = operatorStack.pop()!;
-        if (curOperator.symbol === "(") {
+        if (curOperator.symbol === "(")
+        {
             return failedResult(`"(" found while emptying operator stack.  Mismatched parenthesis.`);
         }
         output.push(curOperator);
@@ -343,48 +355,59 @@ export function toPostfix(
 }
 
 
-export function evaluate(input: string): Result<Fraction, string> {
+export function evaluate(input: string): Result<Fraction, string>
+{
     const tokenizeResult = tokenize(input);
-    if (failed(tokenizeResult)) {
+    if (failed(tokenizeResult))
+    {
         return tokenizeResult;
     }
 
     const postfixResult = toPostfix(tokenizeResult.value);
-    if (failed(postfixResult)) {
+    if (failed(postfixResult))
+    {
         return postfixResult;
     }
 
     const stack: Array<Fraction> = [];
-    for (const curToken of postfixResult.value) {
-        if (curToken.type === "IExpressionTokenNumber") {
+    for (const curToken of postfixResult.value)
+    {
+        if (curToken.type === "IExpressionTokenNumber")
+        {
             stack.push(curToken.value);
         }
-        else if (curToken.type === "IExpressionTokenOperator") {
+        else if (curToken.type === "IExpressionTokenOperator")
+        {
             const traits = symbolToTraits(curToken.symbol);
 
             // The stack should have enough values on it to provide a value for
             // each operator argument.
-            if (stack.length < traits.numArguments!) {
+            if (stack.length < traits.numArguments!)
+            {
                 return failedResult(`Not enough arguments for operator ${curToken.symbol} at index ${curToken.startIndex}.`);
             }
 
             const resultVal = traits.evaluate!(stack);
             stack.push(resultVal);
         }
-        else {
+        else
+        {
             assertNever(curToken);
         }
     }
 
     // The stack should contain only 1 value.
     const stackLength = stack.length;
-    if (stackLength === 1) {
+    if (stackLength === 1)
+    {
         return succeededResult(stack[0]);
     }
-    else if (stackLength < 1) {
+    else if (stackLength < 1)
+    {
         return failedResult(`No expression.`);
     }
-    else {
+    else
+    {
         return failedResult(`Expression finished evaluating with items still on the stack.`);
     }
 }

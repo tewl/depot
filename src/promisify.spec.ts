@@ -46,7 +46,8 @@ describe("promisify0()", () =>
         {
             const result = await promisified();
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error");
         }
@@ -98,7 +99,8 @@ describe("promisify1()", () =>
         {
             const result = await promisified(6);
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error - 6");
         }
@@ -150,7 +152,8 @@ describe("promisify2()", () =>
         {
             const result = await promisified(2, 4);
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error - 2, 4");
         }
@@ -202,7 +205,8 @@ describe("promisify3()", () =>
         {
             const result = await promisified(2, 4, 1);
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error - 2, 4, 1");
         }
@@ -256,7 +260,8 @@ describe("promisify4()", () =>
         {
             const result = await promisified(2, 4, 1, 4);
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error - 2, 4, 1, 4");
         }
@@ -310,7 +315,8 @@ describe("promisify5()", () =>
         {
             const result = await promisified(2, 4, 1, 4, 3);
             fail("Should not have resolved.");
-        } catch (error)
+        }
+        catch (error)
         {
             expect((error as Error).message).toEqual("error - 2, 4, 1, 4, 3");
         }

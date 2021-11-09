@@ -7,12 +7,14 @@ export class Url
 {
     public static fromString(urlStr: string): Url | undefined
     {
-        try {
+        try
+        {
             const parsed = new URLParse(urlStr);
             const inst = new Url(parsed);
             return inst;
         }
-        catch (err) {
+        catch (err)
+        {
             return undefined;
         }
     }
@@ -39,7 +41,8 @@ export class Url
      * Creates a duplicate instance of this Url
      * @return The new instance
      */
-    public clone(): Url {
+    public clone(): Url
+    {
         const newInstParsed = _.cloneDeep(this._parsed);
         const newInst = new Url(newInstParsed);
         return newInst;
@@ -51,7 +54,8 @@ export class Url
         const protocolStr = this._parsed.protocol;
         const withoutColon = protocolStr.replace(/:$/, "");
 
-        if (withoutColon === "") {
+        if (withoutColon === "")
+        {
             // No protocol specified.
             return [];
         }
@@ -78,7 +82,8 @@ export class Url
     }
 
 
-    public join(...parts: Array<string>): Url | undefined {
+    public join(...parts: Array<string>): Url | undefined
+    {
         const newUrlStr = urlJoin(this.toString(), ...parts);
         return Url.fromString(newUrlStr);
     }
@@ -87,7 +92,8 @@ export class Url
     /**
      * Host name with port number
      */
-    public get host(): string {
+    public get host(): string
+    {
         return this._parsed.host;
     }
 
@@ -95,7 +101,8 @@ export class Url
     /**
      * Host name without port number
      */
-    public get hostname(): string {
+    public get hostname(): string
+    {
         return this._parsed.hostname;
     }
 
@@ -103,21 +110,23 @@ export class Url
     /**
      * Optional port number.  Empty string if no port number is present.
      */
-    public get port(): number | undefined {
+    public get port(): number | undefined
+    {
         const portStr = this._parsed.port;
-        if (portStr === "") {
+        if (portStr === "")
+        {
             return undefined;
         }
-        else {
+        else
+        {
             return parseInt(portStr, 10);
         }
     }
 
 
-    public set port(val: number | undefined) {
+    public set port(val: number | undefined)
+    {
         this._parsed.set("port", val);
     }
-
-
 
 }

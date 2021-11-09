@@ -37,7 +37,8 @@ export class Timeout extends EventEmitter
         // Stop the current timeout, if any.
         this.stop();
 
-        this._timeoutId = setTimeout(() => {
+        this._timeoutId = setTimeout(() =>
+        {
             this._timeoutId = undefined;
             this.emit(Timeout.eventNameExpired);
         }, this._periodMs);
@@ -51,7 +52,8 @@ export class Timeout extends EventEmitter
     public stop(): void
     {
         // Stop the currently running time, if any.
-        if (this._timeoutId) {
+        if (this._timeoutId)
+        {
             clearTimeout(this._timeoutId);
         }
         this._timeoutId = undefined;

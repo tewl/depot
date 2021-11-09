@@ -16,11 +16,13 @@ interface IContinuePollingNo<TResult>
 }
 
 
-export function continuePollingYes(delayMs: number): IContinuePollingYes {
+export function continuePollingYes(delayMs: number): IContinuePollingYes
+{
     return { continuePolling: true, delayMs: delayMs };
 }
 
-export function continuePollingNo<TResult>(result: TResult): IContinuePollingNo<TResult> {
+export function continuePollingNo<TResult>(result: TResult): IContinuePollingNo<TResult>
+{
     return { continuePolling: false, result: result };
 }
 
@@ -65,7 +67,8 @@ export async function poll<TReturn, TResult>(
     let   iterationNum = 1;
 
     // eslint-disable-next-line no-constant-condition
-    while (true) {
+    while (true)
+    {
         const retVal = func();
 
         // Invoke the predicate to see if polling should continue.  Wrap the
@@ -73,11 +76,13 @@ export async function poll<TReturn, TResult>(
         // cases where a Promise is returned.
         const continueResult = await Promise.resolve(continuePollingPredicate(iterationNum, startTime, retVal));
 
-        if (continueResult.continuePolling) {
+        if (continueResult.continuePolling)
+        {
             await getTimerPromise(continueResult.delayMs, undefined);
             iterationNum++;
         }
-        else {
+        else
+        {
             return continueResult.result;
         }
     }
@@ -136,21 +141,26 @@ export async function pollAsyncResult<TSuccess, TError>(
         ): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
         {
             const result = await asyncResultPromise;
-            if (succeeded(result)) {
+            if (succeeded(result))
+            {
                 let donePolling = true;
-                if (donePollingPredicate) {
+                if (donePollingPredicate)
+                {
                     donePolling = donePollingPredicate(iterationNum, startTime, result.value);
                 }
 
-                if (donePolling) {
+                if (donePolling)
+                {
                     return continuePollingNo(result);
                 }
             }
 
-            if (Date.now() - startTime > timeoutMs) {
+            if (Date.now() - startTime > timeoutMs)
+            {
                 return continuePollingNo(failedResult(new PollingTimeoutError(`Polling timed out after ${timeoutMs} ms.`, result)));
             }
-            else {
+            else
+            {
                 return continuePollingYes(pollIntervalMs);
             }
         }

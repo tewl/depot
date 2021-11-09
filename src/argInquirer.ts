@@ -55,30 +55,38 @@ class ArgInquirer
     {
         const argNames = this.getArgNames();
 
-        if (argv.help) {
+        if (argv.help)
+        {
             this.printUsage();
             return Promise.resolve(undefined);
-        } else if (argv._.length === argNames.length) {
+        }
+        else if (argv._.length === argNames.length)
+        {
             // TODO: Run the values through each question's validate() method.
 
             // The user has passed in the correct number or arguments.
             const argValues: {[key: string]: string} = {};
-            _.forEach(argv._, (curArg, index) => {
+            _.forEach(argv._, (curArg, index) =>
+            {
                 argValues[argNames[index]] = curArg;
             });
             // Copy any other command line arguments onto the returned object.
             _.assign(argValues, argv);
             return Promise.resolve(argValues);
 
-        } else {
+        }
+        else
+        {
             // The user has not provided the correct number of arguments.
             // Interactively prompt them for answers using the inquirer package.
             return inquirer.prompt(this._questions)
-            .then((argValues) => {
+            .then((argValues) =>
+            {
                 // If the user has specified --cli, we should print out a
                 // command line that shows how to invoke with the current set of
                 // arguments.
-                if (argv.cli) {
+                if (argv.cli)
+                {
                     // Get the executable name.
                     let execName = process.argv[1];
                     execName = execName.split(path.sep).slice(-1)[0];
@@ -106,14 +114,14 @@ class ArgInquirer
         execName = execName.split(path.sep).slice(-1)[0];
 
         // Create a string for each argument in the form <name>.
-        const argStrings = _.map(this.getArgNames(), (curArgName) => {
+        const argStrings = _.map(this.getArgNames(), (curArgName) =>
+        {
             return `<${curArgName}>`;
         });
 
         console.log("Usage:");
         console.log(`node ${execName} ${argStrings.join(" ")}`);
     }
-
 }
 
 

@@ -3,21 +3,22 @@ import {Model, Person} from "./serializationObjects.spec";
 import {MemoryStore} from "./serialization";
 
 
-describe("MemoryStore", () => {
+describe("MemoryStore", () =>
+{
 
+    describe("instance", () =>
+    {
 
-    describe("instance", () => {
-
-
-        it("can save data and then load it", async () => {
-
+        it("can save data and then load it", async () =>
+        {
             const registry = new SerializationRegistry();
             registry.register(Person);
             registry.register(Model);
             const store = await MemoryStore.create(registry);
 
             // An IIFE to save the data.
-            await (async () => {
+            await (async () =>
+            {
                 const aerys = Person.create("Aerys", "Targaryen");
                 const rhaella = Person.create("Rhaella", "Targaryen");
 
@@ -35,9 +36,11 @@ describe("MemoryStore", () => {
             })();
 
             // An IIFE to load the data.
-            await (async () => {
+            await (async () =>
+            {
                 const modelIds = await store.getIds(/^model/);
-                if (modelIds.length === 0) {
+                if (modelIds.length === 0)
+                {
                     fail("Unable to find model in MemoryStore.");
                 }
                 const modelId = modelIds[0];

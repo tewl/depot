@@ -33,14 +33,16 @@ export class SerializationRegistry
      */
     public register(serializableClass: ISerializableStatic): () => void
     {
-        if (this._registeredClasses[serializableClass.type] !== undefined) {
+        if (this._registeredClasses[serializableClass.type] !== undefined)
+        {
             throw new Error(`Serializable class already registered for type "${serializableClass.type}".`);
         }
 
         this._registeredClasses[serializableClass.type] = serializableClass;
 
         // Return a function that can be used to unregister.
-        return () => {
+        return () =>
+        {
             // Remove the class from the container of registered classes.
             delete this._registeredClasses[serializableClass.type];
         };
@@ -57,4 +59,3 @@ export class SerializationRegistry
         return this._registeredClasses[type];
     }
 }
-

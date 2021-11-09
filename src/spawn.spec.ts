@@ -7,24 +7,29 @@ import {tmpDir} from "../test/ut/specHelpers";
 import {getOs, OperatingSystem} from "./os";
 
 
-describe("spawn", () => {
+describe("spawn", () =>
+{
 
-    beforeEach(() => {
+    beforeEach(() =>
+    {
         tmpDir.emptySync();
     });
 
 
-    it("will run the specified command", (done) => {
+    it("will run the specified command", (done) =>
+    {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let cmd = "ls";
-        if (os === OperatingSystem.Windows) {
+        if (os === OperatingSystem.Windows)
+        {
             options.shell = true;
             cmd = "dir";
         }
         const testFilePath = path.join(tmpDir.absPath(), "foo.txt");
         spawn(cmd, [">", "foo.txt"], options).closePromise
-        .then(() => {
+        .then(() =>
+        {
             const stats = fs.statSync(testFilePath);
             expect(stats.isFile()).toBeTruthy();
             done();
@@ -32,7 +37,8 @@ describe("spawn", () => {
     });
 
 
-    it("will resolve with the stdout text", (done) => {
+    it("will resolve with the stdout text", (done) =>
+    {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let lsCmd = "ls";
@@ -43,26 +49,30 @@ describe("spawn", () => {
         }
 
         spawn(lsCmd, [">", "foo.txt"], options).closePromise
-        .then(() => {
+        .then(() =>
+        {
             return spawn(lsCmd, [], options).closePromise;
         })
-        .then((output) => {
+        .then((output) =>
+        {
             expect(output).toContain("foo.txt");
             done();
         });
     });
 
 
-    it("provides access to the underlying child process", (done) => {
-
+    it("provides access to the underlying child process", (done) =>
+    {
         let cmd: string;
         let args: Array<string>;
 
-        if (getOs() === OperatingSystem.Windows) {
+        if (getOs() === OperatingSystem.Windows)
+        {
             cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
             args = ["-c ", "sleep 10"];
         }
-        else {
+        else
+        {
             cmd = "sleep";
             args = ["10"];
         }
@@ -70,10 +80,12 @@ describe("spawn", () => {
         const spawnResult = spawn(cmd, args, {cwd: tmpDir.absPath()});
         spawnResult.childProcess.kill();
         spawnResult.closePromise
-        .then(() => {
+        .then(() =>
+        {
             fail("closePromise should reject when the child process is killed.");
         })
-        .catch((reason) => {
+        .catch((reason) =>
+        {
             expect(reason.exitCode).toEqual(null);
             expect(reason.stderr).toEqual("");
             done();
@@ -142,13 +154,15 @@ describe("spawn", () => {
     // });
 
 
-    it("provides the exit code and stderr when the command fails", (done) => {
+    it("provides the exit code and stderr when the command fails", (done) =>
+    {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
         const os = getOs();
         const lsCmd = os === OperatingSystem.Windows ? "dir" : "ls";
         const options = os === OperatingSystem.Windows ? {shell: true} : undefined;
         spawn(lsCmd, [nonExistantFilePath], options).closePromise
-        .catch((err) => {
+        .catch((err) =>
+        {
             expect(err).toBeTruthy();
             expect(err.exitCode).not.toEqual(0);
 
@@ -160,10 +174,13 @@ describe("spawn", () => {
     });
 
 
-    it("provides the expected system error information when the process fails to start", (done) => {
+    it("provides the expected system error information when the process fails to start", (done) =>
+    {
         spawn("notarealcommand.exe", []).closePromise
-        .catch((err: SpawnCloseError) => {
-            if (err.type !== "ISpawnSystemError") {
+        .catch((err: SpawnCloseError) =>
+        {
+            if (err.type !== "ISpawnSystemError")
+            {
                 fail("Should have gotten an ISpawnSystemError.");
                 return;
             }
@@ -174,12 +191,13 @@ describe("spawn", () => {
     });
 
 
-    it("will set the specified environment variables", (done) => {
-
+    it("will set the specified environment variables", (done) =>
+    {
         const env = _.assign({}, process.env, {xyzzy: "xyzzy-xyzzy"});
         spawn("node", ["-e", "console.log(process.env.xyzzy);"], {env: env})
         .closePromise
-        .then((output) => {
+        .then((output) =>
+        {
             expect(output).toEqual("xyzzy-xyzzy");
             done();
         });

@@ -26,7 +26,8 @@ const failureOperation = (): Result<number, OperationError> =>
 ////////////////////////////////////////////////////////////////////////////////
 
 
-describe("example", () => {
+describe("example", () =>
+{
 
     it("of exhaustiveness checking", (): void =>
     {
@@ -48,9 +49,11 @@ describe("example", () => {
 });
 
 
-describe("succeededResult()", () => {
+describe("succeededResult()", () =>
+{
 
-    it("returns an object describing a successful result", () => {
+    it("returns an object describing a successful result", () =>
+    {
         const result = succeededResult(5);
         expect(result.state).toEqual("succeeded");
         expect(result.value).toEqual(5);
@@ -59,9 +62,11 @@ describe("succeededResult()", () => {
 });
 
 
-describe("failedResult()", () => {
+describe("failedResult()", () =>
+{
 
-    it("returns an object describing a failed result", () => {
+    it("returns an object describing a failed result", () =>
+    {
         const result = failedResult(3);
         expect(result.state).toEqual("failed");
         expect(result.error).toEqual(3);
@@ -70,15 +75,18 @@ describe("failedResult()", () => {
 });
 
 
-describe("succeeded()", () => {
+describe("succeeded()", () =>
+{
 
-    it("returns true when given a successful result", () => {
+    it("returns true when given a successful result", () =>
+    {
         const result = successfulOperation();
         expect(succeeded(result)).toBeTruthy();
     });
 
 
-    it("returns false when given a failure result", () => {
+    it("returns false when given a failure result", () =>
+    {
         const result = failureOperation();
         expect(succeeded(result)).toBeFalsy();
     });
@@ -86,15 +94,18 @@ describe("succeeded()", () => {
 });
 
 
-describe("failed()", () => {
+describe("failed()", () =>
+{
 
-    it("returns true when given a failure result", () => {
+    it("returns true when given a failure result", () =>
+    {
         const result = failureOperation();
         expect(failed(result)).toBeTruthy();
     });
 
 
-    it("returns false when given a successful result", () => {
+    it("returns false when given a successful result", () =>
+    {
         const result = successfulOperation();
         expect(failed(result)).toBeFalsy();
     });
@@ -102,7 +113,8 @@ describe("failed()", () => {
 });
 
 
-describe("bindResult()", () => {
+describe("bindResult()", () =>
+{
 
     it("with failed input the error is passed along and the function is not invoked", () =>
     {
@@ -154,7 +166,8 @@ describe("bindResult()", () => {
                            succeededResult(Math.sqrt(x));
         }
 
-        function stringify(x: number): Result<string, string> {
+        function stringify(x: number): Result<string, string>
+        {
             return succeededResult(`${x}`);
         }
 

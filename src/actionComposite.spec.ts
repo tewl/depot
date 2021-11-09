@@ -14,9 +14,11 @@ describe("ActionComposite", () =>
     });
 
 
-    describe("description property", () => {
+    describe("description property", () =>
+    {
 
-        it("contains placeholder text for actions with no description", () => {
+        it("contains placeholder text for actions with no description", () =>
+        {
             const ac = new ActionComposite();
             ac.add(new Action(() => { }));
             ac.add(new Action(() => { }, "action2"));
@@ -71,20 +73,24 @@ describe("ActionComposite", () =>
         it("returns a rejected promise when one of the actions rejects", (done) =>
         {
             const ac = new ActionComposite();
-            ac.add(new Action(() => {
+            ac.add(new Action(() =>
+            {
                 return getTimerPromise(20, 1)
                 .then(() => {});
             }));
 
-            ac.add(new Action(() => {
+            ac.add(new Action(() =>
+            {
                 return getTimerPromise(10, 2)
-                .then(() => {
+                .then(() =>
+                {
                     throw new Error("Error message.");
                 });
             }));
 
             ac.execute()
-            .catch((err: Error) => {
+            .catch((err: Error) =>
+            {
                 expect(err.message).toEqual("Error message.");
                 done();
             });
@@ -99,7 +105,8 @@ describe("ActionComposite", () =>
             ac.add(new Action(() =>
             {
                 return getTimerPromise(20, 1)
-                .then(() => {
+                .then(() =>
+                {
                     action1Done = true;
                 });
             }));
@@ -108,7 +115,8 @@ describe("ActionComposite", () =>
             ac.add(new Action(() =>
             {
                 return getTimerPromise(10, 2)
-                .then(() => {
+                .then(() =>
+                {
                     action2Done = true;
                 });
             }));

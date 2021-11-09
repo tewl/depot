@@ -107,11 +107,13 @@ export function bindResult<TInputSuccess, TOutputSuccess, TError>(
     input: Result<TInputSuccess, TError>
 ): Result<TOutputSuccess, TError>
 {
-    if (succeeded(input)) {
+    if (succeeded(input))
+    {
         const funcResult = fn(input.value);
         return funcResult;
     }
-    else {
+    else
+    {
         return input;
     }
 }
@@ -129,11 +131,13 @@ export function mapSuccess<TInputSuccess, TOutputSuccess, TError>(
     input: Result<TInputSuccess, TError>
 ): Result<TOutputSuccess, TError>
 {
-    if (succeeded(input)) {
+    if (succeeded(input))
+    {
         const mappedValue = fn(input.value);
         return succeededResult(mappedValue);
     }
-    else {
+    else
+    {
         return input;
     }
 }
@@ -151,10 +155,12 @@ export function mapError<TSuccess, TInputError, TOutputError>(
     input: Result<TSuccess, TInputError>
 ): Result<TSuccess, TOutputError>
 {
-    if (succeeded(input)) {
+    if (succeeded(input))
+    {
         return input;
     }
-    else {
+    else
+    {
         const mappedError = fn(input.error);
         return failedResult(mappedError);
     }

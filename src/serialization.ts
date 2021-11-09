@@ -204,7 +204,8 @@ export abstract class AStore<TStow>
 
         // Second pass:  Run all completion functions so that each object can
         // set its references to other objects.
-        await mapAsync(completionFuncs, (curCompletionFunc) => {
+        await mapAsync(completionFuncs, (curCompletionFunc) =>
+        {
             // Wrap the return value from each completion function in a promise
             // in the event the function returns void instead of Promise<void>.
             return Promise.resolve(curCompletionFunc(deserializedSoFar));
@@ -224,7 +225,8 @@ export abstract class AStore<TStow>
 
         await promiseWhile(
             () => needToSerialize.length > 0,
-            async () => {
+            async () =>
+            {
                 const curObj = needToSerialize.shift()!;
 
                 // Note: We could perform a sanity check here to make sure that
@@ -238,7 +240,8 @@ export abstract class AStore<TStow>
 
                 // Check to see if the object has already been serialized.  If
                 // so, do nothing.
-                if (alreadySerialized[curObj.id] !== undefined) {
+                if (alreadySerialized[curObj.id] !== undefined)
+                {
                     return;
                 }
 
@@ -250,7 +253,8 @@ export abstract class AStore<TStow>
                 const putPromise = this.put(serializeResult.serialized, stow);
 
                 // If other objects need to be serialized, queue them up.
-                while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0) {
+                while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0)
+                {
                     needToSerialize.push(serializeResult.othersToSerialize.shift()!);
                 }
 
@@ -319,7 +323,8 @@ export abstract class AStore<TStow>
         // If the id being requested already appears in the dictionary of object
         // that have undergone a first pass deserialization, then return
         // immediately.
-        if (deserializedSoFar[id] !== undefined) {
+        if (deserializedSoFar[id] !== undefined)
+        {
             return deserializedSoFar[id];
         }
 
@@ -327,7 +332,8 @@ export abstract class AStore<TStow>
         const serialized = getResult.serialized;
 
         const foundClass = this._registry.getClass(serialized.type);
-        if (!foundClass) {
+        if (!foundClass)
+        {
             throw new Error(`No class registered for type "${serialized.type}".`);
         }
 
@@ -345,7 +351,8 @@ export abstract class AStore<TStow>
         objWithStow.__stow = getResult.stow;
 
         // If needed, update the list of completion functions that need to be run.
-        while (deserializeResult.completionFuncs && deserializeResult.completionFuncs.length > 0) {
+        while (deserializeResult.completionFuncs && deserializeResult.completionFuncs.length > 0)
+        {
             const completionFunc = deserializeResult.completionFuncs.shift()!;
             completionFuncs.push(completionFunc);
         }
@@ -353,15 +360,17 @@ export abstract class AStore<TStow>
         // If the deserialized object has returned IDs of other objects that
         // need to be deserialized, recurse and do a first pass deserialization
         // on those objects as well.
-        if (deserializeResult.neededIds) {
-
+        if (deserializeResult.neededIds)
+        {
             // Create tasks that will do a first pass deserialization on the
             // needed objects.  We will then execute them serially so that we
             // won't deserialize the same object more than once.  That would
             // result in references to different objects where we need to have
             // references that point to the same object.
-            const tasks = _.map(deserializeResult.neededIds, (curNeededId) => {
-                return () => {
+            const tasks = _.map(deserializeResult.neededIds, (curNeededId) =>
+            {
+                return () =>
+                {
                     return this.doFirstPassDeserialize(curNeededId, deserializedSoFar, completionFuncs);
                 };
             });
@@ -414,7 +423,8 @@ export class MemoryStore extends AStore<IMemoryStow>
     public getIds(regexp?: RegExp): Promise<Array<IdString>>
     {
         let ids: Array<IdString> = _.keys(this._store);
-        if (regexp === undefined) {
+        if (regexp === undefined)
+        {
             return Promise.resolve(ids);
         }
 

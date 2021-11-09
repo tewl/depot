@@ -143,7 +143,8 @@ export function promptForStringInEditor(
     };
 
     return inquirer.prompt<{editorInput: string}>([question])
-    .then((answers) => {
+    .then((answers) =>
+    {
         return answers.editorInput;
     });
 }

@@ -6,10 +6,12 @@ import {makeNodeScriptExecutable, createCmdLaunchScript} from "./nodeUtil";
 import {splitIntoLines} from "./stringHelpers";
 import {getOs, OperatingSystem} from "./os";
 
-describe("makeNodeScriptExecutable()", () => {
+describe("makeNodeScriptExecutable()", () =>
+{
 
     const scriptFile = new File(tmpDir, "hello.js");
-    beforeEach(() => {
+    beforeEach(() =>
+    {
         tmpDir.emptySync();
 
         // language=JavaScript
@@ -17,9 +19,11 @@ describe("makeNodeScriptExecutable()", () => {
     });
 
 
-    it("will add the shebang line to the beginning of the script", (done) => {
+    it("will add the shebang line to the beginning of the script", (done) =>
+    {
         makeNodeScriptExecutable(scriptFile)
-        .then((scriptFile) => {
+        .then((scriptFile) =>
+        {
             const text = scriptFile.readSync();
             const lines = splitIntoLines(text);
             expect(lines.length).toEqual(2);
@@ -30,8 +34,8 @@ describe("makeNodeScriptExecutable()", () => {
     });
 
 
-    it("will make the file executable", (done) => {
-
+    it("will make the file executable", (done) =>
+    {
         // The Node.js documentation states "on Windows only the write
         // permission can be changed."  Therefore, this test will not be run on
         // Windows.
@@ -50,7 +54,8 @@ describe("makeNodeScriptExecutable()", () => {
             expect(beforeStats!.mode & constants.S_IXOTH).toEqual(0);
 
             makeNodeScriptExecutable(scriptFile)
-            .then((scriptFile) => {
+            .then((scriptFile) =>
+            {
                 // After making it executable, all execute bits should be set.
                 const afterStats = scriptFile.existsSync();
                 expect(afterStats).toBeTruthy();
@@ -72,7 +77,8 @@ describe("createCmdLaunchScript()", () =>
     const jsScriptFile = new File(tmpDir, "nodeScript.js");
 
 
-    beforeEach(() => {
+    beforeEach(() =>
+    {
         tmpDir.emptySync();
         jsScriptFile.writeSync("console.log(\"hello\");");
     });

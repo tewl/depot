@@ -42,6 +42,7 @@ export function gitUrlToProjectName(gitUrl: string): string
  * @param dir - The directory path
  * @return The project name
  */
-export function dirToProjectName(dir: Directory): string {
+export function dirToProjectName(dir: Directory): string
+{
     return dir.dirName;
 }

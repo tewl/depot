@@ -287,6 +287,13 @@
         ],
         "block-scoped-var": "error",
         "block-spacing": "error",
+        "brace-style": [
+            "error",
+            "allman",
+            {
+                "allowSingleLine": true
+            }
+        ],
         "camelcase": "error",
         "comma-dangle": "off", // Must be off when @typescript-eslint/comma-dangle is on
         "comma-spacing": "off", // Must be off when @typescript-eslint/comma-spacing is on

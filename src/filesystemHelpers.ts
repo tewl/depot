@@ -13,21 +13,26 @@ import { failedResult, Result, succeeded, succeededResult } from "./result";
  */
 export function getFilesystemItem(path: string): Promise<Directory | File>
 {
-    return new Promise<Directory | File>((resolve, reject) => {
-
-        fs.stat(path, (err, stats: fs.Stats) => {
-            if (err) {
+    return new Promise<Directory | File>((resolve, reject) =>
+    {
+        fs.stat(path, (err, stats: fs.Stats) =>
+        {
+            if (err)
+            {
                 reject(new Error(`"${path}" does not exist.`));
                 return;
             }
 
-            if (stats.isDirectory()) {
+            if (stats.isDirectory())
+            {
                 resolve(new Directory(path));
             }
-            else if (stats.isFile()) {
+            else if (stats.isFile())
+            {
                 resolve(new File(path));
             }
-            else {
+            else
+            {
                 reject(new Error(`"${path}" is not a file or directory.`));
             }
         });
@@ -49,17 +54,21 @@ export async function resolveFileLocation(searchFileName: string, startingDir: D
 {
     let curDir = startingDir;
     let done = false;
-    while (!done) {
+    while (!done)
+    {
         const result = await fileExistsInDir(searchFileName, curDir);
-        if (succeeded(result)) {
+        if (succeeded(result))
+        {
             return result;
         }
 
         const parentDir = curDir.parentDir();
-        if (parentDir === undefined) {
+        if (parentDir === undefined)
+        {
             done = true;
         }
-        else {
+        else
+        {
             curDir = parentDir;
         }
     }
@@ -73,10 +82,12 @@ export async function resolveFileLocation(searchFileName: string, startingDir: D
         const contents = await dir.contents(false);
         const files = contents.files;
         const matchingFile = _.find(files, (curExistingFile) => curExistingFile.fileName === searchFileName);
-        if (matchingFile === undefined) {
+        if (matchingFile === undefined)
+        {
             return failedResult(`${searchFileName} could not be found in ${dir.toString()}.`);
         }
-        else {
+        else
+        {
             return succeededResult(matchingFile);
         }
     }

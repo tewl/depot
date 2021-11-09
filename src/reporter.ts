@@ -55,7 +55,8 @@ export class Reporter
     public log(text: string): void
     {
         const curIndentation = this.getCurrentIndentation();
-        if (curIndentation > 0) {
+        if (curIndentation > 0)
+        {
             text = indent(text, curIndentation);
         }
 

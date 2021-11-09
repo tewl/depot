@@ -12,7 +12,8 @@ export class Deferred<TResolve>
         this.resolve = (): void => { return; };
         this.reject = (): void => { return; };
 
-        this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) => {
+        this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) =>
+        {
             this.resolve = resolve;
             this.reject = reject;
         });

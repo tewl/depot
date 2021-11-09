@@ -4,37 +4,43 @@ import {NodePackage} from "./nodePackage";
 import {tmpDir} from "../test/ut/specHelpers";
 
 
-describe("NodePackage", () => {
+describe("NodePackage", () =>
+{
 
+    describe("static", () =>
+    {
 
-    describe("static", () => {
+        describe("fromDirectory", () =>
+        {
 
-
-        describe("fromDirectory", () => {
-
-
-            it("will reject when given a non-existent directory", (done) => {
+            it("will reject when given a non-existent directory", (done) =>
+            {
                 const dir = new Directory(__dirname, "xyzzy");
                 NodePackage.fromDirectory(dir)
-                .catch(() => {
+                .catch(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will reject when given a directory that does not have a package.json file", (done) => {
+            it("will reject when given a directory that does not have a package.json file", (done) =>
+            {
                 const dir = new Directory(__dirname);
                 NodePackage.fromDirectory(dir)
-                .catch(() => {
+                .catch(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will create a new instance when given a valid directory", (done) => {
+            it("will create a new instance when given a valid directory", (done) =>
+            {
                 const dir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(dir)
-                .then((pkg: NodePackage) => {
+                .then((pkg: NodePackage) =>
+                {
                     expect(pkg).toBeTruthy();
                     done();
                 });
@@ -47,16 +53,18 @@ describe("NodePackage", () => {
     });
 
 
-    describe("instance", () => {
+    describe("instance", () =>
+    {
 
+        describe("config", () =>
+        {
 
-        describe("config", () => {
-
-
-            it("will return properties read from package.json", (done) => {
+            it("will return properties read from package.json", (done) =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(pkgDir)
-                .then((pkg) => {
+                .then((pkg) =>
+                {
                     expect(pkg.config.name).toEqual("depot");
                     expect(pkg.config.version).toBeTruthy();
                     expect(pkg.config.description).toBeTruthy();
@@ -69,10 +77,11 @@ describe("NodePackage", () => {
         });
 
 
-        describe("lockedDependencies", () => {
+        describe("lockedDependencies", () =>
+        {
 
-
-            it("returns properties from package-lock.json", async () => {
+            it("returns properties from package-lock.json", async () =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 const pkg = await NodePackage.fromDirectory(pkgDir);
                 const lockedDeps = pkg.lockedDependencies;
@@ -82,7 +91,8 @@ describe("NodePackage", () => {
             });
 
 
-            it("return undefined when the package directory does not contain package-lock.json", async () => {
+            it("return undefined when the package directory does not contain package-lock.json", async () =>
+            {
                 // First create an empty directory that contains only a package.json.
                 tmpDir.emptySync();
                 const packageJson = new File(__dirname, "..", "package.json");
@@ -96,16 +106,19 @@ describe("NodePackage", () => {
         });
 
 
-        describe("pack()", () => {
+        describe("pack()", () =>
+        {
 
-
-            it("will produce a .tgz file", (done) => {
+            it("will produce a .tgz file", (done) =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(pkgDir)
-                .then((pkg) => {
+                .then((pkg) =>
+                {
                     return pkg.pack();
                 })
-                .then((packedFile: File) => {
+                .then((packedFile: File) =>
+                {
                     expect(packedFile).toBeTruthy();
                     expect(packedFile.fileName).toMatch(/depot-\d+\.\d+\.\d+\.tgz/);
                     expect(packedFile.existsSync()).toBeTruthy();
@@ -114,13 +127,16 @@ describe("NodePackage", () => {
             });
 
 
-            it("will place the .tgz in the package directory when an output directory is not specified", (done) => {
+            it("will place the .tgz in the package directory when an output directory is not specified", (done) =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(pkgDir)
-                .then((pkg) => {
+                .then((pkg) =>
+                {
                     return pkg.pack();
                 })
-                .then((packedFile: File) => {
+                .then((packedFile: File) =>
+                {
                     expect(packedFile).toBeTruthy();
                     expect(packedFile.existsSync()).toBeTruthy();
                     expect(packedFile.directory.toString()).toEqual(pkgDir.toString());
@@ -129,13 +145,16 @@ describe("NodePackage", () => {
             });
 
 
-            it("will place the .tgz in the specified output directory", (done) => {
+            it("will place the .tgz in the specified output directory", (done) =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 NodePackage.fromDirectory(pkgDir)
-                .then((pkg) => {
+                .then((pkg) =>
+                {
                     return pkg.pack(tmpDir);
                 })
-                .then((packedFile: File) => {
+                .then((packedFile: File) =>
+                {
                     expect(packedFile).toBeTruthy();
                     expect(packedFile.existsSync()).toBeTruthy();
                     expect(packedFile.directory.toString()).toEqual(tmpDir.toString());
@@ -147,25 +166,28 @@ describe("NodePackage", () => {
         });
 
 
-        describe("publish()", () => {
+        describe("publish()", () =>
+        {
 
-
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 tmpDir.emptySync();
             });
 
 
-            it("will publish to a directory", (done) => {
+            it("will publish to a directory", (done) =>
+            {
                 const pkgDir = new Directory(__dirname, "..");
                 const pubDir = new Directory(tmpDir, "publish");
                 const pubTmpDir = new Directory(tmpDir, "tmp");
 
                 NodePackage.fromDirectory(pkgDir)
-                .then((pkg) => {
+                .then((pkg) =>
+                {
                     return pkg.publish(pubDir, true, pubTmpDir);
                 })
-                .then((publishDir: Directory) => {
-
+                .then((publishDir: Directory) =>
+                {
                     // Note: Because these unit tests are run before building,
                     // we should not expect to see any transpiled output files.
 

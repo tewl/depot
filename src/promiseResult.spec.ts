@@ -8,10 +8,13 @@ describe("toPromise()", () =>
     it("when given an error result returns a rejected promise", async () =>
     {
         const pr = Promise.resolve(failedResult("error message"));
-        try {
+        try
+        {
             const val = await promiseResult.toPromise(pr);
             expect(false).toBeTruthy();
-        } catch (error) {
+        }
+        catch (error)
+        {
             expect(error).toEqual("error message");
         }
     });
@@ -24,7 +27,8 @@ describe("toPromise()", () =>
         {
             const val = await promiseResult.toPromise(pr);
             expect(val).toEqual("success value");
-        } catch (error)
+        }
+        catch (error)
         {
             expect(false).toBeTruthy();
         }

@@ -18,22 +18,26 @@ const NODEJS_SHEBANG = "#!/usr/bin/env node";
 export function makeNodeScriptExecutable(file: File): Promise<File>
 {
     return file.read()
-    .then((text) => {
+    .then((text) =>
+    {
         const newText = NODEJS_SHEBANG + EOL + text;
         return file.write(newText);
     })
-    .then(() => {
+    .then(() =>
+    {
         // We need to set the access mode of the file to the current mode with
         // execute permissions OR'ed in (for owner, group and other).  So first
         // get the current mode bits.
         return file.exists();
     })
-    .then((stats) => {
+    .then((stats) =>
+    {
         // Turn on all execute bits.
         const newMode = stats!.mode | constants.S_IXUSR | constants.S_IXGRP | constants.S_IXOTH;
         return file.chmod(newMode);
     })
-    .then(() => {
+    .then(() =>
+    {
         return file;
     });
 }
@@ -49,10 +53,12 @@ export function makeNodeScriptExecutable(file: File): Promise<File>
 export function makeAllJsScriptsExecutable(dir: Directory, recursive = false): Promise<Array<File>>
 {
     return dir.contents(recursive)
-    .then((contents) => {
+    .then((contents) =>
+    {
         const scriptFiles = _.filter(contents.files, (curFile) => curFile.extName === ".js");
         return mapAsync(scriptFiles, (curScriptFile) => makeNodeScriptExecutable(curScriptFile))
-        .then(() => {
+        .then(() =>
+        {
             return scriptFiles;
         });
     });
@@ -94,7 +100,8 @@ export function createCmdLaunchScript(jsFile: File): Promise<File>
     const cmdFile = new File(jsFile.directory, cmdFileName);
     const cmdContents = getCmdLauncherCode(jsFile);
     return cmdFile.write(cmdContents)
-    .then(() => {
+    .then(() =>
+    {
         return cmdFile;
     });
 }
@@ -105,8 +112,8 @@ export function createCmdLaunchScript(jsFile: File): Promise<File>
  * @param jsFile - The .js file that will be run
  * @return The .cmd file code needed to launch the specified .js file using node
  */
-function getCmdLauncherCode(jsFile: File): string {
-
+function getCmdLauncherCode(jsFile: File): string
+{
     const cmdCode = `@IF EXIST "%~dp0\\node.exe" (` + EOL +
                     `    "%~dp0\\node.exe"  "%~dp0\\${jsFile.fileName}" %*` + EOL +
                     `) ELSE (` + EOL +

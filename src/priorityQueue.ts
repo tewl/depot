@@ -11,14 +11,18 @@ interface IPriorityQueueItem<TPayload>
 function comparePriority<TPayload>(
     itemA: IPriorityQueueItem<TPayload>,
     itemB: IPriorityQueueItem<TPayload>
-): CompareResult {
-    if (itemA.priority < itemB.priority) {
+): CompareResult
+{
+    if (itemA.priority < itemB.priority)
+    {
         return CompareResult.LESS;
     }
-    else if (itemA.priority === itemB.priority) {
+    else if (itemA.priority === itemB.priority)
+    {
         return CompareResult.EQUAL;
     }
-    else {
+    else
+    {
         return CompareResult.GREATER;
     }
 }

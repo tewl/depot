@@ -78,7 +78,8 @@ export class Heap<T>
      */
     public get depth(): number
     {
-        if (this.length === 0) {
+        if (this.length === 0)
+        {
             return 0;
         }
 
@@ -87,7 +88,8 @@ export class Heap<T>
         let curDepth = 0;
         let curIndex: number | undefined = 1;
 
-        while (curIndex !== undefined) {
+        while (curIndex !== undefined)
+        {
             curDepth++;
             curIndex = this.leftChild(curIndex);
         }
@@ -115,7 +117,8 @@ export class Heap<T>
      */
     public peak(): T | undefined
     {
-        if (this._store.length === 0) {
+        if (this._store.length === 0)
+        {
             return undefined;
         }
 
@@ -132,7 +135,8 @@ export class Heap<T>
         // The length of the backing store upon start.
         const origStoreLength = this._store.length;
 
-        if (origStoreLength <= 1) {
+        if (origStoreLength <= 1)
+        {
             // Only the unused item at index 0 exists. This heap is empty.
             return undefined;
         }
@@ -145,7 +149,8 @@ export class Heap<T>
         this._store.length = origStoreLength - 1;
 
         // If this heap is not empty, sink the root item to its proper location.
-        if (this._store.length > 1) {
+        if (this._store.length > 1)
+        {
             this.sink(1);
         }
 
@@ -164,9 +169,11 @@ export class Heap<T>
      */
     private float(index: number): void
     {
-        if (!this.isRoot(index)) {
+        if (!this.isRoot(index))
+        {
             const parentIndex = this.parentIndex(index)!;
-            if (this.compare(parentIndex, index) === CompareResult.LESS) {
+            if (this.compare(parentIndex, index) === CompareResult.LESS)
+            {
                 this.swap(parentIndex, index);
                 this.float(parentIndex);
             }
@@ -182,7 +189,8 @@ export class Heap<T>
     private sink(index: number): void
     {
         const leftChildIndex = this.leftChild(index);
-        if (leftChildIndex === undefined) {
+        if (leftChildIndex === undefined)
+        {
             // There are no children.  We are done.
             return;
         }
@@ -191,23 +199,28 @@ export class Heap<T>
         let childIndexToCompareTo: number;
 
         const rightChildIndex = this.rightChild(index);
-        if (rightChildIndex === undefined) {
+        if (rightChildIndex === undefined)
+        {
             // There is only a left child.  Compare with it.
             childIndexToCompareTo = leftChildIndex;
         }
-        else {
+        else
+        {
             const childCompareResult = this.compare(leftChildIndex, rightChildIndex);
-            if (childCompareResult === CompareResult.LESS) {
+            if (childCompareResult === CompareResult.LESS)
+            {
                 // The left child is less, so compare against the right child.
                 childIndexToCompareTo = rightChildIndex;
             }
-            else {
+            else
+            {
                 // The left child is equal or greater than the right child.
                 childIndexToCompareTo = leftChildIndex;
             }
         }
 
-        if (this.compare(index, childIndexToCompareTo) === CompareResult.LESS) {
+        if (this.compare(index, childIndexToCompareTo) === CompareResult.LESS)
+        {
             this.swap(index, childIndexToCompareTo);
             this.sink(childIndexToCompareTo);
         }
@@ -222,7 +235,8 @@ export class Heap<T>
      */
     private isRoot(index: number): boolean
     {
-        if (!this.isValidIndex(index)) {
+        if (!this.isValidIndex(index))
+        {
             throw new Error("Invalid index passed to isRoot().");
         }
         return index === 1;
@@ -238,7 +252,8 @@ export class Heap<T>
     private compare(indexA: number, indexB: number): CompareResult
     {
         if (!this.isValidIndex(indexA) ||
-            !this.isValidIndex(indexB)) {
+            !this.isValidIndex(indexB))
+        {
             throw new Error("Invalid index passed to compare().");
         }
 
@@ -254,7 +269,8 @@ export class Heap<T>
     private swap(indexA: number, indexB: number): void
     {
         if (!this.isValidIndex(indexA) ||
-            !this.isValidIndex(indexB)) {
+            !this.isValidIndex(indexB))
+        {
             throw new Error("Invalid index passed to swap().");
         }
 
@@ -271,7 +287,8 @@ export class Heap<T>
      */
     private isValidIndex(index: number): boolean
     {
-        if (index === 0) {
+        if (index === 0)
+        {
             return false;
         }
 
@@ -287,14 +304,17 @@ export class Heap<T>
      */
     private parentIndex(index: number): number | undefined
     {
-        if (!this.isValidIndex(index)) {
+        if (!this.isValidIndex(index))
+        {
             throw new Error("Invalid index passed to parentIndex().");
         }
-        else if (index === 1) {
+        else if (index === 1)
+        {
             // It is the root value.
             return undefined;
         }
-        else {
+        else
+        {
             return Math.floor(index / 2);
         }
     }
@@ -307,7 +327,8 @@ export class Heap<T>
      */
     private leftChild(index: number): number | undefined
     {
-        if (!this.isValidIndex(index)) {
+        if (!this.isValidIndex(index))
+        {
             throw new Error("Invalid index passed to leftChild().");
         }
         const leftChildIndex = index * 2;
@@ -322,7 +343,8 @@ export class Heap<T>
      */
     private rightChild(index: number): number | undefined
     {
-        if (!this.isValidIndex(index)) {
+        if (!this.isValidIndex(index))
+        {
             throw new Error("Invalid index passed to rightChild().");
         }
         const rightChildIndex = index * 2 + 1;

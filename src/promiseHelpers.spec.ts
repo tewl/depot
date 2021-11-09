@@ -6,28 +6,32 @@ import {
 } from "./promiseHelpers";
 
 
-describe("sequence()", () => {
+describe("sequence()", () =>
+{
 
-
-    it("should execute the functions in order", (done) => {
-
+    it("should execute the functions in order", (done) =>
+    {
         const tasks: Array<(previousValue: unknown) => Promise<number>> = [
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(100);
                 return Promise.resolve(200);
             },
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(200);
                 return Promise.resolve(300);
             },
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(300);
                 return Promise.resolve(400);
             }
         ];
 
         sequence(tasks, 100)
-        .then((result) => {
+        .then((result) =>
+        {
             expect(result).toEqual(400);
             done();
         });
@@ -35,54 +39,66 @@ describe("sequence()", () => {
     });
 
 
-    it("will wrap the returned values in a Promise if the functions do not", (done) => {
+    it("will wrap the returned values in a Promise if the functions do not", (done) =>
+    {
         const tasks: Array<(previousValue: unknown) => number> = [
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(100);
                 return 200;
             },
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(200);
                 return 300;
             },
-            (previousResult) => {
+            (previousResult) =>
+            {
                 expect(previousResult).toEqual(300);
                 return 400;
             }
         ];
 
         sequence(tasks, 100)
-        .then((result) => {
+        .then((result) =>
+        {
             expect(result).toEqual(400);
             done();
         });
     });
 
 
-    it("will reject the returned promise whenever a function throws", (done) => {
+    it("will reject the returned promise whenever a function throws", (done) =>
+    {
         const tasks: Array<(previousValue: unknown) => number> = [
-            (previousResult): number => {
+            (previousResult): number =>
+            {
                 expect(previousResult).toEqual(100);
                 return 200;
             },
-            (previousResult): number => {
+            (previousResult): number =>
+            {
                 expect(previousResult).toEqual(200);
-                if (previousResult === 200) {
+                if (previousResult === 200)
+                {
                     throw new Error("error message");
                 }
                 return 300;
             },
-            (): number => {
+            (): number =>
+            {
                 expect(false).toBeTruthy();  // This line should never be executed
                 return 400;
             }
         ];
 
         sequence(tasks, 100)
-        .then(() => {
+        .then(() =>
+        {
             expect(false).toBeTruthy();  // This line should never be executed
         })
-        .catch((err) => {
+        .catch((err) =>
+        {
             expect(err.message).toEqual("error message");
             done();
         });
@@ -94,15 +110,17 @@ describe("sequence()", () => {
 });
 
 
-describe("getTimerPromise()", () => {
+describe("getTimerPromise()", () =>
+{
 
-
-    it("should resolve after the specified amount of time", (done) => {
+    it("should resolve after the specified amount of time", (done) =>
+    {
         const start = Date.now();
         const delayMs = 200;
 
         getTimerPromise(delayMs, "foo")
-        .then((val) => {
+        .then((val) =>
+        {
             expect(val).toEqual("foo");
             expect(Date.now()).toBeGreaterThanOrEqual(start + delayMs);
             done();
@@ -113,19 +131,21 @@ describe("getTimerPromise()", () => {
 });
 
 
-describe("conditionalTask", () => {
+describe("conditionalTask", () =>
+{
 
-
-    it("will run the task when the condition is truthy", (done) => {
-
+    it("will run the task when the condition is truthy", (done) =>
+    {
         let taskWasRun = false;
-        const task = () => {
+        const task = () =>
+        {
             taskWasRun = true;
             return Promise.resolve(5);
         };
 
         conditionalTask(true, task, 10)
-        .then((result) => {
+        .then((result) =>
+        {
             expect(result).toEqual(5);
             expect(taskWasRun).toEqual(true);
             done();
@@ -134,16 +154,18 @@ describe("conditionalTask", () => {
     });
 
 
-    it("will not run the task when the condition is falsy", (done) => {
-
+    it("will not run the task when the condition is falsy", (done) =>
+    {
         let taskWasRun = false;
-        const task = () => {
+        const task = () =>
+        {
             taskWasRun = true;
             return Promise.resolve(5);
         };
 
         conditionalTask(false, task, 10)
-        .then((result) => {
+        .then((result) =>
+        {
             expect(result).toEqual(10);
             expect(taskWasRun).toEqual(false);
             done();
@@ -155,14 +177,16 @@ describe("conditionalTask", () => {
 });
 
 
-describe("eventToPromise()", () => {
-
+describe("eventToPromise()", () =>
+{
     const ee = new EventEmitter();
 
 
-    it("will resolve with the resolve event's payload", (done) => {
+    it("will resolve with the resolve event's payload", (done) =>
+    {
         eventToPromise(ee, "resolve", "reject")
-        .then((result) => {
+        .then((result) =>
+        {
             expect(result).toEqual(5);
             done();
         });
@@ -171,9 +195,11 @@ describe("eventToPromise()", () => {
     });
 
 
-    it("once resolved, there will be no listeners", (done) => {
+    it("once resolved, there will be no listeners", (done) =>
+    {
         eventToPromise(ee, "resolve", "reject")
-        .then(() => {
+        .then(() =>
+        {
             expect(ee.listenerCount("resolve")).toEqual(0);
             expect(ee.listenerCount("reject")).toEqual(0);
             done();
@@ -183,22 +209,26 @@ describe("eventToPromise()", () => {
     });
 
 
-    it("other events will not cause the returned promise to resolve or reject", (done) => {
+    it("other events will not cause the returned promise to resolve or reject", (done) =>
+    {
         let promiseResolved = false;
         let promiseRejected = false;
         eventToPromise(ee, "resolve", "reject")
         .then(
-            () => {
+            () =>
+            {
                 promiseResolved = true;
             },
-            () => {
+            () =>
+            {
                 promiseRejected = true;
             }
         );
 
         ee.emit("other", 5);
         getTimerPromise(10, 0)
-        .then(() => {
+        .then(() =>
+        {
             expect(promiseResolved).toEqual(false);
             expect(promiseRejected).toEqual(false);
             done();
@@ -206,9 +236,11 @@ describe("eventToPromise()", () => {
     });
 
 
-    it("will reject with the reject event's payload", (done) => {
+    it("will reject with the reject event's payload", (done) =>
+    {
         eventToPromise(ee, "resolve", "reject")
-        .catch((err) => {
+        .catch((err) =>
+        {
             expect(err).toEqual("error message");
             done();
         });
@@ -217,9 +249,11 @@ describe("eventToPromise()", () => {
     });
 
 
-    it("once rejected, there will be no listeners", (done) => {
+    it("once rejected, there will be no listeners", (done) =>
+    {
         eventToPromise(ee, "resolve", "reject")
-        .catch(() => {
+        .catch(() =>
+        {
             expect(ee.listenerCount("resolve")).toEqual(0);
             expect(ee.listenerCount("reject")).toEqual(0);
             done();
@@ -232,34 +266,40 @@ describe("eventToPromise()", () => {
 });
 
 
-describe("retry()", () => {
+describe("retry()", () =>
+{
 
-
-    it("should resolve if the given function eventually succeeds", (done) => {
+    it("should resolve if the given function eventually succeeds", (done) =>
+    {
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(2, "foo", "rejected");
 
         retry(theFunc, 3)
         .then(
-            (val) => {
+            (val) =>
+            {
                 expect(val).toEqual("foo");
                 done();
             },
-            () => {
+            () =>
+            {
                 fail("The promise should not have rejected.");
             }
         );
     });
 
 
-    it("should reject if the given function never succeeds", (done) => {
+    it("should reject if the given function never succeeds", (done) =>
+    {
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(5, "bar", "rejected");
 
         retry(theFunc, 3)
         .then(
-            () => {
+            () =>
+            {
                 fail("The promise should not have resolved.");
             },
-            (err) => {
+            (err) =>
+            {
                 expect(err).toEqual("rejected");
                 done();
             }
@@ -296,8 +336,10 @@ function getFuncThatWillRejectNTimes<TResolve, TReject>(
 
     let numFailuresRemaining: number = numFailures;
 
-    return () => {
-        if (numFailuresRemaining > 0) {
+    return () =>
+    {
+        if (numFailuresRemaining > 0)
+        {
             --numFailuresRemaining;
             return Promise.reject(rejectValue);
         }
@@ -306,18 +348,21 @@ function getFuncThatWillRejectNTimes<TResolve, TReject>(
 }
 
 
-describe("retryWhile()", () => {
+describe("retryWhile()", () =>
+{
 
-
-    it("will reject immediately if the while predicate says to stop trying", (done) => {
+    it("will reject immediately if the while predicate says to stop trying", (done) =>
+    {
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(5, "bar", "rejected");
 
         retryWhile(theFunc, () => false, 1000)
         .then(
-            () => {
+            () =>
+            {
                 fail("The promise should not have resolved.");
             },
-            (err) => {
+            (err) =>
+            {
                 expect(err).toEqual("rejected");
                 done();
             }
@@ -325,23 +370,27 @@ describe("retryWhile()", () => {
     });
 
 
-    it("will eventually resolve if the while predicate always returns true", (done) => {
+    it("will eventually resolve if the while predicate always returns true", (done) =>
+    {
         const theFunc: () => Promise<string> = getFuncThatWillRejectNTimes(5, "bar", "rejected");
 
         retryWhile(
             theFunc,
-            (err) => {
+            (err) =>
+            {
                 expect(err).toEqual("rejected");
                 return true;
             },
             1000
         )
         .then(
-            (value) => {
+            (value) =>
+            {
                 expect(value).toEqual("bar");
                 done();
             },
-            () => {
+            () =>
+            {
                 fail("The promise should not have rejected.");
             }
         );
@@ -351,19 +400,24 @@ describe("retryWhile()", () => {
 });
 
 
-describe("promiseWhile()", () => {
+describe("promiseWhile()", () =>
+{
 
-
-    it("will loop until the predicate returns false", (done) => {
+    it("will loop until the predicate returns false", (done) =>
+    {
         let val = "";
         promiseWhile(
-            () => {
+            () =>
+            {
                 return val.length < 5;
             },
-            () => {
-                return new Promise<void>((resolve: () => void) => {
+            () =>
+            {
+                return new Promise<void>((resolve: () => void) =>
+                {
                     setTimeout(
-                        () => {
+                        () =>
+                        {
                             val = val + "a";
                             resolve();
                         },
@@ -371,21 +425,26 @@ describe("promiseWhile()", () => {
                     );
                 });
             }
-        ).then(() => {
+        ).then(() =>
+        {
             expect(val).toEqual("aaaaa");
             done();
         });
     });
 
 
-    it("the returned promise will reject with the same error the body function rejects with", (done) => {
+    it("the returned promise will reject with the same error the body function rejects with", (done) =>
+    {
         let val = "";
         promiseWhile(
             (): boolean => val.length < 5,
-            (): Promise<void> => {
-                return new Promise<void>((resolve, reject) => {
+            (): Promise<void> =>
+            {
+                return new Promise<void>((resolve, reject) =>
+                {
                     setTimeout(
-                        () => {
+                        () =>
+                        {
                             if (val === "aaa")
                             {
                                 reject("xyzzy");
@@ -400,7 +459,8 @@ describe("promiseWhile()", () => {
                 });
             }
         )
-        .catch((err) => {
+        .catch((err) =>
+        {
             expect(err).toEqual("xyzzy");
             done();
         });
@@ -410,11 +470,11 @@ describe("promiseWhile()", () => {
 });
 
 
-describe("sequentialSettle()", () => {
+describe("sequentialSettle()", () =>
+{
 
-
-    it("will return an array of promises that settle in index order", (done) => {
-
+    it("will return an array of promises that settle in index order", (done) =>
+    {
         const settledFlags = [false, false, false];
 
         let promises: Array<Promise<number>> = [
@@ -429,19 +489,22 @@ describe("sequentialSettle()", () => {
         promises[2].then(() => { settledFlags[2] = true; });
 
         promises[0]
-        .then(() => {
+        .then(() =>
+        {
             expect(settledFlags[1]).toBeFalsy();
             expect(settledFlags[2]).toBeFalsy();
         });
 
         promises[1]
-        .then(() => {
+        .then(() =>
+        {
             expect(settledFlags[0]).toBeTruthy();
             expect(settledFlags[2]).toBeFalsy();
         });
 
         promises[2]
-        .then(() => {
+        .then(() =>
+        {
             expect(settledFlags[0]).toBeTruthy();
             expect(settledFlags[1]).toBeTruthy();
             done();
@@ -453,11 +516,11 @@ describe("sequentialSettle()", () => {
 
 
 
-describe("delaySettle()", () => {
+describe("delaySettle()", () =>
+{
 
-
-    it("should delay a resolved Promise until the specified Promise is resolved", (done) => {
-
+    it("should delay a resolved Promise until the specified Promise is resolved", (done) =>
+    {
         // The order in which these promises will settle:  p2, p1, p2Delayed
         const p1 = getTimerPromise(400, 1);
         const p2 = getTimerPromise(100, 2);
@@ -471,17 +534,20 @@ describe("delaySettle()", () => {
         p2.then(() => { p2State = "resolved"; });
         p2Delayed.then(() => { p2DelayedState = "resolved"; });
 
-        p2.then(() => {
+        p2.then(() =>
+        {
             expect(p1State).toEqual("pending");
             expect(p2DelayedState).toEqual("pending");
         });
 
-        p1.then(() => {
+        p1.then(() =>
+        {
             expect(p2State).toEqual("resolved");
             expect(p2DelayedState).toEqual("pending");
         });
 
-        p2Delayed.then(() => {
+        p2Delayed.then(() =>
+        {
             expect(p1State).toEqual("resolved");
             expect(p2State).toEqual("resolved");
             done();
@@ -489,11 +555,12 @@ describe("delaySettle()", () => {
     });
 
 
-    it("should delay a resolved Promise until the specified Promise is rejected", (done) => {
-
+    it("should delay a resolved Promise until the specified Promise is rejected", (done) =>
+    {
         // Expected settle order: p2 (resolved with 2), p1 (rejected), p2Delayed (resolved with 2).
         const p1 = getTimerPromise(400, 1)
-        .then(() => {
+        .then(() =>
+        {
             throw new Error("rejected");
         });
         const p2 = getTimerPromise(100, 2);
@@ -519,40 +586,48 @@ describe("delaySettle()", () => {
         );
 
         p2
-        .then(() => {
+        .then(() =>
+        {
             expect(p1State).toEqual("pending");
             expect(p2DelayedState).toEqual("pending");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             fail("p2 should not have rejected.");
         });
 
         p1
-        .then(() => {
+        .then(() =>
+        {
             fail("p1 should not have resolved.");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             expect(p2State).toEqual("resolved");
             expect(p2DelayedState).toEqual("pending");
         });
 
         p2Delayed
-        .then(() => {
+        .then(() =>
+        {
             expect(p1State).toEqual("rejected");
             expect(p2State).toEqual("resolved");
             done();
         })
-        .catch(() => {
+        .catch(() =>
+        {
             fail("p2Delayed should not have rejected.");
         });
     });
 
 
-    it("should delay a rejected Promise until the specified Promise is resolved", (done) => {
+    it("should delay a rejected Promise until the specified Promise is resolved", (done) =>
+    {
         // Expected settle order: p2 (rejected), p1 (resolved), p2Delayed (rejected).
         const p1 = getTimerPromise(400, 1);
         const p2 = getTimerPromise(100, 2)
-        .then(() => {
+        .then(() =>
+        {
             throw new Error("rejected");
         });
         const p2Delayed = delaySettle(p2, p1);
@@ -575,10 +650,12 @@ describe("delaySettle()", () => {
         );
 
         p2
-        .then(() => {
+        .then(() =>
+        {
             fail("p2 should never resolve");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // p1 is not settled
             expect(p1State).toEqual("pending");
 
@@ -587,7 +664,8 @@ describe("delaySettle()", () => {
         });
 
         p1
-        .then(() => {
+        .then(() =>
+        {
             // p2 is rejected
             expect(p2State).toEqual("rejected");
 
@@ -596,10 +674,12 @@ describe("delaySettle()", () => {
         });
 
         p2Delayed
-        .then(() => {
+        .then(() =>
+        {
             fail("p2Delayed should not resolve");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // p1 is resolved
             expect(p1State).toEqual("resolved");
 
@@ -611,15 +691,17 @@ describe("delaySettle()", () => {
     });
 
 
-    it("should delay a rejected Promise until the specified Promise is rejected", (done) => {
-
+    it("should delay a rejected Promise until the specified Promise is rejected", (done) =>
+    {
         // Expected settle order: p2 (rejected), p1 (rejected), p2Delayed (rejected)
         const p1: Promise<number> = getTimerPromise(400, 1)
-        .then(() => {
+        .then(() =>
+        {
             throw new Error("rejected");
         });
         const p2: Promise<number> = getTimerPromise(100, 2)
-        .then(() => {
+        .then(() =>
+        {
             throw new Error("rejected");
         });
         const p2Delayed: Promise<number> = delaySettle(p2, p1);
@@ -644,10 +726,12 @@ describe("delaySettle()", () => {
         );
 
         p2
-        .then(() => {
+        .then(() =>
+        {
             fail("p2 should never resolve");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // p1 is not settled
             expect(p1State).toEqual("pending");
 
@@ -656,10 +740,12 @@ describe("delaySettle()", () => {
         });
 
         p1
-        .then(() => {
+        .then(() =>
+        {
             fail("p1 should never resolve.");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // p2 is rejected
             expect(p2State).toEqual("rejected");
 
@@ -668,10 +754,12 @@ describe("delaySettle()", () => {
         });
 
         p2Delayed
-        .then(() => {
+        .then(() =>
+        {
             fail("p2Delayed should not resolve");
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // p1 is rejected
             expect(p1State).toEqual("rejected");
 
@@ -735,12 +823,15 @@ describe("mapAsync()", () =>
 });
 
 
-describe("zipWithAsyncValues()", () => {
+describe("zipWithAsyncValues()", () =>
+{
 
-    it("will resolve with the expected tuples when all async values are successfully gotten.", async () => {
+    it("will resolve with the expected tuples when all async values are successfully gotten.", async () =>
+    {
         const src = [10, 30, 15];
 
-        const pairs = await zipWithAsyncValues(src, (curNum) => {
+        const pairs = await zipWithAsyncValues(src, (curNum) =>
+        {
             return getTimerPromise(curNum, curNum + 1);
         });
 
@@ -780,9 +871,11 @@ describe("zipWithAsyncValues()", () => {
 });
 
 
-describe("filterAsync", () => {
+describe("filterAsync", () =>
+{
 
-    it("will include values with truthy async values", async () => {
+    it("will include values with truthy async values", async () =>
+    {
         const src = [10, 31, 16];
 
         const asyncIsEven = (curNum: number): Promise<boolean> =>
@@ -804,10 +897,12 @@ describe("filterAsync", () => {
         {
             await getTimerPromise(curNum, curNum);
 
-            if (curNum % 2 === 0) {
+            if (curNum % 2 === 0)
+            {
                 return true;
             }
-            else {
+            else
+            {
                 throw new Error(`${curNum} rejected.`);
             }
         };

@@ -6,15 +6,17 @@ import {Directory} from "./directory";
 import { failed, succeeded } from "./result";
 
 
-describe("getFilesystemItem()", () => {
+describe("getFilesystemItem()", () =>
+{
 
-
-    beforeEach(() => {
+    beforeEach(() =>
+    {
         tmpDir.emptySync();
     });
 
 
-    it("resolves with a File when the path represents a file", async () => {
+    it("resolves with a File when the path represents a file", async () =>
+    {
         const file = new File(tmpDir, "test.txt");
         file.writeSync("hello");
 
@@ -23,7 +25,8 @@ describe("getFilesystemItem()", () => {
     });
 
 
-    it("resolves with a Directory when the path represents a directory", async () => {
+    it("resolves with a Directory when the path represents a directory", async () =>
+    {
         const dir = new Directory(tmpDir, "test");
         dir.ensureExistsSync();
 
@@ -32,12 +35,15 @@ describe("getFilesystemItem()", () => {
     });
 
 
-    it("rejects when the specified item does not exist", async () => {
-        try {
+    it("rejects when the specified item does not exist", async () =>
+    {
+        try
+        {
             await getFilesystemItem(path.join("tmp", "does-not-exist"));
             fail("The preceding line should have rejected.");
         }
-        catch (err) {
+        catch (err)
+        {
             // Correctly rejected.
         }
     });
@@ -46,8 +52,8 @@ describe("getFilesystemItem()", () => {
 });
 
 
-describe("resolveFileLocation()", () => {
-
+describe("resolveFileLocation()", () =>
+{
 
     beforeEach(() =>
     {
@@ -56,20 +62,23 @@ describe("resolveFileLocation()", () => {
     });
 
 
-    it("resolves with the expected file when the file is found in the starting directory", async () => {
+    it("resolves with the expected file when the file is found in the starting directory", async () =>
+    {
         const searchFile = new File(tmpDir, "foo.txt");
         searchFile.writeSync("search file");
 
         const result = await resolveFileLocation("foo.txt", tmpDir);
         expect(succeeded(result)).toBeTruthy();
-        if (succeeded(result)) {
+        if (succeeded(result))
+        {
             expect(result.value.fileName).toEqual("foo.txt");
             expect(result.value.directory.equals(tmpDir)).toBeTruthy();
         }
     });
 
 
-    it("resolves with the expected file when the file is found in a parent directory", async () => {
+    it("resolves with the expected file when the file is found in a parent directory", async () =>
+    {
         const searchFile = new File(tmpDir, "foo.txt");
         searchFile.writeSync("search file");
 
@@ -82,7 +91,8 @@ describe("resolveFileLocation()", () => {
 
         const result = await resolveFileLocation("foo.txt", dirC);
         expect(succeeded(result)).toBeTruthy();
-        if (succeeded(result)) {
+        if (succeeded(result))
+        {
             expect(result.value.fileName).toEqual("foo.txt");
             expect(result.value.directory.equals(tmpDir)).toBeTruthy();
         }
@@ -107,10 +117,12 @@ describe("resolveFileLocation()", () => {
     // });
 
 
-    it("resolves with a failed result when the file is not found", async () => {
+    it("resolves with a failed result when the file is not found", async () =>
+    {
         const result = await resolveFileLocation("aFileThatShouldNeverBeFound.txt", tmpDir);
         expect(failed(result)).toBeTruthy();
-        if (failed(result)) {
+        if (failed(result))
+        {
             expect(result.error.length).toBeGreaterThan(0);
         }
     });

@@ -1,9 +1,11 @@
 import { objToStrMap, strMapToObj, strMapToJson, jsonToStrMap, mapToStrMap, mapToJson } from "./mapHelpers";
 
 
-describe("strMapToObj()", () => {
+describe("strMapToObj()", () =>
+{
 
-    it("converts to the expected object", () => {
+    it("converts to the expected object", () =>
+    {
         const map = new Map<string, number>();
         map.set("three", 3);
         map.set("five", 5);
@@ -14,9 +16,11 @@ describe("strMapToObj()", () => {
 });
 
 
-describe("objToStrMap()", () => {
+describe("objToStrMap()", () =>
+{
 
-    it("converts to the expected map", () => {
+    it("converts to the expected map", () =>
+    {
         const obj = {two: 2, six: 6, nine: 9};
         const map = objToStrMap(obj);
         expect(map.size).toEqual(3);
@@ -28,9 +32,11 @@ describe("objToStrMap()", () => {
 });
 
 
-describe("strMapToJson()", () => {
+describe("strMapToJson()", () =>
+{
 
-    it("converts to the expected JSON string", () => {
+    it("converts to the expected JSON string", () =>
+    {
         const map = new Map<string, number>();
         map.set("three", 3);
         map.set("five", 5);
@@ -40,9 +46,11 @@ describe("strMapToJson()", () => {
 });
 
 
-describe("jsonToStrMap()", () => {
+describe("jsonToStrMap()", () =>
+{
 
-    it("converts to the expected map", () => {
+    it("converts to the expected map", () =>
+    {
         const map = jsonToStrMap('{"three":3,"five":5}');
         expect(map.size).toEqual(2);
         expect(map.get("three")).toEqual(3);
@@ -52,9 +60,11 @@ describe("jsonToStrMap()", () => {
 });
 
 
-describe("mapToStrMap()", () => {
+describe("mapToStrMap()", () =>
+{
 
-    it("converts to the expected map", () => {
+    it("converts to the expected map", () =>
+    {
         const srcMap = new Map<number, number>();
         srcMap.set(3, 3);
         srcMap.set(5, 5);
@@ -68,9 +78,11 @@ describe("mapToStrMap()", () => {
 });
 
 
-describe("mapToJson()", () => {
+describe("mapToJson()", () =>
+{
 
-    it("converts to the expected JSON", () => {
+    it("converts to the expected JSON", () =>
+    {
         const map = new Map<number, number>();
         map.set(2, 3);
         map.set(4, 5);

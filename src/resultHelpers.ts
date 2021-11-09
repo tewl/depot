@@ -19,19 +19,23 @@ export function mapWhileSuccessful<TInput, TOutput, TError>(
 {
     return _.reduce(
         srcCollection,
-        (acc, curItem) => {
+        (acc, curItem) =>
+        {
             // If we have already failed, just return the error.
-            if (failed(acc)) {
+            if (failed(acc))
+            {
                 return acc;
             }
 
             // We have not yet failed, so process the current item.
             const res = mappingFunc(curItem);
-            if (succeeded(res)) {
+            if (succeeded(res))
+            {
                 const newArr = _.concat(acc.value, res.value);
                 return succeededResult(newArr);
             }
-            else {
+            else
+            {
                 return res;
             }
         },

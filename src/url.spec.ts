@@ -1,17 +1,17 @@
 import {Url} from "./url";
 
 
-describe("Url", () => {
+describe("Url", () =>
+{
 
+    describe("instance", () =>
+    {
 
-    describe("instance", () => {
+        describe("clone()", () =>
+        {
 
-
-        describe("clone()", () => {
-
-
-            it("will create a *copy* of the Url instance", () => {
-
+            it("will create a *copy* of the Url instance", () =>
+            {
                 const url1 = Url.fromString("http://localhost:3030")!;
                 const url2 = url1.clone();
 
@@ -25,11 +25,11 @@ describe("Url", () => {
         });
 
 
-        describe("getProtocols()", () => {
+        describe("getProtocols()", () =>
+        {
 
-
-            it("will return an array of all protocols in the URL", () => {
-
+            it("will return an array of all protocols in the URL", () =>
+            {
                 const urlA = Url.fromString("https://github.com/kwpeters/sampleGitRepo.git");
                 expect(urlA!.getProtocols()).toEqual(["https"]);
 
@@ -38,7 +38,8 @@ describe("Url", () => {
             });
 
 
-            it("will return an empty array when no protocols are present", () => {
+            it("will return an empty array when no protocols are present", () =>
+            {
                 const urlA = Url.fromString("github.com/kwpeters/sampleGitRepo");
                 expect(urlA!.getProtocols()).toEqual([]);
             });
@@ -47,24 +48,27 @@ describe("Url", () => {
         });
 
 
-        describe("replaceProtocol()", () => {
+        describe("replaceProtocol()", () =>
+        {
 
-
-            it("will replace the protocol with the same one", () => {
+            it("will replace the protocol with the same one", () =>
+            {
                 const url = Url.fromString("git+https://github.com/kwpeters/sampleGitRepo.git");
                 expect(url!.replaceProtocol("git+https").toString())
                 .toEqual("git+https://github.com/kwpeters/sampleGitRepo.git");
             });
 
 
-            it("will replace the protocol with a different one", () => {
+            it("will replace the protocol with a different one", () =>
+            {
                 const url = Url.fromString("git://github.com/kwpeters/sampleGitRepo.git");
                 expect(url!.replaceProtocol("https").toString())
                 .toEqual("https://github.com/kwpeters/sampleGitRepo.git");
             });
 
 
-            it("will replace a protocol with multiple protocols", () => {
+            it("will replace a protocol with multiple protocols", () =>
+            {
                 const url = Url.fromString("https://github.com/kwpeters/sampleGitRepo.git");
                 expect(url!.replaceProtocol("git+https").toString())
                 .toEqual("git+https://github.com/kwpeters/sampleGitRepo.git");
@@ -74,10 +78,11 @@ describe("Url", () => {
         });
 
 
-        describe("join()", () => {
+        describe("join()", () =>
+        {
 
-
-            it("will join a URL when the first part does not end with a slash", () => {
+            it("will join a URL when the first part does not end with a slash", () =>
+            {
                 const url1 = Url.fromString("http://www.foo.com/foo");
                 expect(url1).toBeTruthy();
                 const url2 = url1!.join("bar");
@@ -86,7 +91,8 @@ describe("Url", () => {
             });
 
 
-            it("will join a URL when the first part does end with a slash", () => {
+            it("will join a URL when the first part does end with a slash", () =>
+            {
                 const url1 = Url.fromString("http://www.foo.com/foo/");
                 expect(url1).toBeTruthy();
                 const url2 = url1!.join("/bar");
@@ -98,9 +104,10 @@ describe("Url", () => {
         });
 
 
-        describe("host", () => {
-
-            it("returns the expected value", () => {
+        describe("host", () =>
+        {
+            it("returns the expected value", () =>
+            {
                 const url = Url.fromString("http://localhost:3030/foo/bar");
                 expect(url).toBeTruthy();
                 expect(url!.host).toEqual("localhost:3030");
@@ -110,9 +117,11 @@ describe("Url", () => {
         });
 
 
-        describe("hostname", () => {
+        describe("hostname", () =>
+        {
 
-            it("returns the expected value", () => {
+            it("returns the expected value", () =>
+            {
                 const url = Url.fromString("http://localhost:3030/foo/bar");
                 expect(url).toBeTruthy();
                 expect(url!.hostname).toEqual("localhost");
@@ -121,24 +130,27 @@ describe("Url", () => {
         });
 
 
-        describe("port", () => {
+        describe("port", () =>
+        {
 
-
-            it("returns undefined when no port is specified", () => {
+            it("returns undefined when no port is specified", () =>
+            {
                 const url = Url.fromString("http://localhost/foo/bar");
                 expect(url).toBeTruthy();
                 expect(url!.port).toEqual(undefined);
             });
 
 
-            it("returns the expected numeric value", () => {
+            it("returns the expected numeric value", () =>
+            {
                 const url = Url.fromString("http://localhost:3030/foo/bar");
                 expect(url).toBeTruthy();
                 expect(url!.port).toEqual(3030);
             });
 
 
-            it("assigns a new port number", () => {
+            it("assigns a new port number", () =>
+            {
                 const url = Url.fromString("http://localhost:3030/foo/bar");
                 expect(url).toBeTruthy();
                 url!.port = 3040;
@@ -146,7 +158,8 @@ describe("Url", () => {
             });
 
 
-            it("can clear a port number", () => {
+            it("can clear a port number", () =>
+            {
                 const url = Url.fromString("http://localhost:3030/foo/bar");
                 expect(url).toBeTruthy();
                 url!.port = undefined;

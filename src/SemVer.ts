@@ -11,7 +11,8 @@ export class SemVer
 {
     public static sort(arr: Array<SemVer>): Array<SemVer>
     {
-        return arr.sort((semverA, semverB) => {
+        return arr.sort((semverA, semverB) =>
+        {
             return semver.compare(semverA._semver, semverB._semver);
         });
     }

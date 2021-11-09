@@ -1,10 +1,10 @@
 import {matchesAny} from "./regexpHelpers";
 
-describe("matchesAny()", () => {
+describe("matchesAny()", () =>
+{
 
-
-    it("returns true when one of the regexes matches", () => {
-
+    it("returns true when one of the regexes matches", () =>
+    {
         const str = "2011-12-23\\IMG_4394.JPG";
         const regexes = [
             /foo/,
@@ -16,7 +16,8 @@ describe("matchesAny()", () => {
     });
 
 
-    it("returns false when none of the regexes match", () => {
+    it("returns false when none of the regexes match", () =>
+    {
         const str = "2011-12-23\\IMG_4394.JPG";
         const regexes = [
             /foo/,

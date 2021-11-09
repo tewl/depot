@@ -9,16 +9,21 @@ import Jasmine = require("jasmine");
  * more fail.  In either case, the promise does not settle until all tests have
  * completed.
  */
-export function runJasmine(jasmineInstance: Jasmine): Promise<void> {
-    return new Promise((resolve, reject) => {
-
+export function runJasmine(jasmineInstance: Jasmine): Promise<void>
+{
+    return new Promise((resolve, reject) =>
+    {
         // Jasmine's execute() method does not provide the usual promise or
         // accept a callback.  Therefore, we have to rely on registering a
         // callback with onComplete().
-        jasmineInstance.onComplete((allTestsPassed) => {
-            if (allTestsPassed) {
+        jasmineInstance.onComplete((allTestsPassed) =>
+        {
+            if (allTestsPassed)
+            {
                 resolve();
-            } else {
+            }
+            else
+            {
                 reject(new Error("One or more tests failed."));
             }
         });

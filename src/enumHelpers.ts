@@ -6,13 +6,15 @@ import * as _ from "lodash";
  * @param enumObject - The enumeration to choose a key from
  * @return A key from the specified enumeration
  */
-export function numericEnumRandomKey<T>(enumObject: T): keyof T {
+export function numericEnumRandomKey<T>(enumObject: T): keyof T
+{
     const allKeys: Array<keyof T> = Object.keys(enumObject) as Array<keyof T>;
 
     // Numeric enumerations contain "reverse mappings" where the key is the
     // string version of the number and the value is the string version of the
     // key.  Get rid of those.
-    const normalKeys: Array<keyof T> = allKeys.filter((curKey) => {
+    const normalKeys: Array<keyof T> = allKeys.filter((curKey) =>
+    {
         return typeof (enumObject[curKey]) === "number";
     });
     return normalKeys[_.random(normalKeys.length - 1)];
@@ -24,7 +26,8 @@ export function numericEnumRandomKey<T>(enumObject: T): keyof T {
  * @param enumObject - The enumeration to choose a value from
  * @return A value from the specified enumeration
  */
-export function numericEnumRandomValue<T>(enumObject: T): T[keyof T] {
+export function numericEnumRandomValue<T>(enumObject: T): T[keyof T]
+{
     return enumObject[numericEnumRandomKey(enumObject)];
 }
 
@@ -34,7 +37,8 @@ export function numericEnumRandomValue<T>(enumObject: T): T[keyof T] {
  * @param enumObject - The enumeration to choose a key from
  * @return A key from the specified enumeration
  */
-export function stringEnumRandomKey<T>(enumObject: T): keyof T {
+export function stringEnumRandomKey<T>(enumObject: T): keyof T
+{
     const allKeys: Array<keyof T> = Object.keys(enumObject) as Array<keyof T>;
     return allKeys[_.random(allKeys.length - 1)];
 }
@@ -45,7 +49,8 @@ export function stringEnumRandomKey<T>(enumObject: T): keyof T {
  * @param enumObject - The enumeration to choose a value from
  * @return A value from the specified enumeration
  */
-export function stringEnumRandomValue<T>(enumObject: T): T[keyof T] {
+export function stringEnumRandomValue<T>(enumObject: T): T[keyof T]
+{
     return enumObject[stringEnumRandomKey(enumObject)];
 }
 
@@ -56,7 +61,8 @@ export function stringEnumRandomValue<T>(enumObject: T): T[keyof T] {
  * @param val - The value to convert
  * @return The key of the enumeration that has the specified value
  */
-export function numericEnumValToString<T>(enumObject: T, val: T[keyof T]): string {
+export function numericEnumValToString<T>(enumObject: T, val: T[keyof T]): string
+{
     // Leverage the fact that the TS compiler puts the reverse mappings in
     // the generated enumeration object too.  These reverse mappings have a key
     // that is the value and a value that is the string symbol name.

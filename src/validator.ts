@@ -44,16 +44,19 @@ export class Validator<TSubject>
      */
     public isValid(subject: TSubject): Promise<boolean>
     {
-        return mapAsync(this._validatorFuncs, (curValidatorFunc) => {
+        return mapAsync(this._validatorFuncs, (curValidatorFunc) =>
+        {
             const result: Promise<boolean> | boolean = curValidatorFunc(subject);
             // Wrap each return value in a Promise.
             return Promise.resolve(result);
         })
-        .then((validationResults: Array<boolean>) => {
+        .then((validationResults: Array<boolean>) =>
+        {
             // Return true only if every validator returned true.
             return _.every(validationResults);
         })
-        .catch(() => {
+        .catch(() =>
+        {
             // One of the validators rejected.  Assume that means a failed
             // validation.
             return false;

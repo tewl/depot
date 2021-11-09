@@ -50,21 +50,26 @@ export class FileCompareAction
      */
     public execute(): Promise<void>
     {
-        if (this._actionType === FileCompareActionType.CopyLeft) {
+        if (this._actionType === FileCompareActionType.CopyLeft)
+        {
             return this._files.rightFile.copy(this._files.leftFile)
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.CopyRight) {
+        else if (this._actionType === FileCompareActionType.CopyRight)
+        {
             return this._files.leftFile.copy(this._files.rightFile)
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.DeleteLeft) {
+        else if (this._actionType === FileCompareActionType.DeleteLeft)
+        {
             return this._files.leftFile.delete();
         }
-        else if (this._actionType === FileCompareActionType.DeleteRight) {
+        else if (this._actionType === FileCompareActionType.DeleteRight)
+        {
             return this._files.rightFile.delete();
         }
-        else if (this._actionType === FileCompareActionType.DeleteBoth) {
+        else if (this._actionType === FileCompareActionType.DeleteBoth)
+        {
             return Promise.all(
                 [
                     this._files.leftFile.delete(),
@@ -73,10 +78,12 @@ export class FileCompareAction
             )
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.Skip) {
+        else if (this._actionType === FileCompareActionType.Skip)
+        {
             return Promise.resolve();
         }
-        else {
+        else
+        {
             return Promise.reject(new Error(`Unsupported action "${this._actionType}".`));
         }
     }
@@ -105,12 +112,14 @@ export class FileComparer implements IFilesToCompare
     // #endregion
 
 
-    public get leftFile(): File {
+    public get leftFile(): File
+    {
         return this._leftFile;
     }
 
 
-    public get rightFile(): File {
+    public get rightFile(): File
+    {
         return this._rightFile;
     }
 
@@ -289,7 +298,8 @@ export class DiffDirFileItem
     ): DiffDirFileItem
     {
         // The relative file path must be legit.
-        if (relativeFilePath.length === 0) {
+        if (relativeFilePath.length === 0)
+        {
             throw new Error(`DiffDirFileItem relative file path cannot be 0-length.`);
         }
 
@@ -397,7 +407,8 @@ export class DiffDirFileItem
             this._files.rightFile.exists()
         ]);
 
-        if (!leftExists || !rightExists) {
+        if (!leftExists || !rightExists)
+        {
             // One or both of the files do not exist.
             return false;
         }
@@ -447,7 +458,8 @@ export async function diffDirectories(
         (leftContents) => leftContents.files,
         () => []     // Left directory does not exist.
     )
-    .then((leftFiles) => {
+    .then((leftFiles) =>
+    {
         return _.map(
             leftFiles,
             (curLeftFile) => DiffDirFileItem.create(leftDir, rightDir,
@@ -463,7 +475,8 @@ export async function diffDirectories(
         (rightContents) => rightContents.files,
         () => []    // Right directory does not exist.
     )
-    .then((rightFiles) => {
+    .then((rightFiles) =>
+    {
         return _.map(
             rightFiles,
             (curRightFile) => DiffDirFileItem.create(leftDir,

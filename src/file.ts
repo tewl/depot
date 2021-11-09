@@ -122,9 +122,10 @@ export class File
      */
     public exists(): Promise<fs.Stats | undefined>
     {
-        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
-            fs.stat(this._filePath, (err: unknown, stats: fs.Stats) => {
-
+        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) =>
+        {
+            fs.stat(this._filePath, (err: unknown, stats: fs.Stats) =>
+            {
                 if (!err && stats.isFile())
                 {
                     resolve(stats);
@@ -141,11 +142,13 @@ export class File
 
     public existsSync(): fs.Stats | undefined
     {
-        try {
+        try
+        {
             const stats = fs.statSync(this._filePath);
             return stats.isFile() ? stats : undefined;
         }
-        catch (err) {
+        catch (err)
+        {
             if ((err as NodeJS.ErrnoException).code === "ENOENT")
             {
                 return undefined;
@@ -167,16 +170,18 @@ export class File
     public getSiblingFiles(): Promise<Array<File>>
     {
         return this.exists()
-        .then((stats) => {
-            if (stats === undefined) {
+        .then((stats) =>
+        {
+            if (stats === undefined)
+            {
                 throw new Error(`Cannot get sibling files for non existent file ${this.absPath}`);
             }
 
             const parentDir = this.directory;
             return parentDir.contents(false);
         })
-        .then((dirContents) => {
-
+        .then((dirContents) =>
+        {
             const thisFileName = this.fileName;
 
             const allFiles = dirContents.files;
@@ -194,9 +199,12 @@ export class File
      */
     public chmod(mode: number): Promise<File>
     {
-        return new Promise((resolve, reject) => {
-            fs.chmod(this._filePath, mode, (err) => {
-                if (err) {
+        return new Promise((resolve, reject) =>
+        {
+            fs.chmod(this._filePath, mode, (err) =>
+            {
+                if (err)
+                {
                     reject(err);
                     return;
                 }
@@ -234,10 +242,14 @@ export class File
     public delete(): Promise<void>
     {
         return this.exists()
-        .then((stats) => {
-            if (!stats) {
+        .then((stats) =>
+        {
+            if (!stats)
+            {
                 return Promise.resolve();
-            } else {
+            }
+            else
+            {
                 return unlinkAsync(this._filePath);
             }
         });
@@ -246,7 +258,8 @@ export class File
 
     public deleteSync(): void
     {
-        if (!this.existsSync()) {
+        if (!this.existsSync())
+        {
             return;
         }
 
@@ -274,18 +287,22 @@ export class File
         //
         let destFile: File;
 
-        if (dstDirOrFile instanceof File) {
+        if (dstDirOrFile instanceof File)
+        {
             // The caller has specified the destination directory and file
             // name in the form of a File.
             destFile = dstDirOrFile;
         }
-        else
-        {           // dstDirOrFile instanceof Directory
+        else    // dstDirOrFile instanceof Directory
+        {
             // The caller has specified the destination directory and
             // optionally a new file name.
-            if (dstFileName === undefined) {
+            if (dstFileName === undefined)
+            {
                 destFile = new File(dstDirOrFile, this.fileName);
-            } else {
+            }
+            else
+            {
                 destFile = new File(dstDirOrFile, dstFileName);
             }
         }
@@ -295,25 +312,29 @@ export class File
         // doesn't we should get out before we create the destination file.
         //
         return this.exists()
-        .then((stats) => {
+        .then((stats) =>
+        {
             if (!stats)
             {
                 throw new Error(`Source file ${this._filePath} does not exist.`);
             }
         })
-        .then(() => {
+        .then(() =>
+        {
             //
             // Make sure the directory for the destination file exists.
             //
             return destFile.directory.ensureExists();
         })
-        .then(() => {
+        .then(() =>
+        {
             //
             // Do the copy.
             //
             return copyFile(this._filePath, destFile.toString(), {preserveTimestamps: true});
         })
-        .then(() => {
+        .then(() =>
+        {
             return destFile;
         });
     }
@@ -339,16 +360,22 @@ export class File
         //
         let destFile: File;
 
-        if (dstDirOrFile instanceof File) {
+        if (dstDirOrFile instanceof File)
+        {
             // The caller has specified the destination directory and file
             // name in the form of a File.
             destFile = dstDirOrFile;
-        } else {           // dstDirOrFile instanceof Directory
+        }
+        else   // dstDirOrFile instanceof Directory
+        {
             // The caller has specified the destination directory and
             // optionally a new file name.
-            if (dstFileName === undefined) {
+            if (dstFileName === undefined)
+            {
                 destFile = new File(dstDirOrFile, this.fileName);
-            } else {
+            }
+            else
+            {
                 destFile = new File(dstDirOrFile, dstFileName);
             }
         }
@@ -396,18 +423,22 @@ export class File
         //
         let destFile: File;
 
-        if (dstDirOrFile instanceof File) {
+        if (dstDirOrFile instanceof File)
+        {
             // The caller has specified the destination directory and file
             // name in the form of a File.
             destFile = dstDirOrFile;
         }
-        else
-        {           // dstDirOrFile instanceof Directory
+        else  // dstDirOrFile instanceof Directory
+        {
             // The caller has specified the destination directory and
             // optionally a new file name.
-            if (dstFileName === undefined) {
+            if (dstFileName === undefined)
+            {
                 destFile = new File(dstDirOrFile, this.fileName);
-            } else {
+            }
+            else
+            {
                 destFile = new File(dstDirOrFile, dstFileName);
             }
         }
@@ -417,31 +448,36 @@ export class File
         // doesn't we should get out before we create the destination file.
         //
         return this.exists()
-        .then((stats) => {
+        .then((stats) =>
+        {
             if (!stats)
             {
                 throw new Error(`Source file ${this._filePath} does not exist.`);
             }
         })
-        .then(() => {
+        .then(() =>
+        {
             //
             // Make sure the directory for the destination file exists.
             //
             return destFile.directory.ensureExists();
         })
-        .then(() => {
+        .then(() =>
+        {
             //
             // Do the copy.
             //
             return copyFile(this._filePath, destFile.toString(), {preserveTimestamps: true});
         })
-        .then(() => {
+        .then(() =>
+        {
             //
             // Delete the source file.
             //
             return this.delete();
         })
-        .then(() => {
+        .then(() =>
+        {
             return destFile;
         });
     }
@@ -467,16 +503,22 @@ export class File
         //
         let destFile: File;
 
-        if (dstDirOrFile instanceof File) {
+        if (dstDirOrFile instanceof File)
+        {
             // The caller has specified the destination directory and file
             // name in the form of a File.
             destFile = dstDirOrFile;
-        } else {           // dstDirOrFile instanceof Directory
-                           // The caller has specified the destination directory and
-                           // optionally a new file name.
-            if (dstFileName === undefined) {
+        }
+        else   // dstDirOrFile instanceof Directory
+        {
+            // The caller has specified the destination directory and
+            // optionally a new file name.
+            if (dstFileName === undefined)
+            {
                 destFile = new File(dstDirOrFile, this.fileName);
-            } else {
+            }
+            else
+            {
                 destFile = new File(dstDirOrFile, dstFileName);
             }
         }
@@ -518,12 +560,18 @@ export class File
     public write(text: string): Promise<void>
     {
         return this.directory.ensureExists()
-        .then(() => {
-            return new Promise<void>((resolve, reject) => {
-                fs.writeFile(this._filePath, text, "utf8", (err) => {
-                    if (err) {
+        .then(() =>
+        {
+            return new Promise<void>((resolve, reject) =>
+            {
+                fs.writeFile(this._filePath, text, "utf8", (err) =>
+                {
+                    if (err)
+                    {
                         reject(err);
-                    } else {
+                    }
+                    else
+                    {
                         resolve();
                     }
                 });
@@ -582,16 +630,19 @@ export class File
      */
     public getHash(algorithm = "md5"): Promise<string>
     {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) =>
+        {
             const input = fs.createReadStream(this._filePath);
             const hash = crypto.createHash(algorithm);
             hash.setEncoding("hex");
 
             input
-            .on("error", (error: Error) => {
+            .on("error", (error: Error) =>
+            {
                 reject(error);
             })
-            .on("end", () => {
+            .on("end", () =>
+            {
                 hash.end();
                 const hashValue = hash.read() as string;
                 resolve(hashValue);
@@ -626,8 +677,10 @@ export class File
      */
     public read(): Promise<string>
     {
-        return new Promise<string>((resolve: (text: string) => void, reject: (err: unknown) => void) => {
-            fs.readFile(this._filePath, {encoding: "utf8"}, (err, data) => {
+        return new Promise<string>((resolve: (text: string) => void, reject: (err: unknown) => void) =>
+        {
+            fs.readFile(this._filePath, {encoding: "utf8"}, (err, data) =>
+            {
                 if (err)
                 {
                     reject(err);
@@ -658,7 +711,8 @@ export class File
     public readJson<T>(): Promise<T>
     {
         return this.read()
-        .then((text) => {
+        .then((text) =>
+        {
             return JSON.parse(text);
         });
     }
@@ -700,27 +754,30 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
     // streams can read and write smaller chunks of the data.
     //
 
-    return new Promise<void>((resolve: () => void, reject: (err: unknown) => void) => {
-
+    return new Promise<void>((resolve: () => void, reject: (err: unknown) => void) =>
+    {
         const readStream = fs.createReadStream(sourceFilePath);
         const readListenerTracker = new ListenerTracker(readStream);
 
         const writeStream = fs.createWriteStream(destFilePath);
         const writeListenerTracker = new ListenerTracker(writeStream);
 
-        readListenerTracker.on("error", (err) => {
+        readListenerTracker.on("error", (err) =>
+        {
             reject(err);
             readListenerTracker.removeAll();
             writeListenerTracker.removeAll();
         });
 
-        writeListenerTracker.on("error", (err) => {
+        writeListenerTracker.on("error", (err) =>
+        {
             reject(err);
             readListenerTracker.removeAll();
             writeListenerTracker.removeAll();
         });
 
-        writeListenerTracker.on("close", () => {
+        writeListenerTracker.on("close", () =>
+        {
             resolve();
             readListenerTracker.removeAll();
             writeListenerTracker.removeAll();
@@ -728,7 +785,8 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
 
         readStream.pipe(writeStream);
     })
-    .then(() => {
+    .then(() =>
+    {
         if (options?.preserveTimestamps)
         {
             //
@@ -736,18 +794,24 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
             // them to the destination file now.
             //
             return statAsync(sourceFilePath)
-            .then((srcStats: fs.Stats) => {
+            .then((srcStats: fs.Stats) =>
+            {
                 //
                 // Note:  Setting the timestamps on dest requires us to specify
                 // the timestamp in seconds (not milliseconds).  When we divide
                 // by 1000 below and truncation happens, we are actually setting
                 // dest's timestamps *before* those of of source.
                 //
-                return new Promise<void>((resolve, reject) => {
-                    fs.utimes(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000, (err) => {
-                        if (err) {
+                return new Promise<void>((resolve, reject) =>
+                {
+                    fs.utimes(destFilePath, srcStats.atime.valueOf() / 1000, srcStats.mtime.valueOf() / 1000, (err) =>
+                    {
+                        if (err)
+                        {
                             reject(err);
-                        } else {
+                        }
+                        else
+                        {
                             resolve();
                         }
                     });

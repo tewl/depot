@@ -12,13 +12,18 @@ export function promisify0<TSuccess>(
     fn: (cb: NodeCallback<TSuccess>) => void
 ): () => Promise<TSuccess>
 {
-    const promisifiedFn = () => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn((err, result) => {
-                if (err) {
+    const promisifiedFn = () =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn((err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });
@@ -41,13 +46,18 @@ export function promisify1<TSuccess, TArg1>(
     fn: (arg1: TArg1, cb: NodeCallback<TSuccess>) => void
 ): (arg1: TArg1) => Promise<TSuccess>
 {
-    const promisifiedFn = (arg1: TArg1) => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn(arg1, (err, result) => {
-                if (err) {
+    const promisifiedFn = (arg1: TArg1) =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn(arg1, (err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });
@@ -70,13 +80,18 @@ export function promisify2<TSuccess, TArg1, TArg2>(
     fn: (arg1: TArg1, arg2: TArg2, cb: NodeCallback<TSuccess>) => void
 ): (arg1: TArg1, arg2: TArg2) => Promise<TSuccess>
 {
-    const promisifiedFn = (arg1: TArg1, arg2: TArg2) => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn(arg1, arg2, (err, result) => {
-                if (err) {
+    const promisifiedFn = (arg1: TArg1, arg2: TArg2) =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn(arg1, arg2, (err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });
@@ -99,13 +114,18 @@ export function promisify3<TSuccess, TArg1, TArg2, TArg3>(
     fn: (arg1: TArg1, arg2: TArg2, arg3: TArg3, cb: NodeCallback<TSuccess>) => void
 ): (arg1: TArg1, arg2: TArg2, arg3: TArg3) => Promise<TSuccess>
 {
-    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3) => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn(arg1, arg2, arg3, (err, result) => {
-                if (err) {
+    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3) =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn(arg1, arg2, arg3, (err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });
@@ -128,13 +148,18 @@ export function promisify4<TSuccess, TArg1, TArg2, TArg3, TArg4>(
     fn: (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, cb: NodeCallback<TSuccess>) => void
 ): (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4) => Promise<TSuccess>
 {
-    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4) => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn(arg1, arg2, arg3, arg4, (err, result) => {
-                if (err) {
+    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4) =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn(arg1, arg2, arg3, arg4, (err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });
@@ -157,13 +182,18 @@ export function promisify5<TSuccess, TArg1, TArg2, TArg3, TArg4, TArg5>(
     fn: (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, cb: NodeCallback<TSuccess>) => void
 ): (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5) => Promise<TSuccess>
 {
-    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5) => {
-        return new Promise((resolve: (result: TSuccess) => void, reject) => {
-            fn(arg1, arg2, arg3, arg4, arg5, (err, result) => {
-                if (err) {
+    const promisifiedFn = (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5) =>
+    {
+        return new Promise((resolve: (result: TSuccess) => void, reject) =>
+        {
+            fn(arg1, arg2, arg3, arg4, arg5, (err, result) =>
+            {
+                if (err)
+                {
                     reject(err);
                 }
-                else {
+                else
+                {
                     resolve(result as TSuccess);
                 }
             });

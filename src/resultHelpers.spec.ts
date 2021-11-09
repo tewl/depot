@@ -1,12 +1,14 @@
 import { failedResult, succeeded, succeededResult } from "./result";
 import { mapWhileSuccessful } from "./resultHelpers";
 
-describe("mapWhileSuccessful()", () => {
+describe("mapWhileSuccessful()", () =>
+{
 
-
-    it("returns a successful result with the mapped array when all succeed", () => {
+    it("returns a successful result with the mapped array when all succeed", () =>
+    {
         const arr = [1, 2, 3, 4, 5];
-        const squareWithMaxOfFifty = (n: number) => {
+        const squareWithMaxOfFifty = (n: number) =>
+        {
             const square = n * n;
             return square < 50 ?
                 succeededResult(square) :

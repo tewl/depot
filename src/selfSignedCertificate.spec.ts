@@ -1,17 +1,17 @@
 import {SelfSignedCertificate, CertificateCountryCode} from "./selfSignedCertificate";
 
 
-describe("SelfSignedCertificate", () => {
+describe("SelfSignedCertificate", () =>
+{
 
+    describe("static", () =>
+    {
 
-    describe("static", () => {
+        describe("create()", () =>
+        {
 
-
-        describe("create()", () => {
-
-
-            it("will return a new instance when given valid data", async () => {
-
+            it("will return a new instance when given valid data", async () =>
+            {
                 const certPair = await SelfSignedCertificate.create(
                     CertificateCountryCode.US,
                     "Ohio",

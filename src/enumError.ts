@@ -14,7 +14,8 @@ class EnumError<T> extends Error
      * @param enumObject - The enumeration containing the possible errors
      * @param errorNum - The error value to wrap
      */
-    public constructor(enumObject: T, errorNum: T[keyof T]) {
+    public constructor(enumObject: T, errorNum: T[keyof T])
+    {
         // Chain to the base class.
         // Unfortunately, there is a weird issue related to extending Error and
         // targeting ES5.  See: http://bit.ly/2wDu0XP
@@ -33,11 +34,11 @@ class EnumError<T> extends Error
  * @return A class whose instances will wrap error values from the specified
  * enumeration
  */
-export const getEnumErrorClass = <T>(enumObject: T) => { // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
-
+export const getEnumErrorClass = <T>(enumObject: T) =>  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+{
     // tslint:disable-next-line:max-classes-per-file
-    return class SpecificEnumError extends EnumError<T> {
-
+    return class SpecificEnumError extends EnumError<T>
+    {
         public constructor(errorNum: T[keyof T])
         {
             super(enumObject, errorNum);
@@ -45,5 +46,3 @@ export const getEnumErrorClass = <T>(enumObject: T) => { // eslint-disable-line 
         }
     };
 };
-
-

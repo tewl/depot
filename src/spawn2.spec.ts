@@ -9,7 +9,8 @@ import {failed, succeeded} from "./result";
 import {File} from "./file";
 
 
-describe("spawn", () => {
+describe("spawn", () =>
+{
 
     beforeEach(() =>
     {
@@ -60,14 +61,16 @@ describe("spawn", () => {
         let cmd: string;
         let args: Array<string>;
 
-        if (getOs() === OperatingSystem.Windows) {
+        if (getOs() === OperatingSystem.Windows)
+        {
             cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
             args = [
                 "-c ",
                 "sleep 10"   // Must be supplied as a single argument
             ];
         }
-        else {
+        else
+        {
             cmd = "sleep";
             args = ["10"];
         }
@@ -77,7 +80,8 @@ describe("spawn", () => {
         const result = await output.closePromise;
         expect(failed(result)).toBeTruthy();
 
-        if (!isISpawnExitError(result.error)) {
+        if (!isISpawnExitError(result.error))
+        {
             throw new Error("Unexpected type.");
         }
 
@@ -115,7 +119,8 @@ describe("spawn", () => {
         const result = await spawn("notarealcommand.exe", []).closePromise;
         expect(failed(result)).toBeTruthy();
 
-        if (!isISpawnSystemError(result.error)) {
+        if (!isISpawnSystemError(result.error))
+        {
             throw new Error("Unexpected type.");
         }
 

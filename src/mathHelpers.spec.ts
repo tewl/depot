@@ -1,10 +1,11 @@
 import {factorial} from "./mathHelpers";
 
 
-describe("factorial()", () => {
+describe("factorial()", () =>
+{
 
-
-    it("returns the expected value", () => {
+    it("returns the expected value", () =>
+    {
         expect(factorial(0)).toEqual(1);
         expect(factorial(1)).toEqual(1);
         expect(factorial(2)).toEqual(2);

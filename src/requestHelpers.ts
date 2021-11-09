@@ -16,7 +16,8 @@ export type RequestType = typeof request;   // Does this work?
  * @return Resolves with a boolean value indicating whether the specified URL is
  * GET-able.
  */
-export function urlIsGettable(url: string): Promise<boolean> {
+export function urlIsGettable(url: string): Promise<boolean>
+{
     return request(url)
     .then(
         () => true,

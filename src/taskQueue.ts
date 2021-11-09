@@ -43,7 +43,8 @@ export class TaskQueue extends EventEmitter
 
         // numConcurrent set to 0 does not make any sense.  We will assume that
         // the caller wants to allow maximum concurrency.
-        if (numConcurrent === 0) {
+        if (numConcurrent === 0)
+        {
             numConcurrent = undefined;
         }
 
@@ -93,9 +94,11 @@ export class TaskQueue extends EventEmitter
     {
         err = err || new Error("Task cancelled because its TaskQueue was cancelled.");
 
-        while (this._tasks.length > 0) {
+        while (this._tasks.length > 0)
+        {
             const curTask = this._tasks.pop();
-            if (curTask) {
+            if (curTask)
+            {
                 curTask.deferred.reject(err);
             }
         }
@@ -118,13 +121,15 @@ export class TaskQueue extends EventEmitter
             (!this._isProcessingLastFulfillment)  // we are not waiting for the last client fulfillment handler to run
                                                   // (if this._isProcessingLastFulfillment is true
                                                   // there will be a drained event fired in the future)
-        ) {
+        )
+        {
             return Promise.resolve();
         }
 
         // Return a Promise that will be resolved when this TaskQueue eventually
         // drains.
-        return new Promise<void>((resolve: () => void) => {
+        return new Promise<void>((resolve: () => void) =>
+        {
             this.once(TaskQueue.eventNameDrained, resolve);
         });
     }
@@ -157,12 +162,14 @@ export class TaskQueue extends EventEmitter
      */
     private startTasks(justAddedNewTask: boolean): void
     {
-        if (justAddedNewTask) {
+        if (justAddedNewTask)
+        {
             // console.log("New tasks have been added to TaskQueue.");
             this._isProcessingLastFulfillment = false;
         }
 
-        if (this._tasks.length === 0 && this._numRunning === 0) {
+        if (this._tasks.length === 0 && this._numRunning === 0)
+        {
             // The queue of tasks is empty.  Assume that we are running the last
             // fulfillment handler and wait one more tick to see if any new
             // tasks get enqueued.  If the last fulfillment handler enqueues a
@@ -171,14 +178,17 @@ export class TaskQueue extends EventEmitter
             // console.log("Looks like we might be done.  Waiting for handlers to run.");
 
             this._lastSettledInternalRunPromise!
-            .then(() => {
-                if (this._isProcessingLastFulfillment) {
+            .then(() =>
+            {
+                if (this._isProcessingLastFulfillment)
+                {
                     // console.log("No additional tasks queued. TaskQueue is now drained.");
 
                     // We waited one more tick and no new tasks have been
                     // enqueued.  It is safe to say that this queue is now
                     // drained.
-                    if (this._pauseWhenDrained) {
+                    if (this._pauseWhenDrained)
+                    {
                         this.pause();
                     }
                     this.emit(TaskQueue.eventNameDrained);
@@ -201,17 +211,20 @@ export class TaskQueue extends EventEmitter
             // Run another task.
             const curTask = this._tasks.pop();
 
-            if (curTask) {
+            if (curTask)
+            {
                 ++this._numRunning;
 
                 const curRunPromise: Promise<void> = curTask.task()
-                .then((value) => {
+                .then((value) =>
+                {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.resolve(value);
                     --this._numRunning;
                     this.startTasks(false);
                 })
-                .catch((err: unknown) => {
+                .catch((err: unknown) =>
+                {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.reject(err);
                     --this._numRunning;

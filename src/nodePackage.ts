@@ -50,7 +50,8 @@ export class NodePackage
     {
         // Make sure the directory exists.
         return pkgDir.exists()
-        .then((stats: fs.Stats | undefined) => {
+        .then((stats: fs.Stats | undefined) =>
+        {
             if (!stats)
             {
                 throw new Error(`Directory ${pkgDir.toString()} does not exist.`);
@@ -60,7 +61,8 @@ export class NodePackage
             const packageJson = new File(pkgDir, "package.json");
             return packageJson.exists();
         })
-        .then((stats) => {
+        .then((stats) =>
+        {
             if (!stats)
             {
                 throw new Error(`Directory ${pkgDir.toString()} does not contain a package.json file.`);
@@ -115,10 +117,12 @@ export class NodePackage
     public get lockedDependencies(): undefined | ILockedDependency
     {
         const packageLockJson = new File(this._pkgDir, "package-lock.json");
-        if (packageLockJson.existsSync()) {
+        if (packageLockJson.existsSync())
+        {
             return packageLockJson.readJsonSync<ILockedDependency>();
         }
-        else {
+        else
+        {
             return undefined;
         }
     }
@@ -134,7 +138,8 @@ export class NodePackage
     public pack(outDir?: Directory): Promise<File>
     {
         const spawnOptions: cp.SpawnOptions = { cwd: this._pkgDir.toString() };
-        if (getOs() === OperatingSystem.Windows) {
+        if (getOs() === OperatingSystem.Windows)
+        {
             // On Windows child_process.spawn() can only run executables, not
             // scripts.  Since npm is a script on windows, we need to set the
             // shell option so that we are not directly running the script, but
@@ -146,10 +151,12 @@ export class NodePackage
 
         return spawn("npm", ["pack"], spawnOptions)
         .closePromise
-        .then((stdout: string) => {
+        .then((stdout: string) =>
+        {
             return new File(this._pkgDir, stdout);
         })
-        .then((tgzFile: File) => {
+        .then((tgzFile: File) =>
+        {
             if (outDir)
             {
                 return tgzFile.move(outDir);
@@ -187,29 +194,34 @@ export class NodePackage
         publishDir = publishDir.absolute();
         tmpDir = tmpDir.absolute();
 
-        if (publishDir.equals(tmpDir)) {
+        if (publishDir.equals(tmpDir))
+        {
             return Promise.reject("When publishing, publishDir cannot be the same as tmpDir");
         }
 
         return this.pack(tmpDir)
-        .then((tgzFile: File) => {
+        .then((tgzFile: File) =>
+        {
             packageBaseName = tgzFile.baseName;
 
             unpackedDir = new Directory(tmpDir, packageBaseName);
             // Emptying the directory will create it if it does not exist.
             return unpackedDir.empty()
-            .then(() => {
+            .then(() =>
+            {
                 // Use the "compressing" package to extract the .tgz file.
                 return compressing.tgz.uncompress(tgzFile.absPath(), unpackedDir.absPath());
             });
         })
-        .then(() => {
+        .then(() =>
+        {
             // When uncompressed, all content is contained within a "package"
             // directory.
             unpackedPackageDir = new Directory(unpackedDir, "package");
             return unpackedPackageDir.exists();
         })
-        .then((stats) => {
+        .then((stats) =>
+        {
             if (!stats)
             {
                 throw new Error("Uncompressed package does not have a 'package' directory as expected.");
@@ -220,17 +232,20 @@ export class NodePackage
                 // The caller wants us to empty the publish directory before
                 // publishing to it.  Do it now.
                 return publishDir.empty()
-                .then(() => {
+                .then(() =>
+                {
                     return undefined; // To make resolve type undefined in all cases
                 });
             }
 
             return undefined;
         })
-        .then(() => {
+        .then(() =>
+        {
             return unpackedPackageDir.copy(publishDir, false);
         })
-        .then(() => {
+        .then(() =>
+        {
             return publishDir;
         });
     }

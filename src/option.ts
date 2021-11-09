@@ -104,11 +104,13 @@ export function bindOption<TInput, TOutput>(
     input: Option<TInput>
 ): Option<TOutput>
 {
-    if (isSome(input)) {
+    if (isSome(input))
+    {
         const ret = fn(input.value);
         return ret;
     }
-    else {
+    else
+    {
         return input;
     }
 }
@@ -126,11 +128,13 @@ export function mapSome<TInput, TOutput>(
     input: Option<TInput>
 ): Option<TOutput>
 {
-    if (isSome(input)) {
+    if (isSome(input))
+    {
         const ret = fn(input.value);
         return someOption(ret);
     }
-    else {
+    else
+    {
         return input;
     }
 }

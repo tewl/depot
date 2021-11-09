@@ -6,13 +6,15 @@ import {Iterator} from "./list";
  * @param it - The Iterator to advance
  * @param offset - The number of times the iterator should be advanced.
  */
-export function advance<TValue>(it: Iterator<TValue>, offset: number): void {
+export function advance<TValue>(it: Iterator<TValue>, offset: number): void
+{
     "use strict";
 
     const fn: () => void = offset < 0 ? it.prev.bind(it) : it.next.bind(it);
     const numIterations: number = Math.abs(offset);
 
-    for (let i = 0; i < numIterations; ++i) {
+    for (let i = 0; i < numIterations; ++i)
+    {
         fn();
     }
 }
@@ -24,13 +26,15 @@ export function advance<TValue>(it: Iterator<TValue>, offset: number): void {
  * @param itB - The upper Iterator
  * @returns The distance from itA to itB
  */
-export function distance<TValue>(itA: Iterator<TValue>, itB: Iterator<TValue>): number {
+export function distance<TValue>(itA: Iterator<TValue>, itB: Iterator<TValue>): number
+{
     "use strict";
 
     let distance = 0;
     const itCur: Iterator<TValue> = itA.offset(0);
 
-    while (!itCur.equals(itB)) {
+    while (!itCur.equals(itB))
+    {
         itCur.next();
         ++distance;
     }
@@ -52,13 +56,16 @@ export function find<TValue>(
     itBegin: Iterator<TValue>,
     itEnd: Iterator<TValue>,
     value: TValue
-): Iterator<TValue> {
+): Iterator<TValue>
+{
     "use strict";
 
     const itCur: Iterator<TValue> = itBegin;
 
-    while (!itCur.equals(itEnd)) {
-        if (itCur.value === value) {
+    while (!itCur.equals(itEnd))
+    {
+        if (itCur.value === value)
+        {
             break;
         }
         itCur.next();
@@ -82,41 +89,48 @@ export function partition<TValue>(
     itFirst: Iterator<TValue>,
     itLast:  Iterator<TValue>,
     pred:    (val: TValue) => boolean
-): Iterator<TValue> {
+): Iterator<TValue>
+{
     "use strict";
 
     // If the range specified has 0 size, just return.
-    if (itFirst.equals(itLast)) {
+    if (itFirst.equals(itLast))
+    {
         return itFirst;
     }
 
     const itLeft: Iterator<TValue> = itFirst.offset(0);
     const itRight: Iterator<TValue> = itLast.offset(-1);
 
-    while (!itLeft.equals(itRight)) {
-
+    while (!itLeft.equals(itRight))
+    {
         // Advance left towards the right as long as the predicate is returning true.
         while (!itLeft.equals(itRight) && pred(itLeft.value)) { itLeft.next(); }
 
         // Advance right towards the left as long as the predicate is returning false.
         while (!itRight.equals(itLeft) && !pred(itRight.value)) { itRight.prev(); }
 
-        if (!itLeft.equals(itRight)) {
+        if (!itLeft.equals(itRight))
+        {
             swap(itLeft, itRight);
         }
     }
 
     // At this point itLeft and itRight are pointing at the same element.  We
     // need to figure out which range that element belongs to.
-    if (pred(itLeft.value)) {
+    if (pred(itLeft.value))
+    {
         // The second range (of false yielding values) will begin one to the right.
         return itLeft.offset(1);
-    } else {
+    }
+    else
+    {
         // The second range (of false yielding values) begins here.
         return itRight;
     }
 
-    function swap(itA: Iterator<TValue>, itB: Iterator<TValue>): void {
+    function swap(itA: Iterator<TValue>, itB: Iterator<TValue>): void
+    {
         const tmpVal: TValue = itA.value;
         itA.value = itB.value;
         itB.value = tmpVal;

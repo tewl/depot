@@ -4,76 +4,87 @@ import {Directory} from "./directory";
 import {sampleRepoDir, tmpDir} from "../test/ut/specHelpers";
 
 
-describe("GitBranch", () => {
+describe("GitBranch", () =>
+{
 
+    describe("static", () =>
+    {
 
-    describe("static", () => {
+        describe("isValidBranchName()", () =>
+        {
 
-
-        describe("isValidBranchName()", () => {
-
-
-            it("will return false when any path component starts with a '.'", async () => {
+            it("will return false when any path component starts with a '.'", async () =>
+            {
                 const illegalBranchName = "this/.is_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains '..'", async () => {
+            it("will return false when the branch name contains '..'", async () =>
+            {
                 const illegalBranchName = "this.._is_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name ends with '/'", async () => {
+            it("will return false when the branch name ends with '/'", async () =>
+            {
                 const illegalBranchName = "this_is_illegal/";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name ends with '.lock'", async () => {
+            it("will return false when the branch name ends with '.lock'", async () =>
+            {
                 const illegalBranchName = "this_is_illegal.lock";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains a '~'", async () => {
+            it("will return false when the branch name contains a '~'", async () =>
+            {
                 const illegalBranchName = "this~_is_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains a '^'", async () => {
+            it("will return false when the branch name contains a '^'", async () =>
+            {
                 const illegalBranchName = "this^_is_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains a ':'", async () => {
+            it("will return false when the branch name contains a ':'", async () =>
+            {
                 const illegalBranchName = "this:_is_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains a space", async () => {
+            it("will return false when the branch name contains a space", async () =>
+            {
                 const illegalBranchName = "spaces are_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains a '\\'", async () => {
+            it("will return false when the branch name contains a '\\'", async () =>
+            {
                 const illegalBranchName = "backslashes\\_are_illegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return false when the branch name contains any whitespace", async () => {
+            it("will return false when the branch name contains any whitespace", async () =>
+            {
                 const illegalBranchName = "whitespace\tis\tillegal";
                 expect(await GitBranch.isValidBranchName(illegalBranchName)).toBeFalsy();
             });
 
 
-            it("will return true when the branch name contains a '/'", async () => {
+            it("will return true when the branch name contains a '/'", async () =>
+            {
                 const legalBranchName = "feature/feature_name";
                 expect(await GitBranch.isValidBranchName(legalBranchName)).toBeTruthy();
             });
@@ -83,9 +94,11 @@ describe("GitBranch", () => {
 
 
 
-        describe("create()", () => {
+        describe("create()", () =>
+        {
 
-            it("will reject when given an illegal branch name", async () => {
+            it("will reject when given an illegal branch name", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 try
                 {
@@ -99,7 +112,8 @@ describe("GitBranch", () => {
             });
 
 
-            it("will resolve to a GitBranch instance when given a valid branch name", async () => {
+            it("will resolve to a GitBranch instance when given a valid branch name", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 try
                 {
@@ -118,13 +132,14 @@ describe("GitBranch", () => {
     });
 
 
-    describe("instance", () => {
+    describe("instance", () =>
+    {
 
+        describe("name", () =>
+        {
 
-        describe("name", () => {
-
-
-            it("will return the branch's name", async () => {
+            it("will return the branch's name", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 const branch = await GitBranch.create(repo, "feature/featurename", "origin");
                 expect(branch.name).toEqual("feature/featurename");
@@ -133,17 +148,19 @@ describe("GitBranch", () => {
         });
 
 
-        describe("toString()", () => {
+        describe("toString()", () =>
+        {
 
-
-            it("returns the expected string for a local branch", async () => {
+            it("returns the expected string for a local branch", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
                 const branch = await GitBranch.create(repo, "master");
                 expect(branch.toString()).toEqual("master");
             });
 
 
-            it("returns the expected string for a remote branch", async () => {
+            it("returns the expected string for a remote branch", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
                 const branch = await GitBranch.create(repo, "master", "origin");
                 expect(branch.toString()).toEqual("origin/master");
@@ -153,15 +170,17 @@ describe("GitBranch", () => {
         });
 
 
-        describe("isLocal()", () => {
+        describe("isLocal()", () =>
+        {
 
-
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 tmpDir.emptySync();
             });
 
 
-            it("returns true when the branch is local", async () => {
+            it("returns true when the branch is local", async () =>
+            {
                 const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
                 const curBranch = await workingRepo.getCurrentBranch();
                 expect(curBranch).toBeTruthy();
@@ -169,7 +188,8 @@ describe("GitBranch", () => {
             });
 
 
-            it("return false when the branch is remote", async () => {
+            it("return false when the branch is remote", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
                 const branch = await GitBranch.create(repo, "master", "origin");
                 expect(branch.isLocal()).toEqual(false);
@@ -179,15 +199,17 @@ describe("GitBranch", () => {
         });
 
 
-        describe("isRemote()", () => {
+        describe("isRemote()", () =>
+        {
 
-
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 tmpDir.emptySync();
             });
 
 
-            it("returns false when the branch is local", async () => {
+            it("returns false when the branch is local", async () =>
+            {
                 const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
                 const curBranch = await workingRepo.getCurrentBranch();
                 expect(curBranch).toBeTruthy();
@@ -195,7 +217,8 @@ describe("GitBranch", () => {
             });
 
 
-            it("return true when the branch is remote", async () => {
+            it("return true when the branch is remote", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
                 const branch = await GitBranch.create(repo, "master", "origin");
                 expect(branch.isRemote()).toEqual(true);
@@ -205,14 +228,17 @@ describe("GitBranch", () => {
         });
 
 
-        describe("getTrackedBranch()", () => {
+        describe("getTrackedBranch()", () =>
+        {
 
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 tmpDir.emptySync();
             });
 
 
-            it("will resolve with the expected tracked branch", async () => {
+            it("will resolve with the expected tracked branch", async () =>
+            {
                 const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
                 const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
                 expect(originRepo).toBeTruthy();
@@ -229,7 +255,8 @@ describe("GitBranch", () => {
             });
 
 
-            it("will resolve with undefined when the branch is not tracking", async () => {
+            it("will resolve with undefined when the branch is not tracking", async () =>
+            {
                 const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
                 const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
                 expect(originRepo).toBeTruthy();
@@ -244,7 +271,8 @@ describe("GitBranch", () => {
             });
 
 
-            it("returns a branch that is a remote branch", async () => {
+            it("returns a branch that is a remote branch", async () =>
+            {
                 const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "origin");
                 const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
                 expect(originRepo).toBeTruthy();

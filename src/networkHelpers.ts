@@ -8,17 +8,21 @@ import * as _ from "lodash";
  * @return An object in which the keys are the names of the network interfaces
  * and the values are the IPv4 addresses (as strings)
  */
-export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: string} {
-
+export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: string}
+{
     const foundInterfaces: {[networkInterfaceName: string]: string} = {};
 
     const networkInterfaces = os.networkInterfaces();
 
-    for (const curInterfaceName in networkInterfaces) {
-        if (Object.prototype.hasOwnProperty.call(networkInterfaces, curInterfaceName)) {
+    for (const curInterfaceName in networkInterfaces)
+    {
+        if (Object.prototype.hasOwnProperty.call(networkInterfaces, curInterfaceName))
+        {
             const addrArray = networkInterfaces[curInterfaceName]!;
-            for (const curAddr of addrArray) {
-                if ((curAddr.family === "IPv4") && (!curAddr.internal)) {
+            for (const curAddr of addrArray)
+            {
+                if ((curAddr.family === "IPv4") && (!curAddr.internal))
+                {
                     foundInterfaces[curInterfaceName] = curAddr.address;
                 }
             }
@@ -50,16 +54,19 @@ export function getFirstExternalIpv4Address(): string
  */
 function isAvailable(port: number): Promise<number>
 {
-    return new Promise<number>((resolve, reject) => {
+    return new Promise<number>((resolve, reject) =>
+    {
         const server = net.createServer();
         server.unref();
         server.on("error", reject);
-        server.listen({port}, () => {
+        server.listen({port}, () =>
+        {
             // address() will return a string when listening on a pipe or UNIX
             // domain socket, but we are not doing that and will always get an
             // AddressInfo.
             const {port} = server.address() as net.AddressInfo;
-            server.close(() => {
+            server.close(() =>
+            {
                 resolve(port);
             });
         });
@@ -106,7 +113,8 @@ export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promis
 
     return _.reduce<number, Promise<number>>(
         [...preferredPorts, 0],
-        (acc, curPort) => {
+        (acc, curPort) =>
+        {
             return acc.catch(() => isAvailable(curPort));
         },
         Promise.reject(undefined)
@@ -133,8 +141,10 @@ export function determinePort(portConfig?: IPortConfig): Promise<number>
     portConfig = portConfig || {};
 
     return Promise.resolve()
-    .then(() => {
-        if (!(portConfig!.requiredPort)) {
+    .then(() =>
+    {
+        if (!(portConfig!.requiredPort))
+        {
             // There is no required port.  Yield 0.
             return 0;
         }
@@ -142,14 +152,17 @@ export function determinePort(portConfig?: IPortConfig): Promise<number>
         // There is a required port.  If it is available, use it.  Otherwise
         // reject.
         return isTcpPortAvailable(portConfig!.requiredPort!)
-        .then((isAvailable) => {
+        .then((isAvailable) =>
+        {
             if (isAvailable) { return portConfig!.requiredPort; }
             throw new Error(`Required port ${portConfig!.requiredPort} is not available.`);
         });
     })
-    .then((port) => {
+    .then((port) =>
+    {
         // If we have decided on a port, use it.
-        if (port) {
+        if (port)
+        {
             return port;
         }
 

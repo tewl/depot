@@ -16,6 +16,7 @@
  * @param x - The value to be tested for exhaustiveness
  * @return Nothing is returned.  This function always throws an Error.
  */
-export function assertNever(x: never): never {
+export function assertNever(x: never): never
+{
     throw new Error("Object failed exhaustiveness check: " + JSON.stringify(x, undefined, 4));
 }

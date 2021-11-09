@@ -40,7 +40,8 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     public async getIds(regexp?: RegExp): Promise<Array<IdString>>
     {
         let ids: Array<IdString> = await this._pcache.keys();
-        if (regexp === undefined) {
+        if (regexp === undefined)
+        {
             return ids;
         }
 

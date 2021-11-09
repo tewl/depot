@@ -27,18 +27,22 @@ export function comment(
     // eslint-disable-next-line prefer-named-capture-group
     const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
 
-    if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
-
-        if (precedingLine) {
+    if (linesToComment.length === 0 || /^\s*$/.test(linesToComment))
+    {
+        if (precedingLine)
+        {
             const match = commentedLineRegex.exec(precedingLine);
-            if (match) {
+            if (match)
+            {
                 return `${match.groups!.begin_ws}${match.groups!.comment_token}`;
             }
-            else {
+            else
+            {
                 return undefined;
             }
         }
-        else {
+        else
+        {
             // There is nothing to comment and nothing to continue from above.
             return undefined;
         }
@@ -46,7 +50,8 @@ export function comment(
 
     const sourceLines = splitIntoLines(linesToComment, true);
     const nonEmptyLines = splitIntoLines(removeBlankLines(linesToComment), true);
-    if (nonEmptyLines.length === 0) {
+    if (nonEmptyLines.length === 0)
+    {
         // All lines were empty.  There really isn't a need to comment them.
         return undefined;
     }
@@ -55,10 +60,12 @@ export function comment(
 
     // If the first character is non-whitespace, the comment must start in
     // column 0.
-    if (!/\s/.test(nonEmptyLines[0][0])) {
+    if (!/\s/.test(nonEmptyLines[0][0]))
+    {
         indentStr = "";
     }
-    else {
+    else
+    {
         // We will assume the the whitespace used for indentation is the first
         // character of the first non-empty line.  This will (hopefully) figure
         // out whether the user is using spaces or tabs.
@@ -110,7 +117,8 @@ export function comment(
  */
 export function uncomment(linesToUncomment: string): string | undefined
 {
-    if (linesToUncomment.length === 0 || /^\s*$/.test(linesToUncomment)) {
+    if (linesToUncomment.length === 0 || /^\s*$/.test(linesToUncomment))
+    {
         // There is nothing in need of uncommenting.
         return undefined;
     }
@@ -124,7 +132,8 @@ export function uncomment(linesToUncomment: string): string | undefined
     .map((curLine) =>
     {
         const match = commentedLineRegex.exec(curLine);
-        if (!match) {
+        if (!match)
+        {
             return curLine;
         }
 
@@ -158,10 +167,12 @@ export function toggleComment(linesToToggle: string, precedingLine?: string): st
     // eslint-disable-next-line prefer-named-capture-group
     const firstNonWhitespace = /\s*(\S\S)/m;
     const match = firstNonWhitespace.exec(linesToToggle);
-    if (match && match[1] === "//") {
+    if (match && match[1] === "//")
+    {
         return uncomment(linesToToggle);
     }
-    else {
+    else
+    {
         return comment(linesToToggle, precedingLine);
     }
 }

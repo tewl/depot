@@ -4,24 +4,28 @@ import { getTimerPromise } from "./promiseHelpers";
 import { failed, failedResult, succeeded, succeededResult } from "./result";
 
 
-describe("poll()", () => {
+describe("poll()", () =>
+{
 
-
-    it("polls until the predicate says to stop", async () => {
+    it("polls until the predicate says to stop", async () =>
+    {
         const logger = new Logger();
         logger.pushLogLevel(LogLevel.Debug5);
         // logger.addListener(console.log);
 
         let nextReturnVal = 1;
-        const asyncOperation = async () => {
+        const asyncOperation = async () =>
+        {
             await getTimerPromise(100, undefined);
             const thisReturnVal = nextReturnVal;
             nextReturnVal = nextReturnVal + 1;
 
-            if (thisReturnVal % 2) {
+            if (thisReturnVal % 2)
+            {
                 return thisReturnVal;
             }
-            else {
+            else
+            {
                 throw new Error("Reject on even values.");
             }
         };
@@ -30,20 +34,25 @@ describe("poll()", () => {
         // function rejects or the resolved value is less than or equal to 6.
         const predicate: ContinuePollingPredicate<Promise<number>, string> = async (iterationNum, startTime, retVal) =>
         {
-            try {
+            try
+            {
                 logger.debug(`Iteration ${iterationNum} was started at t=${Date.now() - startTime} ms`);
                 const num = await retVal;
-                if (num > 6) {
+                if (num > 6)
+                {
                     const resultVal = `${iterationNum}`;
                     logger.debug(`asyncOperation() resulted in ${num} (> 6).  Terminating with value ${resultVal}`);
                     return continuePollingNo(resultVal);
                 }
-                else {
+                else
+                {
                     const delayMs = 50;
                     logger.debug(`asyncOperation() resulted in ${num} (<= 6).  Will poll again in ${delayMs} ms.`);
                     return continuePollingYes(delayMs);
                 }
-            } catch (err) {
+            }
+            catch (err)
+            {
                 const delayMs = 30;
                 logger.debug(`asyncOperation() rejected.  Will poll again in ${delayMs} ms.`);
                 return continuePollingYes(delayMs);
@@ -58,10 +67,11 @@ describe("poll()", () => {
 });
 
 
-describe("pollAsyncResult()", () => {
+describe("pollAsyncResult()", () =>
+{
 
-
-    it("when operation succeeds, returns the successful result", async () => {
+    it("when operation succeeds, returns the successful result", async () =>
+    {
         const startTime = Date.now();
         let numInvocations = 0;
         const pollingInterval = 100;
@@ -81,8 +91,10 @@ describe("pollAsyncResult()", () => {
     });
 
 
-    it("when timing out returns the most recent failure", async () => {
-        const asyncResultOp = () => {
+    it("when timing out returns the most recent failure", async () =>
+    {
+        const asyncResultOp = () =>
+        {
             return Promise.resolve(failedResult(5));
         };
 
@@ -93,9 +105,11 @@ describe("pollAsyncResult()", () => {
     });
 
 
-    it("will not stop polling until additional predicate also returns true", async () => {
+    it("will not stop polling until additional predicate also returns true", async () =>
+    {
         let numInvocations = 0;
-        const asyncResultOp = () => {
+        const asyncResultOp = () =>
+        {
             numInvocations++;
             return Promise.resolve(succeededResult(numInvocations));
         };
@@ -112,8 +126,10 @@ describe("pollAsyncResult()", () => {
     });
 
 
-    it("when the operation always succeeds but predicate always fails, returns an error with successful lastResult", async () => {
-        const asyncResultOp = () => {
+    it("when the operation always succeeds but predicate always fails, returns an error with successful lastResult", async () =>
+    {
+        const asyncResultOp = () =>
+        {
             return Promise.resolve(succeededResult(3));
         };
 

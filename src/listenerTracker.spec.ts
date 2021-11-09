@@ -2,9 +2,11 @@ import {EventEmitter} from "events";
 import {ListenerTracker} from "./listenerTracker";
 
 
-describe("ListenerTracker", () => {
+describe("ListenerTracker", () =>
+{
 
-    it("on() will register for the specified event using on()", () => {
+    it("on() will register for the specified event using on()", () =>
+    {
         const ee      = new EventEmitter();
         const tracker = new ListenerTracker(ee);
 
@@ -30,7 +32,8 @@ describe("ListenerTracker", () => {
     });
 
 
-    it("once() will register for the specified event using once()", () => {
+    it("once() will register for the specified event using once()", () =>
+    {
         const ee = new EventEmitter();
         const tracker = new ListenerTracker(ee);
 
@@ -57,7 +60,8 @@ describe("ListenerTracker", () => {
     });
 
 
-    it("removeAll() will remove all listeners", () => {
+    it("removeAll() will remove all listeners", () =>
+    {
         const ee = new EventEmitter();
         const tracker = new ListenerTracker(ee);
 

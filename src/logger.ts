@@ -49,7 +49,8 @@ export class Logger
     {
         this._listeners.push(listener);
 
-        return () => {
+        return () =>
+        {
             _.pull(this._listeners, listener);
         };
     }
@@ -86,7 +87,8 @@ export class Logger
      */
     public pop(): void
     {
-        if (this._logLevelStack.length > 0) {
+        if (this._logLevelStack.length > 0)
+        {
             this._logLevelStack.pop();
         }
     }
@@ -99,9 +101,12 @@ export class Logger
      */
     public getCurrentLevel(): LogLevel
     {
-        if (this._logLevelStack.length > 0) {
+        if (this._logLevelStack.length > 0)
+        {
             return this._logLevelStack[this._logLevelStack.length - 1];
-        } else {
+        }
+        else
+        {
             return this._defaultLogLevel;
         }
 
@@ -193,18 +198,22 @@ export class Logger
     {
         const curLogLevel: LogLevel = this.getCurrentLevel();
 
-        if (level > curLogLevel) {
+        if (level > curLogLevel)
+        {
             return false;
         }
 
         const optStr = _.map(optionalParams, (curParam) => inspect(curParam)).join(" ");
-        if (optStr.length > 0) {
+        if (optStr.length > 0)
+        {
             msg += " " + optStr;
         }
 
-        if (msg.length > 0) {
+        if (msg.length > 0)
+        {
             const logMessage = `${getTimestamp()} (${levelLabels[level]}) ${msg}`;
-            _.forEach(this._listeners, (curListener) => {
+            _.forEach(this._listeners, (curListener) =>
+            {
                 curListener(logMessage);
             });
         }

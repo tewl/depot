@@ -8,25 +8,30 @@ import {CommitHash} from "./commitHash";
 import {generateUuid} from "./uuid";
 
 
-describe("GitRepo", () => {
+describe("GitRepo", () =>
+{
 
+    describe("static", () =>
+    {
 
-    describe("static", () => {
+        describe("create()", () =>
+        {
 
-
-        describe("create()", () => {
-
-            it("will reject when not given a directory that is not a repo directory", (done) => {
+            it("will reject when not given a directory that is not a repo directory", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname))
-                .catch(() => {
+                .catch(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will create a new instance when given a Git repo directory", (done) => {
+            it("will create a new instance when given a Git repo directory", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((inst) => {
+                .then((inst) =>
+                {
                     expect(inst).toBeTruthy();
                     done();
                 });
@@ -36,15 +41,17 @@ describe("GitRepo", () => {
         });
 
 
-        describe("clone()", () => {
+        describe("clone()", () =>
+        {
 
-
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 tmpDir.emptySync();
             });
 
 
-            it("will clone a repository on the Internet", async () => {
+            it("will clone a repository on the Internet", async () =>
+            {
                 const repoUrl = Url.fromString(sampleRepoUrl);
                 expect(repoUrl).toBeTruthy();
 
@@ -56,7 +63,8 @@ describe("GitRepo", () => {
             });
 
 
-            it("will clone a repository from a local directory", async () => {
+            it("will clone a repository from a local directory", async () =>
+            {
                 const repo = await GitRepo.clone(sampleRepoDir, tmpDir);
 
                 expect(repo).toBeTruthy();
@@ -65,7 +73,8 @@ describe("GitRepo", () => {
             });
 
 
-            it("can clone from a relative path", async () => {
+            it("can clone from a relative path", async () =>
+            {
                 // This test is important, because when cloning from a relative
                 // directory the clone() method must use the absolute path to
                 // the source repo, because the cwd is the specified parentDir.
@@ -80,7 +89,8 @@ describe("GitRepo", () => {
             });
 
 
-            it("can clone a repo into a specific directory", async () => {
+            it("can clone a repo into a specific directory", async () =>
+            {
                 // Create one clone in the "sample-origin" directory.
                 const originRepo  = await GitRepo.clone(sampleRepoDir, tmpDir, "sample-origin");
                 // Create another clone in the "sample-working" directory.
@@ -99,18 +109,20 @@ describe("GitRepo", () => {
     });
 
 
-    describe("instance", () => {
+    describe("instance", () =>
+    {
 
-
-        beforeEach(() => {
+        beforeEach(() =>
+        {
             tmpDir.emptySync();
         });
 
 
-        describe("files()", () => {
+        describe("files()", () =>
+        {
 
-
-            it("will return the files under version control", async () => {
+            it("will return the files under version control", async () =>
+            {
                 const repo = await GitRepo.clone(sampleRepoDir, tmpDir);
                 const files = await repo.files();
 
@@ -122,14 +134,18 @@ describe("GitRepo", () => {
         });
 
 
-        describe("remotes()", () => {
+        describe("remotes()", () =>
+        {
 
-            it("will return the correct map of remotes", (done) => {
+            it("will return the correct map of remotes", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     return repo.remotes();
                 })
-                .then((remotes) => {
+                .then((remotes) =>
+                {
                     expect(Object.keys.length).toEqual(1);
                     expect(remotes.origin).toEqual("https://github.com/tewl/depot.git");
                     done();
@@ -139,15 +155,18 @@ describe("GitRepo", () => {
         });
 
 
-        describe("name()", () => {
+        describe("name()", () =>
+        {
 
-
-            it("will return the name of the repo", (done) => {
+            it("will return the name of the repo", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     return repo.name();
                 })
-                .then((repoName) => {
+                .then((repoName) =>
+                {
                     expect(repoName).toEqual("depot");
                     done();
                 });
@@ -157,12 +176,14 @@ describe("GitRepo", () => {
         });
 
 
-        describe("directory", () => {
+        describe("directory", () =>
+        {
 
-
-            it("will return the directory of the repo", (done) => {
+            it("will return the directory of the repo", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     expect(repo.directory).toBeTruthy();
                     expect(repo.directory.absPath()).toContain("depot");
                     done();
@@ -173,17 +194,19 @@ describe("GitRepo", () => {
         });
 
 
-        describe("equals()", () => {
+        describe("equals()", () =>
+        {
 
-
-            it("will return true for two GitRepos pointing at the same directory", async () => {
+            it("will return true for two GitRepos pointing at the same directory", async () =>
+            {
                 const repo1 = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 const repo2 = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 expect(repo1.equals(repo2)).toBeTruthy();
             });
 
 
-            it("will return false for two GitRepos pointing at different directories", async () => {
+            it("will return false for two GitRepos pointing at different directories", async () =>
+            {
                 tmpDir.emptySync();
 
                 const dir1 = new Directory(tmpDir, "dir1");
@@ -199,15 +222,18 @@ describe("GitRepo", () => {
         });
 
 
-        describe("tags()", () => {
+        describe("tags()", () =>
+        {
 
-
-            it("will list the tags applied to the repository", (done) => {
+            it("will list the tags applied to the repository", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     return repo.tags();
                 })
-                .then((tags) => {
+                .then((tags) =>
+                {
                     expect(tags).toContain("test");
                     done();
                 });
@@ -217,27 +243,33 @@ describe("GitRepo", () => {
         });
 
 
-        describe("hasTag()", () => {
+        describe("hasTag()", () =>
+        {
 
-
-            it("will return true for a tag that exists", (done) => {
+            it("will return true for a tag that exists", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     return repo.hasTag("test");
                 })
-                .then((hasTag) => {
+                .then((hasTag) =>
+                {
                     expect(hasTag).toBeTruthy();
                     done();
                 });
             });
 
 
-            it("will return false for a tag that does not exists", (done) => {
+            it("will return false for a tag that does not exists", (done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     return repo.hasTag("xyzzy");
                 })
-                .then((hasTag) => {
+                .then((hasTag) =>
+                {
                     expect(hasTag).toBeFalsy();
                     done();
                 });
@@ -247,53 +279,65 @@ describe("GitRepo", () => {
         });
 
 
-        describe("createTag()", () => {
-
+        describe("createTag()", () =>
+        {
 
             let theRepo: GitRepo;
 
 
-            beforeEach((done) => {
+            beforeEach((done) =>
+            {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     theRepo = repo;
                     return repo.deleteTag("unittest_tag");
                 })
-                .then(() => {
+                .then(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will resolve when the specified tag is created", (done) => {
+            it("will resolve when the specified tag is created", (done) =>
+            {
                 theRepo.createTag("unittest_tag")
-                .then(() => {
+                .then(() =>
+                {
                     return theRepo.hasTag("unittest_tag");
                 })
-                .then((hasTag) => {
+                .then((hasTag) =>
+                {
                     expect(hasTag).toBeTruthy();
                     done();
                 });
             });
 
 
-            it("will reject when the tag already exists", (done) => {
+            it("will reject when the tag already exists", (done) =>
+            {
                 theRepo.createTag("unittest_tag")
-                .then(() => {
+                .then(() =>
+                {
                     return theRepo.createTag("unittest_tag");
                 })
-                .catch(() => {
+                .catch(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will resolve when the tag already exists but force is set to true", (done) => {
+            it("will resolve when the tag already exists but force is set to true", (done) =>
+            {
                 theRepo.createTag("unittest_tag")
-                .then(() => {
+                .then(() =>
+                {
                     return theRepo.createTag("unittest_tag", "", true);
                 })
-                .then(() => {
+                .then(() =>
+                {
                     done();
                 });
             });
@@ -302,43 +346,52 @@ describe("GitRepo", () => {
         });
 
 
-        describe("deleteTag()", () => {
-
+        describe("deleteTag()", () =>
+        {
 
             let theRepo: GitRepo;
 
 
-            beforeEach(() => {
+            beforeEach(() =>
+            {
                 return GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) => {
+                .then((repo) =>
+                {
                     theRepo = repo;
                     return repo.deleteTag("unittest_tag");
                 });
             });
 
 
-            afterEach(() => {
+            afterEach(() =>
+            {
                 return theRepo.deleteTag("unittest_tag");
             });
 
 
-            it("will resolve if the specified tag does not exist", (done) => {
+            it("will resolve if the specified tag does not exist", (done) =>
+            {
                 theRepo.deleteTag("xyzzy")
-                .then(() => {
+                .then(() =>
+                {
                     done();
                 });
             });
 
 
-            it("will resolve when the tag is deleted", (done) => {
+            it("will resolve when the tag is deleted", (done) =>
+            {
                 theRepo.createTag("unittest_tag")
-                .then(() => {
+                .then(() =>
+                {
                     return theRepo.deleteTag("unittest_tag");
                 })
-                .then(() => {
+                .then(() =>
+                {
                     return theRepo.hasTag("unittest_tag");
                 })
-                .then((hasTag) => {
+                .then((hasTag) =>
+                {
                     expect(hasTag).toBeFalsy();
                     done();
                 });
@@ -347,9 +400,11 @@ describe("GitRepo", () => {
         });
 
 
-        describe("getBranches", () => {
+        describe("getBranches", () =>
+        {
 
-            it("will return the branches", async () => {
+            it("will return the branches", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 const branches = await repo.getBranches();
                 expect(branches.length).toBeGreaterThan(0);
@@ -360,17 +415,19 @@ describe("GitRepo", () => {
         });
 
 
-        describe("getCurrentBranch()", () => {
+        describe("getCurrentBranch()", () =>
+        {
 
-
-            it("will return the current branch", async () => {
+            it("will return the current branch", async () =>
+            {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
                 const curBranch = await repo.getCurrentBranch();
                 expect(curBranch!.name.length).toBeGreaterThan(0);
             });
 
 
-            it("will return undefined when in detached head state", async () => {
+            it("will return undefined when in detached head state", async () =>
+            {
                 const repo = await GitRepo.clone(sampleRepoDir, tmpDir);
                 // Checkout a commit that has no associated branch pointing at it.
                 await repo.checkoutCommit(CommitHash.fromString("34b8bff")!);
@@ -383,10 +440,11 @@ describe("GitRepo", () => {
         });
 
 
-        describe("fetch()", () => {
+        describe("fetch()", () =>
+        {
 
-            it("will fetch tags", async () => {
-
+            it("will fetch tags", async () =>
+            {
                 // Create to identical clones of the sample repo.
                 const dir1 = new Directory(tmpDir, "dir1");
                 await dir1.ensureExists();
@@ -417,10 +475,11 @@ describe("GitRepo", () => {
         });
 
 
-        describe("getLog()", () => {
+        describe("getLog()", () =>
+        {
 
-
-            it("returns the expected entries", async () => {
+            it("returns the expected entries", async () =>
+            {
                 const repo = await GitRepo.clone(sampleRepoDir, tmpDir);
 
                 const log = await repo.getLog();

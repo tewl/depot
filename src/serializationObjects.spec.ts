@@ -43,7 +43,8 @@ export class Model implements ISerializable
 
     public static deserialize(serialized: ISerialized): IDeserializeResult
     {
-        if (!isIModelSerialized1(serialized)) {
+        if (!isIModelSerialized1(serialized))
+        {
             throw new Error(`Unsupported serialized Model: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
@@ -51,9 +52,11 @@ export class Model implements ISerializable
         const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
-        if (serialized.rootPerson) {
+        if (serialized.rootPerson)
+        {
             neededIds.push(serialized.rootPerson);
-            additionalWork.push((objects: ISerializableMap) => {
+            additionalWork.push((objects: ISerializableMap) =>
+            {
                 deserialized.rootPerson = objects[serialized.rootPerson!] as Person;
             });
         }
@@ -133,7 +136,8 @@ export class Model implements ISerializable
             rootPerson: undefined
         };
 
-        if (this._rootPerson) {
+        if (this._rootPerson)
+        {
             serialized.rootPerson = this._rootPerson.id;
             othersToSerialize.push(this._rootPerson);
         }
@@ -185,7 +189,8 @@ export class Person implements ISerializable
 
     public static deserialize(serialized: ISerialized): IDeserializeResult
     {
-        if (!isIPersonSerialized1(serialized)) {
+        if (!isIPersonSerialized1(serialized))
+        {
             throw new Error(`Unsupported serialized Person: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
@@ -195,16 +200,20 @@ export class Person implements ISerializable
         const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
-        if (serialized.mother) {
+        if (serialized.mother)
+        {
             neededIds.push(serialized.mother);
-            additionalWork.push((objects: ISerializableMap) => {
+            additionalWork.push((objects: ISerializableMap) =>
+            {
                 deserialized.mother = objects[serialized.mother!] as Person;
             });
         }
 
-        if (serialized.father) {
+        if (serialized.father)
+        {
             neededIds.push(serialized.father);
-            additionalWork.push((objects) => {
+            additionalWork.push((objects) =>
+            {
                 deserialized.father = objects[serialized.father!] as Person;
             });
         }
@@ -291,12 +300,14 @@ export class Person implements ISerializable
             father:    undefined
         };
 
-        if (this._mother) {
+        if (this._mother)
+        {
             serialized.mother = this._mother.id;
             othersToSerialize.push(this._mother);
         }
 
-        if (this._father) {
+        if (this._father)
+        {
             serialized.father = this._father.id;
             othersToSerialize.push(this._father);
         }

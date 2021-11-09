@@ -16,16 +16,20 @@ export enum OperatingSystem {
  * Gets the current OS.
  * @return The current OS
  */
-export function getOs(): OperatingSystem {
+export function getOs(): OperatingSystem
+{
     const platform = os.platform();
 
-    if (platform.startsWith("win")) {
+    if (platform.startsWith("win"))
+    {
         return OperatingSystem.Windows;
     }
-    else if (platform === "darwin") {
+    else if (platform === "darwin")
+    {
         return OperatingSystem.Mac;
     }
-    else {
+    else
+    {
         return OperatingSystem.Unknown;
     }
 }
@@ -35,7 +39,8 @@ export function getOs(): OperatingSystem {
  * Gets the current user's home directory
  * @return The current user's home directory
  */
-export function getHomeDir(): Directory {
+export function getHomeDir(): Directory
+{
     const dirStr = os.homedir();
     return new Directory(dirStr);
 }

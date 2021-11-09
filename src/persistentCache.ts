@@ -13,9 +13,8 @@ export interface IPersistentCacheOptions {
  * filesystem. Inspired by:
  * https://github.com/LionC/persistent-cache/blob/master/index.js
  */
-export class PersistentCache<T> {
-
-
+export class PersistentCache<T>
+{
     /**
      * Creates a new PersistentCache instance.
      * @param name - The name of the cache
@@ -23,9 +22,10 @@ export class PersistentCache<T> {
      * @return A promise that resolves with the new cache instance or rejects
      * if there were any errors.
      */
-    public static create<T>(name: string, options?: IPersistentCacheOptions): Promise<PersistentCache<T>> {
-
-        if (!isValidFilesystemName(name)) {
+    public static create<T>(name: string, options?: IPersistentCacheOptions): Promise<PersistentCache<T>>
+    {
+        if (!isValidFilesystemName(name))
+        {
             return Promise.reject(new Error("Illegal cache name"));
         }
 
@@ -33,21 +33,25 @@ export class PersistentCache<T> {
 
         const rootDir = new Directory(options.dir!);
 
-        if (!rootDir.existsSync()) {
+        if (!rootDir.existsSync())
+        {
             return Promise.reject(new Error(`Directory "${options.dir!}" does not exist.`));
         }
 
         // Create the directory for the cache being created.
         const cacheDir = new Directory(rootDir, name);
         return  cacheDir.ensureExists()
-        .then(() => {
+        .then(() =>
+        {
             return new PersistentCache<T>(name, cacheDir);
         });
     }
 
 
-    public static createSync<T>(name: string, options?: IPersistentCacheOptions): PersistentCache<T> {
-        if (!isValidFilesystemName(name)) {
+    public static createSync<T>(name: string, options?: IPersistentCacheOptions): PersistentCache<T>
+    {
+        if (!isValidFilesystemName(name))
+        {
             throw new Error("Illegal cache name");
         }
 
@@ -55,7 +59,8 @@ export class PersistentCache<T> {
 
         const rootDir = new Directory(options.dir!);
 
-        if (!rootDir.existsSync()) {
+        if (!rootDir.existsSync())
+        {
             throw new Error(`Directory "${options.dir!}" does not exist.`);
         }
 
@@ -80,7 +85,8 @@ export class PersistentCache<T> {
      * @param cacheDir - The name of this cache's directory.  This directory is
      * created in create() because it is async.
      */
-    private constructor(name: string, cacheDir: Directory) {
+    private constructor(name: string, cacheDir: Directory)
+    {
         this._name     = name;
         this._cacheDir = cacheDir;
     }
@@ -93,8 +99,10 @@ export class PersistentCache<T> {
      * @return A promise that resolves when the value has been stored.  Rejects
      * if the specified key name is invalid.
      */
-    public put(key: string, val: T): Promise<void> {
-        if (!isValidFilesystemName(key)) {
+    public put(key: string, val: T): Promise<void>
+    {
+        if (!isValidFilesystemName(key))
+        {
             return Promise.reject(new Error(`Invalid character in key ${key}`));
         }
 
@@ -114,26 +122,30 @@ export class PersistentCache<T> {
      * @return A promise that resolves with the value.  The promise rejects if
      * `key` is not in this cache.
      */
-    public get(key: string): Promise<T> {
+    public get(key: string): Promise<T>
+    {
         // If the requested key is in the memory cache, use it.
-        if (Object.prototype.hasOwnProperty.call(this._memCache, key)) {
+        if (Object.prototype.hasOwnProperty.call(this._memCache, key))
+        {
             return Promise.resolve(this._memCache[key].payload);
         }
 
         // See if the requested key is persisted.
         const keyFile = this.keyToKeyFile(key);
         return keyFile.exists()
-        .then((exists) => {
-
+        .then((exists) =>
+        {
             // If the requested key is not persisted, we do not have it.
-            if (!exists) {
+            if (!exists)
+            {
                 throw new Error("No value");
             }
 
             // The requested key was persisted.  Load it, put it in the memory
             // cache and return the value to the caller.
             return keyFile.readJson<{payload: T}>()
-            .then((data) => {
+            .then((data) =>
+            {
                 const entry = CacheEntry.deserialize<T>(data);
                 this._memCache[key] = entry;
                 return entry.payload;
@@ -147,7 +159,8 @@ export class PersistentCache<T> {
      * @param key - The key to delete
      * @return A promise that resolves when the operation is complete
      */
-    public delete(key: string): Promise<void> {
+    public delete(key: string): Promise<void>
+    {
         // Remove it from the memory cache.
         delete this._memCache[key];
         // Remove it from the persistent store.
@@ -160,9 +173,11 @@ export class PersistentCache<T> {
      * Enumerates the keys in this cache
      * @return A promise that resolves with the keys present in this cache
      */
-    public keys(): Promise<Array<string>> {
+    public keys(): Promise<Array<string>>
+    {
         return this._cacheDir.contents()
-        .then((directoryContents) => {
+        .then((directoryContents) =>
+        {
             return _.map(directoryContents.files, (curFile) => this.keyFileToKey(curFile));
         });
 
@@ -178,7 +193,8 @@ export class PersistentCache<T> {
      * @param key - The key name to convert
      * @return The corresponding File
      */
-    private keyToKeyFile(key: string): File {
+    private keyToKeyFile(key: string): File
+    {
         return new File(this._cacheDir, key + ".json");
     }
 
@@ -188,7 +204,8 @@ export class PersistentCache<T> {
      * @param keyFile - The file to convert
      * @return The corresponding key string
      */
-    private keyFileToKey(keyFile: File): string {
+    private keyFileToKey(keyFile: File): string
+    {
         return keyFile.baseName;
     }
 
@@ -205,7 +222,8 @@ export class PersistentCache<T> {
  * directory names and file names.
  * @return An array of illegal characters.
  */
-export function getIllegalChars(): Array<string> {
+export function getIllegalChars(): Array<string>
+{
     return [
         "<",     // illegal in: NTFS, FAT
         ">",     // illegal in: NTFS, FAT
@@ -228,15 +246,17 @@ export function getIllegalChars(): Array<string> {
  * @param name - The name to be validated
  * @return true if `name` is valid.  false otherwise.
  */
-function isValidFilesystemName(name: string): boolean {
-
+function isValidFilesystemName(name: string): boolean
+{
     // FUTURE: Could use the info in the following article to do a better job
     //         validating names.
     //         https://kb.acronis.com/content/39790
     const illegalChars = getIllegalChars();
 
-    for (const curIllegalChar of illegalChars) {
-        if (name.includes(curIllegalChar)) {
+    for (const curIllegalChar of illegalChars)
+    {
+        if (name.includes(curIllegalChar))
+        {
             return false;
         }
     }
@@ -246,8 +266,8 @@ function isValidFilesystemName(name: string): boolean {
 
 
 // tslint:disable-next-line:max-classes-per-file
-class CacheEntry<T> {
-
+class CacheEntry<T>
+{
     /**
      * Creates a CacheEntry instance from its serialized form.  Templated on
      * type "U", which represents the type of user data stored in the payload.
@@ -255,7 +275,8 @@ class CacheEntry<T> {
      * @param serialized - The serialized CacheEntry
      * @return A CacheEntry instance
      */
-    public static deserialize<TPayload>(serialized: {payload: TPayload}): CacheEntry<TPayload> {
+    public static deserialize<TPayload>(serialized: {payload: TPayload}): CacheEntry<TPayload>
+    {
         return new CacheEntry<TPayload>(serialized.payload);
     }
 
@@ -269,7 +290,8 @@ class CacheEntry<T> {
      * Creates a new CacheEntry instance
      * @param payload - The user's data to be stored in this entry
      */
-    public constructor(payload: T) {
+    public constructor(payload: T)
+    {
         this._payload = payload;
     }
 
@@ -279,7 +301,8 @@ class CacheEntry<T> {
      * @return A version of this object that can be persisted and later
      * deserialized
      */
-    public serialize(): {payload: T} {
+    public serialize(): {payload: T}
+    {
         return {
             payload: this._payload
         };
@@ -290,7 +313,8 @@ class CacheEntry<T> {
      * Retrieves the user data stored in this entry.
      * @return The user data
      */
-    public get payload(): T {
+    public get payload(): T
+    {
         return this._payload;
     }
 }

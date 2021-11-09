@@ -10,7 +10,8 @@ export class CombinedStream extends PassThrough
         super();
         this._streams = streams;
 
-        this.on("pipe", (source: Readable) => {
+        this.on("pipe", (source: Readable) =>
+        {
             source.unpipe(this);
 
             let streamEnd: Stream = source;
@@ -26,7 +27,8 @@ export class CombinedStream extends PassThrough
 
     public override pipe<T extends NodeJS.WritableStream>(dest: T, options?: { end?: boolean; }): T
     {
-        if (!this._streamEnd) {
+        if (!this._streamEnd)
+        {
             throw new Error("Internal error: combinedStream.pipe() called before 'pipe' event.");
         }
         return this._streamEnd.pipe(dest, options);

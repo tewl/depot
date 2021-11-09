@@ -74,7 +74,8 @@ export type SpawnError = ISpawnSystemError | ISpawnExitError;
  */
 export function spawnErrorToString(err: SpawnError): string
 {
-    switch (err.type) {
+    switch (err.type)
+    {
         case "ISpawnSystemError":
             return `System error: ${JSON.stringify(err)}`;
 
@@ -170,22 +171,28 @@ export function spawn(
             .pipe(stderrCollector)  // to capture stderr in case child process errors
             .pipe(errorStream);
 
-            childProcess.once("error", (err: ISystemError) => {
+            childProcess.once("error", (err: ISystemError) =>
+            {
                 resolve(failedResult({ type: "ISpawnSystemError", ...err }));
             });
 
-            childProcess.once("exit", (exitCode: number) => {
+            childProcess.once("exit", (exitCode: number) =>
+            {
                 // Wait for all steams to flush before reporting that the child
                 // process has finished.
                 eventToPromise(childProcess, "close")
-                .then(() => {
-                    if (exitCode === 0) {
+                .then(() =>
+                {
+                    if (exitCode === 0)
+                    {
                         if (description)
                         {
                             console.log(`Child process succeeded: ${cmdLineRepresentation}`);
                         }
                         resolve(succeededResult(_.trim(stdoutCollector.collected)));
-                    } else {
+                    }
+                    else
+                    {
                         if (description)
                         {
                             console.log(`Child process failed: ${cmdLineRepresentation}`);
@@ -217,7 +224,8 @@ function getCommandLineRepresentation(cmd: string, args: Array<string>): string
         if (_.includes(curArg, " "))
         {
             return `"${curArg}"`;
-        } else
+        }
+        else
         {
             return curArg;
         }

@@ -81,7 +81,8 @@ export class Fraction
         {
             return failedResult(`The denominator of a Fraction cannot be zero: whole=${whole}, num=${num}, den=${den}`);
         }
-        if (den < 0) {
+        if (den < 0)
+        {
             return failedResult(`The denominator of a Fraction cannot be negative: whole=${whole}, num=${num}, den=${den}`);
         }
 
@@ -89,14 +90,17 @@ export class Fraction
         // Make sure the negativity of the value makes sense.
         //
         let isPositive: boolean;
-        if (whole === 0) {
+        if (whole === 0)
+        {
             // The numerator is allowed to be positive or negative.
             isPositive = num >= 0;
         }
-        else {
+        else
+        {
             // When there is a whole component, the numerator can only be
             // positive.
-            if (num < 0) {
+            if (num < 0)
+            {
                 return failedResult(`Fractions with a whole part cannot have a negative numerator: whole=${whole}, num=${num}, den=${den}`);
             }
             isPositive = whole >= 0;
@@ -107,7 +111,8 @@ export class Fraction
         den   = Math.abs(den);
 
         num = den * whole + num;
-        if (!isPositive) {
+        if (!isPositive)
+        {
             num = num * -1;
         }
         return succeededResult(new Fraction(num, den));
@@ -119,7 +124,8 @@ export class Fraction
         str = _.trim(str);
 
         let negativeAdjuster = 1;   // If positive, multiply by 1
-        if (str.startsWith("-")) {
+        if (str.startsWith("-"))
+        {
             negativeAdjuster = -1;  // If negative, will multiply by -1
             str = str.slice(1);
         }
@@ -155,7 +161,8 @@ export class Fraction
 
     public static fromNumber(num: number): Fraction
     {
-        if (_.isSafeInteger(num)) {
+        if (_.isSafeInteger(num))
+        {
             return new Fraction(num, 1);
         }
 
@@ -168,7 +175,8 @@ export class Fraction
         const whole = Math.floor(Math.abs(num)) * negativeAdjuster;
 
         const match = numRegex.exec(numStr);
-        if (!match) {
+        if (!match)
+        {
             throw new Error("Error converting from number to Fraction.");
         }
         const fracStr = match.groups!.decimal;
@@ -181,25 +189,31 @@ export class Fraction
     public static compare(a: Fraction | number, b: Fraction | number): number
     {
         // If both are numbers, do it quick and easy.
-        if (typeof a === "number" && typeof b === "number") {
-            if (a < b) {
+        if (typeof a === "number" && typeof b === "number")
+        {
+            if (a < b)
+            {
                 return -1;
             }
-            else if (b < a) {
+            else if (b < a)
+            {
                 return 1;
             }
-            else {
+            else
+            {
                 return 0;
             }
         }
 
         const fracAResult = Fraction.from(a);
-        if (failed(fracAResult)) {
+        if (failed(fracAResult))
+        {
             throw new Error("Failed to convert number or fraction to a fraction. Should never happen.");
         }
         const fracA = fracAResult.value;
         const fracBResult = Fraction.from(b);
-        if (failed(fracBResult)) {
+        if (failed(fracBResult))
+        {
             throw new Error("Failed to convert number or fraction to a fraction. Should never happen.");
         }
         const fracB = fracBResult.value;
@@ -207,13 +221,16 @@ export class Fraction
         const crossA = fracA._num * fracB._den;
         const crossB = fracA._den * fracB._num;
 
-        if (crossA < crossB) {
+        if (crossA < crossB)
+        {
             return -1;
         }
-        else if (crossB < crossA) {
+        else if (crossB < crossA)
+        {
             return 1;
         }
-        else {
+        else
+        {
             return 0;
         }
     }
@@ -237,7 +254,8 @@ export class Fraction
 
         // Don't let the denominator be negative.  If it is, then flip the sign
         // of both the numerator and denominator.
-        if (this._den < 0) {
+        if (this._den < 0)
+        {
             this._den = this._den * -1;
             this._num = this._num * -1;
         }
@@ -246,18 +264,23 @@ export class Fraction
 
     public toString(improper = false): string
     {
-        if (this._num === 0) {
+        if (this._num === 0)
+        {
             return "0";
         }
-        else if (improper) {
+        else if (improper)
+        {
             return `${this._num}/${this._den}`;
         }
-        else {
+        else
+        {
             const whole = this.wholePart();
-            if (whole === 0) {
+            if (whole === 0)
+            {
                 return `${this._num}/${this._den}`;
             }
-            else {
+            else
+            {
                 // The `whole` variable will contain the sign.
                 const remainder = Math.abs(this._num) % this._den;
                 const str = remainder === 0 ? `${whole}` : `${whole} ${remainder}/${this._den}`;
@@ -277,13 +300,15 @@ export class Fraction
         // Second, if possible get the reduced (possibly improper) form of this
         // fraction.
         const reduced = this.reduce();
-        if (reduced.wasReduced) {
+        if (reduced.wasReduced)
+        {
             representations.push(reduced.reducedFraction.toString(true));
             lastUsedValue = reduced.reducedFraction;
         }
 
         // Third, if possible get the mixed number form of this fraction.
-        if (lastUsedValue.isImproper()) {
+        if (lastUsedValue.isImproper())
+        {
             representations.push(lastUsedValue.toString(false));
         }
 
@@ -308,7 +333,8 @@ export class Fraction
 
         // Make the sign correct.  Btw, we are checking for whole !== 0 because
         // 0 * -1 is -0 and we want just plain 0.
-        if ((this._num < 0) && (whole !== 0)) {
+        if ((this._num < 0) && (whole !== 0))
+        {
             whole = whole * -1;
         }
         return whole;
@@ -333,12 +359,14 @@ export class Fraction
 
     public changeDenominator(newDenominator: number): Fraction
     {
-        if ((newDenominator <= 0) || !_.isSafeInteger(newDenominator)) {
+        if ((newDenominator <= 0) || !_.isSafeInteger(newDenominator))
+        {
             throw new Error("When changing the denominator, the new value must be a positive integer.");
         }
 
         const reduced = this.reduce().reducedFraction;
-        if (newDenominator % reduced._den) {
+        if (newDenominator % reduced._den)
+        {
             throw new Error(`Cannot change fraction denominator to ${newDenominator} without modifying value.`);
         }
 
@@ -349,7 +377,8 @@ export class Fraction
 
     public reciprocal(): Fraction
     {
-        if (this._num === 0) {
+        if (this._num === 0)
+        {
             throw new Error("Cannot create a reciprocal that would result in a denominator value of 0.");
         }
         return new Fraction(this._den, this._num);
@@ -359,10 +388,12 @@ export class Fraction
     public reduce(): {reducedFraction: Fraction, wasReduced: boolean}
     {
         const gcd = greatestCommonDivisor(this._num, this._den);
-        if (gcd === 1) {
+        if (gcd === 1)
+        {
             return {reducedFraction: this, wasReduced: false};
         }
-        else {
+        else
+        {
             const reducedFration = new Fraction(this._num / gcd, this._den / gcd);
             return {reducedFraction: reducedFration, wasReduced: true};
         }
@@ -467,7 +498,8 @@ export class Fraction
     }
 
 
-    public toNumber(): number {
+    public toNumber(): number
+    {
         return this._num / this._den;
     }
 
@@ -481,13 +513,16 @@ export class Fraction
         const whole = this.wholePart();
         const frac = this.fractionalPart();
 
-        if (frac._num === 0) {
+        if (frac._num === 0)
+        {
             return whole;
         }
-        else if (this._num < 0) {
+        else if (this._num < 0)
+        {
             return whole - 1;
         }
-        else {
+        else
+        {
             return whole;
         }
     }
@@ -502,13 +537,16 @@ export class Fraction
         const whole = this.wholePart();
         const frac = this.fractionalPart();
 
-        if (frac._num === 0) {
+        if (frac._num === 0)
+        {
             return whole;
         }
-        else if (this._num < 0) {
+        else if (this._num < 0)
+        {
             return whole;
         }
-        else {
+        else
+        {
             return whole + 1;
         }
     }
@@ -539,13 +577,15 @@ export class Fraction
         const incr = Fraction.from(increment).value!;
 
         // The increment must be a positive value.
-        if (incr._num === 0 || incr.toNumber() < 0) {
+        if (incr._num === 0 || incr.toNumber() < 0)
+        {
             throw new Error("bracket() increment must be positive.");
         }
 
         // 1 must be evenly divisible by the specified increment value (since we
         // will be stepping from floor() to ceil()).
-        if (incr.reduce().reducedFraction._num !== 1) {
+        if (incr.reduce().reducedFraction._num !== 1)
+        {
             throw new Error("bracket() 1 must be divisible by the specified increment.");
         }
 
@@ -570,9 +610,10 @@ export class Fraction
         let ceilVal: Fraction;
 
         // Find the ceil value by stepping up from rangeFloor.
-        for (let curVal = rangeFloor; curVal.isLessThanOrEqualTo(rangeCeil); curVal = curVal.add(incr)
-        ) {
-            if (curVal.isGreaterThanOrEqualTo(this)) {
+        for (let curVal = rangeFloor; curVal.isLessThanOrEqualTo(rangeCeil); curVal = curVal.add(incr))
+        {
+            if (curVal.isGreaterThanOrEqualTo(this))
+            {
                 ceilVal = curVal;
                 break;
             }
@@ -594,28 +635,40 @@ export class Fraction
 
 export function greatestCommonDivisor(a: number, b: number): number
 {
-    if (a === 0 && b === 0) {
+    if (a === 0 && b === 0)
+    {
         throw new Error("Cannot calculate greatest common divosor of 0.");
     }
 
     // For information on gcd(0, k) see:
     // http://mfleck.cs.illinois.edu/building-blocks/version-1.0/number-theory.pdf
-    if (a === 0) {
+    if (a === 0)
+    {
         return b;
     }
-    else if (b === 0) {
+    else if (b === 0)
+    {
         return a;
     }
-    else {
+    else
+    {
         a = Math.abs(a);
         b = Math.abs(b);
-        if (b > a) {
+        if (b > a)
+        {
             [a, b] = [b, a];
         }
-        while (true) {  // eslint-disable-line no-constant-condition
-            if (b === 0) { return a; }
+        while (true)  // eslint-disable-line no-constant-condition
+        {
+            if (b === 0)
+            {
+                return a;
+            }
             a %= b;
-            if (a === 0) { return b; }
+            if (a === 0)
+            {
+                return b;
+            }
             b %= a;
         }
     }
@@ -624,7 +677,8 @@ export function greatestCommonDivisor(a: number, b: number): number
 
 export function leastCommonMultiple(a: number, b: number): number
 {
-    if (a === 0 || b === 0) {
+    if (a === 0 || b === 0)
+    {
         return 0;
     }
     return Math.abs(a * b) / greatestCommonDivisor(a, b);

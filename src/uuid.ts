@@ -9,6 +9,7 @@ const uuidv4: () => string = require("uuid/v4");
  * Returns a uuid v4 string (e.g. "c17898d0-6c10-46ad-9a50-966f602f73ca").
  * @return The generated uuid
  */
-export function generateUuid(): string {
+export function generateUuid(): string
+{
     return uuidv4();
 }

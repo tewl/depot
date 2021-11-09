@@ -1,25 +1,28 @@
 import {PriorityQueue} from "./priorityQueue";
 
 
-describe("PriorityQueue", () => {
+describe("PriorityQueue", () =>
+{
 
-
-    it("can be created", () => {
+    it("can be created", () =>
+    {
         const priorityQueue = new PriorityQueue<string>();
         expect(priorityQueue).toBeDefined();
     });
 
 
-    describe("length", () => {
+    describe("length", () =>
+    {
 
-
-        it("is 0 after construction", () => {
+        it("is 0 after construction", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.length).toEqual(0);
         });
 
 
-        it("increments as items are added", () => {
+        it("increments as items are added", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.length).toEqual(0);
             priorityQueue.push("Fred", 6);
@@ -30,17 +33,19 @@ describe("PriorityQueue", () => {
     });
 
 
-    describe("peak()", () => {
+    describe("peak()", () =>
+    {
 
-
-        it("returns undefined when emtpty", () => {
+        it("returns undefined when emtpty", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.length).toEqual(0);
             expect(priorityQueue.peak()).toEqual(undefined);
         });
 
 
-        it("returns the hightest priority item without removing it", () => {
+        it("returns the hightest priority item without removing it", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             priorityQueue.push("Fred", 6);
             priorityQueue.push("Barney", 4);
@@ -55,17 +60,19 @@ describe("PriorityQueue", () => {
     });
 
 
-    describe("pop()", () => {
+    describe("pop()", () =>
+    {
 
-
-        it("returns undefined when emtpty", () => {
+        it("returns undefined when emtpty", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.length).toEqual(0);
             expect(priorityQueue.pop()).toEqual(undefined);
         });
 
 
-        it("returns the hightest priority item and removes it", () => {
+        it("returns the hightest priority item and removes it", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             priorityQueue.push("Fred", 6);
             priorityQueue.push("Barney", 4);
@@ -86,16 +93,18 @@ describe("PriorityQueue", () => {
     });
 
 
-    describe("isEmtpy", () => {
+    describe("isEmtpy", () =>
+    {
 
-
-        it("returns true when empty", () => {
+        it("returns true when empty", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.isEmpty).toEqual(true);
         });
 
 
-        it("returns false when it has items", () => {
+        it("returns false when it has items", () =>
+        {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.isEmpty).toEqual(true);
             priorityQueue.push("Fred", 6);

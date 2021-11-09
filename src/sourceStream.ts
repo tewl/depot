@@ -8,14 +8,15 @@ export class SourceStream extends Readable
     // endregion
 
 
-    constructor(data: Array<string> | string, opts?: ReadableOptions) {
+    constructor(data: Array<string> | string, opts?: ReadableOptions)
+    {
         super(opts);
         this._data = Array.isArray(data) ? data : [data];
     }
 
 
-    public override _read(): void {
-
+    public override _read(): void
+    {
         if (this._curIndex >= this._data.length)
         {
             this.push(null);

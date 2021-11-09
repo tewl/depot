@@ -175,8 +175,6 @@ export interface ILoadResult<T extends ISerializable>
 // write data in a manner that is specific to each backing store.
 //
 ////////////////////////////////////////////////////////////////////////////////
-
-// tslint:disable-next-line: max-classes-per-file
 export abstract class AStore<TStow>
 {
     // region Data Members
@@ -397,7 +395,6 @@ interface IMemoryStow
 }
 
 
-// tslint:disable-next-line: max-classes-per-file
 export class MemoryStore extends AStore<IMemoryStow>
 {
 

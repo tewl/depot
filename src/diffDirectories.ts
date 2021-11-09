@@ -97,7 +97,6 @@ export interface IFilesToCompare
 }
 
 
-// tslint:disable-next-line:max-classes-per-file
 export class FileComparer implements IFilesToCompare
 {
     public static create(leftFile: File, rightFile: File): FileComparer
@@ -278,7 +277,6 @@ export class FileComparer implements IFilesToCompare
 }
 
 
-// tslint:disable-next-line:max-classes-per-file
 export class DiffDirFileItem
 {
     /**

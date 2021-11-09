@@ -265,7 +265,6 @@ function isValidFilesystemName(name: string): boolean
 }
 
 
-// tslint:disable-next-line:max-classes-per-file
 class CacheEntry<T>
 {
     /**

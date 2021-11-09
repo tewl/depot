@@ -817,7 +817,7 @@ export class GitRepo
         {
             const entries: Array<IGitLogEntry> = [];
             let match: RegExpExecArray | null;
-            while ((match = GIT_LOG_ENTRY_REGEX.exec(stdout)) !== null) // tslint:disable-line
+            while ((match = GIT_LOG_ENTRY_REGEX.exec(stdout)) !== null)
             {
                 entries.push(
                     {

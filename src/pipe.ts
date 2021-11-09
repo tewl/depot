@@ -242,7 +242,6 @@ export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,
     st: (s: TS) => TT
 ): TT;
 
-// tslint:disable: ban-types
 export function pipe(
     a: unknown,
     ab?: Function,

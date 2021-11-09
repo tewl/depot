@@ -36,7 +36,6 @@ class EnumError<T> extends Error
  */
 export const getEnumErrorClass = <T>(enumObject: T) =>  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
 {
-    // tslint:disable-next-line:max-classes-per-file
     return class SpecificEnumError extends EnumError<T>
     {
         public constructor(errorNum: T[keyof T])

@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import urlJoin = require("url-join");  // tslint:disable-line:no-require-imports
+import urlJoin = require("url-join");
 import URLParse = require("url-parse");
 
 

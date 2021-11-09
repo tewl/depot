@@ -133,7 +133,6 @@ export async function pollAsyncResult<TSuccess, TError>(
 {
     const result = await poll(
         asyncResultOp,
-        // tslint:disable-next-line: max-line-length
         async (
             iterationNum,
             startTime,

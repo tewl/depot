@@ -1,4 +1,3 @@
-// tslint:disable-next-line:no-require-imports
 import Jasmine = require("jasmine");
 
 /**

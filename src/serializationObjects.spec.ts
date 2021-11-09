@@ -175,7 +175,6 @@ function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSer
 }
 
 
-// tslint:disable-next-line:max-classes-per-file
 export class Person implements ISerializable
 {
 

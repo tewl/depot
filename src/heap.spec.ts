@@ -213,12 +213,11 @@ describe("Heap", () =>
     {
         const heap = new Heap(compareNumbers);
 
-        // console.time("large heap-based sort"); // tslint:disable-line:no-console
         _.forEach(randomizedArray, (curValue) =>
         {
             heap.push(curValue);
         });
-        // console.timeEnd("large heap-based sort"); // tslint:disable-line:no-console
+
         expect(heap.length).toEqual(1000);
 
         for (let curIndex = 0; curIndex < 1000; ++curIndex)
@@ -231,14 +230,14 @@ describe("Heap", () =>
         //
 
         // let arr = randomizedArray.slice();
-        // console.time("native array sort"); // tslint:disable-line:no-console
+        // console.time("native array sort");
         // arr.sort();
-        // console.timeEnd("native array sort"); // tslint:disable-line:no-console
+        // console.timeEnd("native array sort");
 
         // arr = randomizedArray.slice();
-        // console.time("lodash array sort"); // tslint:disable-line:no-console
+        // console.time("lodash array sort");
         // _.sortBy(arr);
-        // console.timeEnd("lodash array sort"); // tslint:disable-line:no-console
+        // console.timeEnd("lodash array sort");
     });
 
 });

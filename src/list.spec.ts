@@ -256,9 +256,7 @@ describe("List", () =>
         it("can sort a very large List", () =>
         {
             const list = List.fromArray(randomizedArray);
-            // console.time("large quicksort"); // tslint:disable-line:no-console
             list.quicksort();
-            // console.timeEnd("large quicksort"); // tslint:disable-line:no-console
 
             expect(list.length).toEqual(1000);
 

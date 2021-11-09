@@ -63,7 +63,7 @@ class DLNodeEnd<TValue>
  * Class that represents a node in a doubly linked list.  The nodes form a
  * circle where there is one special "end" node that has a value of undefined.
  */
-class DLNodeValue<TValue>  // tslint:disable-line:max-classes-per-file
+class DLNodeValue<TValue>
 {
     // region Data Members
     private _prev: DLNodeAny<TValue> | undefined;
@@ -144,7 +144,7 @@ type DLNodeAny<TValue> = DLNodeEnd<TValue> | DLNodeValue<TValue>;
  * This linked list is implemented as a circular linked list with one node being
  * the "end" node.
  */
-export class List<TValue> // tslint:disable-line:max-classes-per-file
+export class List<TValue>
 {
     public static fromArray<TValue>(arr: Array<TValue>): List<TValue>
     {
@@ -488,7 +488,7 @@ export type MoveIteratorRetType<T> = {done: false, value: T} | {done: true};
 /**
  * Implements the iterator protocol for List.
  */
-export class Iterator<TValue>     // tslint:disable-line:max-classes-per-file
+export class Iterator<TValue>
 {
     private          _curNode: DLNodeAny<TValue>;
     private readonly _endNode: DLNodeEnd<TValue>;

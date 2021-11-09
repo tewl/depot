@@ -525,6 +525,9 @@
             // Sometimes space is inserted in order for similar lines to line up.
             "off"
         ],
+        "space-infix-ops": [
+          "error"
+        ],
         "space-unary-ops": [
             "error",
             {

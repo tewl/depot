@@ -26,8 +26,6 @@ import BBPromise = require("bluebird");
  */
 export function allSettled(promises: Array<Promise<unknown>>): Promise<Array<BBPromise.Inspection<unknown>>>
 {
-    "use strict";
-
     const wrappedPromises: Array<BBPromise.Inspection<unknown>> = _.map(
         promises,
         (curPromise: Promise<unknown>) => BBPromise.resolve(curPromise).reflect()

@@ -27,8 +27,6 @@ export function sequence(
     initialValue: unknown
 ): Promise<unknown>
 {
-    "use strict";
-
     return tasks.reduce(
         (accumulator, curTask) =>
         {
@@ -54,8 +52,6 @@ export function getTimerPromise<TResolve>(
     resolveValue:  TResolve
 ): Promise<TResolve>
 {
-    "use strict";
-
     return new Promise(
         (resolve: (resolveValue: TResolve) => void) =>
         {
@@ -171,7 +167,6 @@ export function retry<TResolve>(
     maxNumAttempts:  number
 ): Promise<TResolve>
 {
-    "use strict";
     return retryWhileImpl(theFunc, () => true, maxNumAttempts, 0);
 }
 
@@ -205,7 +200,6 @@ export function retryWhile<TResolve>(
     maxNumAttempts: number
 ): Promise<TResolve>
 {
-    "use strict";
     return retryWhileImpl(theFunc, whilePredicate, maxNumAttempts, 0);
 }
 
@@ -232,7 +226,6 @@ function retryWhileImpl<TResolve>(
     attemptsSoFar:   number
 ): Promise<TResolve>
 {
-    "use strict";
     return new Promise(
         (resolve: (value: TResolve|Promise<TResolve>) => void, reject: (err: unknown) => void) =>
         {
@@ -301,8 +294,6 @@ function retryWhileImpl<TResolve>(
  */
 export function promiseWhile(predicate: () => boolean, body: Task<void>): Promise<void>
 {
-    "use strict";
-
     return new Promise<void>((resolve: () => void, reject: () => void) =>
     {
         function loop(): void
@@ -337,8 +328,6 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
  */
 export function sequentialSettle<TResolve>(inputPromises: Array<Promise<TResolve>>): Array<Promise<TResolve>>
 {
-    "use strict";
-
     const outputPromises: Array<Promise<TResolve>> = [];
 
     _.forEach(inputPromises, (curInputPromise) =>

@@ -332,8 +332,6 @@ function getFuncThatWillRejectNTimes<TResolve, TReject>(
     rejectValue: TReject
 ): () => Promise<TResolve>
 {
-    "use strict";
-
     let numFailuresRemaining: number = numFailures;
 
     return () =>

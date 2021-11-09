@@ -8,8 +8,6 @@ import {Iterator} from "./list";
  */
 export function advance<TValue>(it: Iterator<TValue>, offset: number): void
 {
-    "use strict";
-
     const fn: () => void = offset < 0 ? it.prev.bind(it) : it.next.bind(it);
     const numIterations: number = Math.abs(offset);
 
@@ -28,8 +26,6 @@ export function advance<TValue>(it: Iterator<TValue>, offset: number): void
  */
 export function distance<TValue>(itA: Iterator<TValue>, itB: Iterator<TValue>): number
 {
-    "use strict";
-
     let distance = 0;
     const itCur: Iterator<TValue> = itA.offset(0);
 
@@ -58,8 +54,6 @@ export function find<TValue>(
     value: TValue
 ): Iterator<TValue>
 {
-    "use strict";
-
     const itCur: Iterator<TValue> = itBegin;
 
     while (!itCur.equals(itEnd))
@@ -91,8 +85,6 @@ export function partition<TValue>(
     pred:    (val: TValue) => boolean
 ): Iterator<TValue>
 {
-    "use strict";
-
     // If the range specified has 0 size, just return.
     if (itFirst.equals(itLast))
     {

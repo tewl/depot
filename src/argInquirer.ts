@@ -1,5 +1,3 @@
-"use strict";
-
 import * as path from "path";
 import * as _ from "lodash";
 import * as yargs from "yargs";

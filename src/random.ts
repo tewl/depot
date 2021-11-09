@@ -15,7 +15,6 @@
  */
 export function getRandom(): number
 {
-    "use strict";   // TODO: Remove all "use strict" from this codebase.
     return Math.random();
 }
 
@@ -28,7 +27,6 @@ export function getRandom(): number
  */
 export function getRandomFloat(minIncluded: number, maxExcluded: number): number
 {
-    "use strict";
     return Math.random() * (maxExcluded - minIncluded) + minIncluded;
 }
 
@@ -41,7 +39,6 @@ export function getRandomFloat(minIncluded: number, maxExcluded: number): number
  */
 export function getRandomInt(minIncluded: number, maxExcluded: number): number
 {
-    "use strict";
     // Using Math.round() will give you a non-uniform distribution!
     return Math.floor(Math.random() * (maxExcluded - minIncluded)) + minIncluded;
 }
@@ -55,7 +52,6 @@ export function getRandomInt(minIncluded: number, maxExcluded: number): number
  */
 export function getRandomIntInclusive(minIncluded: number, maxIncluded: number): number
 {
-    "use strict";
     // Using Math.floor() instead of Math.round(), because Math.round() will
     // give you a non-uniform distribution!
     return Math.floor(Math.random() * (maxIncluded - minIncluded + 1)) + minIncluded;

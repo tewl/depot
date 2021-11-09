@@ -8,8 +8,6 @@ import * as _ from "lodash";
  */
 export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExecArray | undefined
 {
-    "use strict";
-
     for (const curString of strings)
     {
         const curMatch: RegExpExecArray|null = regex.exec(curString);

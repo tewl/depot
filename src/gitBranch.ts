@@ -261,7 +261,7 @@ export class GitBranch
             else if (lastCols.length > 1)
             {
                 // We should never get more than 1 matching line.
-                return Promise.reject(new Error(`Unexpectedly got multiple results for ${this.name}.`));
+                throw new Error(`Unexpectedly got multiple results for ${this.name}.`);
             }
 
             const lastCol = lastCols[0];

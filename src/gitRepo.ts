@@ -9,6 +9,7 @@ import {Url} from "./url";
 import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
+import { toPromise } from "./promiseResult";
 
 
 interface IGitLogEntry
@@ -545,7 +546,7 @@ export class GitRepo
             }
             else
             {
-                return GitBranch.create(this, branchName);
+                return toPromise(GitBranch.create(this, branchName));
             }
         });
     }

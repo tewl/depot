@@ -4,6 +4,8 @@ import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
 import { splitIntoLines, splitLinesOsIndependent} from "./stringHelpers";
+import { Result } from "./result";
+import { failedResult, succeeded, succeededResult } from ".";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -76,20 +78,19 @@ export class GitBranch
      * @return A Promise for the newly created GitBranch instance.  This Promise
      * will be resolved with undefined if the specified branch name is invalid.
      */
-    public static create(repo: GitRepo, branchName: string, remoteName?: string): Promise<GitBranch>
+    public static async create(
+        repo: GitRepo,
+        branchName: string,
+        remoteName?: string
+    ): Promise<Result<GitBranch, string>>
     {
         const validator = new Validator<string>([this.isValidBranchName]);
 
-        return validator.isValid(branchName)
-        .then((branchNameIsValid) =>
-        {
-            if (!branchNameIsValid)
-            {
-                throw new Error(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
-            }
+        const isValid = await validator.isValid(branchName);
 
-            return new GitBranch(repo, branchName, remoteName);
-        });
+        return isValid ?
+               succeededResult(new GitBranch(repo, branchName, remoteName)) :
+               failedResult(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
     }
 
 
@@ -297,7 +298,18 @@ export class GitBranch
                 matches = remoteBranchRegex.exec(remoteBranchStr);
                 if (matches)
                 {
-                    return GitBranch.create(this.repo, matches[2], matches[1]);
+                    return GitBranch.create(this.repo, matches[2], matches[1])
+                    .then((branchResult) =>
+                    {
+                        if (succeeded(branchResult))
+                        {
+                            return branchResult.value;
+                        }
+                        else
+                        {
+                            throw new Error(branchResult.error);
+                        }
+                    });
                 }
                 else
                 {

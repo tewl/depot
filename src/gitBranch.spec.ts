@@ -2,6 +2,7 @@ import {GitBranch} from "./gitBranch";
 import {GitRepo} from "./gitRepo";
 import {Directory} from "./directory";
 import {sampleRepoDir, tmpDir} from "../test/ut/specHelpers";
+import {failed, succeeded} from "./result";
 
 
 describe("GitBranch", () =>
@@ -97,33 +98,20 @@ describe("GitBranch", () =>
         describe("create()", () =>
         {
 
-            it("will reject when given an illegal branch name", async () =>
+            it("will error when given an illegal branch name", async () =>
             {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
-                try
-                {
-                    await GitBranch.create(repo, "illegal:branch_name");
-                    fail("Should never get here.");
-                }
-                catch (err)
-                {
-                    // Correctly rejected.
-                }
+                const result = await GitBranch.create(repo, "illegal:branch_name");
+                expect(failed(result)).toBeTrue();
             });
 
 
-            it("will resolve to a GitBranch instance when given a valid branch name", async () =>
+            it("will succeed and return a GitBranch instance when given a valid branch name", async () =>
             {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
-                try
-                {
-                    const branch = await GitBranch.create(repo, "feature/feature_name");
-                    expect(branch).toBeTruthy();
-                }
-                catch (err)
-                {
-                    fail("Should never get here.");
-                }
+                const result = await GitBranch.create(repo, "feature/feature_name");
+                expect(succeeded(result)).toBeTrue();
+                expect(result.value! instanceof GitBranch).toBeTrue();
             });
 
 
@@ -141,7 +129,7 @@ describe("GitBranch", () =>
             it("will return the branch's name", async () =>
             {
                 const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
-                const branch = await GitBranch.create(repo, "feature/featurename", "origin");
+                const branch = (await GitBranch.create(repo, "feature/featurename", "origin")).value!;
                 expect(branch.name).toEqual("feature/featurename");
             });
 
@@ -154,7 +142,7 @@ describe("GitBranch", () =>
             it("returns the expected string for a local branch", async () =>
             {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
-                const branch = await GitBranch.create(repo, "master");
+                const branch = (await GitBranch.create(repo, "master")).value!;
                 expect(branch.toString()).toEqual("master");
             });
 
@@ -162,7 +150,7 @@ describe("GitBranch", () =>
             it("returns the expected string for a remote branch", async () =>
             {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
-                const branch = await GitBranch.create(repo, "master", "origin");
+                const branch = (await GitBranch.create(repo, "master", "origin")).value!;
                 expect(branch.toString()).toEqual("origin/master");
             });
 
@@ -191,7 +179,7 @@ describe("GitBranch", () =>
             it("return false when the branch is remote", async () =>
             {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
-                const branch = await GitBranch.create(repo, "master", "origin");
+                const branch = (await GitBranch.create(repo, "master", "origin")).value!;
                 expect(branch.isLocal()).toEqual(false);
             });
 
@@ -220,7 +208,7 @@ describe("GitBranch", () =>
             it("return true when the branch is remote", async () =>
             {
                 const repo = await GitRepo.fromDirectory(sampleRepoDir);
-                const branch = await GitBranch.create(repo, "master", "origin");
+                const branch = (await GitBranch.create(repo, "master", "origin")).value!;
                 expect(branch.isRemote()).toEqual(true);
             });
 
@@ -244,7 +232,7 @@ describe("GitBranch", () =>
                 expect(originRepo).toBeTruthy();
                 expect(workingRepo).toBeTruthy();
 
-                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                const featureBranch = (await GitBranch.create(workingRepo, "a_feature_branch")).value!;
                 await workingRepo.checkoutBranch(featureBranch, true);
                 await workingRepo.pushCurrentBranch("origin", true);
 
@@ -262,7 +250,7 @@ describe("GitBranch", () =>
                 expect(originRepo).toBeTruthy();
                 expect(workingRepo).toBeTruthy();
 
-                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                const featureBranch = (await GitBranch.create(workingRepo, "a_feature_branch")).value!;
                 await workingRepo.checkoutBranch(featureBranch, true);
                 await workingRepo.pushCurrentBranch("origin", false);  // This `false` is the key.  It is not tracking.
 
@@ -278,7 +266,7 @@ describe("GitBranch", () =>
                 expect(originRepo).toBeTruthy();
                 expect(workingRepo).toBeTruthy();
 
-                const featureBranch = await GitBranch.create(workingRepo, "a_feature_branch");
+                const featureBranch = (await GitBranch.create(workingRepo, "a_feature_branch")).value!;
                 await workingRepo.checkoutBranch(featureBranch, true);
                 await workingRepo.pushCurrentBranch("origin", true);
 

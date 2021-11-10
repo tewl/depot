@@ -30,7 +30,7 @@ export class GitBranch
 
     /**
      * Validates the specified branch name
-     * @method
+     *
      * @param branchName - The name to validate
      * @return A promise for a boolean that will indicate whether branchName is
      * valid.  This promise will never reject.
@@ -67,8 +67,9 @@ export class GitBranch
 
 
     /**
-     * Creates a GitBranch
-     * @method
+     * Creates a GitBranch instance.  Note: This method does not create a branch
+     * in a repo.
+     *
      * @param repo - The repo associated with the branch
      * @param branchName - The name of the branch
      * @param remoteName - The remote name (if a remote branch)
@@ -94,7 +95,7 @@ export class GitBranch
 
     /**
      * Enumerates the branches that exist within the specified repo.
-     * @method
+     *
      * @param repo - The repo in which the branches are to be enumerated
      * @return A Promise for an array of branches in the specified repo
      */

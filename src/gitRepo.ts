@@ -169,7 +169,7 @@ export class GitRepo
     /**
      * Determines whether this GitRepo is equal to another GitRepo.  Two
      * instances are considered equal if they point to the same directory.
-     * @method
+     *
      * @param other - The other GitRepo to compare with
      * @return Whether the two GitRepo instances are equal
      */
@@ -806,7 +806,7 @@ export class GitRepo
 
     /**
      * Helper method that retrieves Git log entries
-     * @method
+     *
      * @return A promise for an array of structures describing each commit.
      */
     private getLogEntries(): Promise<Array<IGitLogEntry>>

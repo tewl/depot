@@ -19,7 +19,7 @@ export class GitBranch
     // The regex needed to parse the long name strings printed by "git branch
     // -a".
     // If given remotes/remotename/branch/name
-    // group 1: "remotes/remotename"  (not all that useful)
+    // group 1: "remotes/remotename/" (not all that useful)
     // group 2: "remotename"          (the remote name)
     // group 3: "branch/name"         (the branch name)
     // TODO: Convert the following regex to use named capture groups.

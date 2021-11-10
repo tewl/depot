@@ -200,6 +200,13 @@ export class GitBranch
     }
 
 
+    /**
+     * Gets the remote branch that this branch is tracking (if there is one).
+     *
+     * @return A Promise that never rejects.  The Promise will resolve with the
+     * branch this branch is tracking, or undefined if this branch is not
+     * tracking a remote branch.
+     */
     public getTrackedBranch(): Promise<GitBranch | undefined>
     {
         //

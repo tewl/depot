@@ -6,6 +6,7 @@ import {File} from "./file";
 import {Url} from "./url";
 import {CommitHash} from "./commitHash";
 import {generateUuid} from "./uuid";
+import { failed, succeeded } from ".";
 
 
 describe("GitRepo", () =>
@@ -14,28 +15,21 @@ describe("GitRepo", () =>
     describe("static", () =>
     {
 
-        describe("create()", () =>
+        describe("fromDirectory()", () =>
         {
 
-            it("will reject when not given a directory that is not a repo directory", (done) =>
+            it("will error when not given a directory that is not a repo directory", async () =>
             {
-                GitRepo.fromDirectory(new Directory(__dirname))
-                .catch(() =>
-                {
-                    done();
-                });
+                const result = await GitRepo.fromDirectory(new Directory(__dirname));
+                expect(failed(result)).toBeTrue();
+                expect(result.error!.length).toBeGreaterThan(0);
             });
 
 
-            it("will create a new instance when given a Git repo directory", (done) =>
+            it("will create a new instance when given a Git repo directory", async () =>
             {
-                GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((inst) =>
-                {
-                    expect(inst).toBeTruthy();
-                    done();
-                });
-
+                const result = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
+                expect(succeeded(result)).toBeTrue();
             });
 
         });
@@ -140,9 +134,9 @@ describe("GitRepo", () =>
             it("will return the correct map of remotes", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    return repo.remotes();
+                    return repoResult.value!.remotes();
                 })
                 .then((remotes) =>
                 {
@@ -161,9 +155,9 @@ describe("GitRepo", () =>
             it("will return the name of the repo", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    return repo.name();
+                    return repoResult.value!.name();
                 })
                 .then((repoName) =>
                 {
@@ -182,8 +176,9 @@ describe("GitRepo", () =>
             it("will return the directory of the repo", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
+                    const repo = repoResult.value!;
                     expect(repo.directory).toBeTruthy();
                     expect(repo.directory.absPath()).toContain("depot");
                     done();
@@ -199,8 +194,8 @@ describe("GitRepo", () =>
 
             it("will return true for two GitRepos pointing at the same directory", async () =>
             {
-                const repo1 = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
-                const repo2 = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
+                const repo1 = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const repo2 = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
                 expect(repo1.equals(repo2)).toBeTruthy();
             });
 
@@ -228,9 +223,9 @@ describe("GitRepo", () =>
             it("will list the tags applied to the repository", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    return repo.tags();
+                    return repoResult.value!.tags();
                 })
                 .then((tags) =>
                 {
@@ -249,9 +244,9 @@ describe("GitRepo", () =>
             it("will return true for a tag that exists", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    return repo.hasTag("test");
+                    return repoResult.value!.hasTag("test");
                 })
                 .then((hasTag) =>
                 {
@@ -264,9 +259,9 @@ describe("GitRepo", () =>
             it("will return false for a tag that does not exists", (done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    return repo.hasTag("xyzzy");
+                    return repoResult.value!.hasTag("xyzzy");
                 })
                 .then((hasTag) =>
                 {
@@ -288,10 +283,10 @@ describe("GitRepo", () =>
             beforeEach((done) =>
             {
                 GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    theRepo = repo;
-                    return repo.deleteTag("unittest_tag");
+                    theRepo = repoResult.value!;
+                    return repoResult.value!.deleteTag("unittest_tag");
                 })
                 .then(() =>
                 {
@@ -355,10 +350,10 @@ describe("GitRepo", () =>
             beforeEach(() =>
             {
                 return GitRepo.fromDirectory(new Directory(__dirname, ".."))
-                .then((repo) =>
+                .then((repoResult) =>
                 {
-                    theRepo = repo;
-                    return repo.deleteTag("unittest_tag");
+                    theRepo = repoResult.value!;
+                    return repoResult.value!.deleteTag("unittest_tag");
                 });
             });
 
@@ -405,7 +400,7 @@ describe("GitRepo", () =>
 
             it("will return the branches", async () =>
             {
-                const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
                 const branches = await repo.getBranches();
                 expect(branches.length).toBeGreaterThan(0);
                 expect(_.map(branches, "name")).toContain("master");
@@ -420,7 +415,7 @@ describe("GitRepo", () =>
 
             it("will return the current branch", async () =>
             {
-                const repo = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
                 const curBranch = await repo.getCurrentBranch();
                 expect(curBranch!.name.length).toBeGreaterThan(0);
             });

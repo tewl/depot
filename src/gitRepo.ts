@@ -10,6 +10,7 @@ import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import { toPromise } from "./promiseResult";
+import { Result, failedResult, succeededResult } from "./result";
 
 
 interface IGitLogEntry
@@ -58,27 +59,20 @@ export function isGitRepoDir(dir: Directory): Promise<boolean>
  */
 export class GitRepo
 {
-
     /**
-     * Creates a new GitRepo instance, pointing it at a directory containing the
-     * wrapped repo.
+     * Creates a new GitRepo instance, pointing it at the specified directory.
+     *
      * @param dir - The directory containing the repo
-     * @return A Promise for the GitRepo.
+     * @return A Promise that always resolves.  Resolves with a new GitRepo
+     * instance when successful.  Resolves with an error result containing a
+     * descriptive error message upon failure.
      */
-    public static fromDirectory(dir: Directory): Promise<GitRepo>
+    public static async fromDirectory(dir: Directory): Promise<Result<GitRepo, string>>
     {
-        return isGitRepoDir(dir)
-        .then((isGitRepo) =>
-        {
-            if (isGitRepo)
-            {
-                return new GitRepo(dir);
-            }
-            else
-            {
-                throw new Error(`${dir.toString()} does not exist or is not a Git repo.`);
-            }
-        });
+        const isGitRepo = await isGitRepoDir(dir);
+        return isGitRepo ?
+               succeededResult(new GitRepo(dir)) :
+               failedResult(`${dir.toString()} does not exist or is not a Git repo.`);
     }
 
 

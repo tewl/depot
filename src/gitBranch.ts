@@ -4,8 +4,7 @@ import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
 import { splitIntoLines, splitLinesOsIndependent} from "./stringHelpers";
-import { Result } from "./result";
-import { failedResult, succeeded, succeededResult } from ".";
+import { Result, failedResult, succeeded, succeededResult } from "./result";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -166,6 +165,12 @@ export class GitBranch
     }
 
 
+    /**
+     * If this branch is a remote branch, gets the name of the remote repository.
+     *
+     * @return The name of the remote this branch belongs to.  Returns undefined
+     *      if this branch is local.
+     */
     public get remoteName(): string | undefined
     {
         return this._remoteName;
@@ -203,8 +208,8 @@ export class GitBranch
     /**
      * Gets the remote branch that this branch is tracking (if there is one).
      *
-     * @return A Promise that never rejects.  The Promise will resolve with the
-     * branch this branch is tracking, or undefined if this branch is not
+     * @return A Promise that always resolves.  The Promise will resolve with
+     * the branch this branch is tracking, or undefined if this branch is not
      * tracking a remote branch.
      */
     public getTrackedBranch(): Promise<GitBranch | undefined>

@@ -11,7 +11,8 @@ import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import {toPromise} from "./promiseResult";
-import {Result, failedResult, succeededResult, succeeded} from "./result";
+import {Result, failedResult, succeededResult, succeeded, failed} from "./result";
+import {mapAsync} from "./promiseHelpers";
 
 
 interface IGitLogEntry
@@ -26,8 +27,8 @@ interface IGitLogEntry
 
 /**
  * Gets a regular expression capable of parsing a git log entry.  This regex is
- * wrapped by this function, because the returned regex maintains state with the
- * /g flag.
+ * wrapped by this function, because the returned regex maintains state due to
+ * the /g flag.
  * @return Description
  */
 function getLogEntryRegex(): RegExp
@@ -859,8 +860,6 @@ export class GitRepo
         force: boolean = false
     ): Promise<Result<GitRepo, string>>
     {
-
-
         let args: Array<string>;
 
         if (branch.isLocal())
@@ -886,6 +885,111 @@ export class GitRepo
         return succeeded(result) ?
                succeededResult(this) :
                failedResult(spawnErrorToString(result.error));
+    }
+
+
+    public async getMergedBranches(
+        destBranch: undefined | GitBranch,
+        findLocalBranches: boolean,
+        findRemoteBranches: boolean
+    ): Promise<Result<Array<GitBranch>, string>>
+    {
+        // Do a reality check.  The caller should be asking for either local or
+        // remote branches, or both.
+        if (!findLocalBranches && !findRemoteBranches)
+        {
+            throw new Error("getMergedBranches() called requesting neither local nor remote branches.");
+        }
+
+        let args: Array<string> = [
+            "branch",
+            // We will always get all merged branches and then just filter the
+            // results.  This is easier than dealing with the varying text
+            // output used when using the "-r" (remote) switch.
+            "-a"
+        ];
+
+        if (destBranch)
+        {
+            // If the user specified the destination branch, provide it as the
+            // argument to the --merged switch.
+            args = [...args, "--merged", destBranch.toString()];
+        }
+        else
+        {
+            // If the user wants to get branches merged into the current branch,
+            args = [...args, "--merged"];
+        }
+
+        const result = await spawn2("git", args, {cwd: this._dir.toString()})
+        .closePromise;
+
+        if (succeeded(result))
+        {
+            // Output looks like the following.  Please note how spawn2() trims
+            // the output so the first line does not start with whitespace.
+            // 1828-column_sorting_in_new_proj_list
+            //   origin/HEAD -> origin/master
+            //   bug/1879-changed_after_checked
+            // * dev/2129-remove_vaultitem
+            //   develop
+            //   feature/2001-plc_file_mapping
+            //   feature/strict_ts_settings_1
+            //   feature/strict_ts_settings_2
+            //   fix/breadcrumb_compiler_warnings
+            //   remotes/origin/1828-column_sorting_in_new_proj_list
+            //   remotes/origin/bug/LynnColgrove-patch-1
+            //   remotes/origin/RALEMANDSO-116-A
+            const reOutputLine = /^\*?\s*(?:remotes\/(?<remoteName>\w+)\/)?(?<branchName>.*)$/m;
+
+            let lines = splitIntoLines(result.value);
+            // Remove any lines that look like:
+            // remotes/origin/HEAD -> origin/master
+            lines = _.filter(lines, (curLine) => !_.includes(curLine, " -> "));
+
+            // Map each line to a GitBranch instance.
+            let branches = await mapAsync<string, GitBranch>(
+                lines,
+                async (curLine) =>
+                {
+                    const match = reOutputLine.exec(curLine);
+                    if (!match)
+                    {
+                        throw new Error("Command output did not match parsing regex.");
+                    }
+
+                    const branchName = match.groups!.branchName;
+                    const remoteName = match.groups!.remoteName;
+                    const branchResult = await GitBranch.create(this, branchName, remoteName);
+                    if (failed(branchResult))
+                    {
+                        throw new Error(branchResult.error);
+                    }
+                    return branchResult.value;
+                }
+            );
+
+            if (findLocalBranches && findRemoteBranches)
+            {
+                // Intentionally empty.
+            }
+            else if (findLocalBranches)
+            {
+                branches = _.filter(branches, (curBranch) => curBranch.isLocal());
+            }
+            else if (findRemoteBranches)
+            {
+                branches = _.filter(branches, (curBranch) => curBranch.isRemote());
+            }
+
+            return succeededResult(branches);
+        }
+        else
+        {
+            return failedResult(spawnErrorToString(result.error));
+        }
+
+
     }
 
 

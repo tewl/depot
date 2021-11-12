@@ -673,6 +673,186 @@ describe("GitRepo", () =>
             }, 1000 * 10);
         });
 
+
+        describe("getMergedBranches()", () =>
+        {
+            beforeEach(() =>
+            {
+                tmpDir.emptySync();
+            });
+
+
+            it("will find a local merged branch", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+
+                // Finally, get the merged local branches.
+                const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, true, false);
+                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                const foundFeatureBranch = _.find(
+                    mergedBranchesResult.value!,
+                    (curBranch) => curBranch.name === branchName
+                );
+                expect(foundFeatureBranch).toBeDefined();
+                expect(foundFeatureBranch?.isLocal()).toBeTrue();
+
+            }, 1000 * 10);
+
+
+            it("will find a remote merged branch", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Push the branch upstream and make the feature branch a tracking branch.
+                await workingRepo.pushCurrentBranch(undefined, true);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+                await workingRepo.pushCurrentBranch();
+
+                // Finally, get the merged remote branches.
+                const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, false, true);
+                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                const foundFeatureBranch = _.find(
+                    mergedBranchesResult.value!,
+                    (curBranch) => curBranch.name === branchName
+                );
+                expect(foundFeatureBranch).toBeDefined();
+                expect(foundFeatureBranch?.isRemote()).toBeTrue();
+
+            }, 1000 * 10);
+
+
+            it("will find a local and a remote merged branch", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Push the branch upstream and make the feature branch a tracking branch.
+                await workingRepo.pushCurrentBranch(undefined, true);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+                await workingRepo.pushCurrentBranch();
+
+                // Finally, get the merged remote branches.
+                const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, true, true);
+                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                const foundFeatureBranches = _.filter(
+                    mergedBranchesResult.value!,
+                    (curBranch) => curBranch.name === branchName
+                );
+                expect(foundFeatureBranches.length).toEqual(2);
+
+                const stringRepresentations = _.map(foundFeatureBranches, (curBranch) => curBranch.toString());
+                expect(stringRepresentations).toContain(branchName);
+                expect(stringRepresentations).toContain(`origin/${branchName}`);
+
+            }, 1000 * 10);
+
+
+            it("will find expected branches when the destination branch is not the current branch", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Push the branch upstream and make the feature branch a tracking branch.
+                await workingRepo.pushCurrentBranch(undefined, true);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+                await workingRepo.pushCurrentBranch();
+
+                // Checkout a completely unrelated branch.
+                const bogusBranchName = `feature/${generateUuid(UuidFormat.N)}`;
+                const bogusBranch = (await GitBranch.create(workingRepo, bogusBranchName)).value!;
+                await workingRepo.checkoutBranch(bogusBranch, true);
+
+                // Finally, get the merged remote branches.
+                const mergedBranchesResult = await workingRepo.getMergedBranches(mainBranch, true, true);
+                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                const foundFeatureBranches = _.filter(
+                    mergedBranchesResult.value!,
+                    (curBranch) => curBranch.name === branchName
+                );
+                expect(foundFeatureBranches.length).toEqual(2);
+
+                const stringRepresentations = _.map(foundFeatureBranches, (curBranch) => curBranch.toString());
+                expect(stringRepresentations).toContain(branchName);
+                expect(stringRepresentations).toContain(`origin/${branchName}`);
+
+            }, 1000 * 10);
+        });
+
     });
 
 

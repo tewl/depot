@@ -316,6 +316,18 @@ describe("splitIntoLines", () =>
     });
 
 
+    it("will not mess with leading and trailing whitespace", () =>
+    {
+        const text = "  foo  \n  bar  \r\n\tquux  ";
+        const result = splitIntoLines(text);
+        expect(result).toEqual([
+            "  foo  ",
+            "  bar  ",
+            "\tquux  "
+        ]);
+    });
+
+
 });
 
 

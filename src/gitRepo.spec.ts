@@ -1,12 +1,13 @@
 import * as _ from "lodash";
 import {GitRepo} from "./gitRepo";
 import {sampleRepoDir, sampleRepoUrl, tmpDir} from "../test/ut/specHelpers";
+import {GitBranch} from "./gitBranch";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {Url} from "./url";
 import {CommitHash} from "./commitHash";
-import {generateUuid} from "./uuid";
-import { failed, succeeded } from ".";
+import {generateUuid, UuidFormat} from "./uuid";
+import {failed, succeeded} from "./result";
 
 
 describe("GitRepo", () =>
@@ -498,6 +499,178 @@ describe("GitRepo", () =>
 
 
 
+        });
+
+
+        describe("deleteBranch()", () =>
+        {
+            beforeEach(() =>
+            {
+                tmpDir.emptySync();
+            });
+
+
+            it("will delete a merged local branch when force is not set", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+
+                // Finally, delete the merged local branch.
+                const deleteResult = await workingRepo.deleteBranch(featureBranch);
+                expect(succeeded(deleteResult)).toBeTrue();
+            }, 1000 * 10);
+
+
+            it("will not delete an unmerged local branch when force is not set", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                await workingRepo.checkoutBranch(mainBranch, false);
+
+                // Try to delete the unmerged local feature branch.
+                const deleteResult = await workingRepo.deleteBranch(featureBranch);
+                expect(failed(deleteResult)).toBeTrue();
+                expect(deleteResult.error).toContain("not fully merged");
+            }, 1000 * 10);
+
+
+            it("will delete an unmerged local branch when force is set", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                await workingRepo.checkoutBranch(mainBranch, false);
+
+                // Try to delete the unmerged local feature branch.
+                const deleteResult = await workingRepo.deleteBranch(featureBranch, true);
+                expect(succeeded(deleteResult)).toBeTrue();
+            }, 1000 * 10);
+
+
+
+            it("will delete a merged remote branch when force is not set", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Push the branch upstream and make the feature branch a tracking branch.
+                await workingRepo.pushCurrentBranch(undefined, true);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+                await workingRepo.pushCurrentBranch();
+
+                // Finally, delete the remote branch.
+                const remoteBranch = (await GitBranch.create(workingRepo, branchName, "origin")).value!;
+                const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
+                expect(succeeded(deleteResult)).toBeTrue();
+            }, 1000 * 10);
+
+
+            //
+            // Remote branches will always be forcibly deleted regardless of the
+            // "forced" parameter.  Therefore, there is no unit test for the
+            // scenario where deleteBranch() errors when the branch is unmerged
+            // and force is false.
+            //
+
+
+            it("will delete an unmerged remote branch when force is set", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Push the branch upstream and make the feature branch a tracking branch.
+                await workingRepo.pushCurrentBranch(undefined, true);
+
+                // Leaving the branch unmerged.
+
+                // Finally, delete the remote branch.
+                const remoteBranch = (await GitBranch.create(workingRepo, branchName, "origin")).value!;
+                const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
+                expect(succeeded(deleteResult)).toBeTrue();
+            }, 1000 * 10);
         });
 
     });

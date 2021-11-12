@@ -2,6 +2,7 @@ import {insertIf} from "./arrayHelpers";
 import {Directory} from "./directory";
 import {File} from "./file";
 import {spawn} from "./spawn";
+import {spawn as spawn2, spawnErrorToString} from "./spawn2";
 import {GitBranch} from "./gitBranch";
 import * as _ from "lodash";
 import {outdent, trimBlankLines, splitIntoLines} from "./stringHelpers";
@@ -9,8 +10,8 @@ import {Url} from "./url";
 import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
-import { toPromise } from "./promiseResult";
-import { Result, failedResult, succeededResult } from "./result";
+import {toPromise} from "./promiseResult";
+import {Result, failedResult, succeededResult, succeeded} from "./result";
 
 
 interface IGitLogEntry
@@ -23,16 +24,27 @@ interface IGitLogEntry
 }
 
 
-//
-// A regex for parsing "git log" output.
-// match[1]: commit hash
-// match[2]: author
-// match[3]: commit timestamp
-// match[4]: commit message (a sequence of lines that are either blank or start with whitespace)
-//
-// TODO: Convert the following regex to use named capture groups.
-// eslint-disable-next-line prefer-named-capture-group
-const GIT_LOG_ENTRY_REGEX = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:\s*(.*?)$\s((?:(?:^\s*$\n?)|(?:^\s+(?:.*)$\s?))+)/gm;
+/**
+ * Gets a regular expression capable of parsing a git log entry.  This regex is
+ * wrapped by this function, because the returned regex maintains state with the
+ * /g flag.
+ * @return Description
+ */
+function getLogEntryRegex(): RegExp
+{
+    //
+    // A regex for parsing "git log" output.
+    // match[1]: commit hash
+    // match[2]: author
+    // match[3]: commit timestamp
+    // match[4]: commit message (a sequence of lines that are either blank or start with whitespace)
+    //
+
+    // TODO: Convert the following regex to use named capture groups.
+    // eslint-disable-next-line prefer-named-capture-group
+    const logEntryRegex = /commit\s*([0-9a-f]+).*?$\s^Author:\s*(.*?)$\s^Date:\s*(.*?)$\s((?:(?:^\s*$\n?)|(?:^\s+(?:.*)$\s?))+)/gm;
+    return logEntryRegex;
+}
 
 
 /**
@@ -85,7 +97,12 @@ export class GitRepo
      * into.  If not specified, the project's name will be used.
      * @return A promise for the cloned Git repo.
      */
-    public static clone(src: Url | Directory, parentDir: Directory, dirName?: string): Promise<GitRepo>
+    public static clone(
+        src: Url | Directory,
+        parentDir: Directory,
+        dirName?: string,
+        bare: boolean = false
+    ): Promise<GitRepo>
     {
         let repoDirName: string;
         let srcStr: string;
@@ -120,7 +137,12 @@ export class GitRepo
         {
             return spawn(
                 "git",
-                ["clone", srcStr, repoDirName],
+                [
+                    "clone",
+                    srcStr,
+                    repoDirName,
+                    ...insertIf(bare, "--bare")
+                ],
                 {cwd: parentDir.toString()}
             )
             .closePromise;
@@ -720,7 +742,7 @@ export class GitRepo
         })
         .then((stdout) =>
         {
-            const match = GIT_LOG_ENTRY_REGEX.exec(stdout);
+            const match = getLogEntryRegex().exec(stdout);
             if (!match)
             {
                 throw new Error(`Could not parse "git show" output:\n${stdout}`);
@@ -800,6 +822,74 @@ export class GitRepo
 
 
     /**
+     * Merges the specified branch into this repo's current branch.
+     * @param sourceBranch - The branch to be merged into the current branch
+     * @return Successful results contain this GitRepo instance (to enable
+     * chaining).  Failed results contain a descriptive error message.
+     */
+    public async merge(sourceBranch: GitBranch): Promise<Result<GitRepo, string>>
+    {
+        // TODO: Need to enhance this method to account for things that prevent
+        // this merge from succeeding, like merge conflicts.
+
+        const result = await spawn2(
+            "git",
+            ["merge", sourceBranch.toString()],
+            {cwd: this._dir.toString()}
+        )
+        .closePromise;
+
+        return succeeded(result) ?
+               succeededResult(this) :
+               failedResult(spawnErrorToString(result.error));
+    }
+
+
+    /**
+     * Deletes the specified branch from this repository.
+     * @param branch - The branch to be deleted
+     * @param force - Whether to force deletion when the branch has unmerged
+     * commits.  This only applies if the branch is local.  Remote branches will
+     * always be deleted.
+     * @return Successful results contain this GitRepo instance (to enable
+     * chaining).  Failed results contain a descriptive error message.
+     */
+    public async deleteBranch(
+        branch: GitBranch,
+        force: boolean = false
+    ): Promise<Result<GitRepo, string>>
+    {
+
+
+        let args: Array<string>;
+
+        if (branch.isLocal())
+        {
+            args = [
+                "branch",
+                force ? "-D" : "-d",
+                branch.toString()
+            ];
+        }
+        else
+        {
+            args = [
+                "push",
+                branch.remoteName!,
+                `:${branch.name}`
+            ];
+        }
+
+        const result = await spawn2("git", args, {cwd: this._dir.toString()})
+        .closePromise;
+
+        return succeeded(result) ?
+               succeededResult(this) :
+               failedResult(spawnErrorToString(result.error));
+    }
+
+
+    /**
      * Helper method that retrieves Git log entries
      *
      * @return A promise for an array of structures describing each commit.
@@ -810,9 +900,10 @@ export class GitRepo
         .closePromise
         .then((stdout) =>
         {
+            const logEntryRegex = getLogEntryRegex();
             const entries: Array<IGitLogEntry> = [];
             let match: RegExpExecArray | null;
-            while ((match = GIT_LOG_ENTRY_REGEX.exec(stdout)) !== null)
+            while ((match = logEntryRegex.exec(stdout)) !== null)
             {
                 entries.push(
                     {
@@ -830,7 +921,6 @@ export class GitRepo
             return entries;
         });
     }
-
 
 }
 

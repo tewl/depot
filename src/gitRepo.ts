@@ -600,6 +600,8 @@ export class GitRepo
         })
         .then(() =>
         {
+            // TODO: If the branch was created, add it to the cache of branches.
+            // Also, write a unit test for this case.
             return;
         });
     }
@@ -881,6 +883,10 @@ export class GitRepo
 
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
+
+        if (succeeded(result)) {
+            this._branches = undefined;
+        }
 
         return succeeded(result) ?
                succeededResult(this) :

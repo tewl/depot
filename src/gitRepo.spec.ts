@@ -641,7 +641,7 @@ describe("GitRepo", () =>
             //
 
 
-            it("will delete an unmerged remote branch when force is set", async () =>
+            it("will delete an unmerged remote branch when force is not set", async () =>
             {
                 const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
                 const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
@@ -671,6 +671,43 @@ describe("GitRepo", () =>
                 const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
                 expect(succeeded(deleteResult)).toBeTrue();
             }, 1000 * 10);
+
+
+            it("will invalidate the repository's cache of branches so a new list of branches will be retrieved", async () =>
+            {
+                const originRepo = await GitRepo.clone(sampleRepoDir, tmpDir, "origin", true);
+                const workingRepo = await GitRepo.clone(originRepo.directory, tmpDir, "working");
+                const mainBranch = (await workingRepo.getCurrentBranch())!;
+                expect(mainBranch).toBeDefined();
+
+                const uuid = generateUuid(UuidFormat.N);
+                const branchName = `feature/${uuid}`;
+
+                // Create a feature branch.
+                const featureBranch = (await GitBranch.create(workingRepo, branchName)).value!;
+                await workingRepo.checkoutBranch(featureBranch, true);
+
+                let branches = await workingRepo.getBranches(true);
+
+                // Add a file.
+                const newFile = new File(workingRepo.directory, `${uuid}.txt`);
+                newFile.writeSync(`This is new file ${newFile.baseName}`);
+                await workingRepo.stageAll();
+                await workingRepo.commit(`Added file ${newFile.baseName}.`);
+
+                // Merge the feature branch into the main branch.
+                await workingRepo.checkoutBranch(mainBranch, false);
+                await workingRepo.merge(featureBranch);
+
+                // Finally, delete the merged local branch.
+                const deleteResult = await workingRepo.deleteBranch(featureBranch);
+                expect(succeeded(deleteResult)).toBeTrue();
+
+                // The branch should no longer appear in the list of branches.
+                branches = await workingRepo.getBranches();
+                const found = _.find(branches, (curBranch) => curBranch.equals(featureBranch));
+                expect(found).toBeUndefined();
+            });
         });
 
 

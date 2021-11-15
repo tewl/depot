@@ -123,6 +123,59 @@ describe("GitBranch", () =>
     describe("instance", () =>
     {
 
+        describe("equlas()", () =>
+        {
+            it("returns true when the two represent the same local branch", async () =>
+            {
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const branch1 = (await GitBranch.create(repo, "feature/featureName", undefined)).value!;
+                const branch2 = (await GitBranch.create(repo, "feature/featureName", undefined)).value!;
+                expect(branch1.equals(branch2)).toBeTrue();
+                expect(branch2.equals(branch1)).toBeTrue();
+            });
+
+
+            it("returns true when the two branches are referencing the same remote branch", async () =>
+            {
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const branch1 = (await GitBranch.create(repo, "feature/featureName", "origin")).value!;
+                const branch2 = (await GitBranch.create(repo, "feature/featureName", "origin")).value!;
+                expect(branch1.equals(branch2)).toBeTrue();
+                expect(branch2.equals(branch1)).toBeTrue();
+            });
+
+
+            it("returns false when the two local branches are pointing at different branches", async () =>
+            {
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const branch1 = (await GitBranch.create(repo, "feature/featureA", undefined)).value!;
+                const branch2 = (await GitBranch.create(repo, "feature/featureB", undefined)).value!;
+                expect(branch1.equals(branch2)).toBeFalse();
+                expect(branch2.equals(branch1)).toBeFalse();
+            });
+
+
+            it("returns false when the two remote branches are pointing at the same remote but different branches", async () =>
+            {
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const branch1 = (await GitBranch.create(repo, "feature/featureA", "origin")).value!;
+                const branch2 = (await GitBranch.create(repo, "feature/featureB", "origin")).value!;
+                expect(branch1.equals(branch2)).toBeFalse();
+                expect(branch2.equals(branch1)).toBeFalse();
+            });
+
+
+            it("returns false when the two remote branches are pointing at different remotes", async () =>
+            {
+                const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
+                const branch1 = (await GitBranch.create(repo, "feature/featureName", "origin1")).value!;
+                const branch2 = (await GitBranch.create(repo, "feature/featureName", "origin2")).value!;
+                expect(branch1.equals(branch2)).toBeFalse();
+                expect(branch2.equals(branch1)).toBeFalse();
+            });
+        });
+
+
         describe("name", () =>
         {
 

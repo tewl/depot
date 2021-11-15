@@ -137,7 +137,7 @@ export class GitBranch
     }
 
 
-    // region Data Members
+    // region Instance Data Members
     private readonly _repo: GitRepo;
     private readonly _remoteName: string | undefined;
     private readonly _name: string;
@@ -156,6 +156,14 @@ export class GitBranch
         this._repo = repo;
         this._name = branchName;
         this._remoteName = remoteName || undefined;
+    }
+
+
+    public equals(other: GitBranch): boolean
+    {
+        return this._repo.equals(other._repo) &&
+               this._name === other._name     &&
+               this._remoteName === other._remoteName;
     }
 
 

@@ -1,5 +1,9 @@
 /**
- * Represents a value that can be true, false or indeterminate.
+ * Represents a value that can be true, false or indeterminate.  This
+ * abstraction makes checking state more explicit by comparing against the
+ * possible values enumerated by the public static properties.  This is
+ * less error prone than using undefined | boolean because both undefined and
+ * false are falsy values.
  */
 export class TriState
 {

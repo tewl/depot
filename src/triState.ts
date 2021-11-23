@@ -39,7 +39,8 @@ export class TriState
         {
             return "true";
         }
-        else {
+        else
+        {
             return "false";
         }
     }

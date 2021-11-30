@@ -1,3 +1,8 @@
+/**
+ * Asynchronous utility object that exposes a Promise as well as resolve() and
+ * reject() methods that control it.  Accepts a type parameter defining the
+ * type of the resolved value.
+ */
 export class Deferred<TResolve>
 {
     public readonly promise: Promise<TResolve>;

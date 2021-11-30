@@ -1,17 +1,11 @@
 export class Deferred<TResolve>
 {
     public readonly promise: Promise<TResolve>;
-    public resolve: (result: TResolve) => void;
-    public reject: (err: unknown) => void;
+    public resolve!: (result: TResolve) => void;
+    public reject!: (err: unknown) => void;
 
     constructor()
     {
-        // The following temporary assignments are here to get rid of a bogus TS
-        // error: "TS2564: Property 'resolve' has no initializer and is not
-        // definitely assigned in the constructor."
-        this.resolve = (): void => { return; };
-        this.reject = (): void => { return; };
-
         this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) =>
         {
             this.resolve = resolve;

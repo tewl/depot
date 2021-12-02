@@ -17,7 +17,7 @@ export type MakePropsRequired<T, TRequiredKeys extends keyof T> = {
  * union of property names.
  */
 export type MakePropsNonNullable<T, TNonNullableKeys extends keyof T> = {
-  // All keys not in TRequiredKeys will remain as-is.
+  // All keys not in TNonNullableKeys will remain as-is.
   [X in Exclude<keyof T, TNonNullableKeys>]: T[X]
 } & {
   // All keys in TNonNullableKeys, will become non-nullable.

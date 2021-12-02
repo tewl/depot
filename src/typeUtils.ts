@@ -20,7 +20,7 @@ export type MakePropsNonNullable<T, TNonNullableKeys extends keyof T> = {
   // All keys not in TRequiredKeys will remain as-is.
   [X in Exclude<keyof T, TNonNullableKeys>]: T[X]
 } & {
-  // All keys in TRequiredKeys, will become required (i.e. lose their optionality).
+  // All keys in TNonNullableKeys, will become non-nullable.
   [P in TNonNullableKeys]: NonNullable<T[P]>
 };
 

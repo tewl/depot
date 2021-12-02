@@ -1,4 +1,17 @@
 /**
+ * For a type T adds optionality for each property name in TRequiredKeys.
+ * TRequiredKeys can be a single property name or a union of property names.
+ */
+export type MakePropsOptional<T, TOptionalKeys extends keyof T> = {
+  // All keys not in TOptionalKeys will remain as-is.
+  [X in Exclude<keyof T, TOptionalKeys>]: T[X]
+} & {
+  // All keys in TOptionalKeys, will become optional.
+  [P in TOptionalKeys]?: T[P]
+};
+
+
+/**
  * For a type T removes the optionality for each property name in TRequiredKeys.
  * TRequiredKeys can be a single property name or a union of property names.
  */

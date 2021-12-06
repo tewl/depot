@@ -1,4 +1,8 @@
-import { MakePropsNonNullable, MakePropsNonNullableAndRequired, MakePropsOptional, MakePropsRequired } from "./typeUtils";
+import { MakePropsNonNullable,
+         MakePropsNonNullableAndRequired,
+         MakePropsOptional,
+         MakePropsRequired } from "./typeUtils";
+
 
 interface IAllRequired
 {

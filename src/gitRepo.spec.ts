@@ -707,7 +707,7 @@ describe("GitRepo", () =>
                 branches = await workingRepo.getBranches();
                 const found = _.find(branches, (curBranch) => curBranch.equals(featureBranch));
                 expect(found).toBeUndefined();
-            });
+            }, 10 * 1000);
         });
 
 

@@ -45,7 +45,7 @@ export class SelfSignedCertificate
         ).closePromise;
 
         // Read the key and cert data (in parallel).
-        const [keyData, certData] = await Promise.all<string, string>([keyFile.read(), certFile.read()]);
+        const [keyData, certData] = await Promise.all([keyFile.read(), certFile.read()]);
 
         // Create the new instance.
         const instance = new SelfSignedCertificate(

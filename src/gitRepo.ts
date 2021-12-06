@@ -884,7 +884,8 @@ export class GitRepo
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result)) {
+        if (succeeded(result))
+        {
             this._branches = undefined;
         }
 

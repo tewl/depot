@@ -373,6 +373,9 @@
         "key-spacing": [
             "error",
             {
+                "beforeColon": false,
+                "afterColon": true,
+                "mode": "minimum",
                 "align": {
                     "beforeColon": false,
                     "afterColon": true,

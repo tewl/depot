@@ -1,4 +1,5 @@
-import {Heap, CompareResult} from "./heap";
+import {CompareResult} from "./compare";
+import {Heap} from "./heap";
 
 
 interface IPriorityQueueItem<TPayload>

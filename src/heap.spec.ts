@@ -1,5 +1,6 @@
 import * as _ from "lodash";
-import {Heap, CompareResult} from "./heap";
+import {CompareResult} from "./compare";
+import {Heap} from "./heap";
 import {randomizedArray} from "./random_data.spec";
 
 

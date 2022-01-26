@@ -1,15 +1,5 @@
 import * as _ from "lodash";
-
-
-export enum CompareResult
-{
-    LESS    = -1,
-    EQUAL   = 0,
-    GREATER = 1
-}
-
-
-type CompareFunc<T> = (a: T, b: T) => CompareResult;
+import { CompareFunc, CompareResult } from "./compare";
 
 
 /**

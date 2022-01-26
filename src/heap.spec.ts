@@ -24,10 +24,44 @@ function compareNumbers(a: number, b: number): CompareResult
 describe("Heap", () =>
 {
 
-    it("is creatable", () =>
+    describe("constructor()", () =>
     {
-        const heap = new Heap(compareNumbers);
-        expect(heap).toBeTruthy();
+        it("creates an empty heap when no values are specified", () =>
+        {
+            const heap = new Heap(compareNumbers);
+            expect(heap).toBeDefined();
+        });
+
+
+        it("creates a heap with the specified values", () =>
+        {
+            const heap = new Heap(
+                compareNumbers,
+                [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+            );
+
+            expect(heap.length).toEqual(10);
+        });
+
+
+        it("orders inital values to preserve heap characteristics", () =>
+        {
+            const heap = new Heap(
+                compareNumbers,
+                [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+            );
+
+            expect(heap.pop()).toEqual(16);
+            expect(heap.pop()).toEqual(14);
+            expect(heap.pop()).toEqual(10);
+            expect(heap.pop()).toEqual(9);
+            expect(heap.pop()).toEqual(8);
+            expect(heap.pop()).toEqual(7);
+            expect(heap.pop()).toEqual(4);
+            expect(heap.pop()).toEqual(3);
+            expect(heap.pop()).toEqual(2);
+            expect(heap.pop()).toEqual(1);
+        });
     });
 
 

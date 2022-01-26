@@ -1,3 +1,6 @@
+import * as _ from "lodash";
+
+
 export enum CompareResult
 {
     LESS    = -1,
@@ -25,7 +28,7 @@ type CompareFunc<T> = (a: T, b: T) => CompareResult;
  */
 export class Heap<T>
 {
-    // region Data Members
+    // region Instance Data Members
 
     private readonly _compareFunc: CompareFunc<T>;
 
@@ -39,15 +42,33 @@ export class Heap<T>
     /**
      * Creates a new Heap instance.
      * @param compareFunc - A function that will be used to sort items in this
-     * heap.
+     * @param inputArr - An array of values that will be used to populate the
+     * new heap instance.
      */
-    public constructor(compareFunc: CompareFunc<T>)
+    public constructor(compareFunc: CompareFunc<T>, inputArr?: Array<T>)
     {
         this._compareFunc = compareFunc;
 
         // The element at index 0 is not used.  The root of the binary tree is
         // at index 1.
         this._store = [undefined];
+        if (inputArr !== undefined && inputArr.length > 0)
+        {
+            // Initial values have been specified.  The first index of a leaf
+            // node is at *heap* index Math.floor(inputArr.length / 2) + 1.  All
+            // of those leaf nodes can be thought of as a 1-element heap.  So
+            // all we have to do is go through the remaining (parent) nodes, and
+            // sink each one to its proper location.  We step through the
+            // remaining nodes backwards so that the subtrees rooted at each are
+            // already heaps.  This is more efficient than pushing every element
+            // into the heap, because we only have to process half the elements.
+            const heapIndexLastParent = Math.floor(inputArr.length / 2);
+            this._store = _.concat(this._store, inputArr);
+            for (let curHeapIndex = heapIndexLastParent; curHeapIndex > 0; curHeapIndex--)
+            {
+                this.sink(curHeapIndex);
+            }
+        }
     }
 
 

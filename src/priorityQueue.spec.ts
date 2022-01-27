@@ -33,14 +33,14 @@ describe("PriorityQueue", () =>
     });
 
 
-    describe("peak()", () =>
+    describe("peek()", () =>
     {
 
         it("returns undefined when emtpty", () =>
         {
             const priorityQueue = new PriorityQueue<string>();
             expect(priorityQueue.length).toEqual(0);
-            expect(priorityQueue.peak()).toEqual(undefined);
+            expect(priorityQueue.peek()).toEqual(undefined);
         });
 
 
@@ -52,7 +52,7 @@ describe("PriorityQueue", () =>
             priorityQueue.push("Dino", 2);
             priorityQueue.push("Wilma", 7);
             expect(priorityQueue.length).toEqual(4);
-            expect(priorityQueue.peak()).toEqual("Wilma");
+            expect(priorityQueue.peek()).toEqual("Wilma");
             expect(priorityQueue.length).toEqual(4);
         });
 

@@ -134,13 +134,13 @@ describe("Heap", () =>
     });
 
 
-    describe("peak()", () =>
+    describe("peek()", () =>
     {
 
         it("returns undefined when the heap is empty", () =>
         {
             const heap = new Heap(compareNumbers);
-            expect(heap.peak()).toEqual(undefined);
+            expect(heap.peek()).toEqual(undefined);
         });
 
 
@@ -153,7 +153,7 @@ describe("Heap", () =>
             heap.push(2);
             heap.push(1);
             expect(heap.length).toEqual(5);
-            expect(heap.peak()).toEqual(11);
+            expect(heap.peek()).toEqual(11);
             expect(heap.length).toEqual(5);
         });
 

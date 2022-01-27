@@ -62,9 +62,9 @@ export class PriorityQueue<TPayload>
     }
 
 
-    public peak(): TPayload | undefined
+    public peek(): TPayload | undefined
     {
-        const item = this._heap.peak();
+        const item = this._heap.peek();
         return item === undefined ? undefined : item.payload;
     }
 

@@ -126,7 +126,7 @@ export class Heap<T>
      * Gets the greatest item from this heap (without removing it)
      * @return The item with the greatest value (as determined by compareFunc)
      */
-    public peak(): T | undefined
+    public peek(): T | undefined
     {
         if (this._store.length === 0)
         {

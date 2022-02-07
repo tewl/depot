@@ -1,7 +1,14 @@
-// Adapted from the following article:
-// https://khalilstemmler.com/articles/typescript-value-object/
-//
-// I don't think I need this abstract base class.  I think it's better to just
-// write the individual value object classes.  The implementation of ValueObject
-// provided in the article does not provide much, and its use of any opens up
-// typing issues.
+/**
+ * Base class for value objects that should not be compatible with any other
+ * type (i.e. branded).  Loosely based on the base class described here:
+ * https://khalilstemmler.com/articles/typescript-value-object/
+ */
+export abstract class ValueObject<TDerived>
+{
+    /**
+     * Derived classes must implement structural equality using this method.
+     *
+     * @param other - The object to compare this to
+     */
+    public abstract equals(other: TDerived): boolean;
+}

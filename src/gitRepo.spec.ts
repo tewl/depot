@@ -96,7 +96,7 @@ describe("GitRepo", () =>
 
                 expect(new Directory(tmpDir, "sample-origin").existsSync()).toBeTruthy();
                 expect(new Directory(tmpDir, "sample-working").existsSync()).toBeTruthy();
-            });
+            }, 10 * 1000);
 
         });
 

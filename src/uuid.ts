@@ -62,12 +62,25 @@ export function generateUuid(format: UuidFormat = UuidFormat.D): string
 
 export class Uuid extends ValueObject<Uuid>
 {
+    /**
+     * Creates a standardized representation of the specified UUID string to make
+     * validation and comparison simpler.
+     *
+     * @param uuidStr - The string UUID to be normalized
+     * @return The normalized version of the specified UUID string.
+     */
     private static toNormalizedString(uuidStr: string): string
     {
         return uuidStr.toLowerCase().replace(/-/g, "");
     }
 
 
+    /**
+     * Determines whether the specified string is a valid UUID string.
+     *
+     * @param uuidStr - The UUID string to be validated
+     * @returns Whether the specified string is valid
+     */
     public static isValid(uuidStr: string): boolean
     {
         const normalized = Uuid.toNormalizedString(uuidStr);
@@ -77,6 +90,12 @@ export class Uuid extends ValueObject<Uuid>
     }
 
 
+    /**
+     * Creates a new Uuid instance.
+     *
+     * @param format - The format that should be used for the generated UUID.
+     * @return The new Uuid instance.
+     */
     public static create(format: UuidFormat = UuidFormat.D): Uuid
     {
         const uuidStr = generateUuid(format);
@@ -85,6 +104,13 @@ export class Uuid extends ValueObject<Uuid>
     }
 
 
+    /**
+     * Creates a new Uuid instance that wraps the specified value.
+     *
+     * @param uuidStr - The raw value of the UUID to be wrapped.
+     * @return A successful result containing the new instance or a failed result
+     * containing an error message.
+     */
     public static fromString(uuidStr: string): Result<Uuid, string>
     {
         const isValid = Uuid.isValid(uuidStr);
@@ -101,6 +127,7 @@ export class Uuid extends ValueObject<Uuid>
     private readonly _uuidStr;
 
 
+    // Private constructor.  Use static methods to create instances.
     protected constructor(uuidStr: string)
     {
         super();
@@ -114,6 +141,12 @@ export class Uuid extends ValueObject<Uuid>
     }
 
 
+    /**
+     * Determines whether two Uuid instances are equal.
+     *
+     * @param other - The Uuid instance to compare this instance to
+     * @return Whether this instance equals `other`.
+     */
     public equals(other: Uuid): boolean
     {
         const thisNormalized = Uuid.toNormalizedString(this._uuidStr);
@@ -122,6 +155,11 @@ export class Uuid extends ValueObject<Uuid>
     }
 
 
+    /**
+     * The string representation of this Uuid.
+     *
+     * @return The string representation of this Uuid.
+     */
     public override toString(): string
     {
         return this._uuidStr;

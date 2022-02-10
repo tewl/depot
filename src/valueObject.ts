@@ -1,7 +1,5 @@
 /**
- * Base class for value objects that should not be compatible with any other
- * type (i.e. branded).  Loosely based on the base class described here:
- * https://khalilstemmler.com/articles/typescript-value-object/
+ * Base class for value object. Minimally useful.
  */
 export abstract class ValueObject<TDerived>
 {

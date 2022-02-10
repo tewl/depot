@@ -720,6 +720,7 @@ export class GitRepo
 
     // TODO: To get the staged files:
     // git diff --name-only --cached
+    // The returned paths will be relative to the repo's root directory.
 
 
     /**

@@ -1,7 +1,8 @@
 import { MakePropsNonNullable,
          MakePropsNonNullableAndRequired,
          MakePropsOptional,
-         MakePropsRequired } from "./typeUtils";
+         MakePropsRequired,
+         RecursivePartial} from "./typeUtils";
 
 
 interface IAllRequired
@@ -77,3 +78,38 @@ const test4: AllRequiredNoNulls = {
     propB: 3,                   // Must be number.  Will not compile if undefined
     propC: 3                    // Must be number.  Will not compile if null
 };
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RecursivePartial
+////////////////////////////////////////////////////////////////////////////////
+
+interface ITypeA {
+    prop1: {
+        prop1a: number,
+        prop1b: number,
+    },
+    prop2: {
+        prop2a: number,
+        prop2b: number,
+    }
+}
+
+type TypeB = RecursivePartial<ITypeA>;
+
+describe("RecursivePartial", () =>
+{
+    // The following will fail to compile.
+    //
+    // const a: ITypeA = {
+    //     prop1: {
+    //         prop1a: 0
+    //     }
+    // };
+
+    const b: TypeB = {
+        prop1: {
+            prop1a: 0
+        }
+    };
+});

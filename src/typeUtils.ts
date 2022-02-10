@@ -48,3 +48,27 @@ export type MakePropsNonNullableAndRequired<T, TNonNullableRequiredKeys extends 
         MakePropsRequired<T, TNonNullableRequiredKeys>,
         TNonNullableRequiredKeys
     >;
+
+
+/**
+ * For a type T, makes all properties optional (recursively).  This includes all
+ * fields, properties and methods.
+ */
+export type RecursivePartial<T> = {
+    [P in keyof T]?: RecursivePartial<T[P]>
+};
+
+
+/**
+ * Convenience function that casts a partial object to the full type.  This
+ * function should not be used in production code, because use of the returned
+ * value as a T is unsafe.  It may, however, be useful when creating stubs
+ * within unit tests.
+ *
+ * @param partial - The partial object containing some properties of T.
+ * @returns The partial object casted as T
+ */
+export function createStub<T>(partial: RecursivePartial<T>): T
+{
+    return partial as T;
+}

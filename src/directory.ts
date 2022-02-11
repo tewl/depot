@@ -235,6 +235,12 @@ export class Directory
     }
 
 
+    /**
+     * Creates the directory represented by this instance.  If needed,
+     * nonexistent parent directories will also be created.
+     * @returns A Promise that resolves with this Directory instance (for
+     * chaining) when this operation completes.
+     */
     public ensureExists(): Promise<Directory>
     {
         return this.exists()
@@ -311,6 +317,11 @@ export class Directory
     }
 
 
+    /**
+     * Creates the directory represented by this instance.  If needed,
+     * nonexistent parent directories will also be created.
+     * @returns This Directory instance (for chaining)
+     */
     public ensureExistsSync(): this
     {
         if (this.existsSync())

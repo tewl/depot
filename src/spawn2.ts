@@ -111,11 +111,11 @@ export interface ISpawnOutput
 /**
  * Spawns a child process.  Each stdout and stderr output line is prefixed with
  * the specified label.
- * @param description - A textual description of the command that is output when
- *     the child process starts
  * @param cmd - The command to run
  * @param args - An array of arguments for _cmd_
  * @param options - Spawn options.  See child_process.spawn for more info.
+ * @param description - A textual description of the command that is output when
+ *     the child process starts
  * @param stdoutStream - The stream to receive stdout.  A NullStream if
  *     undefined.
  *     For example:

@@ -119,7 +119,7 @@ export class File
      * Determines whether this file is within the specified directory
      * @param dir - The directory to search within
      * @param recursiveSearch - Whether to search recursively through
-     * subdirectories for this file.
+     * subdirectories for this file
      * @returns true if this file was found; false otherwise.
      */
     public isWithin(dir: Directory, recursiveSearch: boolean): boolean

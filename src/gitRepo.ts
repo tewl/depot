@@ -67,6 +67,9 @@ export function isGitRepoDir(dir: Directory): Promise<boolean>
 }
 
 
+export type FilesRelativeTo = "cwd" | "repo";
+
+
 /**
  * Represents a Git repository within the local filesystem.
  */
@@ -626,12 +629,42 @@ export class GitRepo
      */
     public stageAll(): Promise<GitRepo>
     {
-        return spawn("git", ["add", "."], {cwd: this._dir.toString()})
-        .closePromise
+        return spawn("git", ["add", "."], {cwd: this._dir.toString()}).closePromise
         .then(() =>
         {
             return this;
         });
+    }
+
+
+    /**
+     *
+     * @param file - The file to be staged.  The File does not have to be
+     * relative to the repo's root directory.
+     * @returns A Promise that always resolves with a Result.  The result will
+     * be successful if the specified file is modified or unmodified.  A
+     * successful result contains the File passed in.  A failed result will
+     * contain an error message.
+     */
+    public async stage(file: File): Promise<Result<File, string>>
+    {
+        // Get a File representing the file's path within this repo.
+        const repoFile = File.relative(this._dir, file);
+
+        // TODO: Verify the specified file is within this repo's directory.
+        // Is this needed, because the git command will just fail?
+
+        const result = await spawn2("git", ["add", repoFile.toString()], {cwd: this._dir.toString()})
+        .closePromise;
+
+        if (succeeded(result))
+        {
+            return succeededResult(file);
+        }
+        else
+        {
+            return failedResult(spawnErrorToString(result.error));
+        }
     }
 
 
@@ -718,10 +751,42 @@ export class GitRepo
     }
 
 
-    // TODO: To get the staged files:
-    // git diff --name-only --cached
-    // The returned paths will be relative to the repo's root directory.
+    /**
+     * Gets the staged files within a repo.
+     * @param resultsRelativeTo - When successful, what the returned file paths
+     * should be relative to
+     * @returns A Promise that always resolves.  On success, the result contains
+     * an array containing the staged Files.  On error, the result contains an
+     * error message.
+     */
+    public async getStagedFiles(
+        resultsRelativeTo: FilesRelativeTo
+    ): Promise<Result<Array<File>, string>>
+    {
+        const result = await spawn2("git", ["diff", "--name-only", "--cached"], {cwd: this._dir.toString()})
+        .closePromise;
 
+        if (failed(result))
+        {
+            return failedResult(spawnErrorToString(result.error));
+        }
+
+        // The output will contain one file path per line.  The file paths will
+        // be relative to the repo's root directory.
+        let stagedFiles = _.chain(splitIntoLines(result.value))
+        .map((curLine) => curLine.trim())
+        .map((curLine) => new File(curLine))
+        .value();
+
+        if (resultsRelativeTo === "cwd")
+        {
+            stagedFiles = stagedFiles.map(
+                (curStagedFile) => new File(this.directory, curStagedFile.toString())
+            );
+        }
+
+        return succeededResult(stagedFiles);
+    }
 
     /**
      * Commits staged files

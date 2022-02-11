@@ -8,6 +8,7 @@ import {Url} from "./url";
 import {CommitHash} from "./commitHash";
 import {generateUuid, UuidFormat} from "./uuid";
 import {failed, succeeded} from "./result";
+import path from "path";
 
 
 describe("GitRepo", () =>
@@ -434,6 +435,160 @@ describe("GitRepo", () =>
 
 
         });
+
+
+        describe("checkoutBranch()", () =>
+        {
+            // TODO:  Create unit tests.
+        });
+
+
+        describe("checkoutCommit()", () =>
+        {
+            // TODO:  Create unit tests.
+        });
+
+
+        describe("stageAll()", () =>
+        {
+            // TODO:  Create unit tests.
+        });
+
+
+        describe("stage()", () =>
+        {
+            it("succeeds when staging a modified file", async () =>
+            {
+                // Given there is a modified file in a repository...
+                const repoDir = new Directory(tmpDir, "repoDir");
+                await repoDir.ensureExists();
+                const repo = await GitRepo.clone(sampleRepoDir, repoDir);
+
+                const modifiedFile = new File(repo.directory, "package.json");
+                modifiedFile.writeSync("modified by unit test");
+
+                // When we stage the modified file...
+                const stageResult = await repo.stage(modifiedFile);
+
+                // Then, the result will be successful and contain the staged file.
+                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.value!.equals(modifiedFile)).toBeTrue();
+            });
+
+
+            it("succeeds when staging an unmodified file", async () =>
+            {
+                // Given there are no modified files in a repository...
+                const repoDir = new Directory(tmpDir, "repoDir");
+                await repoDir.ensureExists();
+                const repo = await GitRepo.clone(sampleRepoDir, repoDir);
+
+                const repoFile = new File(repo.directory, "package.json");
+
+                // When we attempt to stage an unmodified file...
+                const stageResult = await repo.stage(repoFile);
+
+                // Then, the result will be successful and contain the staged file.
+                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.value!.equals(repoFile)).toBeTrue();
+            });
+
+
+            it("fails when the specified file is not within the repo", async () =>
+            {
+                // Given there are no modified files in a repository...
+                const repoDir = new Directory(tmpDir, "repoDir");
+                await repoDir.ensureExists();
+                const repo = await GitRepo.clone(sampleRepoDir, repoDir);
+
+                const nonexistentFile = new File(repo.directory, "xyzzy-xyzzy.json");
+
+                // When we attempt to stage a nonexistent file...
+                const stageResult = await repo.stage(nonexistentFile);
+
+                // Then, the result will be successful and contain the staged file.
+                expect(failed(stageResult)).toBeTrue();
+                expect(stageResult.error!.length).toBeGreaterThan(0);
+            });
+        });
+
+
+        describe("pushCurrentBranch()", () =>
+        {
+            // TODO:  Create unit tests.
+        });
+
+
+        describe("getCommitDeltas()", () =>
+        {
+            // TODO:  Create unit tests.
+        });
+
+
+        describe("getStagedFiles()", () =>
+        {
+            it("returns an empty array when nothing is staged", async () =>
+            {
+                // Given there are no staged files in a repository...
+                const repoDir = new Directory(tmpDir, "repoDir");
+                await repoDir.ensureExists();
+                const repo = await GitRepo.clone(sampleRepoDir, repoDir);
+
+                // When we get the staged files...
+                const result = await repo.getStagedFiles("repo");
+
+                // Then the result will be successful and contain an empty array.
+                expect(succeeded(result)).toBeTrue();
+                expect(result.value!.length).toEqual(0);
+            });
+
+
+            it("returns the expected staged files relative to the repo", async () =>
+            {
+                // Given a repo has a staged file...
+                const repoDir = new Directory(tmpDir, "repoDir");
+                await repoDir.ensureExists();
+                const repo = await GitRepo.clone(sampleRepoDir, repoDir);
+
+                const stagedFile = new File(repo.directory, "package.json");
+                stagedFile.writeSync("modified by unit test.");
+
+                const stageResult = await repo.stage(stagedFile);
+                expect(succeeded(stageResult)).toBeTrue();
+
+                // When we get the staged files...
+                const getStagedFilesResult = await repo.getStagedFiles("repo");
+
+                // Then the result will be successful and contain an empty array.
+                expect(succeeded(getStagedFilesResult)).toBeTrue();
+                const stagedFiles = getStagedFilesResult.value!;
+                expect(stagedFiles.length).toEqual(1);
+                expect(stagedFiles[0].toString()).toEqual("package.json");
+            });
+
+
+            it("returns the expected staged files relative to the cwd", async () =>
+            {
+                // Given a repo has a staged file...
+                const repo = await GitRepo.clone(sampleRepoDir, tmpDir);
+
+                const stagedFile = new File(repo.directory, "package.json");
+                stagedFile.writeSync("modified by unit test.");
+
+                const stageResult = await repo.stage(stagedFile);
+                expect(succeeded(stageResult)).toBeTrue();
+
+                // When we get the staged files...
+                const getStagedFilesResult = await repo.getStagedFiles("cwd");
+
+                // Then the result will be successful and contain an empty array.
+                expect(succeeded(getStagedFilesResult)).toBeTrue();
+                const stagedFiles = getStagedFilesResult.value!;
+                expect(stagedFiles.length).toEqual(1);
+                expect(stagedFiles[0].toString()).toEqual(path.join("tmp", "sampleGitRepo-src", "package.json"));
+            });
+        });
+
 
 
         describe("fetch()", () =>

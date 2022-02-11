@@ -503,6 +503,19 @@ export class Directory
 
 
     /**
+     * Determines whether this directory contains the specified file
+     * @param file - The file to search for within this directory
+     * @param recursiveSearch - Whether to search recursively through
+     * subdirectories for the file
+     * @returns true if the file was found; false otherwise.
+     */
+    public contains(file: File, recursiveSearch: boolean): boolean
+    {
+        return file.isWithin(this, recursiveSearch);
+    }
+
+
+    /**
      * Reads the contents of this directory.
      * @param recursive - Whether to find subdirectories and files recursively
      * (default is false).

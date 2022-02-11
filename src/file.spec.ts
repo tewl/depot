@@ -172,6 +172,53 @@ describe("File", () =>
         });
 
 
+        describe("isWithin()", () =>
+        {
+            it("returns true when the file is in the directory", async () =>
+            {
+                const theFile = new File(tmpDir, "foo.txt");
+                await theFile.write("xyzzy");
+
+                expect(theFile.isWithin(tmpDir, false)).toBeTrue();
+            });
+
+
+            it("returns true when the file is in a subdirectory and search is recursive", async () =>
+            {
+                const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
+                const dir2 = await new Directory(dir1, "dir2").ensureExists();
+                const dir3 = await new Directory(dir2, "dir3").ensureExists();
+                const theFile = new File(dir3, "foo.txt");
+                await theFile.write("xyzzy");
+
+                expect(theFile.isWithin(tmpDir, true)).toBeTrue();
+            });
+
+
+            it("returns false when the file is in a subdirectory but the search was not recursive", async () =>
+            {
+                const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
+                const dir2 = await new Directory(dir1, "dir2").ensureExists();
+                const dir3 = await new Directory(dir2, "dir3").ensureExists();
+                const theFile = new File(dir3, "foo.txt");
+                await theFile.write("xyzzy");
+
+                expect(theFile.isWithin(tmpDir, false)).toBeFalse();
+            });
+
+
+            it("returns false when the file is not in the directory", async () =>
+            {
+                const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
+                const dir2 = await new Directory(tmpDir, "dir2").ensureExists();
+                const theFile = new File(dir1, "foo.txt");
+                await theFile.write("xyzzy");
+
+                expect(theFile.isWithin(dir2, true)).toBeFalse();
+            });
+        });
+
+
         describe("exists()", () =>
         {
 

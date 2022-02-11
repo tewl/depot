@@ -116,6 +116,28 @@ export class File
 
 
     /**
+     * Determines whether this file is within the specified directory
+     * @param dir - The directory to search within
+     * @param recursiveSearch - Whether to search recursively through
+     * subdirectories for this file.
+     * @returns true if this file was found; false otherwise.
+     */
+    public isWithin(dir: Directory, recursiveSearch: boolean): boolean
+    {
+        if (recursiveSearch) {
+            const fileAbsPath = this.absPath();
+            const dirAbsPath = dir.absPath();
+            const isWithin = fileAbsPath.startsWith(dirAbsPath);
+            return isWithin;
+        }
+        else
+        {
+            return this.directory.equals(dir);
+        }
+    }
+
+
+    /**
      * Checks to see if this File exists.
      * @return A Promise that is always resolved.  It is resolved with a truthy
      * fs.Stats object if it exists.  Otherwise, it is resolved with undefined.

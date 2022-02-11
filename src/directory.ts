@@ -374,6 +374,12 @@ export class Directory
     }
 
 
+    /**
+     * Deletes the contents of this directory.  This directory is created if it
+     * does not exist.
+     * @returns A Promise that resolves with this Directory instance when this
+     * operation has finished.
+     */
     public empty(): Promise<Directory>
     {
         return this.delete()
@@ -384,6 +390,11 @@ export class Directory
     }
 
 
+    /**
+     * Deletes the contents of this directory.  This directory is created if it
+     * does not exist.
+     * @returns This Directory instance (to facilitate chaining)
+     */
     public emptySync(): this
     {
         this.deleteSync();
@@ -391,6 +402,10 @@ export class Directory
     }
 
 
+    /**
+     * Deletes this directory.  Does nothing if this directory does not exist.
+     * @returns A Promise that is resolved when this operation has finished.
+     */
     public delete(): Promise<void>
     {
         return this.exists()
@@ -438,6 +453,9 @@ export class Directory
     }
 
 
+    /**
+     * Deletes this directory.  Does nothing if this directory does not exist.
+     */
     public deleteSync(): void
     {
         if (!this.existsSync())

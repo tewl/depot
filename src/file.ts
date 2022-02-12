@@ -84,6 +84,7 @@ export class File
 
     /**
      * Gets the extension of this file.  This includes the initial dot (".").
+     * If the file has no extension an empty string is returned.
      * @return This file's extension
      */
     public get extName(): string

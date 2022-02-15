@@ -2,7 +2,7 @@ import path from "path";
 import { Directory } from "./directory";
 import {tmpDir} from "../test/ut/specHelpers";
 import {File} from "./file";
-import { findAngularProjectDirs } from "./angular";
+import { findAngularProjectDirs, lintFiles } from "./angular";
 
 
 function createAngularConfigFile(dir: Directory): File
@@ -63,4 +63,11 @@ describe("findAngularProjectDirs()", () =>
         expect(projectDirs).toContain(dir2);
         expect(projectDirs).toContain(dir3);
     });
+});
+
+
+describe("lintFiles()", () =>
+{
+    // Setting up a sample Angular project configured to use ESLint is currently
+    // beyond the scope of these unit tests.
 });

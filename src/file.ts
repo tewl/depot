@@ -125,7 +125,8 @@ export class File
      */
     public isWithin(dir: Directory, recursiveSearch: boolean): boolean
     {
-        if (recursiveSearch) {
+        if (recursiveSearch)
+        {
             const fileAbsPath = this.absPath();
             const dirAbsPath = dir.absPath();
             const isWithin = fileAbsPath.startsWith(dirAbsPath);

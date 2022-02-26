@@ -1,5 +1,25 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
+/**
+ * Passes a value through a series of functions.  The value returned from each
+ * function is passed in as the argument to the next function.
+ *
+ * @example
+ * // pipe() can make chained transformations that return a Result easy to write
+ * // using the bindResult() function:
+ * const result = pipe(
+ *     "16",
+ *     parse,
+ *     (r) => bindResult(sqrt, r),
+ *     (r) => bindResult(stringify, r)
+ * );
+ *
+ * @example
+ * // pipe() can also make chained transformations that return Option easy to
+ * // write.
+ *
+ * @return The value returned from the last function.
+ */
 export function pipe<TA>(a: TA): TA;
 export function pipe<TA, TB>(a: TA, ab: (a: TA) => TB): TB;
 export function pipe<TA, TB, TC>(a: TA, ab: (a: TA) => TB, bc: (b: TB) => TC): TC;

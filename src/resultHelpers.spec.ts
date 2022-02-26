@@ -1,5 +1,5 @@
-import { failedResult, succeeded, succeededResult } from "./result";
-import { mapWhileSuccessful } from "./resultHelpers";
+import { failedResult, Result, succeeded, succeededResult } from "./result";
+import { executeWhileSuccessful, mapWhileSuccessful } from "./resultHelpers";
 
 describe("mapWhileSuccessful()", () =>
 {
@@ -57,4 +57,40 @@ describe("mapWhileSuccessful()", () =>
     });
 
 
+});
+
+
+describe("executeWhileSuccessful()", () =>
+{
+    it("returns a successful result with typed array elements when all functions succeed", () =>
+    {
+        function boolResultFn(): Result<boolean, string>
+        {
+            return succeededResult(true);
+        }
+
+        function stringResultFn(): Result<string, string>
+        {
+            return succeededResult("xyzzy");
+        }
+
+        function numberResultFn(): Result<number, string>
+        {
+            return succeededResult(5);
+        }
+
+        const result = executeWhileSuccessful(
+            boolResultFn,
+            stringResultFn,
+            numberResultFn
+        );
+
+        // The TS compiler knows the individual types for each array/tuple
+        // element. You can verify this by hovering over the following variables
+        // and checking their type.
+        const [boolVal, strVal, numVal] = result.value!;
+        expect(boolVal).toEqual(true);
+        expect(strVal).toEqual("xyzzy");
+        expect(numVal).toEqual(5);
+    });
 });

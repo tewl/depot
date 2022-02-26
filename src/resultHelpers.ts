@@ -1,9 +1,81 @@
 /* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/ban-types */
-
 
 import * as _ from "lodash";
-import { failed, Result, succeeded, succeededResult } from "./result";
+import { failed, failedResult, Result, succeeded, succeededResult } from "./result";
+
+
+/**
+ * If _input_ is successful, unwraps the value and passes it into _fn_,
+ * returning the result.  If _input_ is not successful, returns it.
+ * @param fn - The function to invoke on _input.value_ when _input_ is
+ * successful.
+ * @param input - The input Result.
+ * @return Either the passed-through failure Result or the Result returned from
+ * _fn_.
+ */
+export function bindResult<TInputSuccess, TOutputSuccess, TError>(
+    fn: (x: TInputSuccess) => Result<TOutputSuccess, TError>,
+    input: Result<TInputSuccess, TError>
+): Result<TOutputSuccess, TError>
+{
+    if (succeeded(input))
+    {
+        const funcResult = fn(input.value);
+        return funcResult;
+    }
+    else
+    {
+        return input;
+    }
+}
+
+
+/**
+ * When _input_ is successful, maps the wrapped value using _fn_.
+ * @param fn - Function that maps the wrapped success value to another value.
+ * @param input - The input Result.
+ * @return Either the mapped successful Result or the passed-through failure
+ * Result.
+ */
+export function mapSuccess<TInputSuccess, TOutputSuccess, TError>(
+    fn: (input: TInputSuccess) => TOutputSuccess,
+    input: Result<TInputSuccess, TError>
+): Result<TOutputSuccess, TError>
+{
+    if (succeeded(input))
+    {
+        const mappedValue = fn(input.value);
+        return succeededResult(mappedValue);
+    }
+    else
+    {
+        return input;
+    }
+}
+
+
+/**
+ * When _input_ is a failure, maps the wrapped error using _fn_.
+ * @param fn - Function that maps the wrapped error value to another value.
+ * @param input - The input Result.
+ * @return Either the passed-through successful Result or the mapped error
+ * Result.
+ */
+export function mapError<TSuccess, TInputError, TOutputError>(
+    fn: (input: TInputError) => TOutputError,
+    input: Result<TSuccess, TInputError>
+): Result<TSuccess, TOutputError>
+{
+    if (succeeded(input))
+    {
+        return input;
+    }
+    else
+    {
+        const mappedError = fn(input.error);
+        return failedResult(mappedError);
+    }
+}
 
 
 /**
@@ -51,6 +123,15 @@ export function mapWhileSuccessful<TInput, TOutput, TError>(
 ////////////////////////////////////////////////////////////////////////////////
 // executeWhileSuccessful()
 ////////////////////////////////////////////////////////////////////////////////
+
+// Decoder for type parameter names:
+// T - Because all type parameters must begin with "T"
+// [A-Z] - Ordinal
+// [SE] - Success/Error
+//
+// Examples:
+// TAS - The type fnA returns when successful
+// TBE - The type fnB returns when failed
 
 export function executeWhileSuccessful<TAS, TAE>(
     fnA: () => Result<TAS, TAE>
@@ -183,6 +264,7 @@ export function executeWhileSuccessful<TAS, TAE, TBS, TBE, TCS, TCE, TDS, TDE, T
 ): Result<[TAS, TBS, TCS, TDS, TES, TFS, TGS, THS, TIS, TJS, TKS, TLS, TMS], TAE | TBE | TCE | TDE | TEE | TFE | TGE | THE | TIE | TJE | TKE | TLE | TME>;
 
 export function executeWhileSuccessful(
+    // eslint-disable-next-line @typescript-eslint/ban-types
     ...funcs: Array<Function>
 ): Result<Array<unknown>, unknown>
 {

@@ -282,8 +282,8 @@ export function executeWhileSuccessful(
             const res = curFn();
             if (succeeded(res))
             {
-                const newArr = _.concat(acc.value, res.value);
-                return succeededResult(newArr);
+                acc.value.push(res.value);
+                return acc;
             }
             else
             {

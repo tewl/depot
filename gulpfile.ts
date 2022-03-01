@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as _ from "lodash";
-import del = require("del");
 import chalk = require("chalk");
 import { nodeBinForOs, createCmdLaunchScript, makeNodeScriptExecutable } from "./src/nodeUtil";
 import { Directory } from "./src/directory";
@@ -48,12 +47,9 @@ export async function clean(): Promise<void>
 
 async function runClean(): Promise<Result<undefined, string>>
 {
+    const dirsToDelete = [tmpDir, distDir];
     try {
-        await del([
-            tmpDir.toString() + "/**",
-            distDir.toString() + "/**"
-        ]);
-
+        dirsToDelete.forEach((curDir) => curDir.deleteSync());
         return succeededResult(undefined);
     } catch (error) {
         return failedResult(`Failed to delete files. ${JSON.stringify(error, undefined, 4)}`);

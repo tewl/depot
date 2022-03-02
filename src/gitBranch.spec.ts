@@ -123,7 +123,7 @@ describe("GitBranch", () =>
     describe("instance", () =>
     {
 
-        describe("equlas()", () =>
+        describe("equals()", () =>
         {
             it("returns true when the two represent the same local branch", async () =>
             {
@@ -175,6 +175,32 @@ describe("GitBranch", () =>
             });
         });
 
+
+        describe("exists()", () =>
+        {
+            beforeEach(() =>
+            {
+                tmpDir.emptySync();
+            });
+
+
+            it("returns true for a branch that exists", async () =>
+            {
+                const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
+                const curBranch = await workingRepo.getCurrentBranch();
+                expect(curBranch).toBeTruthy();
+                expect(await curBranch!.exists()).toBeTrue();
+            });
+
+
+            it("returns false for a branch that does not exist", async () =>
+            {
+                const workingRepo = await GitRepo.clone(sampleRepoDir, tmpDir);
+                const fakeBranch = (await GitBranch.create(workingRepo, "doesnotexist")).value!;
+                expect(fakeBranch).toBeTruthy();
+                expect(await fakeBranch.exists()).toBeFalse();
+            });
+        });
 
         describe("name", () =>
         {

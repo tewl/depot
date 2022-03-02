@@ -967,6 +967,11 @@ export class GitRepo
         findRemoteBranches: boolean
     ): Promise<Result<Array<GitBranch>, string>>
     {
+        // We will not be able to get the current branch when working in a
+        // detached head state.  That is fine, because when that is true, we
+        // will not have to remove it from the results either.
+        const currentBranch = await this.getCurrentBranch();
+
         // Do a reality check.  The caller should be asking for either local or
         // remote branches, or both.
         if (!findLocalBranches && !findRemoteBranches)
@@ -1006,13 +1011,6 @@ export class GitRepo
             //   bug/1879-changed_after_checked
             // * dev/2129-remove_vaultitem
             //   develop
-            //   feature/2001-plc_file_mapping
-            //   feature/strict_ts_settings_1
-            //   feature/strict_ts_settings_2
-            //   fix/breadcrumb_compiler_warnings
-            //   remotes/origin/1828-column_sorting_in_new_proj_list
-            //   remotes/origin/bug/LynnColgrove-patch-1
-            //   remotes/origin/RALEMANDSO-116-A
             const reOutputLine = /^\*?\s*(?:remotes\/(?<remoteName>\w+)\/)?(?<branchName>.*)$/m;
 
             let lines = splitIntoLines(result.value);
@@ -1053,6 +1051,18 @@ export class GitRepo
             else if (findRemoteBranches)
             {
                 branches = _.filter(branches, (curBranch) => curBranch.isRemote());
+            }
+
+            if (destBranch)
+            {
+                // Remove the destination branch from the results.
+                branches = _.filter(branches, (curBranch) => !curBranch.equals(destBranch));
+            }
+            else if (currentBranch)
+            {
+                // No destination branch was specified.  Remove the current
+                // branch from the results.
+                branches = _.filter(branches, (curBranch) => !curBranch.equals(currentBranch));
             }
 
             return succeededResult(branches);

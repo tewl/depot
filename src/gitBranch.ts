@@ -74,8 +74,8 @@ export class GitBranch
      * @param repo - The repo associated with the branch
      * @param branchName - The name of the branch
      * @param remoteName - The remote name (if a remote branch)
-     * @return A Promise for the newly created GitBranch instance.  This Promise
-     * will be resolved with undefined if the specified branch name is invalid.
+     * @return A Promise that always resolves with a Result.  The result
+     * indicates whether this operation succeeded.
      */
     public static async create(
         repo: GitRepo,
@@ -83,7 +83,7 @@ export class GitBranch
         remoteName?: string
     ): Promise<Result<GitBranch, string>>
     {
-        const validator = new Validator<string>([this.isValidBranchName]);
+        const validator = new Validator<string>([GitBranch.isValidBranchName]);
 
         const isValid = await validator.isValid(branchName);
 
@@ -164,6 +164,19 @@ export class GitBranch
         return this._repo.equals(other._repo) &&
                this._name === other._name     &&
                this._remoteName === other._remoteName;
+    }
+
+
+    /**
+     * Determines whether the branch represented by this instance exists within
+     * its Git repository.
+     * @return A Promise that resolves with a boolean indicating whether this
+     * branch exists.
+     */
+    public async exists(): Promise<boolean>
+    {
+        const branches = await this._repo.getBranches();
+        return branches.some((curBranch) => curBranch.equals(this));
     }
 
 
@@ -264,7 +277,7 @@ export class GitBranch
                     // - the remainder of the line (group 3)
                     // TODO: Convert the following regex to use named capture groups.
                     // eslint-disable-next-line prefer-named-capture-group
-                    const matches = /^[*]?\s+([\w/.-]+)\s+([0-9a-fA-F]{7})\s+(.*)$/.exec(curLine);
+                    const matches = /^[*]?\s+([\w/.-]+)\s+([0-9a-fA-F]+)\s+(.*)$/.exec(curLine);
                     if (matches && matches[1] === this.name)
                     {
                         acc.push(matches[3]);

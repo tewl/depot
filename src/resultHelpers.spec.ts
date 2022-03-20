@@ -188,6 +188,18 @@ describe("mapWhileSuccessful()", () =>
     });
 
 
+    it("adds each result value to the returned array even when they are arrays", () =>
+    {
+        const inputs = [1, 2, 3];
+        const mapFn = (curInt: number): Result<[number, number], string> =>
+        {
+            return succeededResult([curInt, curInt + 1]);
+        };
+        const result = mapWhileSuccessful(inputs, mapFn);
+        expect(succeeded(result)).toBeTrue();
+        expect(result.value!).toEqual([[1, 2], [2, 3], [3, 4]]);
+    });
+
 });
 
 

@@ -107,8 +107,10 @@ export function mapWhileSuccessful<TInput, TOutput, TError>(
             const res = mappingFunc(curItem);
             if (succeeded(res))
             {
-                const newArr = _.concat(acc.value, res.value);
-                return succeededResult(newArr);
+                // Note:  Do not use array.concat() here, because if the current
+                // result's value is an array, it will be flattened.
+                acc.value.push(res.value);
+                return acc;
             }
             else
             {
@@ -282,6 +284,8 @@ export function executeWhileSuccessful(
             const res = curFn();
             if (succeeded(res))
             {
+                // Note:  Do not use array.concat() here, because if the current
+                // result's value is an array, it will be flattened.
                 acc.value.push(res.value);
                 return acc;
             }

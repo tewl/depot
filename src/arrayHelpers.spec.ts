@@ -33,7 +33,7 @@ describe("insertIf", () =>
     });
 
 
-    it("returns an empty containing the items when the condition is true", () =>
+    it("returns an array containing the items when the condition is true", () =>
     {
         expect(insertIf(true, 1, 2, 3)).toEqual([1, 2, 3]);
     });

@@ -1492,6 +1492,51 @@ describe("File", () =>
         });
 
 
+        describe("readLines()", () =>
+        {
+            it("passes each line of the file to the callback", async () =>
+            {
+                const inputFile = new File(tmpDir, "input.txt");
+                const contents = [
+                    "1\n",
+                    "2\r",
+                    "3\r\n",
+                    "4"
+                ];
+                inputFile.writeSync(contents.join(""));
+
+                const readContents: Array<string> = [];
+                const lineNums: Array<number> = [];
+                await inputFile.readLines((text, lineNum) =>
+                {
+                    readContents.push(text);
+                    lineNums.push(lineNum);
+                });
+
+                expect(readContents).toEqual(["1", "2", "3", "4"]);
+                expect(lineNums).toEqual([1, 2, 3, 4]);
+            });
+
+
+            it("rejects when the file does not exist", async () =>
+            {
+                const inputFile = new File(tmpDir, "input.txt");
+                expect(inputFile.existsSync()).toBeUndefined();
+
+                try
+                {
+                    await inputFile.readLines((lineText, lineNum) => {});
+                    fail("Should never get here.");
+                }
+                catch (err)
+                {
+                    expect(err).toBeDefined();
+                }
+            });
+
+        });
+
+
     });
 
 });

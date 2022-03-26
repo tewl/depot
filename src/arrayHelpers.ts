@@ -49,6 +49,12 @@ export function insertIf<TItem>(
 }
 
 
+/**
+ * Calculates all possible permutations of an array.
+ * @param vals - The values for which all permutations will be calculated.
+ * @returns An array in which each value is an array representing one
+ * permutation of the original array.
+ */
 export function permutations<T>(vals: Array<T>): Array<Array<T>>
 {
     if (vals.length === 0)

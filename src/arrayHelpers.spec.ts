@@ -1,4 +1,4 @@
-import {anyMatchRegex, insertIf, permutations} from "./arrayHelpers";
+import {anyMatchRegex, insertIf, permutations, toArray} from "./arrayHelpers";
 
 describe("anyMatchRegex()", () =>
 {
@@ -109,4 +109,31 @@ describe("permutations()", () =>
     });
 
 
+});
+
+
+describe("toArray()", () =>
+{
+    it("returns an empty array when given undefined", () =>
+    {
+        expect(toArray(undefined)).toEqual([]);
+    });
+
+
+    it("returns an empty array when given null", () =>
+    {
+        expect(toArray(null)).toEqual([]);
+    });
+
+
+    it("returns the original array when given an array", () =>
+    {
+        expect(toArray(["one", "two"])).toEqual(["one", "two"]);
+    });
+
+
+    it("wraps a single value in an array", () =>
+    {
+        expect(toArray("one")).toEqual(["one"]);
+    });
 });

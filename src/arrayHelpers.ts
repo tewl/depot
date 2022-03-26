@@ -82,3 +82,20 @@ export function permutations<T>(vals: Array<T>): Array<Array<T>>
 
     return allPermutations;
 }
+
+
+/**
+ * If needed, converts the specified value to an array.
+ * @param val - The value to convert into an array (if it is not already an
+ * array)
+ * @returns - The resulting array.
+ */
+export function toArray<T>(val: unknown): Array<T>
+{
+    if (val === undefined || val === null)
+    {
+        return [];
+    }
+
+    return Array.isArray(val) ? val : [val];
+}

@@ -297,3 +297,25 @@ export function executeWhileSuccessful(
         succeededResult([]) as Result<Array<unknown>, unknown>
     );
 }
+
+
+/**
+ * Converts a boolean value into a successful or failure Result.
+ * @param condition - The condition.
+ * @param trueSuccessVal - Value to be wrapped in a successful Result when
+ * _condition_ is truthy.
+ * @param falseErrorVal - Value to be wrapped in a failure Result when
+ * _condition_ is falsy.
+ * @returns A Result wrapping either of the specified values, determined by
+ * _condition_.
+ */
+export function boolToResult<TSuccess, TError>(
+    condition: unknown,
+    trueSuccessVal: TSuccess,
+    falseErrorVal: TError
+): Result<TSuccess, TError>
+{
+    return condition ?
+        succeededResult(trueSuccessVal) :
+        failedResult(falseErrorVal);
+}

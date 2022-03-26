@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { pipe } from "./pipe";
 import { failed, failedResult, Result, succeeded, succeededResult } from "./result";
-import { bindResult, executeWhileSuccessful, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
+import { bindResult, boolToResult, executeWhileSuccessful, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
 
 
 describe("bindResult()", () =>
@@ -235,5 +235,24 @@ describe("executeWhileSuccessful()", () =>
         expect(boolVal).toEqual(true);
         expect(strVal).toEqual("xyzzy");
         expect(numVal).toEqual(5);
+    });
+});
+
+
+describe("boolToResult()", () =>
+{
+    it("returns a Result wrapping the truty value when the condition is truthy", () =>
+    {
+        const result = boolToResult(1, "yes", "no");
+        expect(succeeded(result)).toBeTrue();
+        expect(result.value).toEqual("yes");
+    });
+
+
+    it("returns a Result wrapping the falsy value when the condition is falsy", () =>
+    {
+        const result = boolToResult(0, "yes", "no");
+        expect(failed(result)).toBeTrue();
+        expect(result.error).toEqual("no");
     });
 });

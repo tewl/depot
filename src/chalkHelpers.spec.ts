@@ -18,9 +18,16 @@ describe("highlightMatches()", () =>
     });
 
 
-    it("highlights multiple occurrences", () =>
+    it("highlights only the first match when global flag is not specified", () =>
     {
         const result = highlightMatches("foobarfoobarfoo", /bar/, chalk.red);
+        expect(result).toEqual([1, "foo\u001b[31mbar\u001b[39mfoobarfoo"]);
+    });
+
+
+    it("highlights multiple occurrences when global flag is used", () =>
+    {
+        const result = highlightMatches("foobarfoobarfoo", /bar/g, chalk.red);
         expect(result).toEqual([2, "foo\u001b[31mbar\u001b[39mfoo\u001b[31mbar\u001b[39mfoo"]);
     });
 });

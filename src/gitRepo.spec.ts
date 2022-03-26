@@ -621,7 +621,7 @@ describe("GitRepo", () =>
                 // the fetchTags parameter only needs to be set when getting
                 // tags that point to commits that would not normally be
                 // downloaded.
-            }, 1000 * 10);
+            }, 1000 * 20);
 
         });
 
@@ -785,7 +785,7 @@ describe("GitRepo", () =>
                 const remoteBranch = (await GitBranch.create(workingRepo, branchName, "origin")).value!;
                 const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
                 expect(succeeded(deleteResult)).toBeTrue();
-            }, 1000 * 10);
+            }, 1000 * 20);
 
 
             //
@@ -993,7 +993,7 @@ describe("GitRepo", () =>
                 expect(stringRepresentations).toContain(branchName);
                 expect(stringRepresentations).toContain(`origin/${branchName}`);
 
-            }, 1000 * 10);
+            }, 1000 * 20);
 
 
             it("will find expected branches when the destination branch is not the current branch", async () =>

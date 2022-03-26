@@ -68,7 +68,16 @@ export function setFlags(srcRegex: RegExp, flagsToSet: Array<RegExpFlag>): RegEx
 }
 
 
-const regexStrRegex = /^\/(?<pattern>.*)\/(?<flags>[dgimsuy]*)$/g;
+/**
+ * Gets a RegExp used to match regular expression expressions.  Wrapped in
+ * this function to avoid problems with the instance's state.
+ * @returns A regular expression that matches regular expression expressions.
+ */
+function getRegExpStrRegExp(): RegExp
+{
+    const regexStrRegex = /^\/(?<pattern>.*)\/(?<flags>[dgimsuy]*)$/g;
+    return regexStrRegex;
+}
 
 
 /**
@@ -80,12 +89,11 @@ const regexStrRegex = /^\/(?<pattern>.*)\/(?<flags>[dgimsuy]*)$/g;
  */
 export function strToRegExp(str: string): Result<RegExp, string>
 {
-    const matches = regexStrRegex.exec(str);
+    const matches = getRegExpStrRegExp().exec(str);
     try
     {
         if (matches)
         {
-
             const regex = new RegExp(matches.groups!.pattern, matches.groups!.flags);
             return succeededResult(regex);
         }

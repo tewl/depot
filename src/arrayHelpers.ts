@@ -90,7 +90,7 @@ export function permutations<T>(vals: Array<T>): Array<Array<T>>
  * array)
  * @returns - The resulting array.
  */
-export function toArray<T>(val: unknown): Array<T>
+export function toArray<T>(val: undefined | null | T | Array<T>): Array<T>
 {
     if (val === undefined || val === null)
     {

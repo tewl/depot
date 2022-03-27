@@ -1,7 +1,7 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
     removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight,
-    repeat
+    repeat, splice
 } from "./stringHelpers";
 
 
@@ -452,4 +452,70 @@ describe("repeat()", () =>
     {
         expect(repeat("123", 10)).toEqual("1231231231");
     });
+});
+
+
+describe("splice()", () =>
+{
+    it("can remove characters", () =>
+    {
+        expect(splice("012345", 3, 2, "")).toEqual("0125");
+    });
+
+
+    it("can insert characters", () =>
+    {
+        expect(splice("012345", 3, 0, "abc")).toEqual("012abc345");
+    });
+
+
+    it("can remove and insert characters", () =>
+    {
+        expect(splice("012345", 3, 2, "abc")).toEqual("012abc5");
+    });
+
+
+    it("can insert at the beginning", () =>
+    {
+        expect(splice("012345", 0, 0, "abc")).toEqual("abc012345");
+    });
+
+
+    it("can insert at the end", () =>
+    {
+        expect(splice("012345", 6, 0, "abc")).toEqual("012345abc");
+    });
+
+
+    it("can delete at the beginning", () =>
+    {
+        expect(splice("012345", 0, 2, "")).toEqual("2345");
+    });
+
+
+    it("can delete at the end", () =>
+    {
+        expect(splice("012345", 5, 2, "")).toEqual("01234");
+    });
+
+
+    it("can specify negative index to make relative to the end", () =>
+    {
+        expect(splice("012345", -1, 1, "")).toEqual("01234");
+        expect(splice("012345", -2, 1, "")).toEqual("01235");
+    });
+
+
+    it("operates on the end if the index specified is too large", () =>
+    {
+        expect(splice("012345", 100, 50, "abc")).toEqual("012345abc");
+    });
+
+
+    it("operates on the beginning of a negative index is too large", () =>
+    {
+        expect(splice("012345", -100, 2, "abc")).toEqual("abc2345");
+    });
+
+
 });

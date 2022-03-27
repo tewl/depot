@@ -339,3 +339,27 @@ export function repeat(str: string, numChars: number): string
     const res = tooLong.substr(0, numChars);
     return res;
 }
+
+
+/**
+ * Removes and inserts characters at a specified index.
+ * @param str - The string to operate on
+ * @param index - The index where to delete and insert characters
+ * @param numCharsToDelete - The number of chars to delete
+ * @param insert - The string to be inserted
+ * @returns The resulting string
+ */
+export function splice(str: string, index: number, numCharsToDelete: number, insert: string): string
+{
+    // We cannot pass negative indexes directly to the 2nd slicing operation.
+    if (index < 0)
+    {
+        index = str.length + index;
+        if (index < 0)
+        {
+            index = 0;
+        }
+    }
+
+    return str.slice(0, index) + (insert || "") + str.slice(index + numCharsToDelete);
+}

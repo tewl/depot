@@ -1,5 +1,5 @@
 import { assertNever } from "./never";
-import {bindOption, isNone, isSome, mapSome, noneOption, Option, someOption} from "./option";
+import {bindOption, boolToOption, isNone, isSome, mapSome, noneOption, Option, someOption} from "./option";
 import { pipe } from "./pipe";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,5 +183,20 @@ describe("mapSome()", () =>
 
         expect(isSome(opt)).toBeTruthy();
         expect(opt.value).toEqual(6);
+    });
+});
+
+
+describe("boolToOption()", () =>
+{
+    it("returns some value when condition is true", () =>
+    {
+        expect(boolToOption(true, 5)).toEqual(someOption(5));
+    });
+
+
+    it("returns none value when condition is false", () =>
+    {
+        expect(boolToOption(false, 5)).toEqual(noneOption());
     });
 });

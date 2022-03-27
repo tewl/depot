@@ -138,3 +138,15 @@ export function mapSome<TInput, TOutput>(
         return input;
     }
 }
+
+
+
+export function boolToOption<TSome>(
+    condition: unknown,
+    trueSomeVal: TSome
+): Option<TSome>
+{
+    return condition ?
+        someOption(trueSomeVal) :
+        noneOption();
+}

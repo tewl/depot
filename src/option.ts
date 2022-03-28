@@ -143,12 +143,9 @@ export function mapSome<TInput, TOutput>(
 /**
  * Converts a boolean value into an Option.
  * @param condition - The condition.
- * @param trueSuccessVal - Value to be wrapped in a "Some" Option when
+ * @param trueSomeVal - Value to be wrapped in a "Some" Option when
  * _condition_ is truthy.
- * @param falseErrorVal - Value to be wrapped in a "None" Option when
- * _condition_ is falsy.
- * @returns An Option wrapping either of the specified values, determined by
- * _condition_.
+ * @returns The resulting Option.
  */
 export function boolToOption<TSome>(
     condition: unknown,

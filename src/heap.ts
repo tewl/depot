@@ -9,12 +9,14 @@ import { CompareFunc, CompareResult } from "./compare";
  *     in its children (and thus is also greater than or equal to all of the
  *     values in its subtrees).
  * 2. Shape
- *     A. All leaves are at depth d or d-1.
- *     B. All of the leaves at depth d-1 are to the right of the leaves at depth
- *        d.
- *     C. (1) There is at most 1 node with just 1 child.
- *        (2) That child is the left child of its parent.
- *        (3) It is the rightmost leaf at depth d.
+ *    Nodes are added to the binary tree from left to right in a breadth first
+ *    manner.
+ *      A. All leaves are at depth d or d-1.
+ *      B. All of the leaves at depth d-1 are to the right of the leaves at depth
+ *         d.
+ *      C. (1) There is at most 1 node with just 1 child.
+ *         (2) That child is the left child of its parent.
+ *         (3) It is the rightmost leaf at depth d.
  */
 export class Heap<T>
 {

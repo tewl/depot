@@ -440,7 +440,7 @@ describe("padRight()", () =>
 });
 
 
-fdescribe("repeat()", () =>
+describe("repeat()", () =>
 {
     it("repeats the string as expected when the number of chars requested is a whole multiple", () =>
     {

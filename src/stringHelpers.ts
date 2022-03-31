@@ -336,7 +336,7 @@ export function repeat(str: string, numChars: number): string
 {
     const repeatCount = Math.ceil(numChars / str.length);
     const tooLong = _.repeat(str, repeatCount);
-    const res = tooLong.substr(0, numChars);
+    const res = tooLong.slice(0, numChars);
     return res;
 }
 

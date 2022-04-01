@@ -114,56 +114,7 @@ export class DirectedGraph<TVertex, TEdgeAttr>
 
     public breadthFirstSearch(source: TVertex): IBfsResult<TVertex>
     {
-        // Initialize data structures.
-        const color: Map<TVertex, BfsPaintedColor> = new Map();
-        const dist: Map<TVertex, number> = new Map();
-        const pred: Map<TVertex, TVertex | undefined> = new Map();
-
-        const nonSourceVertices = difference(this.vertices, new Set([source]));
-        for (const curNonSourceVertex of nonSourceVertices)
-        {
-            color.set(curNonSourceVertex, BfsPaintedColor.White);
-            dist.set(curNonSourceVertex, Infinity);
-            pred.set(curNonSourceVertex, undefined);
-        }
-
-        color.set(source, BfsPaintedColor.Gray);
-        dist.set(source, 0);
-        pred.set(source, undefined);
-
-        // A queue of discovered vertices whose neighbors still need to be
-        // discovered (gray vertices).
-        const q: Array<TVertex> = [source];
-
-        while (q.length !== 0)
-        {
-            const u = q[0];
-            for (const curAdjInfo of this._adjMap.get(u)!)
-            {
-                const v = curAdjInfo.toVertex;
-                if (color.get(v) === BfsPaintedColor.White)
-                {
-                    // Vertex v is now discovered.
-                    color.set(v, BfsPaintedColor.Gray);
-                    dist.set(v, dist.get(u)! + 1);
-                    pred.set(v, u);
-
-                    // Put it in the gray queue so we will eventually discover
-                    // v's neighbors.
-                    q.push(v);
-                }
-            }
-
-            // All of u's neighbors were discovered in the above for loop.
-            // Therefore, this vertex is now black.
-            color.set(u, BfsPaintedColor.Black);
-            q.shift();
-        }
-
-        return {
-            distance:    dist,
-            predecessor: pred
-        };
+        return bfs(this._adjMap, source);
     }
 }
 
@@ -192,4 +143,76 @@ enum BfsPaintedColor
     White = 0,    // Undiscovered
     Gray = 1,     // Discovered but some neighbors are undiscovered
     Black = 2     // Discovered and all neighbors are discovered (all neighbors are black or gray)
+}
+
+
+function bfs<TVertex, TEdgeAttr>(
+    adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
+    source: TVertex,
+    stopPred: (discovered: Set<TVertex>) => boolean = () => false
+): IBfsResult<TVertex>
+{
+    // Initialize data structures.
+    const color: Map<TVertex, BfsPaintedColor> = new Map();
+    const dist: Map<TVertex, number> = new Map();
+    const pred: Map<TVertex, TVertex | undefined> = new Map();
+    const discovered: Set<TVertex> = new Set();
+
+    const allVertices = new Set(Array.from(adjMap.keys()));
+    const nonSourceVertices = difference(allVertices, new Set([source]));
+    for (const curNonSourceVertex of nonSourceVertices)
+    {
+        color.set(curNonSourceVertex, BfsPaintedColor.White);
+        dist.set(curNonSourceVertex, Infinity);
+        pred.set(curNonSourceVertex, undefined);
+    }
+
+    color.set(source, BfsPaintedColor.Gray);
+    discovered.add(source);
+    dist.set(source, 0);
+    pred.set(source, undefined);
+
+    // A queue of discovered vertices whose neighbors still need to be
+    // discovered (gray vertices).
+    const q: Array<TVertex> = [source];
+
+    while (q.length !== 0)
+    {
+        const u = q[0];
+        for (const curAdjInfo of adjMap.get(u)!)
+        {
+            const v = curAdjInfo.toVertex;
+            if (color.get(v) === BfsPaintedColor.White)
+            {
+                // Vertex v is now discovered.
+                color.set(v, BfsPaintedColor.Gray);
+                dist.set(v, dist.get(u)! + 1);
+                pred.set(v, u);
+                discovered.add(v);
+
+                // Invoke the stop predicate to see if we should stop searching.
+                if (stopPred(discovered))
+                {
+                    return {
+                        distance:    dist,
+                        predecessor: pred
+                    };
+                }
+
+                // Put v in the gray queue so we will eventually discover
+                // v's neighbors.
+                q.push(v);
+            }
+        }
+
+        // All of u's neighbors were discovered in the above for loop.
+        // Therefore, this vertex is now black.
+        color.set(u, BfsPaintedColor.Black);
+        q.shift();
+    }
+
+    return {
+        distance:    dist,
+        predecessor: pred
+    };
 }

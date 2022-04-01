@@ -52,6 +52,32 @@ describe("DirectedGraph()", () =>
         });
 
 
+        describe("findVertex()", () =>
+        {
+            it("returns the found vertex", () =>
+            {
+                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
+
+                // Example of using function.bind().
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const vt = digraph.findVertex(comparei.bind(null, "T"));
+                expect(vt).toEqual("t");
+
+                // Example of using a plain old lambda.
+                const vw = digraph.findVertex((vert) => comparei("W", vert));
+                expect(vw).toEqual("w");
+            });
+
+
+            it("return undefined when the predicate is never truthy", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const vt = digraph.findVertex((v) => false);
+                expect(vt).toBeUndefined();
+            });
+        });
+
+
         describe("breadthFirstSearch()", () =>
         {
             it("returns the expected output", () =>

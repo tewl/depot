@@ -1,6 +1,7 @@
 import { failedResult, Result, succeededResult } from "./result";
 import { difference } from "./setHelpers";
 
+
 export interface IAdjacencyInfo<TVertex, TEdgeAttr>
 {
     edgeAttr: TEdgeAttr;
@@ -82,8 +83,32 @@ export class DirectedGraph<TVertex, TEdgeAttr>
 
     public get vertices(): Set<TVertex>
     {
-        const keys = Array.from(this._adjMap.keys());
-        return new Set(keys);
+        const vertices = Array.from(this._adjMap.keys());
+        return new Set(vertices);
+    }
+
+
+    /**
+     * Iterates over this graph's vertices, returning the first vertex
+     * _predicate_ returns truthy for.  This facilitates getting the vertex when
+     * TVertex is a reference type.
+     * @param predicate - The function invoked on each vertex
+     * @returns The found vertex or undefined
+     */
+    public findVertex(predicate: (vertex: TVertex, allVertices: Set<TVertex>) => boolean): undefined | TVertex
+    {
+        const vertices = new Set(Array.from(this._adjMap.keys()));
+
+        for (const curVertex of vertices)
+        {
+            const predicateResult = predicate(curVertex, vertices);
+            if (predicateResult)
+            {
+                return curVertex;
+            }
+        }
+
+        return undefined;
     }
 
 

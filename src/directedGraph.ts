@@ -185,8 +185,8 @@ function bfs<TVertex, TEdgeAttr>(
     dist.set(source, 0);
     pred.set(source, undefined);
 
-    // A queue of discovered vertices whose neighbors still need to be
-    // discovered (gray vertices).
+    // A queue of discovered (gray) vertices whose neighbors may be
+    // undiscovered.
     const q: Array<TVertex> = [source];
 
     while (q.length !== 0)

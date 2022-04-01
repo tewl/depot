@@ -166,7 +166,16 @@ export class DirectedGraph<TVertex, TEdgeAttr>
 
 export interface IBfsResult<TVertex>
 {
+    /**
+     * The distance from the keyed vertex to the source node. Vertices that have
+     * no path to the source vertex will have a distance of Infinity.
+     */
     distance: Map<TVertex, number>;
+    /**
+     * Each vertex's predecessor along the shortest path to the source vertex.
+     * Undefined if the vertex has no path to the source node or the vertex is
+     * the source vertex.
+     */
     predecessor: Map<TVertex, TVertex | undefined>;
 }
 

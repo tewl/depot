@@ -83,8 +83,7 @@ export class DirectedGraph<TVertex, TEdgeAttr>
 
     public get vertices(): Set<TVertex>
     {
-        const vertices = Array.from(this._adjMap.keys());
-        return new Set(vertices);
+        return new Set(this._adjMap.keys());
     }
 
 
@@ -112,7 +111,7 @@ export class DirectedGraph<TVertex, TEdgeAttr>
     }
 
 
-    public breadthFirstSearch(source: TVertex): IBfsResult<TVertex>
+    public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string>
     {
         return bfs(this._adjMap, source);
     }
@@ -158,15 +157,21 @@ function bfs<TVertex, TEdgeAttr>(
     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
     source: TVertex,
     stopPred: (discovered: Set<TVertex>) => boolean = () => false
-): IBfsResult<TVertex>
+): Result<IBfsResult<TVertex>, string>
 {
+    const allVertices = new Set(adjMap.keys());
+    if (!allVertices.has(source))
+    {
+        const sourceText = JSON.stringify(source);
+        return failedResult(`Source vertex ${sourceText} is not a vertex in the graph.`);
+    }
+
     // Initialize data structures.
     const color: Map<TVertex, BfsPaintedColor> = new Map();
     const dist: Map<TVertex, number> = new Map();
     const pred: Map<TVertex, TVertex | undefined> = new Map();
     const discovered: Set<TVertex> = new Set();
 
-    const allVertices = new Set(Array.from(adjMap.keys()));
     const nonSourceVertices = difference(allVertices, new Set([source]));
     for (const curNonSourceVertex of nonSourceVertices)
     {
@@ -201,7 +206,7 @@ function bfs<TVertex, TEdgeAttr>(
                 // Invoke the stop predicate to see if we should stop searching.
                 if (stopPred(discovered))
                 {
-                    return { distance: dist, predecessor: pred };
+                    return succeededResult({distance: dist, predecessor: pred});
                 }
 
                 // Put v in the gray queue so we will eventually discover
@@ -216,5 +221,53 @@ function bfs<TVertex, TEdgeAttr>(
         q.shift();
     }
 
-    return { distance: dist, predecessor: pred };
+    return succeededResult({distance: dist, predecessor: pred});
 }
+
+
+// function getEdge<TVertex, TEdgeAttr>(
+//     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
+//     fromVertex: TVertex,
+//     toVertex: TVertex
+// ): undefined | IEdge<TVertex, TEdgeAttr>
+// {
+//     const adjList = adjMap.get(fromVertex);
+//     if (!adjList)
+//     {
+//         return undefined;
+//     }
+//
+//     const foundNeighbor = adjList.find((curAdjInfo) => curAdjInfo.toVertex === toVertex);
+//     if (!foundNeighbor)
+//     {
+//         return undefined;
+//     }
+//
+//     // Note: This returned edge should not be compared to the edges specified
+//     // during creation, because this is a different object (reference equality).
+//     return {
+//         fromVertex: fromVertex,
+//         toVertex:   toVertex,
+//         edgeAttr:   foundNeighbor.edgeAttr
+//     };
+//
+// }
+
+
+// function predecessorsToPath<TVertex>(
+//     predecessor: Map<TVertex, TVertex | undefined>,
+//     destVertex: TVertex
+// ): Array<IEdge<TVertex, TEdgeAttr>>
+// {
+//
+// }
+
+
+// function shortestPath<TVertex, TEdgeAttr>(
+//     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
+//     startVertex: TVertex,
+//     endVertex: TVertex
+// ): Array<TVertex>
+// {
+//     bfs
+// }

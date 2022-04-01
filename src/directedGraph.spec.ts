@@ -65,17 +65,6 @@ describe("DirectedGraph()", () =>
             });
 
 
-            it("returns the found vertex (function.bind() example)", () =>
-            {
-                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
-
-                // Example of using function.bind().
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const vt = digraph.findVertex(comparei.bind(null, "T"));
-                expect(vt).toEqual("t");
-            });
-
-
             it("returns the found vertex", () =>
             {
                 const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
@@ -91,6 +80,17 @@ describe("DirectedGraph()", () =>
 
                 const digraph = DirectedGraph.create(vertices, edges).value!;
                 const vt = digraph.findVertex(createFindFn("T"));
+                expect(vt).toEqual("t");
+            });
+
+
+            it("returns the found vertex (function.bind() example)", () =>
+            {
+                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
+
+                // Example of using function.bind().
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const vt = digraph.findVertex(comparei.bind(null, "T"));
                 expect(vt).toEqual("t");
             });
 
@@ -156,7 +156,9 @@ describe("DirectedGraph()", () =>
             it("returns the expected output", () =>
             {
                 const digraph = DirectedGraph.create(vertices, edges).value!;
-                const {distance, predecessor} = digraph.breadthFirstSearch("s");
+                const searchRes = digraph.breadthFirstSearch("s");
+                expect(succeeded(searchRes)).toBeTrue();
+                const {distance, predecessor} = searchRes.value!;
                 expect(distance).toEqual(new Map([
                     ["r", 1],
                     ["s", 0],
@@ -177,6 +179,14 @@ describe("DirectedGraph()", () =>
                     ["x", "w"],
                     ["y", "x"]
                 ]));
+            });
+
+
+            it("fails when the source node does not exist in the graph", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const searchRes = digraph.breadthFirstSearch("a");
+                expect(failed(searchRes)).toBeTrue();
             });
         });
     });

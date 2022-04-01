@@ -138,7 +138,8 @@ export class DirectedGraph<TVertex, TEdgeAttr>
         while (q.length !== 0)
         {
             const u = q[0];
-            for (const curAdjInfo of this._adjMap.get(u)!) {
+            for (const curAdjInfo of this._adjMap.get(u)!)
+            {
                 const v = curAdjInfo.toVertex;
                 if (color.get(v) === BfsPaintedColor.White)
                 {

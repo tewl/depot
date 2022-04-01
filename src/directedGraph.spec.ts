@@ -42,6 +42,16 @@ describe("DirectedGraph()", () =>
 
     describe("instance", () =>
     {
+        describe("vertices property", () =>
+        {
+            it("contains the graphs's vertices", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                expect(digraph.vertices).toEqual(new Set(["r", "s", "t", "u", "v", "w", "x", "y"]));
+            });
+        });
+
+
         describe("breadthFirstSearch()", () =>
         {
             it("returns the expected output", () =>
@@ -71,5 +81,4 @@ describe("DirectedGraph()", () =>
             });
         });
     });
-
 });

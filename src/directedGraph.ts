@@ -146,6 +146,14 @@ enum BfsPaintedColor
 }
 
 
+/**
+ * Performs a breadth-first search.
+ * @param adjMap - The graph's adjacency map
+ * @param source - The vertex to start searching from
+ * @param stopPred - A predicate that returns truthy to stop searching early.
+ * The vertices discovered so far are passed in.
+ * @returns The results of the search.
+ */
 function bfs<TVertex, TEdgeAttr>(
     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
     source: TVertex,

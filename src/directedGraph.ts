@@ -201,10 +201,7 @@ function bfs<TVertex, TEdgeAttr>(
                 // Invoke the stop predicate to see if we should stop searching.
                 if (stopPred(discovered))
                 {
-                    return {
-                        distance:    dist,
-                        predecessor: pred
-                    };
+                    return { distance: dist, predecessor: pred };
                 }
 
                 // Put v in the gray queue so we will eventually discover
@@ -219,8 +216,5 @@ function bfs<TVertex, TEdgeAttr>(
         q.shift();
     }
 
-    return {
-        distance:    dist,
-        predecessor: pred
-    };
+    return { distance: dist, predecessor: pred };
 }

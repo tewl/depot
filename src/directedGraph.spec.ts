@@ -39,4 +39,37 @@ describe("DirectedGraph()", () =>
         });
     });
 
+
+    describe("instance", () =>
+    {
+        describe("breadthFirstSearch()", () =>
+        {
+            it("returns the expected output", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const {distance, predecessor} = digraph.breadthFirstSearch("s");
+                expect(distance).toEqual(new Map([
+                    ["r", 1],
+                    ["s", 0],
+                    ["t", 2],
+                    ["u", 3],
+                    ["v", 2],
+                    ["w", 1],
+                    ["x", 2],
+                    ["y", 3]
+                ]));
+                expect(predecessor).toEqual(new Map([
+                    ["r", "s"],
+                    ["s", undefined],
+                    ["t", "w"],
+                    ["u", "t"],
+                    ["v", "r"],
+                    ["w", "s"],
+                    ["x", "w"],
+                    ["y", "x"]
+                ]));
+            });
+        });
+    });
+
 });

@@ -148,8 +148,10 @@ export class DirectedGraph<TVertex, TEdgeAttr>
                 }
             }
 
-            q.shift();
+            // All of u's neighbors were discovered in the above for loop.
+            // Therefore, this vertex is now black.
             color.set(u, BfsPaintedColor.Black);
+            q.shift();
         }
 
         return {
@@ -172,7 +174,7 @@ export interface IBfsResult<TVertex>
  */
 enum BfsPaintedColor
 {
-    White = 0,    // Unvisited
-    Gray = 1,     // Visited but has some white neighbors
-    Black = 2     // Visited and all neighbors are black or gray
+    White = 0,    // Undiscovered
+    Gray = 1,     // Discovered but some neighbors are undiscovered
+    Black = 2     // Discovered and all neighbors are discovered (all neighbors are black or gray)
 }

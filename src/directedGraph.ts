@@ -131,7 +131,7 @@ export class DirectedGraph<TVertex, TEdgeAttr>
         dist.set(source, 0);
         pred.set(source, undefined);
 
-        // A queue discovered vertices whose neighbors still need to be
+        // A queue of discovered vertices whose neighbors still need to be
         // discovered (gray vertices).
         const q: Array<TVertex> = [source];
 
@@ -143,9 +143,13 @@ export class DirectedGraph<TVertex, TEdgeAttr>
                 const v = curAdjInfo.toVertex;
                 if (color.get(v) === BfsPaintedColor.White)
                 {
+                    // Vertex v is now discovered.
                     color.set(v, BfsPaintedColor.Gray);
                     dist.set(v, dist.get(u)! + 1);
                     pred.set(v, u);
+
+                    // Put it in the gray queue so we will eventually discover
+                    // v's neighbors.
                     q.push(v);
                 }
             }

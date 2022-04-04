@@ -3,7 +3,7 @@ import { assertNever } from "./never";
 import { NIError } from "./niError";
 
 
-fdescribe("NIError", () =>
+describe("NIError", () =>
 {
     describe("Usage", () =>
     {

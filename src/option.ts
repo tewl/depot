@@ -23,6 +23,13 @@ export interface INoneOption
     readonly value: undefined;
 }
 
+
+/**
+ * The one-and-only None value.  Using this single instance saves memory.
+ *
+ * Note: This also allows equality operations, but that is discouraged, because
+ * clients can always create their own instances.  It is better to use IsNone().
+ */
 const noneVal: INoneOption = { state: "none", value: undefined };
 
 

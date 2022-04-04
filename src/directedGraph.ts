@@ -1,27 +1,32 @@
-import { failedResult, Result, succeededResult } from "./result";
+import { failed, failedResult, Result, succeededResult } from "./result";
+import { mapWhileSuccessful } from "./resultHelpers";
 import { difference } from "./setHelpers";
+import { noneOption, Option, someOption } from "./option";
 
 
-export interface IAdjacencyInfo<TVertex, TEdgeAttr>
+export interface IAdjacencyInfo<TVertex, TEdge>
 {
-    edgeAttr: TEdgeAttr;
+    edgeAttr: TEdge;
     toVertex: TVertex;
 }
 
 
-// export type DirectedGraph<TVertex, TEdgeAttr> = Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdgeAttr>>>;
-export type AdjacencyMap<TVertex, TEdgeAttr> = Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdgeAttr>>>;
+export type AdjacencyMap<TVertex, TEdge> = Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdge>>>;
 
 
-export interface IEdge<TVertex, TEdgeAttr>
+export interface IEdge<TVertex, TEdge>
 {
     fromVertex: TVertex;
     toVertex: TVertex;
-    edgeAttr: TEdgeAttr;
+    edgeAttr: TEdge;
 }
 
 
-export class DirectedGraph<TVertex, TEdgeAttr>
+/**
+ * Models a directed graph.  Each vertex has type TVertex and each edge has
+ * attached data of type TEdge.
+ */
+export class DirectedGraph<TVertex, TEdge>
 {
     /**
      * Creates a new DirectedGraph instance.
@@ -31,12 +36,12 @@ export class DirectedGraph<TVertex, TEdgeAttr>
      * @returns A Result for the new instance. If there was an error, a failure
      * Result containing an error message string.
      */
-    public static create<TVertex, TEdgeAttr>(
+    public static create<TVertex, TEdge>(
         vertices: Set<TVertex>,
-        edges: Array<IEdge<TVertex, TEdgeAttr>>
-    ): Result<DirectedGraph<TVertex, TEdgeAttr>, string>
+        edges: Array<IEdge<TVertex, TEdge>>
+    ): Result<DirectedGraph<TVertex, TEdge>, string>
     {
-        const adjMap: AdjacencyMap<TVertex, TEdgeAttr> = new Map();
+        const adjMap: AdjacencyMap<TVertex, TEdge> = new Map();
 
         // Create an empty adjacency map with an entry for each vertex.
         for (const curVertex of vertices)
@@ -69,13 +74,15 @@ export class DirectedGraph<TVertex, TEdgeAttr>
         return succeededResult(inst);
     }
 
-    private readonly _adjMap: AdjacencyMap<TVertex, TEdgeAttr>;
+
+    private readonly _adjMap: AdjacencyMap<TVertex, TEdge>;
+
 
     /**
      * Private constructor.  Use static methods to create instances.
      * @param adjMap - The adjacency map defining the graph.
      */
-    private constructor(adjMap: AdjacencyMap<TVertex, TEdgeAttr>)
+    private constructor(adjMap: AdjacencyMap<TVertex, TEdge>)
     {
         this._adjMap = adjMap;
     }
@@ -111,9 +118,29 @@ export class DirectedGraph<TVertex, TEdgeAttr>
     }
 
 
+    /**
+     * Performs a breadth-first search from the specified source node.  This
+     * results in each node's minimal distance from _source_ and the predecessor
+     * each node has in its shortest path to _source_.
+     * @param source  - The vertex to start searching from
+     * @returns The results of the search
+     */
     public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string>
     {
         return bfs(this._adjMap, source);
+    }
+
+
+    /**
+     * Find the specified edge within this graph.
+     * @param fromVertex - Originating vertex of the edge being retrieved
+     * @param toVertex - Destination vertex of the edge being retrieved
+     * @returns If found, a Some option wrapping the edge's value.  A None
+     * option if there is no edge connecting the specified vertices.
+     */
+    public getEdge(fromVertex: TVertex, toVertex: TVertex): Option<TEdge>
+    {
+        return getEdge(this._adjMap, fromVertex, toVertex);
     }
 }
 
@@ -146,15 +173,17 @@ enum BfsPaintedColor
 
 
 /**
- * Performs a breadth-first search.
+ * Performs a breadth-first search from the specified source node.  This results
+ * in each node's minimal distance from _source_ and the predecessor each node
+ * has in its shortest path to _source_.
  * @param adjMap - The graph's adjacency map
  * @param source - The vertex to start searching from
  * @param stopPred - A predicate that returns truthy to stop searching early.
  * The vertices discovered so far are passed in.
- * @returns The results of the search.
+ * @returns The results of the search
  */
-function bfs<TVertex, TEdgeAttr>(
-    adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
+function bfs<TVertex, TEdge>(
+    adjMap: AdjacencyMap<TVertex, TEdge>,
     source: TVertex,
     stopPred: (discovered: Set<TVertex>) => boolean = () => false
 ): Result<IBfsResult<TVertex>, string>
@@ -225,46 +254,50 @@ function bfs<TVertex, TEdgeAttr>(
 }
 
 
-// function getEdge<TVertex, TEdgeAttr>(
-//     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
-//     fromVertex: TVertex,
-//     toVertex: TVertex
-// ): undefined | IEdge<TVertex, TEdgeAttr>
-// {
-//     const adjList = adjMap.get(fromVertex);
-//     if (!adjList)
-//     {
-//         return undefined;
-//     }
-//
-//     const foundNeighbor = adjList.find((curAdjInfo) => curAdjInfo.toVertex === toVertex);
-//     if (!foundNeighbor)
-//     {
-//         return undefined;
-//     }
-//
-//     // Note: This returned edge should not be compared to the edges specified
-//     // during creation, because this is a different object (reference equality).
-//     return {
-//         fromVertex: fromVertex,
-//         toVertex:   toVertex,
-//         edgeAttr:   foundNeighbor.edgeAttr
-//     };
-//
-// }
+/**
+ * Finds the specified edge within the graph.
+ * @param adjMap - The graph's adjacency map.
+ * @param fromVertex - Originating vertex of the edge being retrieved
+ * @param toVertex  - Destination vertex of the edge being retrieved
+ * @returns If found, a Some option wrapping the edge's value.  A None option
+ * if there is no edge connecting the specified vertices.
+ */
+function getEdge<TVertex, TEdge>(
+    adjMap: AdjacencyMap<TVertex, TEdge>,
+    fromVertex: TVertex,
+    toVertex: TVertex
+): Option<TEdge>
+{
+    const vertices = new Set(adjMap.keys());
+    const validationRes = mapWhileSuccessful(
+        [fromVertex, toVertex],
+        (v) => vertices.has(v) ?
+                succeededResult(v) :
+                failedResult(`Vertex ${JSON.stringify(v)} is not a vertex in this graph.`)
+    );
+    if (failed(validationRes))
+    {
+        throw new Error(validationRes.error);
+    }
+
+    const adjInfo =
+        adjMap.get(fromVertex)
+        ?.find((curAdjInfo) => curAdjInfo.toVertex === toVertex);
+
+    if (adjInfo)
+    {
+        return someOption(adjInfo.edgeAttr);
+    }
+    else
+    {
+        // There is no edge connecting the two vertices.
+        return noneOption();
+    }
+}
 
 
-// function predecessorsToPath<TVertex>(
-//     predecessor: Map<TVertex, TVertex | undefined>,
-//     destVertex: TVertex
-// ): Array<IEdge<TVertex, TEdgeAttr>>
-// {
-//
-// }
-
-
-// function shortestPath<TVertex, TEdgeAttr>(
-//     adjMap: AdjacencyMap<TVertex, TEdgeAttr>,
+// function shortestPath<TVertex, TEdge>(
+//     adjMap: AdjacencyMap<TVertex, TEdge>,
 //     startVertex: TVertex,
 //     endVertex: TVertex
 // ): Array<TVertex>

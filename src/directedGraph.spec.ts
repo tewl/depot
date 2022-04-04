@@ -1,19 +1,20 @@
 import * as _ from "lodash";
 import { DirectedGraph } from "./directedGraph";
+import { isNone, isSome } from "./option";
 import { failed, succeeded } from "./result";
 
 
 const vertices = new Set(["r", "s", "t", "u", "v", "w", "x", "y"]);
 const edges = [
-    {fromVertex: "s", toVertex: "r", edgeAttr: undefined},
-    {fromVertex: "r", toVertex: "v", edgeAttr: undefined},
-    {fromVertex: "s", toVertex: "w", edgeAttr: undefined},
-    {fromVertex: "w", toVertex: "t", edgeAttr: undefined},
-    {fromVertex: "w", toVertex: "x", edgeAttr: undefined},
-    {fromVertex: "x", toVertex: "t", edgeAttr: undefined},
-    {fromVertex: "t", toVertex: "u", edgeAttr: undefined},
-    {fromVertex: "x", toVertex: "y", edgeAttr: undefined},
-    {fromVertex: "u", toVertex: "y", edgeAttr: undefined},
+    {fromVertex: "s", toVertex: "r", edgeAttr: "sr"},
+    {fromVertex: "r", toVertex: "v", edgeAttr: "rv"},
+    {fromVertex: "s", toVertex: "w", edgeAttr: "sw"},
+    {fromVertex: "w", toVertex: "t", edgeAttr: "wt"},
+    {fromVertex: "w", toVertex: "x", edgeAttr: "wx"},
+    {fromVertex: "x", toVertex: "t", edgeAttr: "xt"},
+    {fromVertex: "t", toVertex: "u", edgeAttr: "tu"},
+    {fromVertex: "x", toVertex: "y", edgeAttr: "xy"},
+    {fromVertex: "u", toVertex: "y", edgeAttr: "uy"},
 ];
 
 
@@ -30,9 +31,9 @@ describe("DirectedGraph()", () =>
             });
 
 
-            it("fails when given invalid data", () =>
+            it("fails when given invalid data (a vertex does not exist)", () =>
             {
-                const invalidEdges = edges.concat({fromVertex: "a", toVertex: "s", edgeAttr: undefined});
+                const invalidEdges = edges.concat({fromVertex: "a", toVertex: "s", edgeAttr: "as"});
                 const createRes = DirectedGraph.create(vertices, invalidEdges);
                 expect(failed(createRes)).toBeTrue();
                 expect(createRes.error).toEqual('Edge specifies a fromVertex of "a" which is not in the vertex collection.');
@@ -189,5 +190,26 @@ describe("DirectedGraph()", () =>
                 expect(failed(searchRes)).toBeTrue();
             });
         });
+
+
+        describe("getEdge()", () =>
+        {
+            it("when the edge exists returns the edge's value", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const edgeOpt = digraph.getEdge("t", "u");
+                expect(isSome(edgeOpt)).toBeTrue();
+                expect(edgeOpt.value).toEqual("tu");
+            });
+
+
+            it("when the edge does not exist return None", () =>
+            {
+                const digraph = DirectedGraph.create(vertices, edges).value!;
+                const edgeOpt = digraph.getEdge("s", "t");
+                expect(isNone(edgeOpt)).toBeTrue();
+            });
+        });
+
     });
 });

@@ -11,7 +11,8 @@ export interface IAdjacencyInfo<TVertex, TEdge>
 }
 
 
-export type AdjacencyMap<TVertex, TEdge> = Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdge>>>;
+export type AdjacencyMap<TVertex, TEdge> =
+    Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdge>>>;
 
 
 export interface IEdge<TVertex, TEdge>
@@ -94,53 +95,34 @@ export class DirectedGraph<TVertex, TEdge>
     }
 
 
-    /**
-     * Iterates over this graph's vertices, returning the first vertex
-     * _predicate_ returns truthy for.  This facilitates getting the vertex when
-     * TVertex is a reference type.
-     * @param predicate - The function invoked on each vertex
-     * @returns The found vertex or undefined
-     */
-    public findVertex(predicate: (vertex: TVertex, allVertices: Set<TVertex>) => boolean): undefined | TVertex
+    public get edges(): Array<IEdge<TVertex, TEdge>>
     {
-        const vertices = new Set(Array.from(this._adjMap.keys()));
-
-        for (const curVertex of vertices)
+        const edges: Array<IEdge<TVertex, TEdge>> = [];
+        for (const [fromVertex, adjList] of this._adjMap.entries())
         {
-            const predicateResult = predicate(curVertex, vertices);
-            if (predicateResult)
+            for (const adjInfo of adjList)
             {
-                return curVertex;
+                edges.push({
+                    fromVertex: fromVertex,
+                    toVertex:   adjInfo.toVertex,
+                    edgeAttr:   adjInfo.edgeAttr
+                });
             }
         }
-
-        return undefined;
+        return edges;
     }
 
 
     /**
      * Performs a breadth-first search from the specified source node.  This
-     * results in each node's minimal distance from _source_ and the predecessor
-     * each node has in its shortest path to _source_.
+     * results in each vertex's minimal distance from _source_ and the predecessor
+     * each vertex has in its shortest path to _source_.
      * @param source  - The vertex to start searching from
      * @returns The results of the search
      */
     public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string>
     {
         return bfs(this._adjMap, source);
-    }
-
-
-    /**
-     * Find the specified edge within this graph.
-     * @param fromVertex - Originating vertex of the edge being retrieved
-     * @param toVertex - Destination vertex of the edge being retrieved
-     * @returns If found, a Some option wrapping the edge's value.  A None
-     * option if there is no edge connecting the specified vertices.
-     */
-    public getEdge(fromVertex: TVertex, toVertex: TVertex): Option<TEdge>
-    {
-        return getEdge(this._adjMap, fromVertex, toVertex);
     }
 }
 
@@ -174,7 +156,7 @@ enum BfsPaintedColor
 
 /**
  * Performs a breadth-first search from the specified source node.  This results
- * in each node's minimal distance from _source_ and the predecessor each node
+ * in each vertex's minimal distance from _source_ and the predecessor each vertex
  * has in its shortest path to _source_.
  * @param adjMap - The graph's adjacency map
  * @param source - The vertex to start searching from
@@ -251,48 +233,6 @@ function bfs<TVertex, TEdge>(
     }
 
     return succeededResult({distance: dist, predecessor: pred});
-}
-
-
-/**
- * Finds the specified edge within the graph.
- * @param adjMap - The graph's adjacency map.
- * @param fromVertex - Originating vertex of the edge being retrieved
- * @param toVertex  - Destination vertex of the edge being retrieved
- * @returns If found, a Some option wrapping the edge's value.  A None option
- * if there is no edge connecting the specified vertices.
- */
-function getEdge<TVertex, TEdge>(
-    adjMap: AdjacencyMap<TVertex, TEdge>,
-    fromVertex: TVertex,
-    toVertex: TVertex
-): Option<TEdge>
-{
-    const vertices = new Set(adjMap.keys());
-    const validationRes = mapWhileSuccessful(
-        [fromVertex, toVertex],
-        (v) => vertices.has(v) ?
-                succeededResult(v) :
-                failedResult(`Vertex ${JSON.stringify(v)} is not a vertex in this graph.`)
-    );
-    if (failed(validationRes))
-    {
-        throw new Error(validationRes.error);
-    }
-
-    const adjInfo =
-        adjMap.get(fromVertex)
-        ?.find((curAdjInfo) => curAdjInfo.toVertex === toVertex);
-
-    if (adjInfo)
-    {
-        return someOption(adjInfo.edgeAttr);
-    }
-    else
-    {
-        // There is no edge connecting the two vertices.
-        return noneOption();
-    }
 }
 
 

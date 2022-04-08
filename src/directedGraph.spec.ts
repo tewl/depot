@@ -54,100 +54,22 @@ describe("DirectedGraph()", () =>
         });
 
 
-        describe("findVertex()", () =>
+        describe("edges property", () =>
         {
-            it("returns the found vertex", () =>
-            {
-                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
-
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const vw = digraph.findVertex((vert) => comparei("W", vert));
-                expect(vw).toEqual("w");
-            });
-
-
-            it("returns the found vertex", () =>
-            {
-                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
-
-                const createFindFn = (vertex: string) =>
-                {
-                    function findFn(curVertex: string)
-                    {
-                        return comparei(vertex, curVertex);
-                    }
-                    return findFn;
-                };
-
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const vt = digraph.findVertex(createFindFn("T"));
-                expect(vt).toEqual("t");
-            });
-
-
-            it("returns the found vertex (function.bind() example)", () =>
-            {
-                const comparei = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
-
-                // Example of using function.bind().
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const vt = digraph.findVertex(comparei.bind(null, "T"));
-                expect(vt).toEqual("t");
-            });
-
-
-            it("returns the found vertex (_.isEqual example)", () =>
-            {
-                // Convert the vertices into objects.  To facilitate this create
-                // a map of name to vertex object.
-                const vertexMap =
-                    new Map(
-                        Array.from(vertices.values())
-                        .map((vertName) => [vertName, {name: vertName}] as const)
-                    );
-                const objVertices = new Set(Array.from(vertexMap.values()));
-                const objEdges = edges.map((curEdge) => ({
-                    fromVertex: vertexMap.get(curEdge.fromVertex)!,
-                    toVertex:   vertexMap.get(curEdge.toVertex)!,
-                    edgeAttr:   curEdge.edgeAttr
-                }));
-                const digraph = DirectedGraph.create(objVertices, objEdges).value!;
-
-                // _.isEqual performs a deep comparison.
-                const vw = digraph.findVertex((v) => _.isEqual({name: "w"}, v));
-                expect(vw).toEqual(vertexMap.get("w"));
-            });
-
-
-            it("returns the found vertex (_.matches example)", () =>
-            {
-                // Convert the vertices into objects that have properties we
-                // will be uninterested in when finding a vertex.
-                const vertexMap =
-                    new Map(
-                        Array.from(vertices.values())
-                        .map((vertName) => [vertName, {name: vertName, dontCareA: "foo", dontCareB: "bar" }] as const)
-                    );
-                const objVertices = new Set(Array.from(vertexMap.values()));
-                const objEdges = edges.map((curEdge) => ({
-                    fromVertex: vertexMap.get(curEdge.fromVertex)!,
-                    toVertex:   vertexMap.get(curEdge.toVertex)!,
-                    edgeAttr:   curEdge.edgeAttr
-                }));
-                const digraph = DirectedGraph.create(objVertices, objEdges).value!;
-
-                // _.matches will only compare the specified properties.
-                const vw = digraph.findVertex(_.matches({name: "w"}));
-                expect(vw).toEqual(vertexMap.get("w"));
-
-            });
-
-
-            it("return undefined when the predicate is never truthy", () =>
+            it("contains the graph's edges", () =>
             {
                 const digraph = DirectedGraph.create(vertices, edges).value!;
-                const vt = digraph.findVertex((v) => false);
-                expect(vt).toBeUndefined();
+                expect(digraph.edges).toEqual([
+                    { fromVertex: "r", toVertex: "v", edgeAttr: "rv" },
+                    { fromVertex: "s", toVertex: "r", edgeAttr: "sr" },
+                    { fromVertex: "s", toVertex: "w", edgeAttr: "sw" },
+                    { fromVertex: "t", toVertex: "u", edgeAttr: "tu" },
+                    { fromVertex: "u", toVertex: "y", edgeAttr: "uy" },
+                    { fromVertex: "w", toVertex: "t", edgeAttr: "wt" },
+                    { fromVertex: "w", toVertex: "x", edgeAttr: "wx" },
+                    { fromVertex: "x", toVertex: "t", edgeAttr: "xt" },
+                    { fromVertex: "x", toVertex: "y", edgeAttr: "xy" }
+                ]);
             });
         });
 
@@ -190,26 +112,5 @@ describe("DirectedGraph()", () =>
                 expect(failed(searchRes)).toBeTrue();
             });
         });
-
-
-        describe("getEdge()", () =>
-        {
-            it("when the edge exists returns the edge's value", () =>
-            {
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const edgeOpt = digraph.getEdge("t", "u");
-                expect(isSome(edgeOpt)).toBeTrue();
-                expect(edgeOpt.value).toEqual("tu");
-            });
-
-
-            it("when the edge does not exist return None", () =>
-            {
-                const digraph = DirectedGraph.create(vertices, edges).value!;
-                const edgeOpt = digraph.getEdge("s", "t");
-                expect(isNone(edgeOpt)).toBeTrue();
-            });
-        });
-
     });
 });

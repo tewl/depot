@@ -118,11 +118,20 @@ export class DirectedGraph<TVertex, TEdge>
      * results in each vertex's minimal distance from _source_ and the predecessor
      * each vertex has in its shortest path to _source_.
      * @param source  - The vertex to start searching from
-     * @returns The results of the search
+     * @returns The result of the search
      */
     public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string>
     {
         return bfs(this._adjMap, source);
+    }
+
+    /**
+     * Performs a depth-first search of this graph.
+     * @returns The results of the search
+     */
+    public depthFirstSearch(): IDfsResult<TVertex>
+    {
+        return dfs(this._adjMap);
     }
 }
 
@@ -146,7 +155,7 @@ export interface IBfsResult<TVertex>
 /**
  * Colors nodes are painted with while traversing a graph.
  */
-enum BfsPaintedColor
+enum PaintedColor
 {
     White = 0,    // Undiscovered
     Gray = 1,     // Discovered but some neighbors are undiscovered
@@ -178,7 +187,7 @@ function bfs<TVertex, TEdge>(
     }
 
     // Initialize data structures.
-    const color: Map<TVertex, BfsPaintedColor> = new Map();
+    const color: Map<TVertex, PaintedColor> = new Map();
     const dist: Map<TVertex, number> = new Map();
     const pred: Map<TVertex, TVertex | undefined> = new Map();
     const discovered: Set<TVertex> = new Set();
@@ -186,12 +195,12 @@ function bfs<TVertex, TEdge>(
     const nonSourceVertices = difference(allVertices, new Set([source]));
     for (const curNonSourceVertex of nonSourceVertices)
     {
-        color.set(curNonSourceVertex, BfsPaintedColor.White);
+        color.set(curNonSourceVertex, PaintedColor.White);
         dist.set(curNonSourceVertex, Infinity);
         pred.set(curNonSourceVertex, undefined);
     }
 
-    color.set(source, BfsPaintedColor.Gray);
+    color.set(source, PaintedColor.Gray);
     discovered.add(source);
     dist.set(source, 0);
     pred.set(source, undefined);
@@ -206,10 +215,10 @@ function bfs<TVertex, TEdge>(
         for (const curAdjInfo of adjMap.get(u)!)
         {
             const v = curAdjInfo.toVertex;
-            if (color.get(v) === BfsPaintedColor.White)
+            if (color.get(v) === PaintedColor.White)
             {
                 // Vertex v is now discovered.
-                color.set(v, BfsPaintedColor.Gray);
+                color.set(v, PaintedColor.Gray);
                 dist.set(v, dist.get(u)! + 1);
                 pred.set(v, u);
                 discovered.add(v);
@@ -228,11 +237,91 @@ function bfs<TVertex, TEdge>(
 
         // All of u's neighbors were discovered in the above for loop.
         // Therefore, this vertex is now black.
-        color.set(u, BfsPaintedColor.Black);
+        color.set(u, PaintedColor.Black);
         q.shift();
     }
 
     return succeededResult({distance: dist, predecessor: pred});
+}
+
+
+export interface IDfsResult<TVertex>
+{
+    /**
+     * Each vertex's predecessor within a tree of the resulting depth-first
+     * forest.  Undefined indicates the vertex is the root of tree within the
+     * resulting depth-first forest.
+     */
+    predecessor: Map<TVertex, TVertex | undefined>;
+    /**
+     * A timestamp indicating when the vertex was discovered during the
+     * depth-first search.  Used to classify the edges of the graph.
+     */
+    discoveryTimestamp: Map<TVertex, number>;
+    /**
+     * A timestamp indicating when the vertex was done being explored during the
+     * depth-first search.  Used when performing a topological sort or finding
+     * strongly connected components.
+     */
+    finishTimestamp: Map<TVertex, number>;
+}
+
+
+/**
+ * Performs a depth-first search of the specified graph.
+ * @param adjMap - The graph's adjacency map
+ * @returns The result of the search
+ */
+function dfs<TVertex, TEdge>(
+    adjMap: AdjacencyMap<TVertex, TEdge>
+): IDfsResult<TVertex>
+{
+    const color: Map<TVertex, PaintedColor> = new Map();
+    const pred: Map<TVertex, TVertex | undefined> = new Map();
+    const discoveryTimestamp: Map<TVertex, number> = new Map();
+    const finishTimestamp: Map<TVertex, number> = new Map();
+    for (const curVertex of adjMap.keys()) {
+        color.set(curVertex, PaintedColor.White);
+        pred.set(curVertex, undefined);
+    }
+    let time = 0;
+    for (const curVertex of adjMap.keys())
+    {
+        if (color.get(curVertex) === PaintedColor.White)
+        {
+            // curVertex has become the root of a new tree in the depth-first
+            // forest.
+            dfsVisit(curVertex);
+        }
+    }
+
+    return {
+        predecessor:        pred,
+        discoveryTimestamp: discoveryTimestamp,
+        finishTimestamp:    finishTimestamp
+    };
+
+    function dfsVisit(u: TVertex)
+    {
+        // White vertex u has just been discovered.
+        color.set(u, PaintedColor.Gray);
+        discoveryTimestamp.set(u, ++time);
+
+        // Explore u's neighbors.
+        const neighborVertices = adjMap.get(u)!.map((adjInfo) => adjInfo.toVertex);
+        for (const v of neighborVertices)
+        {
+            if (color.get(v) === PaintedColor.White)
+            {
+                pred.set(v, u);
+                dfsVisit(v);
+            }
+        }
+
+        // u's neighbors have been explored.  u is now finished.
+        color.set(u, PaintedColor.Black);
+        finishTimestamp.set(u, ++time);
+    }
 }
 
 

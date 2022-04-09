@@ -1,7 +1,5 @@
-import { failed, failedResult, Result, succeededResult } from "./result";
-import { mapWhileSuccessful } from "./resultHelpers";
+import { failedResult, Result, succeededResult } from "./result";
 import { difference } from "./setHelpers";
-import { noneOption, Option, someOption } from "./option";
 
 
 export interface IAdjacencyInfo<TVertex, TEdge>
@@ -280,7 +278,8 @@ function dfs<TVertex, TEdge>(
     const pred: Map<TVertex, TVertex | undefined> = new Map();
     const discoveryTimestamp: Map<TVertex, number> = new Map();
     const finishTimestamp: Map<TVertex, number> = new Map();
-    for (const curVertex of adjMap.keys()) {
+    for (const curVertex of adjMap.keys())
+    {
         color.set(curVertex, PaintedColor.White);
         pred.set(curVertex, undefined);
     }

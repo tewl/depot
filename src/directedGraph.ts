@@ -1,6 +1,9 @@
 import { failedResult, Result, succeededResult } from "./result";
 import { difference } from "./setHelpers";
 
+////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////
 
 export interface IAdjacencyInfo<TVertex, TEdge>
 {
@@ -20,6 +23,59 @@ export interface IEdge<TVertex, TEdge>
     edgeAttr: TEdge;
 }
 
+
+export interface IBfsResult<TVertex>
+{
+    /**
+     * The distance from the keyed vertex to the source node. Vertices that have
+     * no path to the source vertex will have a distance of Infinity.
+     */
+    distance: Map<TVertex, number>;
+    /**
+     * Each vertex's predecessor along the shortest path to the source vertex.
+     * Undefined if the vertex has no path to the source node or the vertex is
+     * the source vertex.
+     */
+    predecessor: Map<TVertex, TVertex | undefined>;
+}
+
+
+/**
+ * Colors nodes are painted with while traversing a graph.
+ */
+enum PaintedColor
+{
+    White = 0,    // Undiscovered
+    Gray = 1,     // Discovered but some neighbors are undiscovered
+    Black = 2     // Discovered and all neighbors are discovered (all neighbors are black or gray)
+}
+
+
+export interface IDfsResult<TVertex>
+{
+    /**
+     * Each vertex's predecessor within a tree of the resulting depth-first
+     * forest.  Undefined indicates the vertex is the root of tree within the
+     * resulting depth-first forest.
+     */
+    predecessor: Map<TVertex, TVertex | undefined>;
+    /**
+     * A timestamp indicating when the vertex was discovered during the
+     * depth-first search.  Used to classify the edges of the graph.
+     */
+    discoveryTimestamp: Map<TVertex, number>;
+    /**
+     * A timestamp indicating when the vertex was done being explored during the
+     * depth-first search.  Used when performing a topological sort or finding
+     * strongly connected components.
+     */
+    finishTimestamp: Map<TVertex, number>;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DirectedGraph
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Models a directed graph.  Each vertex has type TVertex and each edge has
@@ -134,33 +190,6 @@ export class DirectedGraph<TVertex, TEdge>
 }
 
 
-export interface IBfsResult<TVertex>
-{
-    /**
-     * The distance from the keyed vertex to the source node. Vertices that have
-     * no path to the source vertex will have a distance of Infinity.
-     */
-    distance: Map<TVertex, number>;
-    /**
-     * Each vertex's predecessor along the shortest path to the source vertex.
-     * Undefined if the vertex has no path to the source node or the vertex is
-     * the source vertex.
-     */
-    predecessor: Map<TVertex, TVertex | undefined>;
-}
-
-
-/**
- * Colors nodes are painted with while traversing a graph.
- */
-enum PaintedColor
-{
-    White = 0,    // Undiscovered
-    Gray = 1,     // Discovered but some neighbors are undiscovered
-    Black = 2     // Discovered and all neighbors are discovered (all neighbors are black or gray)
-}
-
-
 /**
  * Performs a breadth-first search from the specified source node.  This results
  * in each vertex's minimal distance from _source_ and the predecessor each vertex
@@ -240,28 +269,6 @@ function bfs<TVertex, TEdge>(
     }
 
     return succeededResult({distance: dist, predecessor: pred});
-}
-
-
-export interface IDfsResult<TVertex>
-{
-    /**
-     * Each vertex's predecessor within a tree of the resulting depth-first
-     * forest.  Undefined indicates the vertex is the root of tree within the
-     * resulting depth-first forest.
-     */
-    predecessor: Map<TVertex, TVertex | undefined>;
-    /**
-     * A timestamp indicating when the vertex was discovered during the
-     * depth-first search.  Used to classify the edges of the graph.
-     */
-    discoveryTimestamp: Map<TVertex, number>;
-    /**
-     * A timestamp indicating when the vertex was done being explored during the
-     * depth-first search.  Used when performing a topological sort or finding
-     * strongly connected components.
-     */
-    finishTimestamp: Map<TVertex, number>;
 }
 
 

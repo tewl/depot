@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { DirectedGraph, IEdge } from "./directedGraph";
+import { DirectedGraph, EdgeClassification, IEdge } from "./directedGraph";
 import { failed, succeeded } from "./result";
 
 
@@ -165,6 +165,14 @@ describe("DirectedGraph()", () =>
                     ["x", 5],
                     ["y", 6],
                     ["z", 11],
+                ]));
+                expect(res.edgeClassification).toEqual(new Map([
+                    ["u", [{toVertex: "v", edgeAttr: EdgeClassification.Tree}, {toVertex: "x", edgeAttr: EdgeClassification.Forward}]],
+                    ["v", [{toVertex: "y", edgeAttr: EdgeClassification.Tree}]],
+                    ["w", [{toVertex: "y", edgeAttr: EdgeClassification.Cross}, {toVertex: "z", edgeAttr: EdgeClassification.Tree}]],
+                    ["x", [{toVertex: "v", edgeAttr: EdgeClassification.Back}]],
+                    ["y", [{toVertex: "x", edgeAttr: EdgeClassification.Tree}]],
+                    ["z", [{toVertex: "z", edgeAttr: EdgeClassification.Back}]]
                 ]));
             });
         });

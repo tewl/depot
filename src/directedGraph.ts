@@ -51,6 +51,17 @@ enum PaintedColor
 }
 
 
+export enum EdgeClassification
+{
+    Tree,     // An edge in the depth-first forest defined by the predecessor tree
+    Back,     // An edge (u, v) connecting u to an ancestor v, including self-loops
+    Forward,  // Non-tree edges connecting u to a descendant v
+    Cross     // All other edges.  May connect vertices within the same depth-first
+              // tree when neither is an ancestor of the other.  May also connect
+              // vertices of different depth-first trees.
+}
+
+
 export interface IDfsResult<TVertex>
 {
     /**
@@ -70,6 +81,10 @@ export interface IDfsResult<TVertex>
      * strongly connected components.
      */
     finishTimestamp: Map<TVertex, number>;
+    /**
+     * An adjacency map classifying the edges of the graph.
+     */
+    edgeClassification: AdjacencyMap<TVertex, EdgeClassification>;
 }
 
 
@@ -190,6 +205,10 @@ export class DirectedGraph<TVertex, TEdge>
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Helper Functions
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Performs a breadth-first search from the specified source node.  This results
  * in each vertex's minimal distance from _source_ and the predecessor each vertex
@@ -285,10 +304,13 @@ function dfs<TVertex, TEdge>(
     const pred: Map<TVertex, TVertex | undefined> = new Map();
     const discoveryTimestamp: Map<TVertex, number> = new Map();
     const finishTimestamp: Map<TVertex, number> = new Map();
+    const edgeClassification: AdjacencyMap<TVertex, EdgeClassification> = new Map();
+
     for (const curVertex of adjMap.keys())
     {
         color.set(curVertex, PaintedColor.White);
         pred.set(curVertex, undefined);
+        edgeClassification.set(curVertex, []);
     }
     let time = 0;
     for (const curVertex of adjMap.keys())
@@ -301,10 +323,13 @@ function dfs<TVertex, TEdge>(
         }
     }
 
+    fixForwardCrossEdgeClassifications();
+
     return {
         predecessor:        pred,
         discoveryTimestamp: discoveryTimestamp,
-        finishTimestamp:    finishTimestamp
+        finishTimestamp:    finishTimestamp,
+        edgeClassification: edgeClassification
     };
 
     function dfsVisit(u: TVertex)
@@ -317,10 +342,23 @@ function dfs<TVertex, TEdge>(
         const neighborVertices = adjMap.get(u)!.map((adjInfo) => adjInfo.toVertex);
         for (const v of neighborVertices)
         {
-            if (color.get(v) === PaintedColor.White)
+            const vColor = color.get(v);
+            if (vColor === PaintedColor.White)
             {
                 pred.set(v, u);
+                setEdgeClassificationIfClear(u, v, EdgeClassification.Tree);
                 dfsVisit(v);
+            }
+            else if (vColor === PaintedColor.Gray)
+            {
+                setEdgeClassificationIfClear(u, v, EdgeClassification.Back);
+            }
+            else if (vColor === PaintedColor.Black)
+            {
+                // The edge is either Forward or Cross.  We'll set it to Cross
+                // here and then use the discovery timestamp at the end to
+                // distinguish between the two.
+                setEdgeClassificationIfClear(u, v, EdgeClassification.Cross);
             }
         }
 
@@ -328,14 +366,32 @@ function dfs<TVertex, TEdge>(
         color.set(u, PaintedColor.Black);
         finishTimestamp.set(u, ++time);
     }
+
+    function setEdgeClassificationIfClear(u: TVertex, v: TVertex, classification: EdgeClassification): void
+    {
+        const adjList = edgeClassification.get(u)!;
+        const foundAdjInfo = adjList.find((adjInfo) => adjInfo.toVertex === v);
+        if (foundAdjInfo === undefined)
+        {
+            adjList.push({edgeAttr: classification, toVertex: v});
+        }
+    }
+
+    function fixForwardCrossEdgeClassifications(): void
+    {
+        // Inspect all of the "Cross" classifications and change the appropriate
+        // ones to "Forward" based on the discovery timestamps.
+        for (const fromVertex of edgeClassification.keys())
+        {
+            const adjList = edgeClassification.get(fromVertex)!;
+            for (const adjInfo of adjList)
+            {
+                if (adjInfo.edgeAttr === EdgeClassification.Cross &&
+                    discoveryTimestamp.get(fromVertex)! < discoveryTimestamp.get(adjInfo.toVertex)!)
+                {
+                    adjInfo.edgeAttr = EdgeClassification.Forward;
+                }
+            }
+        }
+    }
 }
-
-
-// function shortestPath<TVertex, TEdge>(
-//     adjMap: AdjacencyMap<TVertex, TEdge>,
-//     startVertex: TVertex,
-//     endVertex: TVertex
-// ): Array<TVertex>
-// {
-//     bfs
-// }

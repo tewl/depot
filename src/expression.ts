@@ -9,8 +9,7 @@ import { IDuMember } from "./discriminatedUnion";
 ////////////////////////////////////////////////////////////////////////////////
 // IExpressionToken
 ////////////////////////////////////////////////////////////////////////////////
-export interface IExpressionToken
-{
+export interface IExpressionToken {
     /// The full original expression
     originalExpression: string;
     /// Starting character index in originalExpression
@@ -25,8 +24,7 @@ export interface IExpressionToken
 ////////////////////////////////////////////////////////////////////////////////
 // IExpressionTokenNumber
 ////////////////////////////////////////////////////////////////////////////////
-export interface IExpressionTokenNumber extends IDuMember, IExpressionToken
-{
+export interface IExpressionTokenNumber extends IDuMember, IExpressionToken {
     type: "IExpressionTokenNumber";
     value: Fraction;
 }
@@ -42,8 +40,7 @@ type OperatorAssociativity = "n/a" | "left-to-right" | "right-to-left";
 type OperatorSymbol = "(" | ")" | "*" | "/" | "+" | "-";
 
 
-interface IOperatorTraits
-{
+interface IOperatorTraits {
     symbol: OperatorSymbol;
     precedence: number;
     associativity: OperatorAssociativity;
@@ -52,8 +49,7 @@ interface IOperatorTraits
 }
 
 
-export interface IExpressionTokenOperator extends IDuMember, IExpressionToken
-{
+export interface IExpressionTokenOperator extends IDuMember, IExpressionToken {
     type: "IExpressionTokenOperator";
     symbol: OperatorSymbol;
     precedence: number;
@@ -61,10 +57,8 @@ export interface IExpressionTokenOperator extends IDuMember, IExpressionToken
 }
 
 
-export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
-{
-    switch (symbol)
-    {
+export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits {
+    switch (symbol) {
         case "(":
             return {
                 symbol:        "(",
@@ -85,8 +79,7 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    15,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction
-                {
+                evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.multiply(first);
@@ -99,8 +92,7 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    15,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction
-                {
+                evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.divide(first);
@@ -113,8 +105,7 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    14,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction
-                {
+                evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.add(first);
@@ -127,8 +118,7 @@ export function symbolToTraits(symbol: OperatorSymbol): IOperatorTraits
                 precedence:    14,
                 associativity: "left-to-right",
                 numArguments:  2,
-                evaluate(args: Array<Fraction>): Fraction
-                {
+                evaluate(args: Array<Fraction>): Fraction {
                     const first = args.pop()!;
                     const second = args.pop()!;
                     return second.subtract(first);
@@ -152,8 +142,7 @@ export type ExpressionToken =
 ////////////////////////////////////////////////////////////////////////////////
 
 
-interface ITokenizer
-{
+interface ITokenizer {
     matcherFn(remainingText: string): RegExpExecArray | null;
     tokenCreatorFn(
         match: RegExpExecArray,
@@ -163,14 +152,12 @@ interface ITokenizer
 }
 
 
-function getTokenizers(): Array<ITokenizer>
-{
+function getTokenizers(): Array<ITokenizer> {
     return [
 
         // Number tokenizer
         {
-            matcherFn: (remainingText: string) =>
-            {
+            matcherFn: (remainingText: string) => {
                 //
                 // TODO: Replace the following regular expressions with those in fraction.ts
                 //
@@ -181,8 +168,7 @@ function getTokenizers(): Array<ITokenizer>
                        regexFrac.exec(remainingText) ||
                        regexWhole.exec(remainingText);
             },
-            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-            {
+            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) => {
                 return {
                     type:               "IExpressionTokenNumber" as const,
                     value:              Fraction.from(match[0]).value!,
@@ -196,13 +182,11 @@ function getTokenizers(): Array<ITokenizer>
 
         // Operator tokenizer
         {
-            matcherFn: (remainingText: string) =>
-            {
+            matcherFn: (remainingText: string) => {
                 const regexPlus = /^(?<leadingws>\s*)(?<operator>[()*/+-])(?<trailingws>\s*)/;
                 return regexPlus.exec(remainingText);
             },
-            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) =>
-            {
+            tokenCreatorFn: (match: RegExpExecArray, fullExpression: string, startIndex: number, endIndex: number) => {
                 const traits = symbolToTraits(match.groups!.operator as OperatorSymbol);
                 return {
                     type:               "IExpressionTokenOperator" as const,
@@ -221,21 +205,18 @@ function getTokenizers(): Array<ITokenizer>
 
 const tokenizers = getTokenizers();
 
-export function tokenize(input: string): Result<Array<ExpressionToken>, string>
-{
+export function tokenize(input: string): Result<Array<ExpressionToken>, string> {
     const originalExpression = input;
     let remainingExpression = input;
     let remainingExpressionStartIndex = 0;
 
     const tokens: Array<ExpressionToken> = [];
 
-    while (remainingExpression.length > 0)
-    {
+    while (remainingExpression.length > 0) {
 
         // eslint-disable-next-line @typescript-eslint/no-loop-func
         const foundTokenizer = find(tokenizers, (curTokenizer) => curTokenizer.matcherFn(remainingExpression));
-        if (foundTokenizer)
-        {
+        if (foundTokenizer) {
             const matchedText = foundTokenizer.predicateReturn[0];
             const matchedLength = matchedText.length;
             const endIndex = foundTokenizer.predicateReturn.index + matchedLength;
@@ -251,8 +232,7 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
             remainingExpression = remainingExpression.slice(endIndex);
             remainingExpressionStartIndex = token.endIndex;
         }
-        else
-        {
+        else {
             return failedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of "${originalExpression}".`);
         }
     }
@@ -272,8 +252,7 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string>
  */
 export function toPostfix(
     infixTokens: Array<ExpressionToken>
-): Result<Array<ExpressionToken>, string>
-{
+): Result<Array<ExpressionToken>, string> {
     // See https://en.wikipedia.org/wiki/Shunting-yard_algorithm.
     const input: Array<ExpressionToken> = infixTokens.slice();
     input.reverse();
@@ -281,53 +260,43 @@ export function toPostfix(
     const output: Array<ExpressionToken> = [];
     const operatorStack: Array<IExpressionTokenOperator> = [];
 
-    while (!_.isEmpty(input))
-    {
+    while (!_.isEmpty(input)) {
         const curToken = input.pop()!;
 
-        if (curToken.type === "IExpressionTokenNumber")
-        {
+        if (curToken.type === "IExpressionTokenNumber") {
             output.push(curToken);
         }
-        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === "(")
-        {
+        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === "(") {
             operatorStack.push(curToken);
         }
-        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")")
-        {
-            if (_.isEmpty(operatorStack))
-            {
+        else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")") {
+            if (_.isEmpty(operatorStack)) {
                 return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
             }
             let firstInOperatorStack = _.last(operatorStack)!;
-            while (firstInOperatorStack.symbol !== "(")
-            {
+            while (firstInOperatorStack.symbol !== "(") {
                 output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
-                if (_.isEmpty(operatorStack))
-                {
+                if (_.isEmpty(operatorStack)) {
                     return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
                 }
                 firstInOperatorStack = _.last(operatorStack)!;
             }
 
             const topOperator = operatorStack.pop();
-            if (topOperator === undefined || topOperator.symbol !== "(")
-            {
+            if (topOperator === undefined || topOperator.symbol !== "(") {
                 return failedResult(`Operator stack invalid after finding "(".`);
             }
             // We intentionally do nothing with the popped "(".  Discard it.
         }
-        else if (curToken.type === "IExpressionTokenOperator")
-        {
+        else if (curToken.type === "IExpressionTokenOperator") {
             let firstInOperatorStack = _.last(operatorStack);
             while (firstInOperatorStack !== undefined &&                     // While there is an operator on the operator stack AND
                 firstInOperatorStack.symbol !== "(" &&                       // it is not a left parenthesis AND
                 (firstInOperatorStack.precedence > curToken.precedence ||    // (it has greater precedence than the current token OR
                                                                              //  the same precedence AND the current token is left-associative)
                     (firstInOperatorStack.precedence === curToken.precedence && curToken.associativity === "left-to-right"))
-            )
-            {
+            ) {
                 output.push(operatorStack.pop()!);
                 firstInOperatorStack = _.last(operatorStack);
             }
@@ -336,11 +305,9 @@ export function toPostfix(
     }
 
     // Move the remaining operators to the output queue.
-    while (!_.isEmpty(operatorStack))
-    {
+    while (!_.isEmpty(operatorStack)) {
         const curOperator = operatorStack.pop()!;
-        if (curOperator.symbol === "(")
-        {
+        if (curOperator.symbol === "(") {
             return failedResult(`"(" found while emptying operator stack.  Mismatched parenthesis.`);
         }
         output.push(curOperator);
@@ -350,59 +317,48 @@ export function toPostfix(
 }
 
 
-export function evaluate(input: string): Result<Fraction, string>
-{
+export function evaluate(input: string): Result<Fraction, string> {
     const tokenizeResult = tokenize(input);
-    if (failed(tokenizeResult))
-    {
+    if (failed(tokenizeResult)) {
         return tokenizeResult;
     }
 
     const postfixResult = toPostfix(tokenizeResult.value);
-    if (failed(postfixResult))
-    {
+    if (failed(postfixResult)) {
         return postfixResult;
     }
 
     const stack: Array<Fraction> = [];
-    for (const curToken of postfixResult.value)
-    {
-        if (curToken.type === "IExpressionTokenNumber")
-        {
+    for (const curToken of postfixResult.value) {
+        if (curToken.type === "IExpressionTokenNumber") {
             stack.push(curToken.value);
         }
-        else if (curToken.type === "IExpressionTokenOperator")
-        {
+        else if (curToken.type === "IExpressionTokenOperator") {
             const traits = symbolToTraits(curToken.symbol);
 
             // The stack should have enough values on it to provide a value for
             // each operator argument.
-            if (stack.length < traits.numArguments!)
-            {
+            if (stack.length < traits.numArguments!) {
                 return failedResult(`Not enough arguments for operator ${curToken.symbol} at index ${curToken.startIndex}.`);
             }
 
             const resultVal = traits.evaluate!(stack);
             stack.push(resultVal);
         }
-        else
-        {
+        else {
             assertNever(curToken);
         }
     }
 
     // The stack should contain only 1 value.
     const stackLength = stack.length;
-    if (stackLength === 1)
-    {
+    if (stackLength === 1) {
         return succeededResult(stack[0]);
     }
-    else if (stackLength < 1)
-    {
+    else if (stackLength < 1) {
         return failedResult(`No expression.`);
     }
-    else
-    {
+    else {
         return failedResult(`Expression finished evaluating with items still on the stack.`);
     }
 }

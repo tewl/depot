@@ -25,11 +25,9 @@ export type Task<TResolve> = () => Promise<TResolve>;
 export function sequence(
     tasks: Array<(previousValue: unknown) => unknown>,
     initialValue: unknown
-): Promise<unknown>
-{
+): Promise<unknown> {
     return tasks.reduce(
-        (accumulator, curTask) =>
-        {
+        (accumulator, curTask) => {
             return accumulator.then(curTask);
         },
         Promise.resolve(initialValue)
@@ -50,14 +48,11 @@ export function sequence(
 export function getTimerPromise<TResolve>(
     ms:            number,
     resolveValue:  TResolve
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return new Promise(
-        (resolve: (resolveValue: TResolve) => void) =>
-        {
+        (resolve: (resolveValue: TResolve) => void) => {
             setTimeout(
-                () =>
-                {
+                () => {
                     resolve(resolveValue);
                 },
                 ms
@@ -82,14 +77,11 @@ export function conditionalTask<TResolve>(
     condition: unknown,
     task: Task<TResolve>,
     falseResolveValue: TResolve
-): Promise<TResolve>
-{
-    if (condition)
-    {
+): Promise<TResolve> {
+    if (condition) {
         return task();
     }
-    else
-    {
+    else {
         return Promise.resolve(falseResolveValue);
     }
 }
@@ -106,23 +98,18 @@ export function eventToPromise<TResolve>(
     emitter: EventEmitter,
     resolveEventName: string,
     rejectEventName?: string
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return new Promise<TResolve>(
-        (resolve: (result: TResolve) => void, reject: (err: unknown) => void) =>
-        {
+        (resolve: (result: TResolve) => void, reject: (err: unknown) => void) => {
             const tracker = new ListenerTracker(emitter);
 
-            tracker.once(resolveEventName, (result: TResolve) =>
-            {
+            tracker.once(resolveEventName, (result: TResolve) => {
                 tracker.removeAll();
                 resolve(result);
             });
 
-            if (rejectEventName)
-            {
-                tracker.once(rejectEventName, (err: unknown) =>
-                {
+            if (rejectEventName) {
+                tracker.once(rejectEventName, (err: unknown) => {
                     tracker.removeAll();
                     reject(err);
                 });
@@ -138,8 +125,7 @@ export function eventToPromise<TResolve>(
  * @return A Promise that will be resolved when the stream emits the "finish"
  * event and rejects when it emits an "error" event.
  */
-export function streamToPromise(stream: Writable): Promise<void>
-{
+export function streamToPromise(stream: Writable): Promise<void> {
     return eventToPromise(stream, "finish", "error");
 }
 
@@ -165,8 +151,7 @@ export function streamToPromise(stream: Writable): Promise<void>
 export function retry<TResolve>(
     theFunc:         () => Promise<TResolve>,
     maxNumAttempts:  number
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return retryWhileImpl(theFunc, () => true, maxNumAttempts, 0);
 }
 
@@ -198,8 +183,7 @@ export function retryWhile<TResolve>(
     theFunc: () => Promise<TResolve>,
     whilePredicate: (err: unknown) => boolean,
     maxNumAttempts: number
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return retryWhileImpl(theFunc, whilePredicate, maxNumAttempts, 0);
 }
 
@@ -224,35 +208,28 @@ function retryWhileImpl<TResolve>(
     whilePredicate:  (err: unknown) => boolean,
     maxNumAttempts:  number,
     attemptsSoFar:   number
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return new Promise(
-        (resolve: (value: TResolve|Promise<TResolve>) => void, reject: (err: unknown) => void) =>
-        {
+        (resolve: (value: TResolve|Promise<TResolve>) => void, reject: (err: unknown) => void) => {
             ++attemptsSoFar;
             theFunc()
             .then(
-                (value: TResolve) =>
-                {
+                (value: TResolve) => {
                     // The current iteration resolved.  Return the value to the client
                     // immediately.
                     resolve(value);
                 },
-                (err: unknown): void =>
-                {
+                (err: unknown): void => {
                     // The promise was rejected.
-                    if (attemptsSoFar >= maxNumAttempts)
-                    {
+                    if (attemptsSoFar >= maxNumAttempts) {
                         // logger.error("Retry operation failed after " + maxNumAttempts + " attempts.");
                         reject(err);
                     }
-                    else if (!whilePredicate(err))
-                    {
+                    else if (!whilePredicate(err)) {
                         // logger.error("Stopped retrying operation because while predicate returned false." + err);
                         reject(err);
                     }
-                    else
-                    {
+                    else {
                         const backoffBaseMs: number = Math.pow(2, attemptsSoFar - 1) * BACKOFF_MULTIPLIER;
 
                         // A random amount of time should be added to or
@@ -270,8 +247,7 @@ function retryWhileImpl<TResolve>(
                         const timerPromise: Promise<void> = getTimerPromise(delayMs, undefined);
                         resolve(
                             timerPromise
-                            .then(() =>
-                            {
+                            .then(() => {
                                 return retryWhileImpl(theFunc, whilePredicate, maxNumAttempts, attemptsSoFar);
                             })
                         );
@@ -292,14 +268,10 @@ function retryWhileImpl<TResolve>(
  * @returns A Promise that is resolved when all iterations have
  * successfully completed or will be rejected when body returns a rejected promise.
  */
-export function promiseWhile(predicate: () => boolean, body: Task<void>): Promise<void>
-{
-    return new Promise<void>((resolve: () => void, reject: () => void) =>
-    {
-        function loop(): void
-        {
-            if (!predicate())
-            {
+export function promiseWhile(predicate: () => boolean, body: Task<void>): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: () => void) => {
+        function loop(): void {
+            if (!predicate()) {
                 // We are done iterating.  Resolve with a void value.
                 return resolve();
             }
@@ -326,12 +298,10 @@ export function promiseWhile(predicate: () => boolean, body: Task<void>): Promis
  * @returns A new array of Promises that will settle sequentially,
  * starting at index 0.
  */
-export function sequentialSettle<TResolve>(inputPromises: Array<Promise<TResolve>>): Array<Promise<TResolve>>
-{
+export function sequentialSettle<TResolve>(inputPromises: Array<Promise<TResolve>>): Array<Promise<TResolve>> {
     const outputPromises: Array<Promise<TResolve>> = [];
 
-    _.forEach(inputPromises, (curInputPromise) =>
-    {
+    _.forEach(inputPromises, (curInputPromise) => {
         const previousPromise: Promise<unknown> = outputPromises.length > 0 ?
                                                   outputPromises[outputPromises.length - 1]! :
                                                   Promise.resolve();
@@ -356,19 +326,16 @@ export function sequentialSettle<TResolve>(inputPromises: Array<Promise<TResolve
 export function delaySettle<TResolve>(
     thePromise: Promise<TResolve>,
     waitFor:    Promise<unknown>
-): Promise<TResolve>
-{
+): Promise<TResolve> {
     return thePromise
-    .then((result: TResolve) =>
-    {
+    .then((result: TResolve) => {
         // Whether waitFor resolved or rejected, we should resolve
         // with the original resolved value.
         return waitFor
         .then(() => result)
         .catch(() => result);
     })
-    .catch((err: unknown) =>
-    {
+    .catch((err: unknown) => {
         // Whether waitFor resolved or rejected, we should reject with the
         // original error.
         return waitFor
@@ -387,8 +354,7 @@ export function delaySettle<TResolve>(
 export async function mapAsync<TInput, TOutput>(
     collection:     Array<TInput>,
     asyncValueFunc: (curItem: TInput) => Promise<TOutput>
-): Promise<Array<TOutput>>
-{
+): Promise<Array<TOutput>> {
     const promises = _.map(collection, (curItem) => asyncValueFunc(curItem));
     const values = await Promise.all(promises);
     return values;
@@ -408,13 +374,11 @@ export async function mapAsync<TInput, TOutput>(
 export async function zipWithAsyncValues<TInput, TOutput>(
     collection:     Array<TInput>,
     asyncValueFunc: (curItem: TInput) => Promise<TOutput>
-): Promise<Array<[TInput, TOutput]>>
-{
+): Promise<Array<[TInput, TOutput]>> {
     const values = await mapAsync(collection, (curItem) => asyncValueFunc(curItem));
 
     const pairs: Array<[TInput, TOutput]> = [];
-    _.forEach(collection, (curItem, index) =>
-    {
+    _.forEach(collection, (curItem, index) => {
         pairs.push([curItem, values[index]!]);
     });
 
@@ -434,8 +398,7 @@ export async function zipWithAsyncValues<TInput, TOutput>(
 export async function filterAsync<T>(
     collection:     Array<T>,
     asyncPredicate: (curVal: T) => Promise<unknown>
-): Promise<Array<T>>
-{
+): Promise<Array<T>> {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
     return _.chain(pairs)
     .filter((curPair) => !!curPair[1])
@@ -458,8 +421,7 @@ export async function filterAsync<T>(
 export async function partitionAsync<T>(
     collection:     Array<T>,
     asyncPredicate: (curVal: T) => Promise<unknown>
-): Promise<[Array<T>, Array<T>]>
-{
+): Promise<[Array<T>, Array<T>]> {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 
     const [truthyPairs, falsyPairs] = _.partition(pairs, (curPair) => !!curPair[1]);
@@ -482,16 +444,13 @@ export async function partitionAsync<T>(
 export async function removeAsync<T>(
     collection:     Array<T>,
     asyncPredicate: (curVal: T) => Promise<unknown>
-): Promise<Array<T>>
-{
+): Promise<Array<T>> {
     const pairs = await zipWithAsyncValues(collection, asyncPredicate);
 
     const removed: Array<T> = [];
-    for (let i = pairs.length - 1; i >= 0; i--)
-    {
+    for (let i = pairs.length - 1; i >= 0; i--) {
         const [item, predicateResult] = pairs[i]!;
-        if (predicateResult)
-        {
+        if (predicateResult) {
             // Remove the current item.
             removed.push(item);
             collection.splice(i, 1);

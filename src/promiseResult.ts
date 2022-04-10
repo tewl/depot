@@ -10,8 +10,7 @@ import { IIndexedItem } from "./utilityTypes";
  */
 export async function toPromise<TSuccess, TError>(
     pr: Promise<Result<TSuccess, TError>>
-): Promise<TSuccess>
-{
+): Promise<TSuccess> {
     const result = await pr;
     return succeeded(result) ?
         Promise.resolve(result.value) :
@@ -136,8 +135,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
 //
 export function all(
     ...promises: Array<Promise<Result<unknown, unknown>>>
-): Promise<Result<Array<unknown>, IIndexedItem<unknown>>>
-{
+): Promise<Result<Array<unknown>, IIndexedItem<unknown>>> {
     return allArray<unknown, unknown>(promises);
 }
 
@@ -152,21 +150,16 @@ export function all(
  */
 export function allArray<TSuccess, TFail>(
     promises: Array<Promise<Result<TSuccess, TFail>>>
-): Promise<Result<Array<TSuccess>, IIndexedItem<TFail>>>
-{
-    return new Promise((resolve, reject) =>
-    {
+): Promise<Result<Array<TSuccess>, IIndexedItem<TFail>>> {
+    return new Promise((resolve, reject) => {
 
         const numPromises = promises.length;
         let numSuccesses = 0;
         const successfulResults: Array<TSuccess> = [];
-        _.forEach(promises, (curPromise, index) =>
-        {
+        _.forEach(promises, (curPromise, index) => {
             curPromise
-            .then((curResult) =>
-            {
-                if (succeeded(curResult))
-                {
+            .then((curResult) => {
+                if (succeeded(curResult)) {
                     // The current async operation succeeded.
                     successfulResults[index] = curResult.value;
                     numSuccesses++;
@@ -174,13 +167,11 @@ export function allArray<TSuccess, TFail>(
                     // If this is the last successful async operation, resolve
                     // with an array of all the success values.  Otherwise, keep
                     // waiting.
-                    if (numSuccesses === numPromises)
-                    {
+                    if (numSuccesses === numPromises) {
                         resolve(succeededResult(successfulResults));
                     }
                 }
-                else
-                {
+                else {
                     // It failed.  Return the failed result immediately.
                     // resolve(curResult);
                     const indexed: IIndexedItem<TFail> = {
@@ -190,8 +181,7 @@ export function allArray<TSuccess, TFail>(
                     resolve(failedResult(indexed));
                 }
             })
-            .catch((err) =>
-            {
+            .catch((err) => {
                 // This should never happen, because failure is supposed to be
                 // communicated with a Promise that resolves (not rejects) with
                 // a failed Result object.

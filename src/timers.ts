@@ -1,8 +1,7 @@
 import { EventEmitter } from "events";
 
 
-export class Timeout extends EventEmitter
-{
+export class Timeout extends EventEmitter {
     // region Events
     public static readonly eventNameExpired: "expired" = "expired";
     // endregion
@@ -11,8 +10,7 @@ export class Timeout extends EventEmitter
     private _timeoutId: undefined | NodeJS.Timeout;
 
 
-    public constructor(periodMs: number)
-    {
+    public constructor(periodMs: number) {
         super();
         this._periodMs = periodMs;
         this._timeoutId = undefined;
@@ -23,8 +21,7 @@ export class Timeout extends EventEmitter
      * Returns this timer's running state.
      * @return This timer's running state
      */
-    public isRunning(): boolean
-    {
+    public isRunning(): boolean {
         return !!this._timeoutId;
     }
 
@@ -32,13 +29,11 @@ export class Timeout extends EventEmitter
     /**
      * Starts (or restarts) this timeout timer.
      */
-    public start(): void
-    {
+    public start(): void {
         // Stop the current timeout, if any.
         this.stop();
 
-        this._timeoutId = setTimeout(() =>
-        {
+        this._timeoutId = setTimeout(() => {
             this._timeoutId = undefined;
             this.emit(Timeout.eventNameExpired);
         }, this._periodMs);
@@ -49,11 +44,9 @@ export class Timeout extends EventEmitter
      * Stops this timeout timer if it is running.  Safe to call when the timer
      * is not running.
      */
-    public stop(): void
-    {
+    public stop(): void {
         // Stop the currently running time, if any.
-        if (this._timeoutId)
-        {
+        if (this._timeoutId) {
             clearTimeout(this._timeoutId);
         }
         this._timeoutId = undefined;

@@ -36,8 +36,7 @@ const levelLabels: Array<string> = [
 Object.freeze(levelLabels);
 
 
-export class Logger
-{
+export class Logger {
     // region Private Data Members
     private readonly _logLevelStack: Array<LogLevel>    = [];
     private readonly _defaultLogLevel: LogLevel         = LogLevel.Warn2;
@@ -45,19 +44,16 @@ export class Logger
     // endregion
 
 
-    public addListener(listener: LogListenerFunc): RemoveListenerFunc
-    {
+    public addListener(listener: LogListenerFunc): RemoveListenerFunc {
         this._listeners.push(listener);
 
-        return () =>
-        {
+        return () => {
             _.pull(this._listeners, listener);
         };
     }
 
 
-    public numListeners(): number
-    {
+    public numListeners(): number {
         return this._listeners.length;
     }
 
@@ -65,8 +61,7 @@ export class Logger
     /**
      * Resets the logging level to its default state.
      */
-    public reset(): void
-    {
+    public reset(): void {
         this._logLevelStack.length = 0;
     }
 
@@ -76,8 +71,7 @@ export class Logger
      * its previous state, call pop().
      * @param newLogLevel - The new state of this logger
      */
-    public pushLogLevel(newLogLevel: LogLevel): void
-    {
+    public pushLogLevel(newLogLevel: LogLevel): void {
         this._logLevelStack.push(newLogLevel);
     }
 
@@ -85,10 +79,8 @@ export class Logger
     /**
      * Restores this logger's state to the previous state.
      */
-    public pop(): void
-    {
-        if (this._logLevelStack.length > 0)
-        {
+    public pop(): void {
+        if (this._logLevelStack.length > 0) {
             this._logLevelStack.pop();
         }
     }
@@ -99,14 +91,11 @@ export class Logger
      * higher or equal severity will be logged.
      * @returns The current severity level
      */
-    public getCurrentLevel(): LogLevel
-    {
-        if (this._logLevelStack.length > 0)
-        {
+    public getCurrentLevel(): LogLevel {
+        if (this._logLevelStack.length > 0) {
             return this._logLevelStack[this._logLevelStack.length - 1];
         }
-        else
-        {
+        else {
             return this._defaultLogLevel;
         }
 
@@ -119,8 +108,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public error(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public error(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Error1, msg, ...optionalParams);
     }
 
@@ -131,8 +119,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public warn(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public warn(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Warn2, msg, ...optionalParams);
     }
 
@@ -143,8 +130,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public info(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public info(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Info3, msg, ...optionalParams);
     }
 
@@ -155,8 +141,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public verbose(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public verbose(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Verbose4, msg, ...optionalParams);
     }
 
@@ -167,8 +152,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public debug(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public debug(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Debug5, msg, ...optionalParams);
     }
 
@@ -179,8 +163,7 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged given current logger settings.
      */
-    public silly(msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    public silly(msg: string, ...optionalParams: Array<unknown>): boolean {
         return this.log(LogLevel.Silly6, msg, ...optionalParams);
     }
 
@@ -194,26 +177,21 @@ export class Logger
      * @param optionalParams - Additional values to be logged
      * @returns Whether the message was logged.
      */
-    private log(level: LogLevel, msg: string, ...optionalParams: Array<unknown>): boolean
-    {
+    private log(level: LogLevel, msg: string, ...optionalParams: Array<unknown>): boolean {
         const curLogLevel: LogLevel = this.getCurrentLevel();
 
-        if (level > curLogLevel)
-        {
+        if (level > curLogLevel) {
             return false;
         }
 
         const optStr = _.map(optionalParams, (curParam) => inspect(curParam)).join(" ");
-        if (optStr.length > 0)
-        {
+        if (optStr.length > 0) {
             msg += " " + optStr;
         }
 
-        if (msg.length > 0)
-        {
+        if (msg.length > 0) {
             const logMessage = `${getTimestamp()} (${levelLabels[level]}) ${msg}`;
-            _.forEach(this._listeners, (curListener) =>
-            {
+            _.forEach(this._listeners, (curListener) => {
                 curListener(logMessage);
             });
         }
@@ -231,8 +209,7 @@ Object.freeze(Logger.prototype);
 // Helper methods
 ////////////////////////////////////////////////////////////////////////////////
 
-function getTimestamp(): string
-{
+function getTimestamp(): string {
     return new Date().toISOString();
 }
 

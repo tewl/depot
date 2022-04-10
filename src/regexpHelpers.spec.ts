@@ -1,11 +1,9 @@
 import {matchesAny, setFlags, clearFlags, strToRegExp} from "./regexpHelpers";
 import { failed, succeeded } from "./result";
 
-describe("matchesAny()", () =>
-{
+describe("matchesAny()", () => {
 
-    it("returns true when one of the regexes matches", () =>
-    {
+    it("returns true when one of the regexes matches", () => {
         const str = "2011-12-23\\IMG_4394.JPG";
         const regexes = [
             /foo/,
@@ -17,8 +15,7 @@ describe("matchesAny()", () =>
     });
 
 
-    it("returns false when none of the regexes match", () =>
-    {
+    it("returns false when none of the regexes match", () => {
         const str = "2011-12-23\\IMG_4394.JPG";
         const regexes = [
             /foo/,
@@ -31,10 +28,8 @@ describe("matchesAny()", () =>
 });
 
 
-describe("clearFlags", () =>
-{
-    it("clears the specified flags", () =>
-    {
+describe("clearFlags", () => {
+    it("clears the specified flags", () => {
         const srcRegex = /bar/dig;
         const newRegex = clearFlags(srcRegex, ["i", "g", "y"]);
         expect(newRegex.flags).toEqual("d");
@@ -42,10 +37,8 @@ describe("clearFlags", () =>
 });
 
 
-describe("setFlags()", () =>
-{
-    it("sets the specified flags", () =>
-    {
+describe("setFlags()", () => {
+    it("sets the specified flags", () => {
         const srcRegex = /bar/d;
         const newRegex = setFlags(srcRegex, ["i", "g"]);
         expect(newRegex.flags).toEqual("dgi");
@@ -53,25 +46,21 @@ describe("setFlags()", () =>
 });
 
 
-describe("strToRegExp()", () =>
-{
-    it("succeeds when given a valid regex", () =>
-    {
+describe("strToRegExp()", () => {
+    it("succeeds when given a valid regex", () => {
         const result = strToRegExp("foo");
         expect(succeeded(result)).toBeTrue();
     });
 
 
-    it("succeeds when given a regex with flags", () =>
-    {
+    it("succeeds when given a regex with flags", () => {
         const result = strToRegExp("/foo/i");
         expect(succeeded(result)).toBeTrue();
         expect(result.value?.flags).toEqual("i");
     });
 
 
-    it("fails when given in invalid regex", () =>
-    {
+    it("fails when given in invalid regex", () => {
         const result = strToRegExp("foo\\");
         expect(failed(result)).toBeTrue();
         expect(result.error?.length).toBeGreaterThan(0);

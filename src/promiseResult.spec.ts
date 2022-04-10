@@ -3,43 +3,34 @@ import { getTimerPromise } from "./promiseHelpers";
 import { failed, failedResult, succeeded, succeededResult } from "./result";
 
 
-describe("toPromise()", () =>
-{
-    it("when given an error result returns a rejected promise", async () =>
-    {
+describe("toPromise()", () => {
+    it("when given an error result returns a rejected promise", async () => {
         const pr = Promise.resolve(failedResult("error message"));
-        try
-        {
+        try {
             const val = await promiseResult.toPromise(pr);
             expect(false).toBeTruthy();
         }
-        catch (error)
-        {
+        catch (error) {
             expect(error).toEqual("error message");
         }
     });
 
 
-    it("when given a successful result returns a resolved promise", async () =>
-    {
+    it("when given a successful result returns a resolved promise", async () => {
         const pr = Promise.resolve(succeededResult("success value"));
-        try
-        {
+        try {
             const val = await promiseResult.toPromise(pr);
             expect(val).toEqual("success value");
         }
-        catch (error)
-        {
+        catch (error) {
             expect(false).toBeTruthy();
         }
     });
 });
 
 
-describe("all()", () =>
-{
-    it("when all are successful, the returned promise resolves with a Result containing an array of all the successful values", async () =>
-    {
+describe("all()", () => {
+    it("when all are successful, the returned promise resolves with a Result containing an array of all the successful values", async () => {
         const op1 = () => getTimerPromise(25, succeededResult(25));
         const op2 = () => getTimerPromise(50, succeededResult(50));
         const op3 = () => getTimerPromise(75, succeededResult(75));
@@ -50,8 +41,7 @@ describe("all()", () =>
     });
 
 
-    it("when one result fails, the returned promise resolves with a Result containing the index of the item that failed and its error", async () =>
-    {
+    it("when one result fails, the returned promise resolves with a Result containing the index of the item that failed and its error", async () => {
         const op1 = () => getTimerPromise(25, succeededResult(25));
         const op2 = () => getTimerPromise(50, failedResult("Error 1"));
         const op3 = () => getTimerPromise(75, succeededResult(75));
@@ -63,8 +53,7 @@ describe("all()", () =>
     });
 
 
-    it("when one result fails, the returned promise resolves *immediately* with the failure", async () =>
-    {
+    it("when one result fails, the returned promise resolves *immediately* with the failure", async () => {
         const op1 = () => getTimerPromise(25, succeededResult(25));
         const op2 = () => getTimerPromise(50, failedResult("Error 1"));
         const op3 = () => getTimerPromise(75, succeededResult(75));

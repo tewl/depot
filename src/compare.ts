@@ -1,5 +1,4 @@
-export enum CompareResult
-{
+export enum CompareResult {
     LESS    = -1,
     EQUAL   = 0,
     GREATER = 1

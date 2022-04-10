@@ -18,18 +18,14 @@ export interface IFindResult<TCollectionItem, TPredicateReturn> {
 export function find<TCollectionItem, TPredicateReturn>(
     collection: Array<TCollectionItem>,
     predicate: (item: TCollectionItem, index: number, collection: Array<TCollectionItem>) => TPredicateReturn
-): undefined | IFindResult<TCollectionItem, Exclude<TPredicateReturn, null | undefined>>
-{
+): undefined | IFindResult<TCollectionItem, Exclude<TPredicateReturn, null | undefined>> {
     let index = 0;
-    for (const curItem of collection)
-    {
+    for (const curItem of collection) {
         const result = predicate(curItem, index, collection);
-        if (result)
-        {
+        if (result) {
             return {item: curItem, predicateReturn: result!};
         }
-        else
-        {
+        else {
             index++;
         }
     }

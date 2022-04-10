@@ -8,8 +8,7 @@ import { failedResult, Result, succeededResult } from "./result";
  * @param flags - Any RegExp flag that should be used when creating the regex.
  * @return The newly created regex
  */
-export function createEolRegex(flags?: string): RegExp
-{
+export function createEolRegex(flags?: string): RegExp {
     return new RegExp("\\r?\\n", flags);
 }
 
@@ -22,8 +21,7 @@ export function createEolRegex(flags?: string): RegExp
  * @return true if one or more of the regular expressions match `str`; false
  * otherwise.
  */
-export function matchesAny(str: string, regexes: Array<RegExp>): boolean
-{
+export function matchesAny(str: string, regexes: Array<RegExp>): boolean {
     const matchesAny = _.some(regexes, (curRegex) => str.match(curRegex));
     return matchesAny;
 }
@@ -38,11 +36,9 @@ type RegExpFlag = "d" | "g" | "i" | "m" | "s" | "u" | "y";
  * @param flagsToClear - The flag to clear
  * @returns A new RegExp without the specified flag.
  */
-export function clearFlags(srcRegex: RegExp, flagsToClear: Array<RegExpFlag>): RegExp
-{
+export function clearFlags(srcRegex: RegExp, flagsToClear: Array<RegExpFlag>): RegExp {
     let newFlags = srcRegex.flags;
-    flagsToClear.forEach((curFlag) =>
-    {
+    flagsToClear.forEach((curFlag) => {
         newFlags = newFlags.replace(curFlag, "");
     });
     const newRegex = new RegExp(srcRegex, newFlags);
@@ -56,11 +52,9 @@ export function clearFlags(srcRegex: RegExp, flagsToClear: Array<RegExpFlag>): R
  * @param flagsToSet - The flag to set
  * @returns A new RegExp with the specified flag set
  */
-export function setFlags(srcRegex: RegExp, flagsToSet: Array<RegExpFlag>): RegExp
-{
+export function setFlags(srcRegex: RegExp, flagsToSet: Array<RegExpFlag>): RegExp {
     let newFlags = srcRegex.flags;
-    flagsToSet.forEach((curFlag) =>
-    {
+    flagsToSet.forEach((curFlag) => {
         newFlags = newFlags.replace(curFlag, "") + curFlag;
     });
     const newRegex = new RegExp(srcRegex, newFlags);
@@ -73,8 +67,7 @@ export function setFlags(srcRegex: RegExp, flagsToSet: Array<RegExpFlag>): RegEx
  * this function to avoid problems with the instance's state.
  * @returns A regular expression that matches regular expression expressions.
  */
-function getRegExpStrRegExp(): RegExp
-{
+function getRegExpStrRegExp(): RegExp {
     const regexStrRegex = /^\/(?<pattern>.*)\/(?<flags>[dgimsuy]*)$/g;
     return regexStrRegex;
 }
@@ -87,24 +80,19 @@ function getRegExpStrRegExp(): RegExp
  * @returns A Result for the RegExp instance.  Upon failure, the error
  * contains a descriptive error message.
  */
-export function strToRegExp(str: string): Result<RegExp, string>
-{
+export function strToRegExp(str: string): Result<RegExp, string> {
     const matches = getRegExpStrRegExp().exec(str);
-    try
-    {
-        if (matches)
-        {
+    try {
+        if (matches) {
             const regex = new RegExp(matches.groups!.pattern, matches.groups!.flags);
             return succeededResult(regex);
         }
-        else
-        {
+        else {
             const regex = new RegExp(str);
             return succeededResult(regex);
         }
     }
-    catch (err)
-    {
+    catch (err) {
         return failedResult((err as Error).message);
     }
 }

@@ -8,8 +8,7 @@ import {isISpawnExitError, spawn, spawnErrorToString} from "./spawn2";
 const angularProjectFilename = "angular.json";
 
 
-export async function findAngularProjectDirs(rootDir: Directory): Promise<Array<Directory>>
-{
+export async function findAngularProjectDirs(rootDir: Directory): Promise<Array<Directory>> {
     const contents = await rootDir.contents(true);
     const projectFiles = contents.files.filter((curFile) => curFile.fileName === angularProjectFilename);
     const projectDirs = projectFiles.map((curProjFile) => curProjFile.directory);
@@ -19,8 +18,7 @@ export async function findAngularProjectDirs(rootDir: Directory): Promise<Array<
 
 type EslintResults = Array<IEslintFileResults>;
 
-interface IEslintFileResults
-{
+interface IEslintFileResults {
     filePath: string;
     messages: Array<IEslintMessage>;
     errorCount: number;
@@ -32,8 +30,7 @@ interface IEslintFileResults
     usedDeprecatedRules: Array<{ruleId: string, replacedBy: Array<string>}>
 }
 
-interface IEslintMessage
-{
+interface IEslintMessage {
     ruleId: string;
     severity: number;
     message: string;
@@ -65,15 +62,13 @@ export async function lintFiles(
     projectDir: Directory,
     files: Array<File>,
     fix: boolean
-): Promise<Result<EslintResults, string>>
-{
+): Promise<Result<EslintResults, string>> {
     // Only lint files within the project directory.
     files = files.filter((curFile) => curFile.isWithin(projectDir, true));
     // Only lint files with appropriate extensions.
     files = files.filter((curFile) => lintedFileExtensions.some((curExt) => curExt === curFile.extName));
 
-    if (files.length === 0)
-    {
+    if (files.length === 0) {
         // There are no files to lint.  Consider this a successful linting.
         return succeededResult([]);
     }
@@ -88,8 +83,7 @@ export async function lintFiles(
         "--format", "json",
         ...insertIf(fix, "--fix")
     ];
-    projectRelativeFiles.forEach((curProjRelativeFile) =>
-    {
+    projectRelativeFiles.forEach((curProjRelativeFile) => {
         args.push("--lint-file-patterns");
         args.push(curProjRelativeFile.toString());
     });
@@ -99,16 +93,13 @@ export async function lintFiles(
     // Do not fail if the process returned a failure exit code.  That only
     // indicates that lint errors were found.  In that case, we should go ahead
     // and parse the output.
-    if (succeeded(result))
-    {
+    if (succeeded(result)) {
         // Linting returned an exit code of 0.  This means there were no
         // warnings or errors or they were all fixed.
         return succeededResult([]);
     }
-    else
-    {
-        if (!isISpawnExitError(result.error))
-        {
+    else {
+        if (!isISpawnExitError(result.error)) {
             const errMsg = spawnErrorToString(result.error);
             console.error(errMsg);
             return failedResult(errMsg);
@@ -117,8 +108,7 @@ export async function lintFiles(
 
     const output = result.error.stdout;
     const matches = output.match(ngLintOutputRegex);
-    if (!matches)
-    {
+    if (!matches) {
         const errMsg = `Output from "ng lint" does not match expected text.  ${output}`;
         return failedResult(errMsg);
 
@@ -126,12 +116,10 @@ export async function lintFiles(
 
     const jsonStr = matches.groups!.json;
     let json: EslintResults;
-    try
-    {
+    try {
         json = JSON.parse(jsonStr);
     }
-    catch (error)
-    {
+    catch (error) {
         const errMsg = `Failed to parse "ng lint JSON output.  ${error}`;
         return failedResult(errMsg);
     }

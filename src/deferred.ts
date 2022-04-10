@@ -3,16 +3,13 @@
  * reject() methods that control it.  Accepts a type parameter defining the
  * type of the resolved value.
  */
-export class Deferred<TResolve>
-{
+export class Deferred<TResolve> {
     public readonly promise: Promise<TResolve>;
     public resolve!: (result: TResolve) => void;
     public reject!: (err: unknown) => void;
 
-    constructor()
-    {
-        this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) =>
-        {
+    constructor() {
+        this.promise = new Promise((resolve: (result: TResolve) => void, reject: (err: unknown) => void) => {
             this.resolve = resolve;
             this.reject = reject;
         });
@@ -32,8 +29,7 @@ export class Deferred<TResolve>
 export function connectPromiseToDeferred<TResolve>(
     thePromise: Promise<TResolve>,
     theDeferred: Deferred<TResolve>
-): void
-{
+): void {
     thePromise
     .then(
         (result: TResolve) => { theDeferred.resolve(result); },

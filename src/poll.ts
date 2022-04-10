@@ -2,27 +2,23 @@ import { getTimerPromise } from "./promiseHelpers";
 import { failedResult, Result, succeeded } from "./result";
 
 
-interface IContinuePollingYes
-{
+interface IContinuePollingYes {
     continuePolling: true;
     delayMs: number;
 }
 
 
-interface IContinuePollingNo<TResult>
-{
+interface IContinuePollingNo<TResult> {
     continuePolling: false;
     result: TResult;
 }
 
 
-export function continuePollingYes(delayMs: number): IContinuePollingYes
-{
+export function continuePollingYes(delayMs: number): IContinuePollingYes {
     return { continuePolling: true, delayMs: delayMs };
 }
 
-export function continuePollingNo<TResult>(result: TResult): IContinuePollingNo<TResult>
-{
+export function continuePollingNo<TResult>(result: TResult): IContinuePollingNo<TResult> {
     return { continuePolling: false, result: result };
 }
 
@@ -61,14 +57,12 @@ type Func<TReturn> = (() => TReturn);
 export async function poll<TReturn, TResult>(
     func: Func<TReturn>,
     continuePollingPredicate: ContinuePollingPredicate<TReturn, TResult>
-): Promise<TResult>
-{
+): Promise<TResult> {
     const startTime = Date.now();
     let   iterationNum = 1;
 
     // eslint-disable-next-line no-constant-condition
-    while (true)
-    {
+    while (true) {
         const retVal = func();
 
         // Invoke the predicate to see if polling should continue.  Wrap the
@@ -76,13 +70,11 @@ export async function poll<TReturn, TResult>(
         // cases where a Promise is returned.
         const continueResult = await Promise.resolve(continuePollingPredicate(iterationNum, startTime, retVal));
 
-        if (continueResult.continuePolling)
-        {
+        if (continueResult.continuePolling) {
             await getTimerPromise(continueResult.delayMs, undefined);
             iterationNum++;
         }
-        else
-        {
+        else {
             return continueResult.result;
         }
     }
@@ -92,12 +84,10 @@ export async function poll<TReturn, TResult>(
 /**
  * A class for representing polling timeout errors.
  */
-export class PollingTimeoutError<TSuccess, TError> extends Error
-{
+export class PollingTimeoutError<TSuccess, TError> extends Error {
     public readonly lastResult: Result<TSuccess, TError>;
 
-    public constructor(message: string, lastResult: Result<TSuccess, TError>)
-    {
+    public constructor(message: string, lastResult: Result<TSuccess, TError>) {
         super(message);
         this.lastResult = lastResult;
     }
@@ -129,37 +119,30 @@ export async function pollAsyncResult<TSuccess, TError>(
     donePollingPredicate: undefined | ((iterationNum: number, startTime: number, retVal: TSuccess) => boolean),
     pollIntervalMs: number,
     timeoutMs: number
-): Promise<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>
-{
+): Promise<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>> {
     const result = await poll(
         asyncResultOp,
         async (
             iterationNum,
             startTime,
             asyncResultPromise
-        ): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> =>
-        {
+        ): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> => {
             const result = await asyncResultPromise;
-            if (succeeded(result))
-            {
+            if (succeeded(result)) {
                 let donePolling = true;
-                if (donePollingPredicate)
-                {
+                if (donePollingPredicate) {
                     donePolling = donePollingPredicate(iterationNum, startTime, result.value);
                 }
 
-                if (donePolling)
-                {
+                if (donePolling) {
                     return continuePollingNo(result);
                 }
             }
 
-            if (Date.now() - startTime > timeoutMs)
-            {
+            if (Date.now() - startTime > timeoutMs) {
                 return continuePollingNo(failedResult(new PollingTimeoutError(`Polling timed out after ${timeoutMs} ms.`, result)));
             }
-            else
-            {
+            else {
                 return continuePollingYes(pollIntervalMs);
             }
         }

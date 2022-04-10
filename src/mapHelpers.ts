@@ -1,8 +1,6 @@
-export function strMapToObj<TValue>(strMap: Map<string, TValue>): {[key: string]: TValue}
-{
+export function strMapToObj<TValue>(strMap: Map<string, TValue>): {[key: string]: TValue} {
     const obj: {[key: string]: TValue} = Object.create(null);
-    for (const [k, v] of strMap)
-    {
+    for (const [k, v] of strMap) {
         // We don’t escape the key '__proto__'
         // which can cause problems on older engines
         obj[k] = v;
@@ -11,11 +9,9 @@ export function strMapToObj<TValue>(strMap: Map<string, TValue>): {[key: string]
 }
 
 
-export function objToStrMap<TValue>(obj: {[key: string]: TValue}): Map<string, TValue>
-{
+export function objToStrMap<TValue>(obj: {[key: string]: TValue}): Map<string, TValue> {
     const strMap = new Map<string, TValue>();
-    for (const k of Object.keys(obj))
-    {
+    for (const k of Object.keys(obj)) {
         strMap.set(k, obj[k]);
     }
     return strMap;
@@ -26,14 +22,12 @@ export function strMapToJson(
     strMap: Map<string, unknown>,
     replacer?: (this: any, key: string, value: any) => any,    // eslint-disable-line @typescript-eslint/no-explicit-any
     space?: string | number
-): string
-{
+): string {
     return JSON.stringify(strMapToObj(strMap), replacer, space);
 }
 
 
-export function jsonToStrMap<TValue>(jsonStr: string): Map<string, TValue>
-{
+export function jsonToStrMap<TValue>(jsonStr: string): Map<string, TValue> {
     return objToStrMap(JSON.parse(jsonStr));
 }
 
@@ -49,11 +43,9 @@ export function jsonToStrMap<TValue>(jsonStr: string): Map<string, TValue>
 export function mapToStrMap<TKey, TValue>(
     srcMap: Map<TKey, TValue>,
     keyMapper: (key: TKey) => string
-): Map<string, TValue>
-{
+): Map<string, TValue> {
     const destMap = new Map<string, TValue>();
-    for (const [key, value] of srcMap)
-    {
+    for (const [key, value] of srcMap) {
         const newKey = keyMapper(key);
         destMap.set(newKey, value);
     }
@@ -74,8 +66,7 @@ export function mapToJson<TKey, TValue>(
     keyMapper: (key: TKey) => string,
     replacer?: (this: any, key: string, value: any) => any,  // eslint-disable-line @typescript-eslint/no-explicit-any
     space?: string | number
-): string
-{
+): string {
     const strMap = mapToStrMap(srcMap, keyMapper);
     const obj = strMapToObj(strMap);
     const json = JSON.stringify(obj, replacer, space);

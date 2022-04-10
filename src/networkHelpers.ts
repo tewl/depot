@@ -8,21 +8,16 @@ import * as _ from "lodash";
  * @return An object in which the keys are the names of the network interfaces
  * and the values are the IPv4 addresses (as strings)
  */
-export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: string}
-{
+export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: string} {
     const foundInterfaces: {[networkInterfaceName: string]: string} = {};
 
     const networkInterfaces = os.networkInterfaces();
 
-    for (const curInterfaceName in networkInterfaces)
-    {
-        if (Object.prototype.hasOwnProperty.call(networkInterfaces, curInterfaceName))
-        {
+    for (const curInterfaceName in networkInterfaces) {
+        if (Object.prototype.hasOwnProperty.call(networkInterfaces, curInterfaceName)) {
             const addrArray = networkInterfaces[curInterfaceName]!;
-            for (const curAddr of addrArray)
-            {
-                if ((curAddr.family === "IPv4") && (!curAddr.internal))
-                {
+            for (const curAddr of addrArray) {
+                if ((curAddr.family === "IPv4") && (!curAddr.internal)) {
                     foundInterfaces[curInterfaceName] = curAddr.address;
                 }
             }
@@ -37,8 +32,7 @@ export function getExternalIpv4Addresses(): {[networkInterfaceName: string]: str
  * Gets the first externally exposed IPv4 address
  * @return The first externally exposed IPv4 address
  */
-export function getFirstExternalIpv4Address(): string
-{
+export function getFirstExternalIpv4Address(): string {
     const addresses = getExternalIpv4Addresses();
     const address = _.first(_.values(addresses))!;
     return address;
@@ -52,21 +46,17 @@ export function getFirstExternalIpv4Address(): string
  * @return A promise that resolves with the port when available.  It rejects if
  * the specified port is not available.
  */
-function isAvailable(port: number): Promise<number>
-{
-    return new Promise<number>((resolve, reject) =>
-    {
+function isAvailable(port: number): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
         const server = net.createServer();
         server.unref();
         server.on("error", reject);
-        server.listen({port}, () =>
-        {
+        server.listen({port}, () => {
             // address() will return a string when listening on a pipe or UNIX
             // domain socket, but we are not doing that and will always get an
             // AddressInfo.
             const {port} = server.address() as net.AddressInfo;
-            server.close(() =>
-            {
+            server.close(() => {
                 resolve(port);
             });
         });
@@ -80,8 +70,7 @@ function isAvailable(port: number): Promise<number>
  * @return A promise that always resolves with a boolean indicating whether the
  * specified port is available.
  */
-export function isTcpPortAvailable(port: number): Promise<boolean>
-{
+export function isTcpPortAvailable(port: number): Promise<boolean> {
     return isAvailable(port)
     .then(() => true)
     .catch(() => false);
@@ -92,8 +81,7 @@ export function isTcpPortAvailable(port: number): Promise<boolean>
  * Gets an available TCP port number
  * @return An available TCP port number
  */
-export function getAvailableTcpPort(): Promise<number>
-{
+export function getAvailableTcpPort(): Promise<number> {
     return isAvailable(0);
 }
 
@@ -106,15 +94,13 @@ export function getAvailableTcpPort(): Promise<number>
  * available
  * @return An available TCP port number
  */
-export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promise<number>
-{
+export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promise<number> {
     // Remove any preferred ports that we know cannot be used.
     _.remove(preferredPorts, (curPort) => curPort === 0);
 
     return _.reduce<number, Promise<number>>(
         [...preferredPorts, 0],
-        (acc, curPort) =>
-        {
+        (acc, curPort) => {
             return acc.catch(() => isAvailable(curPort));
         },
         Promise.reject(undefined)
@@ -122,8 +108,7 @@ export function selectAvailableTcpPort(...preferredPorts: Array<number>): Promis
 }
 
 
-export interface IPortConfig
-{
+export interface IPortConfig {
     requiredPort?: number;
     preferredPort?: number;
 }
@@ -136,15 +121,12 @@ export interface IPortConfig
  * promise rejects if the caller specified a required port number that is
  * not available.
  */
-export function determinePort(portConfig?: IPortConfig): Promise<number>
-{
+export function determinePort(portConfig?: IPortConfig): Promise<number> {
     portConfig = portConfig || {};
 
     return Promise.resolve()
-    .then(() =>
-    {
-        if (!(portConfig!.requiredPort))
-        {
+    .then(() => {
+        if (!(portConfig!.requiredPort)) {
             // There is no required port.  Yield 0.
             return 0;
         }
@@ -152,17 +134,14 @@ export function determinePort(portConfig?: IPortConfig): Promise<number>
         // There is a required port.  If it is available, use it.  Otherwise
         // reject.
         return isTcpPortAvailable(portConfig!.requiredPort!)
-        .then((isAvailable) =>
-        {
+        .then((isAvailable) => {
             if (isAvailable) { return portConfig!.requiredPort; }
             throw new Error(`Required port ${portConfig!.requiredPort} is not available.`);
         });
     })
-    .then((port) =>
-    {
+    .then((port) => {
         // If we have decided on a port, use it.
-        if (port)
-        {
+        if (port) {
             return port;
         }
 

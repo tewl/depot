@@ -5,21 +5,18 @@ import {AStore, ISerialized, IdString, IStoreGetResult, IStorePutResult} from ".
 
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IPersistentCacheStow
-{
+interface IPersistentCacheStow {
     // Intentionally left empty.
     // PersistentCache does not require any stowed data.
 }
 
 
-export class PersistentCacheStore extends AStore<IPersistentCacheStow>
-{
+export class PersistentCacheStore extends AStore<IPersistentCacheStow> {
 
     public static create(
         registry: SerializationRegistry,
         persistentCache: PersistentCache<ISerialized>
-    ): Promise<PersistentCacheStore>
-    {
+    ): Promise<PersistentCacheStore> {
         const instance = new PersistentCacheStore(registry, persistentCache);
         return Promise.resolve(instance);
     }
@@ -30,18 +27,15 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     // endregion
 
 
-    private constructor(registry: SerializationRegistry, pcache: PersistentCache<ISerialized>)
-    {
+    private constructor(registry: SerializationRegistry, pcache: PersistentCache<ISerialized>) {
         super(registry);
         this._pcache = pcache;
     }
 
 
-    public async getIds(regexp?: RegExp): Promise<Array<IdString>>
-    {
+    public async getIds(regexp?: RegExp): Promise<Array<IdString>> {
         let ids: Array<IdString> = await this._pcache.keys();
-        if (regexp === undefined)
-        {
+        if (regexp === undefined) {
             return ids;
         }
 
@@ -52,8 +46,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     }
 
 
-    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>>
-    {
+    protected async get(id: IdString): Promise<IStoreGetResult<IPersistentCacheStow>> {
         // Read the specified data from the backing store.
         const serialized = await this._pcache.get(id);
 
@@ -69,8 +62,7 @@ export class PersistentCacheStore extends AStore<IPersistentCacheStow>
     protected async put(
         serialized: ISerialized,
         stow: undefined | IPersistentCacheStow
-    ): Promise<IStorePutResult<IPersistentCacheStow>>
-    {
+    ): Promise<IStorePutResult<IPersistentCacheStow>> {
         // Transform `serialized` into the backing store's representation.
         // This is not needed for PersistentCache, because it stores the data as
         // an ISerialized.

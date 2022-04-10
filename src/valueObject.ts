@@ -1,8 +1,7 @@
 /**
  * Base class for value object. Minimally useful.
  */
-export abstract class ValueObject<TDerived>
-{
+export abstract class ValueObject<TDerived> {
     /**
      * Derived classes must implement structural equality using this method.
      *

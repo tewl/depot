@@ -10,8 +10,7 @@ export enum ActionPriority {
 }
 
 
-export enum FileCompareActionType
-{
+export enum FileCompareActionType {
     CopyLeft    = "copy left",
     CopyRight   = "copy right",
     DeleteLeft  = "delete left",
@@ -21,8 +20,7 @@ export enum FileCompareActionType
 }
 
 
-export class FileCompareAction
-{
+export class FileCompareAction {
 
     private readonly _files: IFilesToCompare;
     private readonly _actionType: FileCompareActionType;
@@ -30,15 +28,13 @@ export class FileCompareAction
     public constructor(
         files: IFilesToCompare,
         actionType: FileCompareActionType
-    )
-    {
+    ) {
         this._files      = files;
         this._actionType = actionType;
     }
 
 
-    public get type(): FileCompareActionType
-    {
+    public get type(): FileCompareActionType {
         return this._actionType;
     }
 
@@ -48,28 +44,22 @@ export class FileCompareAction
      * @return A promise that is resolved when the action has completed
      *     successfully or rejects if it failed.
      */
-    public execute(): Promise<void>
-    {
-        if (this._actionType === FileCompareActionType.CopyLeft)
-        {
+    public execute(): Promise<void> {
+        if (this._actionType === FileCompareActionType.CopyLeft) {
             return this._files.rightFile.copy(this._files.leftFile)
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.CopyRight)
-        {
+        else if (this._actionType === FileCompareActionType.CopyRight) {
             return this._files.leftFile.copy(this._files.rightFile)
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.DeleteLeft)
-        {
+        else if (this._actionType === FileCompareActionType.DeleteLeft) {
             return this._files.leftFile.delete();
         }
-        else if (this._actionType === FileCompareActionType.DeleteRight)
-        {
+        else if (this._actionType === FileCompareActionType.DeleteRight) {
             return this._files.rightFile.delete();
         }
-        else if (this._actionType === FileCompareActionType.DeleteBoth)
-        {
+        else if (this._actionType === FileCompareActionType.DeleteBoth) {
             return Promise.all(
                 [
                     this._files.leftFile.delete(),
@@ -78,29 +68,24 @@ export class FileCompareAction
             )
             .then(() => { return; });
         }
-        else if (this._actionType === FileCompareActionType.Skip)
-        {
+        else if (this._actionType === FileCompareActionType.Skip) {
             return Promise.resolve();
         }
-        else
-        {
+        else {
             return Promise.reject(new Error(`Unsupported action "${this._actionType}".`));
         }
     }
 }
 
-export interface IFilesToCompare
-{
+export interface IFilesToCompare {
     leftFile: File;
     rightFile: File;
     actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>;
 }
 
 
-export class FileComparer implements IFilesToCompare
-{
-    public static create(leftFile: File, rightFile: File): FileComparer
-    {
+export class FileComparer implements IFilesToCompare {
+    public static create(leftFile: File, rightFile: File): FileComparer {
         return new FileComparer(leftFile, rightFile);
     }
 
@@ -111,25 +96,21 @@ export class FileComparer implements IFilesToCompare
     // #endregion
 
 
-    public get leftFile(): File
-    {
+    public get leftFile(): File {
         return this._leftFile;
     }
 
 
-    public get rightFile(): File
-    {
+    public get rightFile(): File {
         return this._rightFile;
     }
 
-    private constructor(leftFile: File, rightFile: File)
-    {
+    private constructor(leftFile: File, rightFile: File) {
         this._leftFile = leftFile;
         this._rightFile = rightFile;
     }
 
-    public async isLeftOnly(): Promise<boolean>
-    {
+    public async isLeftOnly(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
@@ -138,8 +119,7 @@ export class FileComparer implements IFilesToCompare
         return !!(leftExists && !rightExists);
     }
 
-    public async isRightOnly(): Promise<boolean>
-    {
+    public async isRightOnly(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
@@ -148,8 +128,7 @@ export class FileComparer implements IFilesToCompare
         return !!(!leftExists && rightExists);
     }
 
-    public async isInBoth(): Promise<boolean>
-    {
+    public async isInBoth(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
@@ -159,15 +138,13 @@ export class FileComparer implements IFilesToCompare
     }
 
 
-    public async bothExistAndIdentical(): Promise<boolean>
-    {
+    public async bothExistAndIdentical(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
         ]);
 
-        if (!leftExists || !rightExists)
-        {
+        if (!leftExists || !rightExists) {
             // One or both of the files do not exist.
             return false;
         }
@@ -178,8 +155,7 @@ export class FileComparer implements IFilesToCompare
         return leftHash === rightHash;
     }
 
-    public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
-    {
+    public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>> {
         const [leftExists, rightExists] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
@@ -191,22 +167,18 @@ export class FileComparer implements IFilesToCompare
 
         const actions: Array<FileCompareAction> = [];
 
-        if (isLeftOnly)
-        {
-            if (actionPriority === ActionPriority.SyncLeftToRight)
-            {
+        if (isLeftOnly) {
+            if (actionPriority === ActionPriority.SyncLeftToRight) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteLeft));
             }
-            else if (actionPriority === ActionPriority.SyncRightToLeft)
-            {
+            else if (actionPriority === ActionPriority.SyncRightToLeft) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteLeft));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
             }
-            else if (actionPriority === ActionPriority.PRESERVE)
-            {
+            else if (actionPriority === ActionPriority.PRESERVE) {
                 // No action priority specified.  Give priority to preserving
                 // files.
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
@@ -214,22 +186,18 @@ export class FileComparer implements IFilesToCompare
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteLeft));
             }
         }
-        else if (isRightOnly)
-        {
-            if (actionPriority === ActionPriority.SyncLeftToRight)
-            {
+        else if (isRightOnly) {
+            if (actionPriority === ActionPriority.SyncLeftToRight) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteRight));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyLeft));
             }
-            else if (actionPriority === ActionPriority.SyncRightToLeft)
-            {
+            else if (actionPriority === ActionPriority.SyncRightToLeft) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyLeft));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteRight));
             }
-            else if (actionPriority === ActionPriority.PRESERVE)
-            {
+            else if (actionPriority === ActionPriority.PRESERVE) {
                 // No action priority specified.  Give priority to preserving
                 // files.
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyLeft));
@@ -237,31 +205,26 @@ export class FileComparer implements IFilesToCompare
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteRight));
             }
         }
-        else if (isInBoth)
-        {
+        else if (isInBoth) {
             const [leftHash, rightHash] = await Promise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
             const filesAreIdentical = leftHash === rightHash;
 
-            if (filesAreIdentical)
-            {
+            if (filesAreIdentical) {
                 // When the files are identical, there should be no actions.
             }
-            else if (actionPriority === ActionPriority.SyncLeftToRight)
-            {
+            else if (actionPriority === ActionPriority.SyncLeftToRight) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyLeft));
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteBoth));
             }
-            else if (actionPriority === ActionPriority.SyncRightToLeft)
-            {
+            else if (actionPriority === ActionPriority.SyncRightToLeft) {
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyLeft));
                 actions.push(new FileCompareAction(this, FileCompareActionType.Skip));
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
                 actions.push(new FileCompareAction(this, FileCompareActionType.DeleteBoth));
             }
-            else
-            {
+            else {
                 // No action priority specified.  Give priority to preserving
                 // files.
                 actions.push(new FileCompareAction(this, FileCompareActionType.CopyRight));
@@ -277,8 +240,7 @@ export class FileComparer implements IFilesToCompare
 }
 
 
-export class DiffDirFileItem
-{
+export class DiffDirFileItem {
     /**
      * Creates a new instance.
      * @param leftRootDir - The left directory being compared
@@ -293,11 +255,9 @@ export class DiffDirFileItem
         leftRootDir:      Directory,
         rightRootDir:     Directory,
         relativeFilePath: string
-    ): DiffDirFileItem
-    {
+    ): DiffDirFileItem {
         // The relative file path must be legit.
-        if (relativeFilePath.length === 0)
-        {
+        if (relativeFilePath.length === 0) {
             throw new Error(`DiffDirFileItem relative file path cannot be 0-length.`);
         }
 
@@ -326,8 +286,7 @@ export class DiffDirFileItem
         rightRootDir:          Directory,
         relativeFilePath:      string,
         files:                 IFilesToCompare
-    )
-    {
+    ) {
         this._leftRootDir           = leftRootDir;
         this._rightRootDir          = rightRootDir;
         this._relativeFilePath      = relativeFilePath;
@@ -335,38 +294,32 @@ export class DiffDirFileItem
     }
 
 
-    public get leftRootDir(): Directory
-    {
+    public get leftRootDir(): Directory {
         return this._leftRootDir;
     }
 
 
-    public get rightRootDir(): Directory
-    {
+    public get rightRootDir(): Directory {
         return this._rightRootDir;
     }
 
 
-    public get relativeFilePath(): string
-    {
+    public get relativeFilePath(): string {
         return this._relativeFilePath;
     }
 
 
-    public get leftFile(): File
-    {
+    public get leftFile(): File {
         return this._files.leftFile;
     }
 
 
-    public get rightFile(): File
-    {
+    public get rightFile(): File {
         return this._files.rightFile;
     }
 
 
-    public async isLeftOnly(): Promise<boolean>
-    {
+    public async isLeftOnly(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._files.leftFile.exists(),
             this._files.rightFile.exists()
@@ -376,8 +329,7 @@ export class DiffDirFileItem
     }
 
 
-    public async isRightOnly(): Promise<boolean>
-    {
+    public async isRightOnly(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._files.leftFile.exists(),
             this._files.rightFile.exists()
@@ -387,8 +339,7 @@ export class DiffDirFileItem
     }
 
 
-    public async isInBoth(): Promise<boolean>
-    {
+    public async isInBoth(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._files.leftFile.exists(),
             this._files.rightFile.exists()
@@ -398,15 +349,13 @@ export class DiffDirFileItem
     }
 
 
-    public async bothExistAndIdentical(): Promise<boolean>
-    {
+    public async bothExistAndIdentical(): Promise<boolean> {
         const [leftExists, rightExists] = await Promise.all([
             this._files.leftFile.exists(),
             this._files.rightFile.exists()
         ]);
 
-        if (!leftExists || !rightExists)
-        {
+        if (!leftExists || !rightExists) {
             // One or both of the files do not exist.
             return false;
         }
@@ -421,8 +370,7 @@ export class DiffDirFileItem
     }
 
 
-    public actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>>
-    {
+    public actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>> {
         const actions = this._files.actions(actionPriority);
         return actions;
     }
@@ -446,8 +394,7 @@ export async function diffDirectories(
     leftDir: Directory,
     rightDir: Directory,
     includeIdentical = false
-): Promise<Array<DiffDirFileItem>>
-{
+): Promise<Array<DiffDirFileItem>> {
     //
     // Create an array of DiffDirFileItems for the files in the left directory.
     //
@@ -456,8 +403,7 @@ export async function diffDirectories(
         (leftContents) => leftContents.files,
         () => []     // Left directory does not exist.
     )
-    .then((leftFiles) =>
-    {
+    .then((leftFiles) => {
         return _.map(
             leftFiles,
             (curLeftFile) => DiffDirFileItem.create(leftDir, rightDir,
@@ -473,8 +419,7 @@ export async function diffDirectories(
         (rightContents) => rightContents.files,
         () => []    // Right directory does not exist.
     )
-    .then((rightFiles) =>
-    {
+    .then((rightFiles) => {
         return _.map(
             rightFiles,
             (curRightFile) => DiffDirFileItem.create(leftDir,
@@ -494,8 +439,7 @@ export async function diffDirectories(
     //
     // If not including identical files, remove them.
     //
-    if (!includeIdentical)
-    {
+    if (!includeIdentical) {
         const identicalPromises = _.map(diffDirFileItems,
                                         (curDiffDirFileItem) => curDiffDirFileItem.bothExistAndIdentical());
         const isIdenticalValues = await Promise.all(identicalPromises);

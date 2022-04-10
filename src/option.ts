@@ -7,8 +7,7 @@
 /**
  * Describes an optional value that has a value.
  */
-export interface ISomeOption<T>
-{
+export interface ISomeOption<T> {
     readonly state: "some";
     readonly value: T;
 }
@@ -17,8 +16,7 @@ export interface ISomeOption<T>
 /**
  * Describes an optional value that does not have a value.
  */
-export interface INoneOption
-{
+export interface INoneOption {
     readonly state: "none";
     readonly value: undefined;
 }
@@ -50,8 +48,7 @@ export type Option<T> = ISomeOption<T> | INoneOption;
  * @param value The value of the option
  * @returns The created "some" Option.
  */
-export function someOption<T>(value: T): ISomeOption<T>
-{
+export function someOption<T>(value: T): ISomeOption<T> {
     return {state: "some", value: value};
 }
 
@@ -60,8 +57,7 @@ export function someOption<T>(value: T): ISomeOption<T>
  * Convenience function that creates an Option that does not have a value.
  * @returns The created "none" Option.
  */
-export function noneOption(): INoneOption
-{
+export function noneOption(): INoneOption {
     return noneVal;
 }
 
@@ -78,8 +74,7 @@ export function noneOption(): INoneOption
  * @param option - The Option to inspect
  * @returns Whether the Option instance has a value.
  */
-export function isSome<T>(option: Option<T>): option is ISomeOption<T>
-{
+export function isSome<T>(option: Option<T>): option is ISomeOption<T> {
     return option.state === "some";
 }
 
@@ -89,8 +84,7 @@ export function isSome<T>(option: Option<T>): option is ISomeOption<T>
  * @param option The Option to inspect
  * @returns Whether the Option instance does not have a value.
  */
-export function isNone<T>(option: Option<T>): option is INoneOption
-{
+export function isNone<T>(option: Option<T>): option is INoneOption {
     return option.state === "none";
 }
 
@@ -109,15 +103,12 @@ export function isNone<T>(option: Option<T>): option is INoneOption
 export function bindOption<TInput, TOutput>(
     fn: (x: TInput) => Option<TOutput>,
     input: Option<TInput>
-): Option<TOutput>
-{
-    if (isSome(input))
-    {
+): Option<TOutput> {
+    if (isSome(input)) {
         const ret = fn(input.value);
         return ret;
     }
-    else
-    {
+    else {
         return input;
     }
 }
@@ -133,15 +124,12 @@ export function bindOption<TInput, TOutput>(
 export function mapSome<TInput, TOutput>(
     fn: (x: TInput) => TOutput,
     input: Option<TInput>
-): Option<TOutput>
-{
-    if (isSome(input))
-    {
+): Option<TOutput> {
+    if (isSome(input)) {
         const ret = fn(input.value);
         return someOption(ret);
     }
-    else
-    {
+    else {
         return input;
     }
 }
@@ -157,8 +145,7 @@ export function mapSome<TInput, TOutput>(
 export function boolToOption<TSome>(
     condition: unknown,
     trueSomeVal: TSome
-): Option<TSome>
-{
+): Option<TSome> {
     return condition ?
         someOption(trueSomeVal) :
         noneOption();

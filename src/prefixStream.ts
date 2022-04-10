@@ -5,8 +5,7 @@ import {Deferred} from "./deferred";
 /**
  * A stream that prefixes each line with a specified string.
  */
-export class PrefixStream extends Transform
-{
+export class PrefixStream extends Transform {
     // region Private Members
     private readonly _prefixBuf: Buffer;
     private _partial: Buffer | undefined;
@@ -14,16 +13,14 @@ export class PrefixStream extends Transform
     // endregion
 
 
-    constructor(prefix: string)
-    {
+    constructor(prefix: string) {
         super();
         this._prefixBuf = Buffer.from(`[${prefix}] `);
         this._flushedDeferred = new Deferred<void>();
     }
 
 
-    public override _transform(chunk: Buffer | string, encoding: string, done: () => unknown): void
-    {
+    public override _transform(chunk: Buffer | string, encoding: string, done: () => unknown): void {
         // Convert to a Buffer.
         const chunkBuf: Buffer = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
 
@@ -33,8 +30,7 @@ export class PrefixStream extends Transform
 
         // While complete lines exist, push them.
         let index: number = this._partial.indexOf("\n");
-        while (index !== -1)
-        {
+        while (index !== -1) {
             const line = this._partial.slice(0, ++index);
             this._partial = this._partial.slice(index);
             this.push(Buffer.concat([this._prefixBuf, line]));
@@ -45,10 +41,8 @@ export class PrefixStream extends Transform
     }
 
 
-    public override _flush(done: () => unknown): void
-    {
-        if (this._partial?.length)
-        {
+    public override _flush(done: () => unknown): void {
+        if (this._partial?.length) {
             this.push(Buffer.concat([this._prefixBuf, this._partial]));
         }
         this._flushedDeferred.resolve(undefined);
@@ -57,14 +51,12 @@ export class PrefixStream extends Transform
     }
 
 
-    public get prefix(): string
-    {
+    public get prefix(): string {
         return this._prefixBuf.toString();
     }
 
 
-    public get flushedPromise(): Promise<void>
-    {
+    public get flushedPromise(): Promise<void> {
         return this._flushedDeferred.promise;
     }
 }

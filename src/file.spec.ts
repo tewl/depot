@@ -7,17 +7,13 @@ import {Directory} from "./directory";
 import {getOs, OperatingSystem} from "./os";
 
 
-describe("File", () =>
-{
+describe("File", () => {
 
-    describe("static", () =>
-    {
+    describe("static", () => {
 
-        describe("relative()", () =>
-        {
+        describe("relative()", () => {
 
-            it("returns undefined when the left part string does not match", () =>
-            {
+            it("returns undefined when the left part string does not match", () => {
                 const d = new Directory(path.join("a", "b"));
                 const f = new File(path.join("a", "b", "c", "d", "e.txt"));
                 expect(File.relative(d, f).toString()).toEqual(path.join("c", "d", "e.txt"));
@@ -27,11 +23,9 @@ describe("File", () =>
         });
 
 
-        describe("relativeParts()", () =>
-        {
+        describe("relativeParts()", () => {
 
-            it("returns the expected array of path parts", () =>
-            {
+            it("returns the expected array of path parts", () => {
                 const d = new Directory(path.join("a", "b"));
                 const f = new File(path.join("a", "b", "c", "d", "e.txt"));
                 expect(File.relativeParts(d, f)).toEqual(["c", "d", "e.txt"]);
@@ -43,20 +37,16 @@ describe("File", () =>
     });
 
 
-    describe("instance", () =>
-    {
+    describe("instance", () => {
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
         });
 
 
-        describe("dirName, baseName, fileName, extName", () =>
-        {
+        describe("dirName, baseName, fileName, extName", () => {
 
-            it("will give the correct parts of a normal file path with initial parent dir", () =>
-            {
+            it("will give the correct parts of a normal file path with initial parent dir", () => {
                 const file1: File = new File("..", "tmp", "bar", "baz.txt");
                 expect(file1.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
                 expect(file1.baseName).toEqual("baz");
@@ -64,8 +54,7 @@ describe("File", () =>
                 expect(file1.extName).toEqual(".txt");
             });
 
-            it("will give the correct parts of a normal file path", () =>
-            {
+            it("will give the correct parts of a normal file path", () => {
                 const file1: File = new File("tmp", "bar", "baz.txt");
                 expect(file1.dirName).toEqual(path.join("tmp", "bar") + path.sep);
                 expect(file1.baseName).toEqual("baz");
@@ -74,8 +63,7 @@ describe("File", () =>
             });
 
 
-            it("will give the correct parts of a file path with no directory", () =>
-            {
+            it("will give the correct parts of a file path with no directory", () => {
                 const file: File = new File("baz.foo");
 
                 expect(file.dirName).toEqual("." + path.sep);
@@ -85,8 +73,7 @@ describe("File", () =>
             });
 
 
-            it("will give the correct parts of a file path with no extension", () =>
-            {
+            it("will give the correct parts of a file path with no extension", () => {
                 const file: File = new File(path.join("..", "tmp", "bar", "baz"));
 
                 expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
@@ -96,8 +83,7 @@ describe("File", () =>
             });
 
 
-            it("will give the correct parts for a dotfile", () =>
-            {
+            it("will give the correct parts for a dotfile", () => {
                 const file: File = new File(path.join("..", "tmp", "bar", ".baz"));
 
                 expect(file.dirName).toEqual(path.join("..", "tmp", "bar") + path.sep);
@@ -110,11 +96,9 @@ describe("File", () =>
         });
 
 
-        describe("directory", () =>
-        {
+        describe("directory", () => {
 
-            it("will return a Directory object representing the directory containing the file", () =>
-            {
+            it("will return a Directory object representing the directory containing the file", () => {
                 const dir = new Directory(path.join("..", "foo", "bar"));
                 const file = new File(dir, "baz.txt");
                 expect(file.directory.toString()).toEqual(dir.toString());
@@ -124,11 +108,9 @@ describe("File", () =>
         });
 
 
-        describe("toString()", () =>
-        {
+        describe("toString()", () => {
 
-            it("will return the string that was passed into the constructor", () =>
-            {
+            it("will return the string that was passed into the constructor", () => {
                 const file1 = new File(path.join(".", "foo", "bar.txt"));
                 expect(file1.toString()).toEqual(path.join("foo", "bar.txt"));
             });
@@ -137,11 +119,9 @@ describe("File", () =>
         });
 
 
-        describe("equals()", () =>
-        {
+        describe("equals()", () => {
 
-            it("will return true for 2 files that are equal", () =>
-            {
+            it("will return true for 2 files that are equal", () => {
                 const file1 = new File(__filename);
                 const file2 = new File(__filename);
 
@@ -149,8 +129,7 @@ describe("File", () =>
             });
 
 
-            it("will return false for 2 different files", () =>
-            {
+            it("will return false for 2 different files", () => {
                 const file1 = new File(".", "foo.txt");
                 const file2 = new File(".", "bar.txt");
 
@@ -158,8 +137,7 @@ describe("File", () =>
             });
 
 
-            it("will return false for two files named the same but in different folders", () =>
-            {
+            it("will return false for two files named the same but in different folders", () => {
                 tmpDir.emptySync();
 
                 const file1 = new File(tmpDir, "foo", "a.txt");
@@ -172,10 +150,8 @@ describe("File", () =>
         });
 
 
-        describe("isWithin()", () =>
-        {
-            it("returns true when the file is in the directory", async () =>
-            {
+        describe("isWithin()", () => {
+            it("returns true when the file is in the directory", async () => {
                 const theFile = new File(tmpDir, "foo.txt");
                 await theFile.write("xyzzy");
 
@@ -183,8 +159,7 @@ describe("File", () =>
             });
 
 
-            it("returns true when the file is in a subdirectory and search is recursive", async () =>
-            {
+            it("returns true when the file is in a subdirectory and search is recursive", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(dir1, "dir2").ensureExists();
                 const dir3 = await new Directory(dir2, "dir3").ensureExists();
@@ -195,8 +170,7 @@ describe("File", () =>
             });
 
 
-            it("returns false when the file is in a subdirectory but the search was not recursive", async () =>
-            {
+            it("returns false when the file is in a subdirectory but the search was not recursive", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(dir1, "dir2").ensureExists();
                 const dir3 = await new Directory(dir2, "dir3").ensureExists();
@@ -207,8 +181,7 @@ describe("File", () =>
             });
 
 
-            it("returns false when the file is not in the directory", async () =>
-            {
+            it("returns false when the file is not in the directory", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(tmpDir, "dir2").ensureExists();
                 const theFile = new File(dir1, "foo.txt");
@@ -219,37 +192,30 @@ describe("File", () =>
         });
 
 
-        describe("exists()", () =>
-        {
+        describe("exists()", () => {
 
-            it("will resolve to a Stats object for an existing file", () =>
-            {
+            it("will resolve to a Stats object for an existing file", () => {
                 const file = new File(__filename);
                 return file.exists()
-                .then((stats) =>
-                {
+                .then((stats) => {
                     expect(stats).toBeTruthy();
                 });
             });
 
 
-            it("will resolve to false for a file that does not exist", () =>
-            {
+            it("will resolve to false for a file that does not exist", () => {
                 const file = new File(__dirname, "xyzzy.txt");
                 return file.exists()
-                .then((result) =>
-                {
+                .then((result) => {
                     expect(result).toBeFalsy();
                 });
             });
 
 
-            it("will resolve to false for a directory with the specified path", () =>
-            {
+            it("will resolve to false for a directory with the specified path", () => {
                 const file = new File(__dirname);
                 return file.exists()
-                .then((result) =>
-                {
+                .then((result) => {
                     expect(result).toBeFalsy();
                 });
             });
@@ -258,23 +224,19 @@ describe("File", () =>
         });
 
 
-        describe("existsSync()", () =>
-        {
+        describe("existsSync()", () => {
 
-            it("will return a truthy fs.Stats object for an existing file", () =>
-            {
+            it("will return a truthy fs.Stats object for an existing file", () => {
                 expect(new File(__filename).existsSync()).toBeTruthy();
             });
 
 
-            it("will return false for a file that does not exist", () =>
-            {
+            it("will return false for a file that does not exist", () => {
                 expect(new File(__dirname, "xyzzy.txt").existsSync()).toBeFalsy();
             });
 
 
-            it("will return false for a directory with the specified path", () =>
-            {
+            it("will return false for a directory with the specified path", () => {
                 expect(new File(__dirname).existsSync()).toBeFalsy();
             });
 
@@ -282,26 +244,21 @@ describe("File", () =>
         });
 
 
-        describe("getSiblingFiles()", () =>
-        {
-            beforeEach(() =>
-            {
+        describe("getSiblingFiles()", () => {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
-            it("rejects when called on a nonexistant file", (done) =>
-            {
+            it("rejects when called on a nonexistant file", (done) => {
                 const file = new File(tmpDir, "foo.txt");
                 file.getSiblingFiles()
-                .catch((err) =>
-                {
+                .catch((err) => {
                     done();
                 });
             });
 
 
-            it("resolves with expected sibling files and they contain expected path", async () =>
-            {
+            it("resolves with expected sibling files and they contain expected path", async () => {
                 const subDir = new Directory(tmpDir, "subdir");
                 await subDir.ensureExists();
 
@@ -326,27 +283,22 @@ describe("File", () =>
         });
 
 
-        describe("chmod()", () =>
-        {
+        describe("chmod()", () => {
             const testFile = new File(tmpDir, "test.txt");
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 testFile.writeSync("This is a test file");
             });
 
 
-            it("will change the mode bits to the specified value (non-Windows)", (done) =>
-            {
-                if (getOs() !== OperatingSystem.Windows)
-                {
+            it("will change the mode bits to the specified value (non-Windows)", (done) => {
+                if (getOs() !== OperatingSystem.Windows) {
                     testFile.chmod(
                         constants.S_IRWXU |
                         constants.S_IRGRP | constants.S_IXGRP |
                         constants.S_IROTH | constants.S_IXOTH
                     )
-                    .then((testFile) =>
-                    {
+                    .then((testFile) => {
                         const afterStats = testFile.existsSync();
                         expect(afterStats).toBeTruthy();
                         expect(afterStats!.mode & constants.S_IRUSR).toEqual(constants.S_IRUSR);
@@ -361,16 +313,13 @@ describe("File", () =>
                         done();
                     });
                 }
-                else
-                {
+                else {
                     done();
                 }
             });
 
-            it("will change the mode bits to the specified value (Windows)", (done) =>
-            {
-                if (getOs() === OperatingSystem.Windows)
-                {
+            it("will change the mode bits to the specified value (Windows)", (done) => {
+                if (getOs() === OperatingSystem.Windows) {
 
                     // chmod() is implemented very strangely on Windows.
                     //
@@ -395,8 +344,7 @@ describe("File", () =>
                     const newMode = 0o755;
 
                     testFile.chmod(newMode)
-                    .then((testFile) =>
-                    {
+                    .then((testFile) => {
                         const afterStats = testFile.existsSync();
                         expect(afterStats).toBeTruthy();
                         expect(afterStats!.mode & 0o400).toEqual(0o400);
@@ -411,8 +359,7 @@ describe("File", () =>
                         done();
                     });
                 }
-                else
-                {
+                else {
                     done();
                 }
             });
@@ -421,20 +368,16 @@ describe("File", () =>
         });
 
 
-        describe("chmodSync", () =>
-        {
+        describe("chmodSync", () => {
             const testFile = new File(tmpDir, "test.txt");
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 testFile.writeSync("This is a test file");
             });
 
 
-            it("will change the mode bits to the specified value (non-Windows)", () =>
-            {
-                if (getOs() !== OperatingSystem.Windows)
-                {
+            it("will change the mode bits to the specified value (non-Windows)", () => {
+                if (getOs() !== OperatingSystem.Windows) {
                     testFile.chmodSync(
                         constants.S_IRWXU |
                         constants.S_IRGRP | constants.S_IXGRP |
@@ -457,20 +400,16 @@ describe("File", () =>
         });
 
 
-        describe("absPath()", () =>
-        {
+        describe("absPath()", () => {
 
-            it("will return the absolute path of the file", () =>
-            {
+            it("will return the absolute path of the file", () => {
                 const file = new File(__filename);
                 const absPath = file.absPath();
 
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
                 }
-                else
-                {
+                else {
                     expect(_.startsWith(absPath, "/")).toBeTruthy();
                 }
 
@@ -481,21 +420,17 @@ describe("File", () =>
         });
 
 
-        describe("absolute()", () =>
-        {
+        describe("absolute()", () => {
 
-            it("will return a File instance that is absolute", () =>
-            {
+            it("will return a File instance that is absolute", () => {
                 const relFile = new File("../package.json");
                 expect(_.startsWith(relFile.toString(), ".." + path.sep)).toBeTruthy();
 
                 const absFile = relFile.absolute();
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(absFile.toString(), "C:\\")).toBeTruthy();
                 }
-                else
-                {
+                else {
                     expect(_.startsWith(absFile.toString(), "/")).toBeTruthy();
                 }
             });
@@ -504,32 +439,27 @@ describe("File", () =>
         });
 
 
-        describe("delete()", () =>
-        {
+        describe("delete()", () => {
 
-            it("will delete the specified file", () =>
-            {
+            it("will delete the specified file", () => {
                 const fileA = new File(tmpDir, "a.txt");
                 fileA.writeSync("This is file A");
                 expect(fileA.existsSync()).toBeTruthy();
 
                 return fileA.delete()
-                .then(() =>
-                {
+                .then(() => {
                     expect(fileA.existsSync()).toBeFalsy();
                 });
             });
 
 
-            it("will resolve when the specified file does not exist", (done) =>
-            {
+            it("will resolve when the specified file does not exist", (done) => {
                 const fileA = new File(tmpDir, "xyzzy.txt");
 
                 expect(fileA.existsSync()).toBeFalsy();
 
                 fileA.delete()
-                .then(() =>
-                {
+                .then(() => {
                     done();
                 });
             });
@@ -538,11 +468,9 @@ describe("File", () =>
         });
 
 
-        describe("deleteSync()", () =>
-        {
+        describe("deleteSync()", () => {
 
-            it("will delete the specified file", () =>
-            {
+            it("will delete the specified file", () => {
                 const fileA = new File(tmpDir, "a.txt");
                 fileA.writeSync("This is file A");
                 expect(fileA.existsSync()).toBeTruthy();
@@ -553,8 +481,7 @@ describe("File", () =>
             });
 
 
-            it("will just return when the specified file does not exist", () =>
-            {
+            it("will just return when the specified file does not exist", () => {
                 const fileA = new File(tmpDir, "xyzzy.txt");
 
                 expect(fileA.existsSync()).toBeFalsy();
@@ -566,25 +493,21 @@ describe("File", () =>
         });
 
 
-        describe("copy()", () =>
-        {
+        describe("copy()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will copy the file to the specified destination directory", (done) =>
-            {
+            it("will copy the file to the specified destination directory", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.copy(dstDir)
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(dstDir.absPath(), "file.txt"));
                     expect(dstFile.readSync()).toEqual("abc");
@@ -593,16 +516,14 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a directory and filename is specified", (done) =>
-            {
+            it("will rename the file when a directory and filename is specified", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("123");
 
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.copy(dstDir, "dest.txt")
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(dstDir.absPath(), "dest.txt"));
                     expect(dstFile.readSync()).toEqual("123");
@@ -611,16 +532,14 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a destination File is specified", (done) =>
-            {
+            it("will rename the file when a destination File is specified", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("def");
 
                 const dstFile = new File(tmpDir, "dst", "dest.txt");
 
                 srcFile.copy(dstFile)
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(tmpDir.absPath(), "dst", "dest.txt"));
                     expect(dstFile.readSync()).toEqual("def");
@@ -629,41 +548,35 @@ describe("File", () =>
             });
 
 
-            it("will reject if the source file does not exist", (done) =>
-            {
+            it("will reject if the source file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.copy(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     done();
                 });
             });
 
 
-            it("will not create a destination directory if the source file does not exist", (done) =>
-            {
+            it("will not create a destination directory if the source file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.copy(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     expect(dstDir.existsSync()).toBeFalsy();
                     done();
                 });
             });
 
 
-            it("will not create a destination file if the source file does not exist", (done) =>
-            {
+            it("will not create a destination file if the source file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.copy(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     const dstFile = new File(dstDir, "xyzzy.txt");
                     expect(dstFile.existsSync()).toBeFalsy();
                     done();
@@ -671,8 +584,7 @@ describe("File", () =>
             });
 
 
-            it("will overwrite an existing desintation file", (done) =>
-            {
+            it("will overwrite an existing desintation file", (done) => {
                 const oldDstFile = new File(tmpDir, "dst", "dst.txt");
                 oldDstFile.writeSync("old");
 
@@ -680,8 +592,7 @@ describe("File", () =>
                 srcFile.writeSync("new");
 
                 srcFile.copy(oldDstFile)
-                .then((newDstFile) =>
-                {
+                .then((newDstFile) => {
                     expect(newDstFile.existsSync()).toBeTruthy();
                     expect(newDstFile.absPath()).toEqual(oldDstFile.absPath());
                     expect(newDstFile.readSync()).toEqual("new");
@@ -690,8 +601,7 @@ describe("File", () =>
             });
 
 
-            it("will copy the atime and mtime from the source file", (done) =>
-            {
+            it("will copy the atime and mtime from the source file", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -703,19 +613,16 @@ describe("File", () =>
                 // waiting for 2 seconds before doing the copy and then
                 // making sure that the timestamp deltas are within the
                 // allowable 1 second.
-                setTimeout(() =>
-                {
+                setTimeout(() => {
                     srcFile.copy(dstFile)
-                    .then(() =>
-                    {
+                    .then(() => {
                         // We get the source file's stats after the copy has
                         // happened, because copying it changes its last access
                         // time (atime).
                         const srcStats = srcFile.existsSync();
                         const dstStats = dstFile.existsSync();
 
-                        if (!srcStats || !dstStats)
-                        {
+                        if (!srcStats || !dstStats) {
                             fail();
                             return;
                         }
@@ -731,17 +638,14 @@ describe("File", () =>
         });
 
 
-        describe("copySync()", () =>
-        {
+        describe("copySync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will copy the file to the specified destination directory", () =>
-            {
+            it("will copy the file to the specified destination directory", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -755,8 +659,7 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a directory and filename is specified", () =>
-            {
+            it("will rename the file when a directory and filename is specified", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("123");
 
@@ -770,8 +673,7 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a destination File is specified", () =>
-            {
+            it("will rename the file when a destination File is specified", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("def");
 
@@ -785,20 +687,17 @@ describe("File", () =>
             });
 
 
-            it("will throw if the source file does not exist", () =>
-            {
+            it("will throw if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
-                expect(() =>
-                {
+                expect(() => {
                     srcFile.copySync(dstDir);
                 }).toThrow();
             });
 
 
-            it("will not create a destination directory if the source file does not exist", () =>
-            {
+            it("will not create a destination directory if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
@@ -807,8 +706,7 @@ describe("File", () =>
             });
 
 
-            it("will not create a destination file if the source file does not exist", () =>
-            {
+            it("will not create a destination file if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
@@ -818,8 +716,7 @@ describe("File", () =>
             });
 
 
-            it("will overwrite an existing desintation file", () =>
-            {
+            it("will overwrite an existing desintation file", () => {
                 const oldDstFile = new File(tmpDir, "dst", "dst.txt");
                 oldDstFile.writeSync("old");
 
@@ -833,8 +730,7 @@ describe("File", () =>
             });
 
 
-            it("will copy the atime and mtime from the source file", (done) =>
-            {
+            it("will copy the atime and mtime from the source file", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -846,8 +742,7 @@ describe("File", () =>
                 // waiting for 2 seconds before doing the copy and then
                 // making sure that the timestamp deltas are within the
                 // allowable 1 second.
-                setTimeout(() =>
-                {
+                setTimeout(() => {
                     srcFile.copySync(dstFile);
 
                     // We get the source file's stats after the copy has
@@ -856,8 +751,7 @@ describe("File", () =>
                     const srcStats = srcFile.existsSync();
                     const dstStats = dstFile.existsSync();
 
-                    if (!srcStats || !dstStats)
-                    {
+                    if (!srcStats || !dstStats) {
                         fail();
                         return;
                     }
@@ -872,25 +766,21 @@ describe("File", () =>
         });
 
 
-        describe("move()", () =>
-        {
+        describe("move()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will move the file to the specified destination directory", (done) =>
-            {
+            it("will move the file to the specified destination directory", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.move(dstDir)
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(srcFile.existsSync()).toBeFalsy();
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(dstDir.absPath(), "file.txt"));
@@ -900,16 +790,14 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a directory and filename is specified", (done) =>
-            {
+            it("will rename the file when a directory and filename is specified", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("123");
 
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.move(dstDir, "dest.txt")
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(srcFile.existsSync()).toBeFalsy();
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(dstDir.absPath(), "dest.txt"));
@@ -919,16 +807,14 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a destination File is specified", (done) =>
-            {
+            it("will rename the file when a destination File is specified", (done) => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("def");
 
                 const dstFile = new File(tmpDir, "dst", "dest.txt");
 
                 srcFile.move(dstFile)
-                .then((dstFile) =>
-                {
+                .then((dstFile) => {
                     expect(srcFile.existsSync()).toBeFalsy();
                     expect(dstFile.existsSync()).toBeTruthy();
                     expect(dstFile.absPath()).toEqual(path.join(tmpDir.absPath(), "dst", "dest.txt"));
@@ -938,41 +824,35 @@ describe("File", () =>
             });
 
 
-            it("will reject if the source file does not exist", (done) =>
-            {
+            it("will reject if the source file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.move(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     done();
                 });
             });
 
 
-            it("will not create a destination directory if the soure file does not exist", (done) =>
-            {
+            it("will not create a destination directory if the soure file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.move(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     expect(dstDir.existsSync()).toBeFalsy();
                     done();
                 });
             });
 
 
-            it("will not create a destination file if the source file does not exist", (done) =>
-            {
+            it("will not create a destination file if the source file does not exist", (done) => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcFile.move(dstDir)
-                .catch(() =>
-                {
+                .catch(() => {
                     const dstFile = new File(dstDir, "xyzzy.txt");
                     expect(dstFile.existsSync()).toBeFalsy();
                     done();
@@ -980,8 +860,7 @@ describe("File", () =>
             });
 
 
-            it("will overwrite an existing destination file", (done) =>
-            {
+            it("will overwrite an existing destination file", (done) => {
                 const oldDstFile = new File(tmpDir, "dst", "dst.txt");
                 oldDstFile.writeSync("old");
 
@@ -989,8 +868,7 @@ describe("File", () =>
                 srcFile.writeSync("new");
 
                 srcFile.move(oldDstFile)
-                .then((newDstFile) =>
-                {
+                .then((newDstFile) => {
                     expect(srcFile.existsSync()).toBeFalsy();
                     expect(newDstFile.existsSync()).toBeTruthy();
                     expect(newDstFile.absPath()).toEqual(oldDstFile.absPath());
@@ -1000,8 +878,7 @@ describe("File", () =>
             });
 
 
-            it("will copy the atime and mtime from the source file", (done) =>
-            {
+            it("will copy the atime and mtime from the source file", (done) => {
                 const operatingSystem = getOs();
 
                 // Create a source file.  Then, wait 2 seconds and move it while
@@ -1018,19 +895,16 @@ describe("File", () =>
                 // waiting for 2 seconds before doing the copy and then
                 // making sure that the timestamp deltas are within the
                 // allowable 1 second.
-                setTimeout(() =>
-                {
+                setTimeout(() => {
                     // We need to get the source file's timestamps now, because
                     // after the move the source file will no longer exist.
                     const srcStats = srcFile.existsSync();
 
                     srcFile.move(dstFile)
-                    .then(() =>
-                    {
+                    .then(() => {
                         const dstStats = dstFile.existsSync();
 
-                        if (!srcStats || !dstStats)
-                        {
+                        if (!srcStats || !dstStats) {
                             fail();
                             return;
                         }
@@ -1052,17 +926,14 @@ describe("File", () =>
         });
 
 
-        describe("moveSync()", () =>
-        {
+        describe("moveSync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will move the file to the specified destination directory", () =>
-            {
+            it("will move the file to the specified destination directory", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("abc");
 
@@ -1077,8 +948,7 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a directory and filename is specified", () =>
-            {
+            it("will rename the file when a directory and filename is specified", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("123");
 
@@ -1093,8 +963,7 @@ describe("File", () =>
             });
 
 
-            it("will rename the file when a destination File is specified", () =>
-            {
+            it("will rename the file when a destination File is specified", () => {
                 const srcFile = new File(tmpDir, "src", "file.txt");
                 srcFile.writeSync("def");
 
@@ -1109,20 +978,17 @@ describe("File", () =>
             });
 
 
-            it("will throw if the source file does not exist", () =>
-            {
+            it("will throw if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
-                expect(() =>
-                {
+                expect(() => {
                     srcFile.moveSync(dstDir);
                 }).toThrow();
             });
 
 
-            it("will not create a destination directory if the source file does not exist", () =>
-            {
+            it("will not create a destination directory if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
@@ -1131,8 +997,7 @@ describe("File", () =>
             });
 
 
-            it("will not create a destination file if the source file does not exist", () =>
-            {
+            it("will not create a destination file if the source file does not exist", () => {
                 const srcFile = new File(tmpDir, "src", "xyzzy.txt");
                 const dstDir = new Directory(tmpDir, "dst");
 
@@ -1142,8 +1007,7 @@ describe("File", () =>
             });
 
 
-            it("will overwrite an existing desintation file", () =>
-            {
+            it("will overwrite an existing desintation file", () => {
                 const oldDstFile = new File(tmpDir, "dst", "dst.txt");
                 oldDstFile.writeSync("old");
 
@@ -1158,8 +1022,7 @@ describe("File", () =>
             });
 
 
-            it("will copy the atime and mtime from the source file", (done) =>
-            {
+            it("will copy the atime and mtime from the source file", (done) => {
                 const operatingSystem = getOs();
 
                 // Create a source file.  Then, wait 2 seconds and move it while
@@ -1176,8 +1039,7 @@ describe("File", () =>
                 // waiting for 2 seconds before doing the copy and then
                 // making sure that the timestamp deltas are within the
                 // allowable 1 second.
-                setTimeout(() =>
-                {
+                setTimeout(() => {
                     // We need to get the source file's timestamps now, because
                     // after the move the source file will no longer exist.
                     const srcStats = srcFile.existsSync();
@@ -1186,8 +1048,7 @@ describe("File", () =>
 
                     const dstStats = dstFile.existsSync();
 
-                    if (!srcStats || !dstStats)
-                    {
+                    if (!srcStats || !dstStats) {
                         fail();
                         return;
                     }
@@ -1210,17 +1071,14 @@ describe("File", () =>
         });
 
 
-        describe("write()", () =>
-        {
+        describe("write()", () => {
 
-            it("creates the necessary directories", (done) =>
-            {
+            it("creates the necessary directories", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
                 file.write("hello world")
-                .then(() =>
-                {
+                .then(() => {
                     expect(dir.existsSync()).toBeTruthy();
                     expect(file.existsSync()).toBeTruthy();
                     done();
@@ -1229,18 +1087,15 @@ describe("File", () =>
             });
 
 
-            it("writes the specified text to the file", (done) =>
-            {
+            it("writes the specified text to the file", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
                 file.write("hello world")
-                .then(() =>
-                {
+                .then(() => {
                     return file.read();
                 })
-                .then((text: string) =>
-                {
+                .then((text: string) => {
                     expect(text).toEqual("hello world");
                     done();
                 });
@@ -1248,11 +1103,9 @@ describe("File", () =>
         });
 
 
-        describe("writeSync()", () =>
-        {
+        describe("writeSync()", () => {
 
-            it("creates the necessary directories", () =>
-            {
+            it("creates the necessary directories", () => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
@@ -1262,8 +1115,7 @@ describe("File", () =>
             });
 
 
-            it("writes the specified text to the file", () =>
-            {
+            it("writes the specified text to the file", () => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
@@ -1276,17 +1128,14 @@ describe("File", () =>
         });
 
 
-        describe("writeJson()", () =>
-        {
+        describe("writeJson()", () => {
 
-            it("creates the necessary directories", (done) =>
-            {
+            it("creates the necessary directories", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.json");
 
                 file.writeJson({foo: "bar"})
-                .then(() =>
-                {
+                .then(() => {
                     expect(dir.existsSync()).toBeTruthy();
                     expect(file.existsSync()).toBeTruthy();
                     done();
@@ -1294,18 +1143,15 @@ describe("File", () =>
             });
 
 
-            it("writes the specified JSON to the file", (done) =>
-            {
+            it("writes the specified JSON to the file", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.json");
 
                 file.writeJson({foo: "bar"})
-                .then(() =>
-                {
+                .then(() => {
                     return file.readJson<{foo: string}>();
                 })
-                .then((data) =>
-                {
+                .then((data) => {
                     expect(data.foo).toEqual("bar");
                     done();
                 });
@@ -1314,11 +1160,9 @@ describe("File", () =>
         });
 
 
-        describe("writeJsonSync()", () =>
-        {
+        describe("writeJsonSync()", () => {
 
-            it("creates the necessary directories", () =>
-            {
+            it("creates the necessary directories", () => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
@@ -1328,8 +1172,7 @@ describe("File", () =>
             });
 
 
-            it("writes the specified JSON to the file", () =>
-            {
+            it("writes the specified JSON to the file", () => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
 
@@ -1342,17 +1185,14 @@ describe("File", () =>
         });
 
 
-        describe("getHash()", () =>
-        {
+        describe("getHash()", () => {
 
-            it("calculates the expected hash value", (done) =>
-            {
+            it("calculates the expected hash value", (done) => {
                 const file = new File(tmpDir, "src", "file.txt");
                 file.writeSync("abc");
 
                 file.getHash()
-                .then((hash) =>
-                {
+                .then((hash) => {
                     expect(hash).toEqual("900150983cd24fb0d6963f7d28e17f72");
                     done();
                 });
@@ -1362,11 +1202,9 @@ describe("File", () =>
         });
 
 
-        describe("getHashSync()", () =>
-        {
+        describe("getHashSync()", () => {
 
-            it("calculates the expected hash value", () =>
-            {
+            it("calculates the expected hash value", () => {
                 const file = new File(tmpDir, "src", "file.txt");
                 file.writeSync("abc");
 
@@ -1378,31 +1216,26 @@ describe("File", () =>
         });
 
 
-        describe("read()", () =>
-        {
+        describe("read()", () => {
 
-            it("can read the contents of a file", (done) =>
-            {
+            it("can read the contents of a file", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
                 file.writeSync("12345");
 
                 file.read()
-                .then((text) =>
-                {
+                .then((text) => {
                     expect(text).toEqual("12345");
                     done();
                 });
             });
 
 
-            it("will reject if the file being read does not exist", (done) =>
-            {
+            it("will reject if the file being read does not exist", (done) => {
                 const file = new File(tmpDir, "xyzzy.txt");
 
                 file.read()
-                .catch(() =>
-                {
+                .catch(() => {
                     done();
                 });
             });
@@ -1411,11 +1244,9 @@ describe("File", () =>
         });
 
 
-        describe("readSync()", () =>
-        {
+        describe("readSync()", () => {
 
-            it("can read the contents of a file", () =>
-            {
+            it("can read the contents of a file", () => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
                 file.writeSync("12345");
@@ -1424,52 +1255,43 @@ describe("File", () =>
             });
 
 
-            it("will throw if the file being read does not exist", () =>
-            {
+            it("will throw if the file being read does not exist", () => {
                 const file = new File(tmpDir, "xyzzy.txt");
-                expect(() =>
-                {
+                expect(() => {
                     file.readSync();
                 }).toThrow();
             });
         });
 
 
-        describe("readJson()", () =>
-        {
+        describe("readJson()", () => {
 
-            it("can read the contents of a file", (done) =>
-            {
+            it("can read the contents of a file", (done) => {
                 const dir = new Directory(tmpDir, "foo", "bar");
                 const file = new File(dir, "file.txt");
                 file.writeSync(JSON.stringify({foo: "bar"}));
 
                 file.readJson<{foo: string}>()
-                .then((data) =>
-                {
+                .then((data) => {
                     expect(data.foo).toEqual("bar");
                     done();
                 });
             });
 
 
-            it("will reject if the file being read does not exist", (done) =>
-            {
+            it("will reject if the file being read does not exist", (done) => {
                 const file = new File(tmpDir, "xyzzy.txt");
 
                 file.readJson()
-                .catch(() =>
-                {
+                .catch(() => {
                     done();
                 });
             });
 
 
-            describe("readJsonSync()", () =>
-            {
+            describe("readJsonSync()", () => {
 
-                it("can read the contents of a file", () =>
-                {
+                it("can read the contents of a file", () => {
                     const dir = new Directory(tmpDir, "foo", "bar");
                     const file = new File(dir, "file.txt");
                     file.writeSync(JSON.stringify({foo: "bar"}));
@@ -1478,11 +1300,9 @@ describe("File", () =>
                 });
 
 
-                it("will throw if the file being read does not exist", () =>
-                {
+                it("will throw if the file being read does not exist", () => {
                     const file = new File(tmpDir, "xyzzy.txt");
-                    expect(() =>
-                    {
+                    expect(() => {
                         file.readJsonSync();
                     }).toThrow();
                 });
@@ -1492,10 +1312,8 @@ describe("File", () =>
         });
 
 
-        describe("readLines()", () =>
-        {
-            it("passes each line of the file to the callback", async () =>
-            {
+        describe("readLines()", () => {
+            it("passes each line of the file to the callback", async () => {
                 const inputFile = new File(tmpDir, "input.txt");
                 const contents = [
                     "1\n",
@@ -1507,8 +1325,7 @@ describe("File", () =>
 
                 const readContents: Array<string> = [];
                 const lineNums: Array<number> = [];
-                await inputFile.readLines((text, lineNum) =>
-                {
+                await inputFile.readLines((text, lineNum) => {
                     readContents.push(text);
                     lineNums.push(lineNum);
                 });
@@ -1518,18 +1335,15 @@ describe("File", () =>
             });
 
 
-            it("rejects when the file does not exist", async () =>
-            {
+            it("rejects when the file does not exist", async () => {
                 const inputFile = new File(tmpDir, "input.txt");
                 expect(inputFile.existsSync()).toBeUndefined();
 
-                try
-                {
+                try {
                     await inputFile.readLines((lineText, lineNum) => {});
                     fail("Should never get here.");
                 }
-                catch (err)
-                {
+                catch (err) {
                     expect(err).toBeDefined();
                 }
             });

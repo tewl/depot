@@ -23,8 +23,7 @@ export interface ISslConfig {
  * See this classes unit test file for an example of how to create a derived
  * concrete class.
  */
-export class QuickServer
-{
+export class QuickServer {
 
     // region Instance Members
     private readonly _port:            number;
@@ -57,8 +56,7 @@ export class QuickServer
         port: number,
         sslConfig: undefined | ISslConfig,
         requestListener: RequestListener
-    )
-    {
+    ) {
         this._port            = port;
         this._sslConfig       = sslConfig;
         this._requestListener = requestListener;
@@ -69,8 +67,7 @@ export class QuickServer
      * Gets the wrapped HTTP server.  undefined is returned if there is no
      * server (i.e. listen() has not been called).
      */
-    public get server(): undefined | http.Server | https.Server
-    {
+    public get server(): undefined | http.Server | https.Server {
         return this._server;
     }
 
@@ -79,8 +76,7 @@ export class QuickServer
      * Gets the port that this server will run on (once `start()` is
      * called)
      */
-    public get port(): number
-    {
+    public get port(): number {
         return this._port;
     }
 
@@ -88,8 +84,7 @@ export class QuickServer
     /**
      * Gets the IP address of this server.
      */
-    public get ipAddress(): string
-    {
+    public get ipAddress(): string {
         return getFirstExternalIpv4Address();
     }
 
@@ -97,16 +92,14 @@ export class QuickServer
     /**
      * Gets the URL of this server.
      */
-    public get url(): string
-    {
+    public get url(): string {
         const ipAddress = this.ipAddress;
         const protocol = this._sslConfig ? "https" : "http";
         return `${protocol}://${ipAddress}:${this._port}`;
     }
 
 
-    public get isReferenced(): undefined | boolean
-    {
+    public get isReferenced(): undefined | boolean {
         return this._isReferenced;
     }
 
@@ -115,8 +108,7 @@ export class QuickServer
      * A request-promise object that can be used to make requests to this
      * server.
      */
-    public get request(): RequestType
-    {
+    public get request(): RequestType {
         const requestOptions: request.RequestPromiseOptions = {
             baseUrl: this.url,
             json:    true
@@ -126,8 +118,7 @@ export class QuickServer
         // be able to walk the certificate chain back to a root CA.  Typically,
         // this would cause a "self signed certificate" error.  To get around
         // this, we will not require this authorization.
-        if (this._sslConfig?.isSelfSigned)
-        {
+        if (this._sslConfig?.isSelfSigned) {
             requestOptions.rejectUnauthorized = false;
         }
 
@@ -142,29 +133,22 @@ export class QuickServer
      *     to exit if this is the only active server.
      * @return A promise that resolves when this server has started
      */
-    public listen(referenced = true): Promise<void>
-    {
+    public listen(referenced = true): Promise<void> {
         // If this server is already started, just resolve.
-        if (this._server)
-        {
+        if (this._server) {
             return Promise.resolve();
         }
 
-        return new Promise((resolve) =>
-        {
-            if (this._sslConfig)
-            {
+        return new Promise((resolve) => {
+            if (this._sslConfig) {
                 this._server = https.createServer(this._sslConfig, this._requestListener);
             }
-            else
-            {
+            else {
                 this._server = http.createServer(this._requestListener);
             }
 
-            this._server.listen(this._port, () =>
-            {
-                if (!referenced)
-                {
+            this._server.listen(this._port, () => {
+                if (!referenced) {
                     this._server!.unref();
                 }
                 this._isReferenced = referenced;
@@ -172,12 +156,10 @@ export class QuickServer
                 // Start tracking the active connections to this server.
                 // This is needed in case we have to destroy them when closing
                 // this server.
-                this._server!.on("connection", (conn) =>
-                {
+                this._server!.on("connection", (conn) => {
                     const key = `${conn.remoteAddress}:${conn.remotePort}`;
                     this._connections[key] = conn;
-                    conn.on("close", () =>
-                    {
+                    conn.on("close", () => {
                         delete this._connections[key];
                     });
                 });
@@ -200,18 +182,14 @@ export class QuickServer
      * @return A promise that resolves when all existing connection have closed
      * naturally.
      */
-    public close(force = false): Promise<void>
-    {
+    public close(force = false): Promise<void> {
         // If this server is already stopped, just resolve.
-        if (!this._server)
-        {
+        if (!this._server) {
             return Promise.resolve();
         }
 
-        return new Promise((resolve) =>
-        {
-            this._server!.close(() =>
-            {
+        return new Promise((resolve) => {
+            this._server!.close(() => {
                 this._server = undefined;
                 this._isReferenced = undefined;
                 this._connections = {};
@@ -220,10 +198,8 @@ export class QuickServer
 
             // If the caller wants to force this server to close, forcibly
             // destroy all existing connections.
-            if (force)
-            {
-                _.forOwn(this._connections, (curConn) =>
-                {
+            if (force) {
+                _.forOwn(this._connections, (curConn) => {
                     curConn.destroy();
                 });
             }

@@ -7,8 +7,7 @@
 /**
  * Describes a successful result for an operation that may succeed or fail.
  */
-export interface ISucceededResult<TSuccess>
-{
+export interface ISucceededResult<TSuccess> {
     readonly state: "succeeded";
     readonly value: TSuccess;
     readonly error: undefined;
@@ -18,8 +17,7 @@ export interface ISucceededResult<TSuccess>
 /**
  * Describes a failure result for an operation that may succeed or fail.
  */
-export interface IFailedResult<TError>
-{
+export interface IFailedResult<TError> {
     readonly state: "failed";
     readonly value: undefined;
     readonly error: TError;
@@ -44,8 +42,7 @@ export type Result<TSuccess, TError> = ISucceededResult<TSuccess> | IFailedResul
  * @param result - The success value that will be wrapped
  * @return The successful Result instance
  */
-export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess>
-{
+export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSuccess> {
     return { state: "succeeded", value: value, error: undefined };
 }
 
@@ -55,8 +52,7 @@ export function succeededResult<TSuccess>(value: TSuccess): ISucceededResult<TSu
  * @param error - The error payload that will be wrapped
  * @return The failure Result instance
  */
-export function failedResult<TError>(error: TError): IFailedResult<TError>
-{
+export function failedResult<TError>(error: TError): IFailedResult<TError> {
     return { state: "failed", value: undefined, error: error };
 }
 
@@ -73,8 +69,7 @@ export function failedResult<TError>(error: TError): IFailedResult<TError>
  * @param result - The Result instance to inspect
  * @return Whether the Result instance represents a success.
  */
-export function succeeded<TSuccess, TError>(result: Result<TSuccess, TError>): result is ISucceededResult<TSuccess>
-{
+export function succeeded<TSuccess, TError>(result: Result<TSuccess, TError>): result is ISucceededResult<TSuccess> {
     return result.state === "succeeded";
 }
 
@@ -84,7 +79,6 @@ export function succeeded<TSuccess, TError>(result: Result<TSuccess, TError>): r
  * @param result - The Result instance to inspect
  * @return Whether the Result instance represents a failure.
  */
-export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): result is IFailedResult<TError>
-{
+export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): result is IFailedResult<TError> {
     return result.state === "failed";
 }

@@ -1,13 +1,10 @@
 import { Reporter } from "./reporter";
 
-describe("reporter", () =>
-{
+describe("reporter", () => {
 
-    describe("constructor", () =>
-    {
+    describe("constructor", () => {
 
-        it("creates a new instance", () =>
-        {
+        it("creates a new instance", () => {
             const inst = new Reporter();
             expect(inst).not.toBeUndefined();
         });
@@ -15,21 +12,17 @@ describe("reporter", () =>
     });
 
 
-    describe("log()", () =>
-    {
+    describe("log()", () => {
 
-        it("has no ill side effects when no listeners are registered", () =>
-        {
+        it("has no ill side effects when no listeners are registered", () => {
             const reporter = new Reporter();
             reporter.log("hello world");
         });
 
 
-        it("logs as expected when there is no indentation applied", () =>
-        {
+        it("logs as expected when there is no indentation applied", () => {
             let reportedText = "";
-            const listener = (text: string) =>
-            {
+            const listener = (text: string) => {
                 reportedText = text;
             };
 
@@ -41,11 +34,9 @@ describe("reporter", () =>
         });
 
 
-        it("logs as expected when there is indentation applied", () =>
-        {
+        it("logs as expected when there is indentation applied", () => {
             let reportedText = "";
-            const listener = (text: string) =>
-            {
+            const listener = (text: string) => {
                 reportedText = text;
             };
 
@@ -58,11 +49,9 @@ describe("reporter", () =>
         });
 
 
-        it("logs as expected when there is indentation and a string with newlines is logged", () =>
-        {
+        it("logs as expected when there is indentation and a string with newlines is logged", () => {
             let reportedText = "";
-            const listener = (text: string) =>
-            {
+            const listener = (text: string) => {
                 reportedText = text;
             };
 
@@ -75,11 +64,9 @@ describe("reporter", () =>
         });
 
 
-        it("logs as expected as indentation is pushed and popped", () =>
-        {
+        it("logs as expected as indentation is pushed and popped", () => {
             let reportedText = "";
-            const listener = (text: string) =>
-            {
+            const listener = (text: string) => {
                 reportedText = text;
             };
 

@@ -2,8 +2,7 @@ import * as _ from "lodash";
 import {ISerializableStatic} from "./serialization";
 
 
-export class SerializationRegistry
-{
+export class SerializationRegistry {
     // region Instance Data Members
 
     // A map of registered classes.  The key is the type string and the value is
@@ -13,14 +12,12 @@ export class SerializationRegistry
     // endregion
 
 
-    public constructor()
-    {
+    public constructor() {
         this._registeredClasses = {};
     }
 
 
-    public get numRegisteredClasses(): number
-    {
+    public get numRegisteredClasses(): number {
         return _.keys(this._registeredClasses).length;
     }
 
@@ -31,18 +28,15 @@ export class SerializationRegistry
      * @param serializableClass - The class to register
      * @return A function that can be called to unregister
      */
-    public register(serializableClass: ISerializableStatic): () => void
-    {
-        if (this._registeredClasses[serializableClass.type] !== undefined)
-        {
+    public register(serializableClass: ISerializableStatic): () => void {
+        if (this._registeredClasses[serializableClass.type] !== undefined) {
             throw new Error(`Serializable class already registered for type "${serializableClass.type}".`);
         }
 
         this._registeredClasses[serializableClass.type] = serializableClass;
 
         // Return a function that can be used to unregister.
-        return () =>
-        {
+        return () => {
             // Remove the class from the container of registered classes.
             delete this._registeredClasses[serializableClass.type];
         };
@@ -54,8 +48,7 @@ export class SerializationRegistry
      * @param type - The type string
      * @return The class associated with the specified type string
      */
-    public getClass(type: string): undefined | ISerializableStatic
-    {
+    public getClass(type: string): undefined | ISerializableStatic {
         return this._registeredClasses[type];
     }
 }

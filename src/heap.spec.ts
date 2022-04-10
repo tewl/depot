@@ -5,37 +5,29 @@ import {randomizedArray} from "./random_data.spec";
 
 
 // A comparison function that compares numbers.
-function compareNumbers(a: number, b: number): CompareResult
-{
-    if (a < b)
-    {
+function compareNumbers(a: number, b: number): CompareResult {
+    if (a < b) {
         return CompareResult.LESS;
     }
-    else if (a === b)
-    {
+    else if (a === b) {
         return CompareResult.EQUAL;
     }
-    else
-    {
+    else {
         return CompareResult.GREATER;
     }
 }
 
 
-describe("Heap", () =>
-{
+describe("Heap", () => {
 
-    describe("constructor()", () =>
-    {
-        it("creates an empty heap when no values are specified", () =>
-        {
+    describe("constructor()", () => {
+        it("creates an empty heap when no values are specified", () => {
             const heap = new Heap(compareNumbers);
             expect(heap).toBeDefined();
         });
 
 
-        it("creates a heap with the specified values", () =>
-        {
+        it("creates a heap with the specified values", () => {
             const heap = new Heap(
                 compareNumbers,
                 [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
@@ -45,8 +37,7 @@ describe("Heap", () =>
         });
 
 
-        it("orders inital values to preserve heap characteristics", () =>
-        {
+        it("orders inital values to preserve heap characteristics", () => {
             const heap = new Heap(
                 compareNumbers,
                 [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
@@ -66,18 +57,15 @@ describe("Heap", () =>
     });
 
 
-    describe("length", () =>
-    {
+    describe("length", () => {
 
-        it("is 0 after construction", () =>
-        {
+        it("is 0 after construction", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.length).toEqual(0);
         });
 
 
-        it("increments when items are added", () =>
-        {
+        it("increments when items are added", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.length).toEqual(0);
             heap.push(6);
@@ -90,18 +78,15 @@ describe("Heap", () =>
     });
 
 
-    describe("depth", () =>
-    {
+    describe("depth", () => {
 
-        it("is 0 after construction", () =>
-        {
+        it("is 0 after construction", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.depth).toEqual(0);
         });
 
 
-        it("increases appropriately as items are added", () =>
-        {
+        it("increases appropriately as items are added", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.depth).toEqual(0);
 
@@ -134,18 +119,15 @@ describe("Heap", () =>
     });
 
 
-    describe("peek()", () =>
-    {
+    describe("peek()", () => {
 
-        it("returns undefined when the heap is empty", () =>
-        {
+        it("returns undefined when the heap is empty", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.peek()).toEqual(undefined);
         });
 
 
-        it("returns the greatest item without removing it", () =>
-        {
+        it("returns the greatest item without removing it", () => {
             const heap = new Heap(compareNumbers);
             heap.push(3);
             heap.push(6);
@@ -161,18 +143,15 @@ describe("Heap", () =>
     });
 
 
-    describe("pop()", () =>
-    {
+    describe("pop()", () => {
 
-        it("returns undefined when the heap is empty", () =>
-        {
+        it("returns undefined when the heap is empty", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.pop()).toEqual(undefined);
         });
 
 
-        it("pops items in the expected order", () =>
-        {
+        it("pops items in the expected order", () => {
             const heap = new Heap(compareNumbers);
 
             heap.push(1);
@@ -223,18 +202,15 @@ describe("Heap", () =>
     });
 
 
-    describe("isEmpty", () =>
-    {
+    describe("isEmpty", () => {
 
-        it("returns true when the heap is empty", () =>
-        {
+        it("returns true when the heap is empty", () => {
             const heap = new Heap(compareNumbers);
             expect(heap.isEmpty).toEqual(true);
         });
 
 
-        it("returns false when the heap has items", () =>
-        {
+        it("returns false when the heap has items", () => {
             const heap = new Heap(compareNumbers);
             heap.push(5);
             expect(heap.isEmpty).toEqual(false);
@@ -244,19 +220,16 @@ describe("Heap", () =>
     });
 
 
-    it("can sort a very large array", () =>
-    {
+    it("can sort a very large array", () => {
         const heap = new Heap(compareNumbers);
 
-        _.forEach(randomizedArray, (curValue) =>
-        {
+        _.forEach(randomizedArray, (curValue) => {
             heap.push(curValue);
         });
 
         expect(heap.length).toEqual(1000);
 
-        for (let curIndex = 0; curIndex < 1000; ++curIndex)
-        {
+        for (let curIndex = 0; curIndex < 1000; ++curIndex) {
             expect(heap.pop()).toEqual(999 - curIndex);
         }
 

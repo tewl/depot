@@ -23,8 +23,7 @@ export interface IDirectoryContents {
 export type WalkCallback = (item: Directory | File) => boolean | Promise<boolean>;
 
 
-export class Directory
-{
+export class Directory {
 
     /**
      * Creates a Directory representing the relative path from `from` to `to`
@@ -35,8 +34,7 @@ export class Directory
     public static relative(
         from: Directory,
         to:   Directory
-    ): Directory
-    {
+    ): Directory {
         const relPath = path.relative(from.toString(), to.toString());
         return new Directory(relPath);
     }
@@ -49,8 +47,7 @@ export class Directory
      * @return An array of strings representing the path segments needed to get
      * from `from` to `to`.
      */
-    public static relativeParts(from: Directory, to: Directory): Array<string>
-    {
+    public static relativeParts(from: Directory, to: Directory): Array<string> {
         const relPath = path.relative(from.toString(), to.toString());
         return relPath.split(path.sep);
     }
@@ -61,13 +58,11 @@ export class Directory
     // endregion
 
 
-    public constructor(pathPart: PathPart, ...pathParts: Array<PathPart>)
-    {
+    public constructor(pathPart: PathPart, ...pathParts: Array<PathPart>) {
         const allParts: Array<PathPart> = [pathPart].concat(pathParts);
         this._dirPath = reducePathParts(allParts);
 
-        if (this._dirPath === "\\" || this._dirPath === "/")
-        {
+        if (this._dirPath === "\\" || this._dirPath === "/") {
             // The path begins with a directory separator, which means that it
             // is a relative path starting from the root of the drive.
             this._dirPath = path.resolve(this._dirPath);
@@ -75,8 +70,7 @@ export class Directory
 
         // Remove trailing directory separator characters.
         while ((this._dirPath.length > 1) &&
-               _.endsWith(this._dirPath, path.sep))
-        {
+               _.endsWith(this._dirPath, path.sep)) {
             this._dirPath = this._dirPath.slice(0, -1);
         }
     }
@@ -85,28 +79,23 @@ export class Directory
     /**
      * Gets the name of this directory (without the preceding path)
      */
-    public get dirName(): string
-    {
-        if (this._dirPath.length === 0)
-        {
+    public get dirName(): string {
+        if (this._dirPath.length === 0) {
             // This directory represents the root of the filesystem.
             return "/";
         }
-        else
-        {
+        else {
             return _.last(this._dirPath.split(path.sep))!;
         }
     }
 
 
-    public toString(): string
-    {
+    public toString(): string {
         return this._dirPath;
     }
 
 
-    public equals(otherDir: Directory): boolean
-    {
+    public equals(otherDir: Directory): boolean {
         return this.absPath() === otherDir.absPath();
     }
 
@@ -116,16 +105,14 @@ export class Directory
      * @return This directory's parent directory.  undefined is returned if this
      * directory is the root of a drive.
      */
-    public parentDir(): undefined | Directory
-    {
+    public parentDir(): undefined | Directory {
         const absPath = this.absPath();
         const parts = _.split(absPath, path.sep);
 
         // If the directory separator was not found, the split will result in a
         // 1-element array.  If this is the case, this directory is the root of
         // the drive.
-        if (parts.length === 1)
-        {
+        if (parts.length === 1) {
             return undefined;
         }
 
@@ -141,8 +128,7 @@ export class Directory
      * Determines whether this directory is the root of a drive.
      * @return true if this directory is the root of a drive.  false otherwise.
      */
-    public isRoot(): boolean
-    {
+    public isRoot(): boolean {
         return this.parentDir() === undefined;
     }
 
@@ -151,16 +137,13 @@ export class Directory
      * Gets the absolute path of this Directory.
      * @return The absolute path of this Directory
      */
-    public absPath(): string
-    {
-        if (this._dirPath[1] === ":")
-        {
+    public absPath(): string {
+        if (this._dirPath[1] === ":") {
             // The path is a Windows path that already has a drive letter at the
             // beginning.  It is already absolute.
             return this._dirPath;
         }
-        else
-        {
+        else {
             return path.resolve(this._dirPath);
         }
     }
@@ -171,24 +154,18 @@ export class Directory
      * absolute path.
      * @return A new Directory representing this Directory's absolute path.
      */
-    public absolute(): Directory
-    {
+    public absolute(): Directory {
         return new Directory(this.absPath());
     }
 
 
-    public exists(): Promise<fs.Stats | undefined>
-    {
-        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) =>
-        {
-            fs.stat(this._dirPath, (err: unknown, stats: fs.Stats) =>
-            {
-                if (!err && stats.isDirectory())
-                {
+    public exists(): Promise<fs.Stats | undefined> {
+        return new Promise<fs.Stats | undefined>((resolve: (result: fs.Stats | undefined) => void) => {
+            fs.stat(this._dirPath, (err: unknown, stats: fs.Stats) => {
+                if (!err && stats.isDirectory()) {
                     resolve(stats);
                 }
-                else
-                {
+                else {
                     resolve(undefined);
                 }
 
@@ -197,39 +174,31 @@ export class Directory
     }
 
 
-    public existsSync(): fs.Stats | undefined
-    {
-        try
-        {
+    public existsSync(): fs.Stats | undefined {
+        try {
             const stats = fs.statSync(this._dirPath);
             return stats.isDirectory() ? stats : undefined;
         }
-        catch (err)
-        {
-            if ((err as NodeJS.ErrnoException).code === "ENOENT")
-            {
+        catch (err) {
+            if ((err as NodeJS.ErrnoException).code === "ENOENT") {
                 return undefined;
             }
-            else
-            {
+            else {
                 throw err;
             }
         }
     }
 
 
-    public isEmpty(): Promise<boolean>
-    {
+    public isEmpty(): Promise<boolean> {
         return readdirAsync(this._dirPath)
-        .then((fsEntries) =>
-        {
+        .then((fsEntries) => {
             return fsEntries.length === 0;
         });
     }
 
 
-    public isEmptySync(): boolean
-    {
+    public isEmptySync(): boolean {
         const fsEntries = fs.readdirSync(this._dirPath);
         return fsEntries.length === 0;
     }
@@ -241,41 +210,32 @@ export class Directory
      * @returns A Promise that resolves with this Directory instance (for
      * chaining) when this operation completes.
      */
-    public ensureExists(): Promise<Directory>
-    {
+    public ensureExists(): Promise<Directory> {
         return this.exists()
-        .then((stats) =>
-        {
-            if (stats)
-            {
+        .then((stats) => {
+            if (stats) {
                 return;
             }
-            else
-            {
+            else {
                 const parts = this._dirPath.split(path.sep);
 
                 // Create an array of successively longer paths, each one adding a
                 // new directory onto the end.
-                const dirsToCreate = parts.reduce((acc: Array<string>, curPart: string): Array<string> =>
-                {
-                    if (acc.length === 0)
-                    {
-                        if (curPart.length === 0)
-                        {
+                const dirsToCreate = parts.reduce((acc: Array<string>, curPart: string): Array<string> => {
+                    if (acc.length === 0) {
+                        if (curPart.length === 0) {
                             // The first item is an empty string.  The path must
                             // have started with the directory separator character
                             // (an absolute path was specified).
                             acc.push(path.sep);
                         }
-                        else
-                        {
+                        else {
                             // The first item contains text.  A relative path must
                             // have been specified.
                             acc.push(curPart);
                         }
                     }
-                    else
-                    {
+                    else {
                         const last = acc[acc.length - 1]!;
                         acc.push(path.join(last, curPart));
                     }
@@ -283,23 +243,18 @@ export class Directory
                 }, []);
 
                 // Don't attempt to create the root of the filesystem.
-                if ((dirsToCreate.length > 0) && (dirsToCreate[0] === path.sep))
-                {
+                if ((dirsToCreate.length > 0) && (dirsToCreate[0] === path.sep)) {
                     dirsToCreate.shift();
                 }
 
                 // Map each successively longer path to a function that will create
                 // it.
-                const createFuncs = dirsToCreate.map((dirToCreate: string) =>
-                {
-                    return (): Promise<void> =>
-                    {
+                const createFuncs = dirsToCreate.map((dirToCreate: string) => {
+                    return (): Promise<void> => {
                         return mkdirAsync(dirToCreate)
-                        .catch((err) =>
-                        {
+                        .catch((err) => {
                             // If the directory already exists, just keep going.
-                            if (err.code !== "EEXIST")
-                            {
+                            if (err.code !== "EEXIST") {
                                 throw err;
                             }
                         });
@@ -310,8 +265,7 @@ export class Directory
                 return sequence(createFuncs, undefined);
             }
         })
-        .then(() =>
-        {
+        .then(() => {
             return this;
         });
     }
@@ -322,10 +276,8 @@ export class Directory
      * nonexistent parent directories will also be created.
      * @returns This Directory instance (for chaining)
      */
-    public ensureExistsSync(): this
-    {
-        if (this.existsSync())
-        {
+    public ensureExistsSync(): this {
+        if (this.existsSync()) {
             return this;
         }
 
@@ -333,26 +285,21 @@ export class Directory
 
         // Create an array of successively longer paths, each one adding a
         // new directory onto the end.
-        const dirsToCreate = parts.reduce((acc: Array<string>, curPart: string): Array<string> =>
-        {
-            if (acc.length === 0)
-            {
-                if (curPart.length === 0)
-                {
+        const dirsToCreate = parts.reduce((acc: Array<string>, curPart: string): Array<string> => {
+            if (acc.length === 0) {
+                if (curPart.length === 0) {
                     // The first item is an empty string.  The path must
                     // have started with the directory separator character
                     // (an absolute path was specified).
                     acc.push(path.sep);
                 }
-                else
-                {
+                else {
                     // The first item contains text.  A relative path must
                     // have been specified.
                     acc.push(curPart);
                 }
             }
-            else
-            {
+            else {
                 const last = acc[acc.length - 1]!;
                 acc.push(path.join(last, curPart));
             }
@@ -360,22 +307,17 @@ export class Directory
         }, []);
 
         // Don't attempt to create the root of the filesystem.
-        if ((dirsToCreate.length > 0) && (dirsToCreate[0] === path.sep))
-        {
+        if ((dirsToCreate.length > 0) && (dirsToCreate[0] === path.sep)) {
             dirsToCreate.shift();
         }
 
-        dirsToCreate.forEach((curDir) =>
-        {
-            try
-            {
+        dirsToCreate.forEach((curDir) => {
+            try {
                 fs.mkdirSync(curDir);
             }
-            catch (err)
-            {
+            catch (err) {
                 // If the directory already exists, just keep going.
-                if ((err as NodeJS.ErrnoException).code !== "EEXIST")
-                {
+                if ((err as NodeJS.ErrnoException).code !== "EEXIST") {
                     throw err;
                 }
             }
@@ -391,11 +333,9 @@ export class Directory
      * @returns A Promise that resolves with this Directory instance when this
      * operation has finished.
      */
-    public empty(): Promise<Directory>
-    {
+    public empty(): Promise<Directory> {
         return this.delete()
-        .then(() =>
-        {
+        .then(() => {
             return this.ensureExists();
         });
     }
@@ -406,8 +346,7 @@ export class Directory
      * does not exist.
      * @returns This Directory instance (to facilitate chaining)
      */
-    public emptySync(): this
-    {
+    public emptySync(): this {
         this.deleteSync();
         return this.ensureExistsSync();
     }
@@ -417,44 +356,34 @@ export class Directory
      * Deletes this directory.  Does nothing if this directory does not exist.
      * @returns A Promise that is resolved when this operation has finished.
      */
-    public delete(): Promise<void>
-    {
+    public delete(): Promise<void> {
         return this.exists()
-        .then((stats) =>
-        {
-            if (!stats)
-            {
+        .then((stats) => {
+            if (!stats) {
                 // The specified directory does not exist.  Do nothing.
                 return;
             }
-            else
-            {
+            else {
                 // First, delete the contents of the specified directory.
                 return readdirAsync(this._dirPath)
-                .then((items: Array<string>) =>
-                {
-                    const absPaths = items.map((curItem) =>
-                    {
+                .then((items: Array<string>) => {
+                    const absPaths = items.map((curItem) => {
                         return path.join(this._dirPath, curItem);
                     });
 
-                    const deletePromises = absPaths.map((curAbsPath: string) =>
-                    {
-                        if (fs.statSync(curAbsPath).isDirectory())
-                        {
+                    const deletePromises = absPaths.map((curAbsPath: string) => {
+                        if (fs.statSync(curAbsPath).isDirectory()) {
                             const subdir = new Directory(curAbsPath);
                             return subdir.delete();
                         }
-                        else
-                        {
+                        else {
                             return unlinkAsync(curAbsPath);
                         }
                     });
 
                     return Promise.all(deletePromises);
                 })
-                .then(() =>
-                {
+                .then(() => {
                     // Now that all of the items in the directory have been deleted, delete
                     // the directory itself.
                     return rmdirAsync(this._dirPath);
@@ -467,31 +396,25 @@ export class Directory
     /**
      * Deletes this directory.  Does nothing if this directory does not exist.
      */
-    public deleteSync(): void
-    {
-        if (!this.existsSync())
-        {
+    public deleteSync(): void {
+        if (!this.existsSync()) {
             // The directory does not exist.  Do nothing.
             return;
         }
 
         // First, delete the contents of the specified directory.
         let fsItems: Array<string> = fs.readdirSync(this._dirPath);
-        fsItems = fsItems.map((curFsItem) =>
-        {
+        fsItems = fsItems.map((curFsItem) => {
             return path.join(this._dirPath, curFsItem);
         });
 
-        fsItems.forEach((curFsItem) =>
-        {
+        fsItems.forEach((curFsItem) => {
             const stats = fs.statSync(curFsItem);
-            if (stats.isDirectory())
-            {
+            if (stats.isDirectory()) {
                 const subdir = new Directory(curFsItem);
                 subdir.deleteSync();
             }
-            else
-            {
+            else {
                 fs.unlinkSync(curFsItem);
             }
         });
@@ -509,8 +432,7 @@ export class Directory
      * subdirectories for the file
      * @returns true if the file was found; false otherwise.
      */
-    public contains(file: File, recursiveSearch: boolean): boolean
-    {
+    public contains(file: File, recursiveSearch: boolean): boolean {
         return file.isWithin(this, recursiveSearch);
     }
 
@@ -524,61 +446,48 @@ export class Directory
      * File and Directory objects will be determined by the relative/absolute
      * nature of this Directory object.
      */
-    public contents(recursive = false): Promise<IDirectoryContents>
-    {
+    public contents(recursive = false): Promise<IDirectoryContents> {
         const parentDirPath = this.toString();
 
         return readdirAsync(this._dirPath)
-        .then((fsEntries) =>
-        {
-            const fsEntryPaths = fsEntries.map((curEntry) =>
-            {
+        .then((fsEntries) => {
+            const fsEntryPaths = fsEntries.map((curEntry) => {
                 return path.join(parentDirPath, curEntry);
             });
 
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
-            return mapAsync(fsEntryPaths, (curPath) =>
-            {
+            return mapAsync(fsEntryPaths, (curPath) => {
                 return lstatAsync(curPath)
-                .then((stats) =>
-                {
-                    if (stats.isFile())
-                    {
+                .then((stats) => {
+                    if (stats.isFile()) {
                         contents.files.push(new File(curPath));
                     }
-                    else if (stats.isDirectory())
-                    {
+                    else if (stats.isDirectory()) {
                         contents.subdirs.push(new Directory(curPath));
                     }
                     // Note: We are ignoring symbolic links here.
                 })
-                .catch(() =>
-                {
+                .catch(() => {
                     // We failed to stat the current item.  This is probably a
                     // permissions error.  Pretend like it's not here.
                 });
             })
-            .then(() =>
-            {
+            .then(() => {
                 return contents;
             });
         })
-        .then((contents: IDirectoryContents) =>
-        {
-            if (!recursive)
-            {
+        .then((contents: IDirectoryContents) => {
+            if (!recursive) {
                 return contents;
             }
 
             // Get the contents of each subdirectory.
             return Promise.all<IDirectoryContents>(_.map(contents.subdirs, (curSubdir) => curSubdir.contents(true)))
-            .then((subdirContents: Array<IDirectoryContents>) =>
-            {
+            .then((subdirContents: Array<IDirectoryContents>) => {
                 // Put the contents of each subdirectory into the returned
                 // `contents` object.
-                for (const curContents of subdirContents)
-                {
+                for (const curContents of subdirContents) {
                     contents.subdirs = _.concat(contents.subdirs, curContents.subdirs);
                     contents.files = _.concat(contents.files, curContents.files);
                 }
@@ -595,35 +504,28 @@ export class Directory
      * @return The contents of the directory, separated into a list of files and a
      * list of subdirectories.  All paths returned are absolute paths.
      */
-    public contentsSync(recursive = false): IDirectoryContents
-    {
+    public contentsSync(recursive = false): IDirectoryContents {
         const parentDirPath = this.toString();
 
         let fsEntries = fs.readdirSync(this._dirPath);
-        fsEntries = fsEntries.map((curFsEntry) =>
-        {
+        fsEntries = fsEntries.map((curFsEntry) => {
             return path.join(parentDirPath, curFsEntry);
         });
 
         const contents: IDirectoryContents = {subdirs: [], files: []};
-        fsEntries.forEach((curFsEntry) =>
-        {
+        fsEntries.forEach((curFsEntry) => {
             const stats = fs.lstatSync(curFsEntry);
-            if (stats.isFile())
-            {
+            if (stats.isFile()) {
                 contents.files.push(new File(curFsEntry));
             }
-            else if (stats.isDirectory())
-            {
+            else if (stats.isDirectory()) {
                 contents.subdirs.push(new Directory(curFsEntry));
             }
             // Note: We are ignoring symbolic links here.
         });
 
-        if (recursive)
-        {
-            contents.subdirs.forEach((curSubdir) =>
-            {
+        if (recursive) {
+            contents.subdirs.forEach((curSubdir) => {
                 const subdirContents = curSubdir.contentsSync(true);
                 contents.subdirs = _.concat(contents.subdirs, subdirContents.subdirs);
                 contents.files   = _.concat(contents.files,   subdirContents.files);
@@ -638,35 +540,28 @@ export class Directory
      * Recursively removes empty subdirectories from within this directory.
      * @return A Promise that is resolved when this directory has been pruned.
      */
-    public prune(): Promise<void>
-    {
+    public prune(): Promise<void> {
         return this.contents()
-        .then((contents) =>
-        {
-            return mapAsync(contents.subdirs, (curSubdir) =>
-            {
+        .then((contents) => {
+            return mapAsync(contents.subdirs, (curSubdir) => {
                 //
                 // Prune the current subdirectory.
                 //
                 return curSubdir.prune()
-                .then(() =>
-                {
+                .then(() => {
                     //
                     // If the subdirectory is now empty, delete it.
                     //
                     return curSubdir.isEmpty();
                 })
-                .then((dirIsEmpty) =>
-                {
-                    if (dirIsEmpty)
-                    {
+                .then((dirIsEmpty) => {
+                    if (dirIsEmpty) {
                         return curSubdir.delete();
                     }
                     return undefined;
                 });
             })
-            .then(() =>
-            {
+            .then(() => {
                 return;
             });
         });
@@ -676,18 +571,15 @@ export class Directory
     /**
      * Recursively removes empty subdirectories from this directory.
      */
-    public pruneSync(): void
-    {
+    public pruneSync(): void {
         const contents = this.contentsSync();
-        contents.subdirs.forEach((curSubdir) =>
-        {
+        contents.subdirs.forEach((curSubdir) => {
             curSubdir.pruneSync();
 
             //
             // If the subdirectory is now empty, delete it.
             //
-            if (curSubdir.isEmptySync())
-            {
+            if (curSubdir.isEmptySync()) {
                 curSubdir.deleteSync();
             }
         });
@@ -705,44 +597,36 @@ export class Directory
      * If copyRoot is true, this will be this Directory's counterpart
      * subdirectory in `destDir`.
      */
-    public copy(destDir: Directory, copyRoot: boolean): Promise<Directory>
-    {
-        if (copyRoot)
-        {
+    public copy(destDir: Directory, copyRoot: boolean): Promise<Directory> {
+        if (copyRoot) {
             // Copying this directory to the destination with copyRoot true just
             // means creating the counterpart to this directory in the
             // destination and then copying to that directory with copyRoot
             // false.
             const thisDest: Directory = new Directory(destDir, this.dirName);
             return thisDest.ensureExists()
-            .then(() =>
-            {
+            .then(() => {
                 return this.copy(thisDest, false);
             })
-            .then(() =>
-            {
+            .then(() => {
                 return thisDest;
             });
         }
 
         return this.contents()
-        .then((contents: IDirectoryContents) =>
-        {
+        .then((contents: IDirectoryContents) => {
             // Copy the files in this directory to the destination.
-            const fileCopyPromises = contents.files.map((curFile) =>
-            {
+            const fileCopyPromises = contents.files.map((curFile) => {
                 return curFile.copy(destDir, curFile.fileName);
             });
 
-            const dirCopyPromises = contents.subdirs.map((curSubdir) =>
-            {
+            const dirCopyPromises = contents.subdirs.map((curSubdir) => {
                 return curSubdir.copy(destDir, true);
             });
 
             return Promise.all(_.concat<Array<Promise<File | Directory>>>(fileCopyPromises, dirCopyPromises));
         })
-        .then(() =>
-        {
+        .then(() => {
             return destDir;
         });
     }
@@ -755,10 +639,8 @@ export class Directory
      * `destDir`.  If false, only the contents of this directory will be copied
      * into `destDir`.
      */
-    public copySync(destDir: Directory, copyRoot: boolean): Directory
-    {
-        if (copyRoot)
-        {
+    public copySync(destDir: Directory, copyRoot: boolean): Directory {
+        if (copyRoot) {
             // Copying this directory to the destination with copyRoot true just
             // means creating the counterpart to this directory in the
             // destination and then copying to that directory with copyRoot
@@ -772,13 +654,11 @@ export class Directory
         const contents = this.contentsSync();
 
         // Copy the files in this directory to the destination.
-        contents.files.forEach((curFile) =>
-        {
+        contents.files.forEach((curFile) => {
             curFile.copySync(destDir, curFile.fileName);
         });
 
-        contents.subdirs.forEach((curSubdir) =>
-        {
+        contents.subdirs.forEach((curSubdir) => {
             curSubdir.copySync(destDir, true);
         });
 
@@ -797,18 +677,14 @@ export class Directory
      * If moveRoot is true, this will be this Directory's counterpart
      * subdirectory in `destDir`.
      */
-    public move(destDir: Directory, moveRoot: boolean): Promise<Directory>
-    {
+    public move(destDir: Directory, moveRoot: boolean): Promise<Directory> {
         return destDir.ensureExists()
-        .then(() =>
-        {
+        .then(() => {
             return this.copy(destDir, moveRoot);
         })
-        .then((counterpartDestDir) =>
-        {
+        .then((counterpartDestDir) => {
             return this.delete()
-            .then(() =>
-            {
+            .then(() => {
                 return counterpartDestDir;
             });
         });
@@ -825,23 +701,19 @@ export class Directory
      * @return A promise that is resolved when the directory tree has been
      *   completely walked.
      */
-    public async walk(cb: WalkCallback): Promise<void>
-    {
+    public async walk(cb: WalkCallback): Promise<void> {
         const thisDirectoryContents = await this.contents(false);
 
         // Invoke the callback for all files concurrently.
-        const filePromises: Array<Promise<boolean>> = _.map(thisDirectoryContents.files, (curFile: File) =>
-        {
+        const filePromises: Array<Promise<boolean>> = _.map(thisDirectoryContents.files, (curFile: File) => {
             return Promise.resolve(cb(curFile));
         });
         await Promise.all(filePromises);
 
         // Process each of the subdirectories one at a time.
-        for (const curSubDir of thisDirectoryContents.subdirs)
-        {
+        for (const curSubDir of thisDirectoryContents.subdirs) {
             const shouldRecurse = await Promise.resolve(cb(curSubDir));
-            if (shouldRecurse)
-            {
+            if (shouldRecurse) {
                 await curSubDir.walk(cb);
             }
         }

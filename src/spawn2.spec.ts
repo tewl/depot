@@ -9,22 +9,18 @@ import {failed, succeeded} from "./result";
 import {File} from "./file";
 
 
-describe("spawn", () =>
-{
+describe("spawn", () => {
 
-    beforeEach(() =>
-    {
+    beforeEach(() => {
         tmpDir.emptySync();
     });
 
 
-    it("will run the specified command", async () =>
-    {
+    it("will run the specified command", async () => {
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let cmd = "ls";
-        if (os === OperatingSystem.Windows)
-        {
+        if (os === OperatingSystem.Windows) {
             options.shell = true;
             cmd = "dir";
         }
@@ -36,16 +32,14 @@ describe("spawn", () =>
     });
 
 
-    it("will resolve with the stdout text", async () =>
-    {
+    it("will resolve with the stdout text", async () => {
         const existingFile = new File(tmpDir, "existingfile.txt");
         existingFile.writeSync("This is an existing file that should appear in the following ls.");
 
         const os = getOs();
         const options: cp.SpawnOptions = { cwd: tmpDir.absPath() };
         let lsCmd = "ls";
-        if (os === OperatingSystem.Windows)
-        {
+        if (os === OperatingSystem.Windows) {
             options.shell = true;
             lsCmd = "dir";
         }
@@ -56,21 +50,18 @@ describe("spawn", () =>
     });
 
 
-    it("provides access to the underlying child process", async () =>
-    {
+    it("provides access to the underlying child process", async () => {
         let cmd: string;
         let args: Array<string>;
 
-        if (getOs() === OperatingSystem.Windows)
-        {
+        if (getOs() === OperatingSystem.Windows) {
             cmd = "c:\\Program Files\\Git\\bin\\sh.exe";
             args = [
                 "-c ",
                 "sleep 10"   // Must be supplied as a single argument
             ];
         }
-        else
-        {
+        else {
             cmd = "sleep";
             args = ["10"];
         }
@@ -80,8 +71,7 @@ describe("spawn", () =>
         const result = await output.closePromise;
         expect(failed(result)).toBeTruthy();
 
-        if (!isISpawnExitError(result.error))
-        {
+        if (!isISpawnExitError(result.error)) {
             throw new Error("Unexpected type.");
         }
 
@@ -90,8 +80,7 @@ describe("spawn", () =>
     });
 
 
-    it("provides the exit code and stderr when the command fails", async () =>
-    {
+    it("provides the exit code and stderr when the command fails", async () => {
         const nonExistantFilePath = path.join(tmpDir.absPath(), "xyzzy.txt");
         const os = getOs();
         const lsCmd = os === OperatingSystem.Windows ? "dir" : "ls";
@@ -99,8 +88,7 @@ describe("spawn", () =>
         const result = await spawn(lsCmd, [nonExistantFilePath], options).closePromise;
         expect(failed(result)).toBeTruthy();
 
-        if (!isISpawnExitError(result.error))
-        {
+        if (!isISpawnExitError(result.error)) {
             throw new Error("Unexpected type.");
         }
 
@@ -114,13 +102,11 @@ describe("spawn", () =>
     });
 
 
-    it("provides the expected system error information when the process fails to start", async () =>
-    {
+    it("provides the expected system error information when the process fails to start", async () => {
         const result = await spawn("notarealcommand.exe", []).closePromise;
         expect(failed(result)).toBeTruthy();
 
-        if (!isISpawnSystemError(result.error))
-        {
+        if (!isISpawnSystemError(result.error)) {
             throw new Error("Unexpected type.");
         }
 
@@ -128,8 +114,7 @@ describe("spawn", () =>
     });
 
 
-    it("will set the specified environment variables", async () =>
-    {
+    it("will set the specified environment variables", async () => {
         const env = _.assign({}, process.env, {xyzzy: "xyzzy-xyzzy"});
         const result =
             await spawn("node", ["-e", "console.log(process.env.xyzzy);"], {env: env})

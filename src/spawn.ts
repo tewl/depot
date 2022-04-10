@@ -8,8 +8,7 @@ import {eventToPromise} from "./promiseHelpers";
 
 // A Node.js error type that is not defined within the Node.js type definitions.
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33217
-export interface ISystemError
-{
+export interface ISystemError {
     address?: string; // If present, the address to which a network connection failed
     code?: string;    // The string error code
     dest?: string;    // If present, the file path destination when reporting a file system error
@@ -23,8 +22,7 @@ export interface ISystemError
 }
 
 
-export interface ISpawnResult
-{
+export interface ISpawnResult {
     /**
      * The underlying child process.  This is provided so that clients can do
      * things like kill() them.
@@ -40,20 +38,17 @@ export interface ISpawnResult
 
 export type SpawnCloseError = ISpawnSystemError | ISpawnExitError;
 
-export function isSpawnCloseError(a: unknown): a is SpawnCloseError
-{
+export function isSpawnCloseError(a: unknown): a is SpawnCloseError {
     return (a as SpawnCloseError).type === "ISpawnSystemError" ||
            (a as SpawnCloseError).type === "ISpawnExitError";
 }
 
-export interface ISpawnSystemError extends ISystemError
-{
+export interface ISpawnSystemError extends ISystemError {
     type: "ISpawnSystemError";
 }
 
 
-export interface ISpawnExitError
-{
+export interface ISpawnExitError {
     type:     "ISpawnExitError";
     exitCode: number;
     stderr:   string;
@@ -85,12 +80,10 @@ export function spawn(
     description?: string,
     stdoutStream?: stream.Writable,
     stderrStream?: stream.Writable
-): ISpawnResult
-{
+): ISpawnResult {
     const cmdLineRepresentation = getCommandLineRepresentation(cmd, args);
 
-    if (description)
-    {
+    if (description) {
         console.log("--------------------------------------------------------------------------------");
         console.log(`${description}`);
         console.log(`    ${cmdLineRepresentation}`);
@@ -103,8 +96,7 @@ export function spawn(
 
     const closePromise = new Promise(
         (resolve: (output: string) => void,
-         reject: (err: SpawnCloseError) => void) =>
-        {
+         reject: (err: SpawnCloseError) => void) => {
             const spawnOptions: cp.SpawnOptions = _.defaults(
                 {},
                 options,
@@ -125,30 +117,23 @@ export function spawn(
             .pipe(stderrCollector)  // to capture stderr in case child process errors
             .pipe(errorStream);
 
-            childProcess.once("error", (err: ISystemError) =>
-            {
+            childProcess.once("error", (err: ISystemError) => {
                 reject({type: "ISpawnSystemError", ...err});
             });
 
-            childProcess.once("exit", (exitCode: number) =>
-            {
+            childProcess.once("exit", (exitCode: number) => {
                 // Wait for all steams to flush before reporting that the child
                 // process has finished.
                 eventToPromise(childProcess, "close")
-                .then(() =>
-                {
-                    if (exitCode === 0)
-                    {
-                        if (description)
-                        {
+                .then(() => {
+                    if (exitCode === 0) {
+                        if (description) {
                             console.log(`Child process succeeded: ${cmdLineRepresentation}`);
                         }
                         resolve(_.trim(stdoutCollector.collected));
                     }
-                    else
-                    {
-                        if (description)
-                        {
+                    else {
+                        if (description) {
                             console.log(`Child process failed: ${cmdLineRepresentation}`);
                         }
                         reject({
@@ -171,16 +156,12 @@ export function spawn(
 }
 
 
-function getCommandLineRepresentation(cmd: string, args: Array<string>): string
-{
-    args = args.map((curArg) =>
-    {
-        if (_.includes(curArg, " "))
-        {
+function getCommandLineRepresentation(cmd: string, args: Array<string>): string {
+    args = args.map((curArg) => {
+        if (_.includes(curArg, " ")) {
             return `"${curArg}"`;
         }
-        else
-        {
+        else {
             return curArg;
         }
     });

@@ -7,16 +7,13 @@ import { diffDirectories, ActionPriority, FileCompareActionType } from "./diffDi
 import {mapAsync} from "./promiseHelpers";
 
 
-describe("diffDirectories()", () =>
-{
+describe("diffDirectories()", () => {
 
-    describe("", () =>
-    {
+    describe("", () => {
         let leftDir: Directory;
         let rightDir: Directory;
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");
@@ -59,8 +56,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("returns the expected results", async () =>
-        {
+        it("returns the expected results", async () => {
             const diffDirFiles = await diffDirectories(leftDir, rightDir);
             expect(diffDirFiles.length).toEqual(5);
 
@@ -98,13 +94,11 @@ describe("diffDirectories()", () =>
     });
 
 
-    describe("", () =>
-    {
+    describe("", () => {
         let leftDir: Directory;
         let rightDir: Directory;
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");
@@ -119,15 +113,13 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("omits identical files by default",  async () =>
-        {
+        it("omits identical files by default",  async () => {
             const diffDirFiles = await diffDirectories(leftDir, rightDir);
             expect(diffDirFiles.length).toEqual(0);
         });
 
 
-        it("will return an item with no actions for identical files",  async () =>
-        {
+        it("will return an item with no actions for identical files",  async () => {
             const diffDirFiles = await diffDirectories(leftDir, rightDir, true);
             expect(diffDirFiles.length).toEqual(1);
             expect((await diffDirFiles[0].isInBoth())).toEqual(true);
@@ -138,13 +130,11 @@ describe("diffDirectories()", () =>
     });
 
 
-    describe("when the left directory doesn't exist", () =>
-    {
+    describe("when the left directory doesn't exist", () => {
         let leftDir: Directory;
         let rightDir: Directory;
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");  // Does not exist.
@@ -155,8 +145,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("returns the expected results", async () =>
-        {
+        it("returns the expected results", async () => {
             const diffDirFiles = await diffDirectories(leftDir, rightDir);
             expect(diffDirFiles.length).toEqual(1);
         });
@@ -165,13 +154,11 @@ describe("diffDirectories()", () =>
     });
 
 
-    describe("when the right directory doesn't exist", () =>
-    {
+    describe("when the right directory doesn't exist", () => {
         let leftDir: Directory;
         let rightDir: Directory;
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");
@@ -182,8 +169,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("returns the expected results", async () =>
-        {
+        it("returns the expected results", async () => {
             const diffDirFiles = await diffDirectories(leftDir, rightDir);
             expect(diffDirFiles.length).toEqual(1);
         });
@@ -191,8 +177,7 @@ describe("diffDirectories()", () =>
     });
 
 
-    describe("", () =>
-    {
+    describe("", () => {
         let leftDir:  Directory;
         let rightDir: Directory;
 
@@ -200,8 +185,7 @@ describe("diffDirectories()", () =>
         let rightOnly: File;
 
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");
@@ -218,8 +202,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("sorts the results according to each file's relative path", async () =>
-        {
+        it("sorts the results according to each file's relative path", async () => {
             const results = await diffDirectories(leftDir, rightDir);
 
             expect(results.length).toEqual(2);
@@ -232,8 +215,7 @@ describe("diffDirectories()", () =>
     });
 
 
-    describe("", () =>
-    {
+    describe("", () => {
         let leftDir:  Directory;
         let rightDir: Directory;
 
@@ -242,8 +224,7 @@ describe("diffDirectories()", () =>
         let bothFileRight: File;
         let rightOnlyFile: File;
 
-        beforeEach(() =>
-        {
+        beforeEach(() => {
             tmpDir.emptySync();
 
             leftDir  = new Directory(tmpDir, "left");
@@ -266,8 +247,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("prioritizes actions appropriately when doing a left-to-right sync", async () =>
-        {
+        it("prioritizes actions appropriately when doing a left-to-right sync", async () => {
             const diffDirFileItems = await diffDirectories(leftDir, rightDir);
 
             expect(diffDirFileItems.length).toEqual(3);
@@ -296,14 +276,12 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("performs actions appropriately when doing a left-to-right sync", async () =>
-        {
+        it("performs actions appropriately when doing a left-to-right sync", async () => {
             const diffDirFileItems = await diffDirectories(leftDir, rightDir);
 
             expect(diffDirFileItems.length).toEqual(3);
 
-            await mapAsync(diffDirFileItems, async (curDiffDirFileItem) =>
-            {
+            await mapAsync(diffDirFileItems, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.SyncLeftToRight))[0].execute();
             });
@@ -320,8 +298,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("prioritizes actions appropriately when doing a right-to-left sync", async () =>
-        {
+        it("prioritizes actions appropriately when doing a right-to-left sync", async () => {
             const diffDirFileItems = await diffDirectories(leftDir, rightDir);
 
             expect(diffDirFileItems.length).toEqual(3);
@@ -350,13 +327,11 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("performs actions appropriately when doing a right-to-left sync", async () =>
-        {
+        it("performs actions appropriately when doing a right-to-left sync", async () => {
             const result = await diffDirectories(leftDir, rightDir);
 
             expect(result.length).toEqual(3);
-            await mapAsync(result, async (curDiffDirFileItem) =>
-            {
+            await mapAsync(result, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.SyncRightToLeft))[0].execute();
             });
@@ -373,8 +348,7 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("prioritizes keeping files when ActionPriority.PRESERVE is specified", async () =>
-        {
+        it("prioritizes keeping files when ActionPriority.PRESERVE is specified", async () => {
             const result = await diffDirectories(leftDir, rightDir);
 
             expect(result.length).toEqual(3);
@@ -403,13 +377,11 @@ describe("diffDirectories()", () =>
         });
 
 
-        it("performs actions appropriately when doing a sync ActionPriority.PRESERVE is specified.",  async () =>
-        {
+        it("performs actions appropriately when doing a sync ActionPriority.PRESERVE is specified.",  async () => {
             const result = await diffDirectories(leftDir, rightDir);
 
             expect(result.length).toEqual(3);
-            await mapAsync(result, async (curDiffDirFileItem) =>
-            {
+            await mapAsync(result, async (curDiffDirFileItem) => {
                 // Execute the first action for each file item.
                 return (await curDiffDirFileItem.actions(ActionPriority.PRESERVE))[0].execute();
             });

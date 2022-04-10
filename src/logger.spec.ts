@@ -1,65 +1,54 @@
 import {Logger, LogLevel} from "./logger";
 
 
-describe("logger", () =>
-{
+describe("logger", () => {
 
     let logger: Logger;
 
-    beforeEach(() =>
-    {
+    beforeEach(() => {
         logger = new Logger();
     });
 
 
-    it("has a default logging level of 'warning'", () =>
-    {
+    it("has a default logging level of 'warning'", () => {
         expect(logger.getCurrentLevel()).toEqual(LogLevel.Warn2);
     });
 
 
-    it("when logging is disabled, nothing will be logged", () =>
-    {
+    it("when logging is disabled, nothing will be logged", () => {
         logger.pushLogLevel(LogLevel.Off0);
         expect(logger.error("test")).toBeFalsy();
     });
 
 
-    it("logging a message with lower severity returns false.", () =>
-    {
+    it("logging a message with lower severity returns false.", () => {
         expect(logger.verbose("test")).toBeFalsy();
     });
 
 
-    it("Logging a message with higher priority returns true.", () =>
-    {
+    it("Logging a message with higher priority returns true.", () => {
         expect(logger.error("")).toBeTruthy();
     });
 
 
-    it("Logging a message with the same priority returns true.", () =>
-    {
+    it("Logging a message with the same priority returns true.", () => {
         expect(logger.warn("")).toBeTruthy();
     });
 
 
-    describe("addListener()", () =>
-    {
+    describe("addListener()", () => {
 
-        it("will add the new listener", () =>
-        {
+        it("will add the new listener", () => {
             const initialListenerCount = logger.numListeners();
             logger.addListener(() => {});
             expect(logger.numListeners()).toEqual(initialListenerCount + 1);
         });
 
 
-        it("will add the new listener and it will be used", () =>
-        {
+        it("will add the new listener and it will be used", () => {
             let invocationCounter = 0;
             let loggedMessage = "";
-            const myListener = (msg: string) =>
-            {
+            const myListener = (msg: string) => {
                 invocationCounter++;
                 loggedMessage = msg;
             };
@@ -71,12 +60,10 @@ describe("logger", () =>
         });
 
 
-        it("will return a function that can be called to remove the listener", () =>
-        {
+        it("will return a function that can be called to remove the listener", () => {
             let invocationCounter = 0;
             let lastMessageLogged = "";
-            const myListener = (msg: string) =>
-            {
+            const myListener = (msg: string) => {
                 invocationCounter++;
                 lastMessageLogged = msg;
             };
@@ -100,11 +87,9 @@ describe("logger", () =>
     });
 
 
-    describe("reset()", () =>
-    {
+    describe("reset()", () => {
 
-        it("sets the current level to WARN_2", () =>
-        {
+        it("sets the current level to WARN_2", () => {
             logger.pushLogLevel(LogLevel.Verbose4);
             logger.reset();
             expect(logger.getCurrentLevel()).toEqual(LogLevel.Warn2);
@@ -114,11 +99,9 @@ describe("logger", () =>
     });
 
 
-    describe("pop()", () =>
-    {
+    describe("pop()", () => {
 
-        it("restores the previous logging level.", () =>
-        {
+        it("restores the previous logging level.", () => {
             logger.pushLogLevel(LogLevel.Verbose4);
             logger.pushLogLevel(LogLevel.Info3);
             logger.pop();
@@ -129,15 +112,12 @@ describe("logger", () =>
     });
 
 
-    describe("logging methods", () =>
-    {
+    describe("logging methods", () => {
 
-        it("log additional parameters", () =>
-        {
+        it("log additional parameters", () => {
             let logMsg = "";
             logger.pushLogLevel(LogLevel.Silly6);
-            logger.addListener((msg: string): void =>
-            {
+            logger.addListener((msg: string): void => {
                 logMsg = msg;
             });
 

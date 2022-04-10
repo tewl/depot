@@ -3,8 +3,7 @@ import { DirectedGraph, EdgeClassification, IEdge } from "./directedGraph";
 import { failed, succeeded } from "./result";
 
 
-function getGraph1(): [Set<string>, Array<IEdge<string, string>>]
-{
+function getGraph1(): [Set<string>, Array<IEdge<string, string>>] {
     const vertices = new Set(["r", "s", "t", "u", "v", "w", "x", "y"]);
     const edges = [
         {fromVertex: "s", toVertex: "r", edgeAttr: "sr"},
@@ -21,8 +20,7 @@ function getGraph1(): [Set<string>, Array<IEdge<string, string>>]
 }
 
 
-function getGraph2(): [Set<string>, Array<IEdge<string, string>>]
-{
+function getGraph2(): [Set<string>, Array<IEdge<string, string>>] {
     const vertices: Set<string> = new Set(["u", "v", "w", "x", "y", "z"]);
     const edges: Array<IEdge<string, string>> = [
         // Ordered to match Cormen p. 479.
@@ -39,21 +37,17 @@ function getGraph2(): [Set<string>, Array<IEdge<string, string>>]
 }
 
 
-describe("DirectedGraph()", () =>
-{
-    describe("static", () =>
-    {
-        describe("create()", () =>
-        {
-            it("succeeds when given valid data", () =>
-            {
+describe("DirectedGraph()", () => {
+    describe("static", () => {
+        describe("create()", () => {
+
+            it("succeeds when given valid data", () => {
                 const createRes = DirectedGraph.create(...getGraph1());
                 expect(succeeded(createRes)).toBeTrue();
             });
 
 
-            it("fails when given invalid data (a vertex does not exist)", () =>
-            {
+            it("fails when given invalid data (a vertex does not exist)", () => {
                 const [vertices, edges] = getGraph1();
                 const invalidEdges = edges.concat({fromVertex: "a", toVertex: "s", edgeAttr: "as"});
                 const createRes = DirectedGraph.create(vertices, invalidEdges);
@@ -64,22 +58,20 @@ describe("DirectedGraph()", () =>
     });
 
 
-    describe("instance", () =>
-    {
-        describe("vertices property", () =>
-        {
-            it("contains the graphs's vertices", () =>
-            {
+    describe("instance", () => {
+
+        describe("vertices property", () => {
+
+            it("contains the graphs's vertices", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 expect(digraph.vertices).toEqual(new Set(["r", "s", "t", "u", "v", "w", "x", "y"]));
             });
         });
 
 
-        describe("edges property", () =>
-        {
-            it("contains the graph's edges", () =>
-            {
+        describe("edges property", () => {
+
+            it("contains the graph's edges", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 expect(digraph.edges).toEqual([
                     { fromVertex: "r", toVertex: "v", edgeAttr: "rv" },
@@ -96,10 +88,9 @@ describe("DirectedGraph()", () =>
         });
 
 
-        describe("breadthFirstSearch()", () =>
-        {
-            it("returns the expected output", () =>
-            {
+        describe("breadthFirstSearch()", () => {
+
+            it("returns the expected output", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 const searchRes = digraph.breadthFirstSearch("s");
                 expect(succeeded(searchRes)).toBeTrue();
@@ -127,8 +118,7 @@ describe("DirectedGraph()", () =>
             });
 
 
-            it("fails when the source node does not exist in the graph", () =>
-            {
+            it("fails when the source node does not exist in the graph", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 const searchRes = digraph.breadthFirstSearch("a");
                 expect(failed(searchRes)).toBeTrue();
@@ -136,10 +126,9 @@ describe("DirectedGraph()", () =>
         });
 
 
-        describe("depthFirstSearch()", () =>
-        {
-            it("returns the expected result", () =>
-            {
+        describe("depthFirstSearch()", () => {
+
+            it("returns the expected result", () => {
                 const digraph = DirectedGraph.create(...getGraph2()).value!;
                 const res = digraph.depthFirstSearch();
                 expect(res.predecessor).toEqual(new Map([

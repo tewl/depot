@@ -6,17 +6,13 @@ import * as _ from "lodash";
 import {getOs, OperatingSystem} from "./os";
 
 
-describe("Directory", () =>
-{
+describe("Directory", () => {
 
-    describe("static", () =>
-    {
+    describe("static", () => {
 
-        describe("relative()", () =>
-        {
+        describe("relative()", () => {
 
-            it("will return a Directory representing the path from `from` to `to`", () =>
-            {
+            it("will return a Directory representing the path from `from` to `to`", () => {
                 const dirA = new Directory(tmpDir, "dirA");
                 const dirB = new Directory(tmpDir, "dirB");
                 const dirC = new Directory(dirB, "dirC");
@@ -33,11 +29,9 @@ describe("Directory", () =>
         });
 
 
-        describe("relativeParts()", () =>
-        {
+        describe("relativeParts()", () => {
 
-            it("returns the expected array of path parts", () =>
-            {
+            it("returns the expected array of path parts", () => {
                 const dirA = new Directory("dirA");
                 const dirB = new Directory(dirA, "b", "c");
                 expect(Directory.relativeParts(dirA, dirB)).toEqual(["b", "c"]);
@@ -50,28 +44,22 @@ describe("Directory", () =>
     });
 
 
-    describe("instance", () =>
-    {
+    describe("instance", () => {
 
-        describe("dirName", () =>
-        {
+        describe("dirName", () => {
 
-            it("will return the name of this directory without preceding path", () =>
-            {
+            it("will return the name of this directory without preceding path", () => {
                 const dir = new Directory(tmpDir, "foo");
                 expect(dir.dirName).toEqual("foo");
             });
 
 
-            it("will return / for the name of the filesystem root", () =>
-            {
+            it("will return / for the name of the filesystem root", () => {
                 const root = new Directory("/");
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(root.dirName).toEqual("C:");
                 }
-                else
-                {
+                else {
                     expect(root.dirName).toEqual("/");
                 }
 
@@ -81,11 +69,9 @@ describe("Directory", () =>
         });
 
 
-        describe("toString()", () =>
-        {
+        describe("toString()", () => {
 
-            it("will return the string that was passed into the constructor", () =>
-            {
+            it("will return the string that was passed into the constructor", () => {
                 const dir1 = new Directory("./foo/bar");
                 expect(dir1.toString()).toEqual(path.join("foo", "bar"));
             });
@@ -94,11 +80,9 @@ describe("Directory", () =>
         });
 
 
-        describe("equals()", () =>
-        {
+        describe("equals()", () => {
 
-            it("will return true for 2 directories that are equal", () =>
-            {
+            it("will return true for 2 directories that are equal", () => {
                 const dir1 = new Directory(__dirname);
                 const dir2 = new Directory(__dirname);
 
@@ -106,8 +90,7 @@ describe("Directory", () =>
             });
 
 
-            it("will return false for 2 different directories", () =>
-            {
+            it("will return false for 2 different directories", () => {
                 const dir1 = new Directory(__dirname);
                 const dir2 = new Directory(__dirname, "..");
 
@@ -115,8 +98,7 @@ describe("Directory", () =>
             });
 
 
-            it("will return false for two directories named the same but in different folders", () =>
-            {
+            it("will return false for two directories named the same but in different folders", () => {
                 tmpDir.emptySync();
 
                 const dir1 = new Directory(tmpDir, "foo", "dir");
@@ -129,18 +111,15 @@ describe("Directory", () =>
         });
 
 
-        describe("parentDir()", () =>
-        {
+        describe("parentDir()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.ensureExistsSync();
                 tmpDir.emptySync();
             });
 
 
-            it("returns the expected parent directory when one exists", () =>
-            {
+            it("returns the expected parent directory when one exists", () => {
                 const parentDir = tmpDir.parentDir();
 
                 expect(parentDir).not.toBeUndefined();
@@ -148,26 +127,22 @@ describe("Directory", () =>
             });
 
 
-            it("returns the root of a drive when the directory is a first level directory", () =>
-            {
+            it("returns the root of a drive when the directory is a first level directory", () => {
                 const dir1 = new Directory("c:", "tmp");
                 expect(dir1.parentDir()!.absPath()).toEqual("c:");
 
                 const dir2 = new Directory("/", "tmp");
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(dir2.parentDir()!.absPath()).toEqual("C:");
                 }
-                else
-                {
+                else {
                     expect(dir2.parentDir()!.absPath()).toEqual("/");
                 }
 
             });
 
 
-            it("return undefined when the directory is the root of a drive", () =>
-            {
+            it("return undefined when the directory is the root of a drive", () => {
                 const dir1 = new Directory("c:\\");
                 expect(dir1.parentDir()).toBeUndefined();
 
@@ -181,23 +156,19 @@ describe("Directory", () =>
         });
 
 
-        describe("isRoot()", () =>
-        {
+        describe("isRoot()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.ensureExistsSync();
                 tmpDir.emptySync();
             });
 
-            it("Returns false for a directory that is not the root of a drive", () =>
-            {
+            it("Returns false for a directory that is not the root of a drive", () => {
                 expect(tmpDir.isRoot()).toBeFalsy();
             });
 
 
-            it("returns true for a directory that is the root of a drive", () =>
-            {
+            it("returns true for a directory that is the root of a drive", () => {
                 const dir1 = new Directory("c:\\");
                 expect(dir1.isRoot()).toBeTruthy();
 
@@ -207,27 +178,22 @@ describe("Directory", () =>
         });
 
 
-        describe("absPath()", () =>
-        {
+        describe("absPath()", () => {
 
-            it("return a string containing the absolute path", () =>
-            {
+            it("return a string containing the absolute path", () => {
                 const absPath = tmpDir.absPath();
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(absPath, "C:\\")).toBeTruthy();
                     expect(_.endsWith(absPath, "\\tmp")).toBeTruthy();
                 }
-                else
-                {
+                else {
                     expect(absPath[0]).toEqual("/");
                     expect(_.endsWith(absPath, "/tmp")).toBeTruthy();
                 }
             });
 
 
-            it("when the directory already has an absolute path returns the same path", () =>
-            {
+            it("when the directory already has an absolute path returns the same path", () => {
                 const dir = new Directory(tmpDir.absPath());
                 expect(dir.absPath()).toEqual(tmpDir.absPath());
             });
@@ -236,23 +202,19 @@ describe("Directory", () =>
         });
 
 
-        describe("absolute()", () =>
-        {
+        describe("absolute()", () => {
 
-            it("returns an absolute path version of the source", () =>
-            {
+            it("returns an absolute path version of the source", () => {
                 const absTmp = tmpDir.absolute();
                 const path = absTmp.toString();
 
                 expect(tmpDir.toString()[0]).not.toEqual("/");
 
-                if (getOs() === OperatingSystem.Windows)
-                {
+                if (getOs() === OperatingSystem.Windows) {
                     expect(_.startsWith(path, "C:\\")).toBeTruthy();
                     expect(_.endsWith(path, "\\tmp")).toBeTruthy();
                 }
-                else
-                {
+                else {
                     expect(path[0]).toEqual("/");
                     expect(_.endsWith(path, "/tmp")).toBeTruthy();
                 }
@@ -262,37 +224,30 @@ describe("Directory", () =>
         });
 
 
-        describe("exists()", () =>
-        {
+        describe("exists()", () => {
 
-            it("will resolve to a truthy fs.Stats object for an existing directory", () =>
-            {
+            it("will resolve to a truthy fs.Stats object for an existing directory", () => {
                 const dir = new Directory(__dirname);
                 return dir.exists()
-                .then((stats) =>
-                {
+                .then((stats) => {
                     expect(stats).toBeTruthy();
                 });
             });
 
 
-            it("will resolve to false for a directory that does not exist", () =>
-            {
+            it("will resolve to false for a directory that does not exist", () => {
                 const dir = new Directory(__dirname, "xyzzy");
                 return dir.exists()
-                .then((stats) =>
-                {
+                .then((stats) => {
                     expect(stats).toBeFalsy();
                 });
             });
 
 
-            it("will resolve to false for a file with the specified path", () =>
-            {
+            it("will resolve to false for a file with the specified path", () => {
                 const dir = new Directory(__filename);
                 return dir.exists()
-                .then((stats) =>
-                {
+                .then((stats) => {
                     expect(stats).toBeFalsy();
                 });
             });
@@ -300,25 +255,21 @@ describe("Directory", () =>
         });
 
 
-        describe("existsSync()", () =>
-        {
+        describe("existsSync()", () => {
 
-            it("will return a truthy fs.Stats object for an existing directory", () =>
-            {
+            it("will return a truthy fs.Stats object for an existing directory", () => {
                 const dir = new Directory(__dirname);
                 expect(dir.existsSync()).toBeTruthy();
             });
 
 
-            it("will return false for a directory that does not exist", () =>
-            {
+            it("will return false for a directory that does not exist", () => {
                 const dir = new Directory(__dirname, "xyzzy");
                 expect(dir.existsSync()).toBeFalsy();
             });
 
 
-            it("will return false for a file with the specified path", () =>
-            {
+            it("will return false for a file with the specified path", () => {
                 const dir = new Directory(__filename);
                 expect(dir.existsSync()).toBeFalsy();
             });
@@ -327,71 +278,59 @@ describe("Directory", () =>
         });
 
 
-        describe("isEmpty()", () =>
-        {
+        describe("isEmpty()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will return false when a directory contains a file", () =>
-            {
+            it("will return false when a directory contains a file", () => {
                 new File(tmpDir, "foo.txt").writeSync("This is foo.txt");
 
                 return tmpDir.isEmpty()
-                .then((isEmpty: boolean) =>
-                {
+                .then((isEmpty: boolean) => {
                     expect(isEmpty).toBeFalsy();
                 });
             });
 
 
-            it("will return false when a directory contains a subdirectory", () =>
-            {
+            it("will return false when a directory contains a subdirectory", () => {
                 const fooDir = new Directory(tmpDir, "foo");
 
                 fooDir.ensureExistsSync();
 
                 return tmpDir.isEmpty()
-                .then((isEmpty: boolean) =>
-                {
+                .then((isEmpty: boolean) => {
                     expect(isEmpty).toBeFalsy();
                 });
             });
 
 
-            it("will return true when a directory is empty", () =>
-            {
+            it("will return true when a directory is empty", () => {
                 return tmpDir.isEmpty()
-                .then((isEmpty: boolean) =>
-                {
+                .then((isEmpty: boolean) => {
                     expect(isEmpty).toBeTruthy();
                 });
             });
         });
 
 
-        describe("isEmptySync()", () =>
-        {
+        describe("isEmptySync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will return false when a directory contains a file", () =>
-            {
+            it("will return false when a directory contains a file", () => {
                 const file = new File(tmpDir, "foo.txt");
                 file.writeSync("This is foo.txt");
                 expect(tmpDir.isEmptySync()).toBeFalsy();
             });
 
 
-            it("will return false when a directory contains a subdirectory", () =>
-            {
+            it("will return false when a directory contains a subdirectory", () => {
                 const fooDir = new Directory(tmpDir, "foo");
 
                 fooDir.ensureExistsSync();
@@ -400,8 +339,7 @@ describe("Directory", () =>
             });
 
 
-            it("will return true when a directory is empty", () =>
-            {
+            it("will return true when a directory is empty", () => {
                 expect(tmpDir.isEmptySync()).toBeTruthy();
             });
 
@@ -409,47 +347,39 @@ describe("Directory", () =>
         });
 
 
-        describe("ensureExists()", () =>
-        {
+        describe("ensureExists()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will make sure all necessary directories exist when given an absolute path", () =>
-            {
+            it("will make sure all necessary directories exist when given an absolute path", () => {
                 const dirPath = path.join(tmpDir.absPath(), "dir1", "dir2", "dir3");
                 const dir = new Directory(dirPath);
 
                 return dir.ensureExists()
-                .then(() =>
-                {
+                .then(() => {
                     expect(new Directory(dirPath).existsSync()).toBeTruthy();
                 });
             });
 
 
-            it("will make sure all necessary directories exist when given a relative path", () =>
-            {
+            it("will make sure all necessary directories exist when given a relative path", () => {
                 const dirPath = path.join("tmp", "dir1", "dir2", "dir3");
                 const dir = new Directory(dirPath);
 
                 return dir.ensureExists()
-                .then(() =>
-                {
+                .then(() => {
                     expect(new Directory(dirPath).existsSync()).toBeTruthy();
                 });
             });
 
 
-            it("will resolve with the Directory instance", (done) =>
-            {
+            it("will resolve with the Directory instance", (done) => {
                 const dir = new Directory(tmpDir, "foo");
                 dir.ensureExists()
-                .then((resultDir) =>
-                {
+                .then((resultDir) => {
                     expect(resultDir.absPath()).toEqual(dir.absPath());
                     done();
                 });
@@ -459,11 +389,9 @@ describe("Directory", () =>
         });
 
 
-        describe("ensureExistsSync()", () =>
-        {
+        describe("ensureExistsSync()", () => {
 
-            it("will make sure all necessary directories exist when given an absolute path", () =>
-            {
+            it("will make sure all necessary directories exist when given an absolute path", () => {
                 const dirPath = path.join(tmpDir.absPath(), "dir1", "dir2", "dir3");
                 const dir = new Directory(dirPath);
                 dir.ensureExistsSync();
@@ -471,8 +399,7 @@ describe("Directory", () =>
             });
 
 
-            it("will make sure all necessary directories exist when given a relative path", () =>
-            {
+            it("will make sure all necessary directories exist when given a relative path", () => {
                 const dirPath = path.join("tmp", "dir1", "dir2", "dir3");
                 const dir = new Directory(dirPath);
                 dir.ensureExistsSync();
@@ -480,8 +407,7 @@ describe("Directory", () =>
             });
 
 
-            it("will return the Directory instance", () =>
-            {
+            it("will return the Directory instance", () => {
                 const dir = new Directory(tmpDir, "foo");
                 const dirResult = dir.ensureExistsSync();
                 expect(dirResult.absPath()).toEqual(dir.absPath());
@@ -491,23 +417,19 @@ describe("Directory", () =>
         });
 
 
-        describe("empty()", () =>
-        {
+        describe("empty()", () => {
 
-            it("if the directory does not exist, will create all needed directories", () =>
-            {
+            it("if the directory does not exist, will create all needed directories", () => {
                 const dir = new Directory(tmpDir, "dir1", "dir2", "dir3");
 
                 return dir.empty()
-                .then(() =>
-                {
+                .then(() => {
                     expect(dir.existsSync()).toBeTruthy();
                 });
             });
 
 
-            it("will remove files from the specified directory", () =>
-            {
+            it("will remove files from the specified directory", () => {
                 const fileA = new File(tmpDir, "a.txt");
                 const fileB = new File(tmpDir, "b.txt");
                 const fileC = new File(tmpDir, "c.txt");
@@ -517,8 +439,7 @@ describe("Directory", () =>
                 fileC.writeSync("This if file C");
 
                 return tmpDir.empty()
-                .then(() =>
-                {
+                .then(() => {
                     expect(tmpDir.existsSync()).toBeTruthy();
                     expect(fileA.existsSync()).toBeFalsy();
                     expect(fileB.existsSync()).toBeFalsy();
@@ -527,13 +448,11 @@ describe("Directory", () =>
             });
 
 
-            it("resolves with the Directory instance", (done) =>
-            {
+            it("resolves with the Directory instance", (done) => {
                 const dir = new Directory(tmpDir, "foo");
                 dir.ensureExistsSync();
                 dir.empty()
-                .then((resultDir) =>
-                {
+                .then((resultDir) => {
                     expect(resultDir.absPath()).toEqual(dir.absPath());
                     done();
                 });
@@ -543,19 +462,16 @@ describe("Directory", () =>
         });
 
 
-        describe("emptySync()", () =>
-        {
+        describe("emptySync()", () => {
 
-            it("if the specified directory does not exist, will create all needed directories", () =>
-            {
+            it("if the specified directory does not exist, will create all needed directories", () => {
                 const dir = new Directory(tmpDir, "dir1", "dir2", "dir3");
                 dir.emptySync();
                 expect(dir.existsSync()).toBeTruthy();
             });
 
 
-            it("will remove files from the specified directory", () =>
-            {
+            it("will remove files from the specified directory", () => {
                 const fileA = new File(tmpDir, "a.txt");
                 const fileB = new File(tmpDir, "b.txt");
                 const fileC = new File(tmpDir, "c.txt");
@@ -573,8 +489,7 @@ describe("Directory", () =>
             });
 
 
-            it("returns the Directory instance", () =>
-            {
+            it("returns the Directory instance", () => {
                 const dir = new Directory(tmpDir, "foo");
                 dir.ensureExistsSync();
                 const resultDir = dir.emptySync();
@@ -584,11 +499,9 @@ describe("Directory", () =>
         });
 
 
-        describe("delete()", () =>
-        {
+        describe("delete()", () => {
 
-            it("will completely remove the directory and its contents", () =>
-            {
+            it("will completely remove the directory and its contents", () => {
                 const testDir = new Directory(tmpDir, "test");
                 const testFile = new File(testDir, "file.txt");
                 const testSubdir = new Directory(testDir, "subdir");
@@ -598,8 +511,7 @@ describe("Directory", () =>
                 testSubdir.ensureExistsSync();
 
                 return testDir.delete()
-                .then(() =>
-                {
+                .then(() => {
                     expect(testDir.existsSync()).toBeFalsy();
                     expect(testFile.existsSync()).toBeFalsy();
                     expect(testSubdir.existsSync()).toBeFalsy();
@@ -607,12 +519,10 @@ describe("Directory", () =>
             });
 
 
-            it("will resolve when the specified directory does not exist", (done) =>
-            {
+            it("will resolve when the specified directory does not exist", (done) => {
                 const dir = new Directory(tmpDir, "xyzzy");
                 dir.delete()
-                .then(() =>
-                {
+                .then(() => {
                     done();
                 });
 
@@ -622,11 +532,9 @@ describe("Directory", () =>
         });
 
 
-        describe("deleteSync()", () =>
-        {
+        describe("deleteSync()", () => {
 
-            it("will completely remove the directory and its contents", () =>
-            {
+            it("will completely remove the directory and its contents", () => {
                 const testDir = new Directory(tmpDir, "test");
                 const testFile = new File(testDir, "file.txt");
                 const testSubdir = new Directory(testDir, "subdir");
@@ -642,12 +550,10 @@ describe("Directory", () =>
             });
 
 
-            it("will not throw when the specified directory does not exist", () =>
-            {
+            it("will not throw when the specified directory does not exist", () => {
                 const dir = new Directory(tmpDir, "xyzzy");
 
-                expect(() =>
-                {
+                expect(() => {
                     dir.deleteSync();
                 }).not.toThrow();
             });
@@ -656,10 +562,8 @@ describe("Directory", () =>
         });
 
 
-        describe("contains()", () =>
-        {
-            it("returns true when the file is in the directory", async () =>
-            {
+        describe("contains()", () => {
+            it("returns true when the file is in the directory", async () => {
                 const theFile = new File(tmpDir, "foo.txt");
                 await theFile.write("xyzzy");
 
@@ -667,8 +571,7 @@ describe("Directory", () =>
             });
 
 
-            it("returns true when the file is in a subdirectory and search is recursive", async () =>
-            {
+            it("returns true when the file is in a subdirectory and search is recursive", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(dir1, "dir2").ensureExists();
                 const dir3 = await new Directory(dir2, "dir3").ensureExists();
@@ -679,8 +582,7 @@ describe("Directory", () =>
             });
 
 
-            it("returns false when the file is in a subdirectory but the search was not recursive", async () =>
-            {
+            it("returns false when the file is in a subdirectory but the search was not recursive", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(dir1, "dir2").ensureExists();
                 const dir3 = await new Directory(dir2, "dir3").ensureExists();
@@ -691,8 +593,7 @@ describe("Directory", () =>
             });
 
 
-            it("returns false when the file is not in the directory", async () =>
-            {
+            it("returns false when the file is not in the directory", async () => {
                 const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
                 const dir2 = await new Directory(tmpDir, "dir2").ensureExists();
                 const theFile = new File(dir1, "foo.txt");
@@ -703,17 +604,14 @@ describe("Directory", () =>
         });
 
 
-        describe("contents()", () =>
-        {
+        describe("contents()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will read the files and subdirectories within a directory", (done) =>
-            {
+            it("will read the files and subdirectories within a directory", (done) => {
                 const dirA = new Directory(tmpDir, "dirA");
                 const fileA = new File(dirA, "a.txt");
 
@@ -730,8 +628,7 @@ describe("Directory", () =>
                 fileC.writeSync("File C");
 
                 tmpDir.contents()
-                .then((result: IDirectoryContents) =>
-                {
+                .then((result: IDirectoryContents) => {
                     expect(result.subdirs.length).toEqual(2);
 
                     // Put the subdirectories in a deterministic order.
@@ -746,8 +643,7 @@ describe("Directory", () =>
             });
 
 
-            it("will include dotfiles and dot folders", (done) =>
-            {
+            it("will include dotfiles and dot folders", (done) => {
                 const dotFile = new File(tmpDir, ".dotfile");
                 const dotFolder = new Directory(tmpDir, ".dotfolder");
 
@@ -755,8 +651,7 @@ describe("Directory", () =>
                 dotFolder.ensureExistsSync();
 
                 tmpDir.contents()
-                .then((contents: IDirectoryContents) =>
-                {
+                .then((contents: IDirectoryContents) => {
                     expect(contents.files.length).toEqual(1);
                     expect(contents.files[0].toString()).toEqual(path.join("tmp", ".dotfile"));
                     expect(contents.subdirs.length).toEqual(1);
@@ -766,8 +661,7 @@ describe("Directory", () =>
             });
 
 
-            it("will read files and subdirectories recursively", (done) =>
-            {
+            it("will read files and subdirectories recursively", (done) => {
                 const dirA = new Directory(tmpDir, "dirA");
                 const dirA2 = new Directory(dirA, "dirA2");
                 const fileA = new File(dirA, "a.txt");
@@ -786,8 +680,7 @@ describe("Directory", () =>
                 fileC.writeSync("File C");
 
                 tmpDir.contents(true)
-                .then((result: IDirectoryContents) =>
-                {
+                .then((result: IDirectoryContents) => {
                     expect(result.subdirs.length).toEqual(3);
 
                     // Put the subdirectories in a deterministic order.
@@ -807,17 +700,14 @@ describe("Directory", () =>
             });
 
 
-            it("rejects when the directory does not exist", (done) =>
-            {
+            it("rejects when the directory does not exist", (done) => {
                 const dirA = new Directory(tmpDir, "dirA");  // Does not exist.
 
                 dirA.contents()
-                .then(() =>
-                {
+                .then(() => {
                     fail("The above call to contents() should have rejected.");
                 })
-                .catch((err) =>
-                {
+                .catch((err) => {
                     done();
                 });
             });
@@ -826,17 +716,14 @@ describe("Directory", () =>
         });
 
 
-        describe("contentsSync()", () =>
-        {
+        describe("contentsSync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will read the files and subdirectories within a directory", () =>
-            {
+            it("will read the files and subdirectories within a directory", () => {
                 const dirA = new Directory(tmpDir, "dirA");
                 const fileA = new File(dirA, "a.txt");
 
@@ -862,8 +749,7 @@ describe("Directory", () =>
             });
 
 
-            it("will include dotfiles and dot folders", () =>
-            {
+            it("will include dotfiles and dot folders", () => {
                 const dotFile = new File(tmpDir, ".dotfile");
                 const dotFolder = new Directory(tmpDir, ".dotfolder");
 
@@ -879,8 +765,7 @@ describe("Directory", () =>
             });
 
 
-            it("will read files and subdirectories recursively", () =>
-            {
+            it("will read files and subdirectories recursively", () => {
                 const dirA = new Directory(tmpDir, "dirA");
                 const dirA2 = new Directory(dirA, "dirA2");
                 const fileA = new File(dirA, "a.txt");
@@ -920,32 +805,27 @@ describe("Directory", () =>
         });
 
 
-        describe("prune()", () =>
-        {
+        describe("prune()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will recursively remove all subdirectories", () =>
-            {
+            it("will recursively remove all subdirectories", () => {
                 new Directory(tmpDir, "dirA", "dirBa", "dirC").ensureExistsSync();
                 new Directory(tmpDir, "dirA", "dirBb", "dirE").ensureExistsSync();
                 new Directory(tmpDir, "dir1", "dir2a", "dir3").ensureExistsSync();
                 new Directory(tmpDir, "dir1", "dir2b", "dir4").ensureExistsSync();
 
                 return tmpDir.prune()
-                .then(() =>
-                {
+                .then(() => {
                     expect(tmpDir.isEmptySync()).toBeTruthy();
                 });
             });
 
 
-            it("will not prune directories containing files", () =>
-            {
+            it("will not prune directories containing files", () => {
                 new Directory(tmpDir, "dirA", "dirBa", "dirC").ensureExistsSync();
                 new Directory(tmpDir, "dirA", "dirBb", "dirE").ensureExistsSync();
                 new Directory(tmpDir, "dir1", "dir2a", "dir3").ensureExistsSync();
@@ -954,8 +834,7 @@ describe("Directory", () =>
                 file.writeSync("This is foo.txt");
 
                 return tmpDir.prune()
-                .then(() =>
-                {
+                .then(() => {
                     expect(tmpDir.isEmptySync()).toBeFalsy();
 
                     const contents = tmpDir.contentsSync();
@@ -973,17 +852,14 @@ describe("Directory", () =>
         });
 
 
-        describe("pruneSync()", () =>
-        {
+        describe("pruneSync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will recursiveely remove all subdirectories", () =>
-            {
+            it("will recursiveely remove all subdirectories", () => {
                 new Directory(tmpDir, "dirA", "dirBa", "dirC").ensureExistsSync();
                 new Directory(tmpDir, "dirA", "dirBb", "dirE").ensureExistsSync();
                 new Directory(tmpDir, "dir1", "dir2a", "dir3").ensureExistsSync();
@@ -995,8 +871,7 @@ describe("Directory", () =>
             });
 
 
-            it("will not prune directories containing files", () =>
-            {
+            it("will not prune directories containing files", () => {
                 new Directory(tmpDir, "dirA", "dirBa", "dirC").ensureExistsSync();
                 new Directory(tmpDir, "dirA", "dirBb", "dirE").ensureExistsSync();
                 new Directory(tmpDir, "dir1", "dir2a", "dir3").ensureExistsSync();
@@ -1023,17 +898,14 @@ describe("Directory", () =>
         });
 
 
-        describe("copy()", () =>
-        {
+        describe("copy()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will copy a directory structure to the destination (copyRoot=true)", (done) =>
-            {
+            it("will copy a directory structure to the destination (copyRoot=true)", (done) => {
                 // src
                 //   dirA
                 //     a.txt
@@ -1066,8 +938,7 @@ describe("Directory", () =>
                 destDir.ensureExistsSync();
 
                 srcDir.copy(destDir, true)
-                .then((counterpartDestDir) =>
-                {
+                .then((counterpartDestDir) => {
                     // Should resolve with the counterpart of the source folder.
                     expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest", "src"));
 
@@ -1081,8 +952,7 @@ describe("Directory", () =>
             });
 
 
-            it("will copy a directory structure to the destination (copyRoot=false)", (done) =>
-            {
+            it("will copy a directory structure to the destination (copyRoot=false)", (done) => {
                 // src
                 //   dirA
                 //     a.txt
@@ -1115,8 +985,7 @@ describe("Directory", () =>
                 destDir.ensureExistsSync();
 
                 srcDir.copy(destDir, false)
-                .then((counterpartDestDir) =>
-                {
+                .then((counterpartDestDir) => {
                     // Should resolve with the counterpart of the source folder.
                     expect(counterpartDestDir.toString()).toEqual(path.join("tmp", "dest"));
 
@@ -1133,17 +1002,14 @@ describe("Directory", () =>
         });
 
 
-        describe("copySync()", () =>
-        {
+        describe("copySync()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will copy a directory structure to the destination (copyRoot=true)", () =>
-            {
+            it("will copy a directory structure to the destination (copyRoot=true)", () => {
                 // src
                 //   dirA
                 //     a.txt
@@ -1185,8 +1051,7 @@ describe("Directory", () =>
             });
 
 
-            it("will copy a directory structure to the destination (copyRoot=false)", () =>
-            {
+            it("will copy a directory structure to the destination (copyRoot=false)", () => {
                 // src
                 //   dirA
                 //     a.txt
@@ -1231,17 +1096,14 @@ describe("Directory", () =>
         });
 
 
-        describe("move()", () =>
-        {
+        describe("move()", () => {
 
-            beforeEach(() =>
-            {
+            beforeEach(() => {
                 tmpDir.emptySync();
             });
 
 
-            it("will create destDir when it does not exist", (done) =>
-            {
+            it("will create destDir when it does not exist", (done) => {
                 const srcDir = new Directory(tmpDir, "src");
                 srcDir.ensureExistsSync();
                 const fileA = new File(srcDir, "a.txt");
@@ -1252,16 +1114,14 @@ describe("Directory", () =>
                 expect(dstDir.existsSync()).toBeFalsy();
 
                 srcDir.move(dstDir, true)
-                .then(() =>
-                {
+                .then(() => {
                     expect(dstDir.existsSync()).toBeTruthy();
                     done();
                 });
             });
 
 
-            it("will move this directory itself when moveRoot is true", (done) =>
-            {
+            it("will move this directory itself when moveRoot is true", (done) => {
                 const srcDir = new Directory(tmpDir, "src");
                 srcDir.ensureExistsSync();
                 const fileA = new File(srcDir, "a.txt");
@@ -1269,8 +1129,7 @@ describe("Directory", () =>
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcDir.move(dstDir, true)
-                .then((newDir) =>
-                {
+                .then((newDir) => {
                     // The destination directory should have been created.
                     expect(dstDir.existsSync()).toBeTruthy();
                     // The src directory should have been moved.
@@ -1288,8 +1147,7 @@ describe("Directory", () =>
             });
 
 
-            it("will move only contents when moveRoot is false", (done) =>
-            {
+            it("will move only contents when moveRoot is false", (done) => {
                 const srcDir = new Directory(tmpDir, "src");
                 srcDir.ensureExistsSync();
                 const fileA = new File(srcDir, "a.txt");
@@ -1297,8 +1155,7 @@ describe("Directory", () =>
                 const dstDir = new Directory(tmpDir, "dst");
 
                 srcDir.move(dstDir, false)
-                .then((newDir) =>
-                {
+                .then((newDir) => {
                     // The destination directory should have been created.
                     expect(dstDir.existsSync()).toBeTruthy();
                     // The src directory should have been deleted.
@@ -1315,8 +1172,7 @@ describe("Directory", () =>
             });
 
 
-            it("will move subdirectories", (done) =>
-            {
+            it("will move subdirectories", (done) => {
                 // src
                 //   dirA
                 //     dirB
@@ -1329,8 +1185,7 @@ describe("Directory", () =>
 
                 const destDir = new Directory(tmpDir, "dest");
                 srcDir.move(destDir, false)
-                .then((newDir) =>
-                {
+                .then((newDir) => {
                     expect(newDir.toString()).toEqual(path.join("tmp", "dest"));
                     const destFile = new File(destDir, "dirA", "dirB", "file.txt");
                     expect(destFile.existsSync).toBeTruthy();
@@ -1346,10 +1201,8 @@ describe("Directory", () =>
         });
 
 
-        describe("walk()", () =>
-        {
-            beforeEach(() =>
-            {
+        describe("walk()", () => {
+            beforeEach(() => {
                 /* eslint-disable no-irregular-whitespace */
                 tmpDir.emptySync();
 
@@ -1394,12 +1247,10 @@ describe("Directory", () =>
             });
 
 
-            it("will invoke the specified callback for every file and directory", async () =>
-            {
+            it("will invoke the specified callback for every file and directory", async () => {
                 const encountered: Array<string> = [];
 
-                const handler = (item: Directory | File) =>
-                {
+                const handler = (item: Directory | File) => {
                     encountered.push(item.toString());
                     return true;   // Always recurse into directories
                 };
@@ -1422,12 +1273,10 @@ describe("Directory", () =>
             });
 
 
-            it("will not recurse into a directory when `false` is returned", async () =>
-            {
+            it("will not recurse into a directory when `false` is returned", async () => {
                 const encountered: Array<string> = [];
 
-                const handler = (item: Directory | File) =>
-                {
+                const handler = (item: Directory | File) => {
                     encountered.push(item.toString());
                     // Do not recurse into dirAA.
                     return !item.toString().endsWith("dirAA");

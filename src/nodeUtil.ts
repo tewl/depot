@@ -15,29 +15,24 @@ const NODEJS_SHEBANG = "#!/usr/bin/env node";
  * @param file - The file to make executable
  * @return A promise that resolves with the file that was made executable
  */
-export function makeNodeScriptExecutable(file: File): Promise<File>
-{
+export function makeNodeScriptExecutable(file: File): Promise<File> {
     return file.read()
-    .then((text) =>
-    {
+    .then((text) => {
         const newText = NODEJS_SHEBANG + EOL + text;
         return file.write(newText);
     })
-    .then(() =>
-    {
+    .then(() => {
         // We need to set the access mode of the file to the current mode with
         // execute permissions OR'ed in (for owner, group and other).  So first
         // get the current mode bits.
         return file.exists();
     })
-    .then((stats) =>
-    {
+    .then((stats) => {
         // Turn on all execute bits.
         const newMode = stats!.mode | constants.S_IXUSR | constants.S_IXGRP | constants.S_IXOTH;
         return file.chmod(newMode);
     })
-    .then(() =>
-    {
+    .then(() => {
         return file;
     });
 }
@@ -50,15 +45,12 @@ export function makeNodeScriptExecutable(file: File): Promise<File>
  * @return A promise that resolves with an array of files that were made
  * executable.
  */
-export function makeAllJsScriptsExecutable(dir: Directory, recursive = false): Promise<Array<File>>
-{
+export function makeAllJsScriptsExecutable(dir: Directory, recursive = false): Promise<Array<File>> {
     return dir.contents(recursive)
-    .then((contents) =>
-    {
+    .then((contents) => {
         const scriptFiles = _.filter(contents.files, (curFile) => curFile.extName === ".js");
         return mapAsync(scriptFiles, (curScriptFile) => makeNodeScriptExecutable(curScriptFile))
-        .then(() =>
-        {
+        .then(() => {
             return scriptFiles;
         });
     });
@@ -73,16 +65,13 @@ export function makeAllJsScriptsExecutable(dir: Directory, recursive = false): P
  * `node_modules/.bin/`.
  * @return The node script file that should be executed for the current OS.
  */
-export function nodeBinForOs(nodeBinFile: File | string): File
-{
+export function nodeBinForOs(nodeBinFile: File | string): File {
     const inputFile: File = nodeBinFile instanceof File ? nodeBinFile : new File(nodeBinFile);
 
-    if (getOs() === OperatingSystem.Windows)
-    {
+    if (getOs() === OperatingSystem.Windows) {
         return new File(inputFile.directory, inputFile.baseName + ".cmd");
     }
-    else
-    {
+    else {
         return inputFile;
     }
 }
@@ -94,14 +83,12 @@ export function nodeBinForOs(nodeBinFile: File | string): File
  * @param jsFile - The JavaScript file to be launched by node.exe
  * @return A File object representing the created .cmd file
  */
-export function createCmdLaunchScript(jsFile: File): Promise<File>
-{
+export function createCmdLaunchScript(jsFile: File): Promise<File> {
     const cmdFileName =  jsFile.baseName + ".cmd";
     const cmdFile = new File(jsFile.directory, cmdFileName);
     const cmdContents = getCmdLauncherCode(jsFile);
     return cmdFile.write(cmdContents)
-    .then(() =>
-    {
+    .then(() => {
         return cmdFile;
     });
 }
@@ -112,8 +99,7 @@ export function createCmdLaunchScript(jsFile: File): Promise<File>
  * @param jsFile - The .js file that will be run
  * @return The .cmd file code needed to launch the specified .js file using node
  */
-function getCmdLauncherCode(jsFile: File): string
-{
+function getCmdLauncherCode(jsFile: File): string {
     const cmdCode = `@IF EXIST "%~dp0\\node.exe" (` + EOL +
                     `    "%~dp0\\node.exe"  "%~dp0\\${jsFile.fileName}" %*` + EOL +
                     `) ELSE (` + EOL +

@@ -2,53 +2,44 @@ import { failed } from ".";
 import {Fraction, greatestCommonDivisor, leastCommonMultiple} from "./fraction";
 
 
-describe("Fraction", () =>
-{
+describe("Fraction", () => {
 
-    describe("static", () =>
-    {
+    describe("static", () => {
 
-        describe("fromParts()", () =>
-        {
+        describe("fromParts()", () => {
 
-            it("fails when any of the values is a non-integer", () =>
-            {
+            it("fails when any of the values is a non-integer", () => {
                 expect(failed(Fraction.fromParts(1.1, 2,   3  ))).toBeTrue();
                 expect(failed(Fraction.fromParts(1,   2.1, 3  ))).toBeTrue();
                 expect(failed(Fraction.fromParts(1,   2,   3.1))).toBeTrue();
             });
 
 
-            it("fails when the denominator is zero", () =>
-            {
+            it("fails when the denominator is zero", () => {
                 expect(failed(Fraction.fromParts(1, 2, 0))).toBeTrue();
             });
 
 
-            it("fails when the denominator is negative", () =>
-            {
+            it("fails when the denominator is negative", () => {
                 expect(failed(Fraction.fromParts(1, 1, -2))).toBeTrue();
                 expect(failed(Fraction.fromParts(1, -2))).toBeTrue();
             });
 
 
-            it("fails when a whole part is specified and the numerator is negative", () =>
-            {
+            it("fails when a whole part is specified and the numerator is negative", () => {
                 expect(failed(Fraction.fromParts(1, -1, 2))).toBeTrue();
                 expect(failed(Fraction.fromParts(-1, -1, 2))).toBeTrue();
             });
 
 
-            it("creates the expected value when given 1 number", () =>
-            {
+            it("creates the expected value when given 1 number", () => {
                 expect(Fraction.fromParts(3).value!.toString()).toEqual("3");
                 expect(Fraction.fromParts(0).value!.toString()).toEqual("0");
                 expect(Fraction.fromParts(-3).value!.toString()).toEqual("-3");
             });
 
 
-            it("creates the expected value when given 2 numbers", () =>
-            {
+            it("creates the expected value when given 2 numbers", () => {
                 expect(Fraction.fromParts(3, 2).value!.toString()).toEqual("1 1/2");
                 expect(Fraction.fromParts(48, 32).value!.toString()).toEqual("1 16/32");
                 expect(Fraction.fromParts(0, 2).value!.toString()).toEqual("0");
@@ -56,8 +47,7 @@ describe("Fraction", () =>
             });
 
 
-            it("creates the expected value when given 3 numbers", () =>
-            {
+            it("creates the expected value when given 3 numbers", () => {
                 expect(Fraction.fromParts(4, 3, 2).value!.toString()).toEqual("5 1/2");
                 expect(Fraction.fromParts(4, 2, 2).value!.toString()).toEqual("5");
                 expect(Fraction.fromParts(4, 12, 8).value!.toString()).toEqual("5 4/8");
@@ -74,11 +64,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("fromString()", () =>
-        {
+        describe("fromString()", () => {
 
-            it("fails when given an invalid string", () =>
-            {
+            it("fails when given an invalid string", () => {
                 expect(failed(Fraction.fromString("abc"))).toBeTrue();
                 expect(failed(Fraction.fromString("1  2"))).toBeTrue();
                 expect(failed(Fraction.fromString("1  2/3"))).toBeTrue();  // too many spaces
@@ -91,8 +79,7 @@ describe("Fraction", () =>
             });
 
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromString("0").value!.toString()).toEqual("0");
                 expect(Fraction.fromString("3").value!.toString()).toEqual("3");
                 expect(Fraction.fromString("-3").value!.toString()).toEqual("-3");
@@ -114,12 +101,10 @@ describe("Fraction", () =>
         });
 
 
-        describe("fromNumber()", () =>
-        {
+        describe("fromNumber()", () => {
 
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromNumber(0).toString()).toEqual("0");
                 expect(Fraction.fromNumber(1).toString()).toEqual("1");
                 expect(Fraction.fromNumber(-1).toString()).toEqual("-1");
@@ -135,12 +120,10 @@ describe("Fraction", () =>
         });
 
 
-        describe("compare()", () =>
-        {
+        describe("compare()", () => {
 
 
-            it("will return the expected result", () =>
-            {
+            it("will return the expected result", () => {
                 expect(Fraction.compare(Fraction.fromParts(0).value!,
                                         Fraction.fromParts(0).value!)).toEqual(0);
                 expect(Fraction.compare(Fraction.fromParts(-0).value!,
@@ -181,8 +164,7 @@ describe("Fraction", () =>
             });
 
 
-            it("will compare Fractions and numbers", () =>
-            {
+            it("will compare Fractions and numbers", () => {
                 expect(Fraction.compare(Fraction.fromString("1 1/16").value!, 1)).toEqual(1);
                 expect(Fraction.compare(1, Fraction.fromString("1 1/16").value!)).toEqual(-1);
             });
@@ -194,20 +176,16 @@ describe("Fraction", () =>
     });
 
 
-    describe("instance", () =>
-    {
+    describe("instance", () => {
 
-        describe("toString()", () =>
-        {
+        describe("toString()", () => {
 
-            it("returns '0' when there is no whole part and no fractional part", () =>
-            {
+            it("returns '0' when there is no whole part and no fractional part", () => {
                 expect(Fraction.fromParts(0, 0, 1).value!.toString()).toEqual("0");
             });
 
 
-            it("returns the expected string", () =>
-            {
+            it("returns the expected string", () => {
                 expect(Fraction.fromParts(3).value!.toString()).toEqual("3");
                 expect(Fraction.fromParts(3, 2).value!.toString()).toEqual("1 1/2");
                 expect(Fraction.fromParts(1, 3, 2).value!.toString()).toEqual("2 1/2");
@@ -215,8 +193,7 @@ describe("Fraction", () =>
             });
 
 
-            it("returns the expected value when asking for improper string", () =>
-            {
+            it("returns the expected value when asking for improper string", () => {
                 expect(Fraction.fromString("0").value!.toString(true)).toEqual("0");
                 expect(Fraction.fromString("3").value!.toString(true)).toEqual("3/1");
                 expect(Fraction.fromString("-3").value!.toString(true)).toEqual("-3/1");
@@ -239,35 +216,30 @@ describe("Fraction", () =>
         });
 
 
-        describe("stringRepresentations()", () =>
-        {
+        describe("stringRepresentations()", () => {
 
-            it("returns a single string when it cannot be reduced and is not improper", () =>
-            {
+            it("returns a single string when it cannot be reduced and is not improper", () => {
                 const frac = Fraction.fromParts(5, 8).value!;
                 const representations = frac.stringRepresentations();
                 expect(representations).toEqual(["5/8"]);
             });
 
 
-            it("returns two strings when it can be reduced and is not improper", () =>
-            {
+            it("returns two strings when it can be reduced and is not improper", () => {
                 const frac = Fraction.fromParts(4, 8).value!;
                 const representations = frac.stringRepresentations();
                 expect(representations).toEqual(["4/8", "1/2"]);
             });
 
 
-            it("returns two string when it cannot be reduced and is improper", () =>
-            {
+            it("returns two string when it cannot be reduced and is improper", () => {
                 const frac = Fraction.fromParts(12, 8).value!;
                 const representations = frac.stringRepresentations();
                 expect(representations).toEqual(["12/8", "3/2", "1 1/2"]);
             });
 
 
-            it("returns three strings when it can be reduced and is improper", () =>
-            {
+            it("returns three strings when it can be reduced and is improper", () => {
                 const frac = Fraction.fromParts(28, 26).value!;
                 const representations = frac.stringRepresentations();
                 expect(representations).toEqual(["28/26", "14/13", "1 1/13"]);
@@ -277,52 +249,43 @@ describe("Fraction", () =>
         });
 
 
-        describe("isImproper()", () =>
-        {
+        describe("isImproper()", () => {
 
-            it("returns true when the numerator is greater than the denominator", () =>
-            {
+            it("returns true when the numerator is greater than the denominator", () => {
                 expect(Fraction.fromParts(4, 3).value!.isImproper()).toBeTrue();
             });
 
 
-            it("returns false when the numerator equals the denominator", () =>
-            {
+            it("returns false when the numerator equals the denominator", () => {
                 expect(Fraction.fromParts(5, 5).value!.isImproper()).toBeFalse();
             });
 
 
-            it("returns false when the numerator is less than the denominator", () =>
-            {
+            it("returns false when the numerator is less than the denominator", () => {
                 expect(Fraction.fromParts(5, 6).value!.isImproper()).toBeFalse();
             });
 
 
-            it("returns true when the numerator is a greater negative number than the denominator", () =>
-            {
+            it("returns true when the numerator is a greater negative number than the denominator", () => {
                 expect(Fraction.fromParts(-7, 6).value!.isImproper()).toBeTrue();
             });
 
 
-            it("returns false when the numerator is equal to the negative of the denominator", () =>
-            {
+            it("returns false when the numerator is equal to the negative of the denominator", () => {
                 expect(Fraction.fromParts(-6, 6).value!.isImproper()).toBeFalse();
             });
 
 
-            it("returns false when the numerator is a lesser negative number than the denominator", () =>
-            {
+            it("returns false when the numerator is a lesser negative number than the denominator", () => {
                 expect(Fraction.fromParts(-5, 6).value!.isImproper()).toBeFalse();
             });
 
         });
 
 
-        describe("wholePart()", () =>
-        {
+        describe("wholePart()", () => {
 
-            it("will return the expected value", () =>
-            {
+            it("will return the expected value", () => {
                 expect(Fraction.fromParts(0).value!.wholePart()).toEqual(0);
 
                 expect(Fraction.fromParts(3).value!.wholePart()).toEqual(3);
@@ -338,11 +301,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("fractionalPart()", () =>
-        {
+        describe("fractionalPart()", () => {
 
-            it("will return the expected value", () =>
-            {
+            it("will return the expected value", () => {
                 expect(Fraction.fromParts(0).value!.fractionalPart().toString()).toEqual("0");
                 expect(Fraction.fromParts(-0).value!.fractionalPart().toString()).toEqual("0");
                 expect(Fraction.fromParts(3).value!.fractionalPart().toString()).toEqual("0");
@@ -361,47 +322,37 @@ describe("Fraction", () =>
         });
 
 
-        describe("setDenominator()", () =>
-        {
+        describe("setDenominator()", () => {
 
-            it("throws when the denominator specified is 0", () =>
-            {
-                expect(() =>
-                {
+            it("throws when the denominator specified is 0", () => {
+                expect(() => {
                     Fraction.fromParts(9, 10).value!.changeDenominator(0);
                 }).toThrow();
             });
 
 
-            it("throws when the denominator specified is negative", () =>
-            {
-                expect(() =>
-                {
+            it("throws when the denominator specified is negative", () => {
+                expect(() => {
                     Fraction.fromParts(9, 10).value!.changeDenominator(-10);
                 }).toThrow();
             });
 
 
-            it("throws when the denominator specified is not an integer", () =>
-            {
-                expect(() =>
-                {
+            it("throws when the denominator specified is not an integer", () => {
+                expect(() => {
                     Fraction.fromParts(9, 10).value!.changeDenominator(1.2);
                 }).toThrow();
             });
 
 
-            it("throws when a denominator is specified that the fraction cannot scale to", () =>
-            {
-                expect(() =>
-                {
+            it("throws when a denominator is specified that the fraction cannot scale to", () => {
+                expect(() => {
                     Fraction.fromParts(9, 10).value!.changeDenominator(11);
                 }).toThrow();
             });
 
 
-            it("Results in the expected value", () =>
-            {
+            it("Results in the expected value", () => {
                 expect(Fraction.fromParts(0, 8).value!.changeDenominator(4).toString()).toEqual("0");
                 expect(Fraction.fromParts(-0, 8).value!.changeDenominator(4).toString()).toEqual("0");
 
@@ -420,19 +371,16 @@ describe("Fraction", () =>
         });
 
 
-        describe("reduce()", () =>
-        {
+        describe("reduce()", () => {
 
-            it("returns an identical value when it cannot be reduced", () =>
-            {
+            it("returns an identical value when it cannot be reduced", () => {
                 const result = Fraction.fromParts(3, 4).value!.reduce();
                 expect(result.reducedFraction.toString()).toEqual("3/4");
                 expect(result.wasReduced).toBeFalse();
             });
 
 
-            it("returns a reduced value", () =>
-            {
+            it("returns a reduced value", () => {
                 let result = Fraction.fromParts(4, 4).value!.reduce();
                 expect(result.reducedFraction.toString()).toEqual("1");
                 expect(result.wasReduced).toBeTrue();
@@ -466,11 +414,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("equals()", () =>
-        {
+        describe("equals()", () => {
 
-            it("returns true when the values are equal", () =>
-            {
+            it("returns true when the values are equal", () => {
                 expect(Fraction.fromParts(0, 1).value!.equals(0)).toEqual(true);
                 expect(Fraction.fromParts(0, 1).value!.equals(Fraction.fromParts(0, 3).value!)).toEqual(true);
 
@@ -482,8 +428,7 @@ describe("Fraction", () =>
             });
 
 
-            it("returns false when the values are not equal", () =>
-            {
+            it("returns false when the values are not equal", () => {
                 expect(Fraction.fromParts(0, 1).value!.equals(1)).toEqual(false);
                 expect(Fraction.fromParts(0, 1).value!.equals(Fraction.fromParts(2, 2).value!)).toEqual(false);
 
@@ -495,11 +440,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("isLessThan()", () =>
-        {
+        describe("isLessThan()", () => {
 
-            it("returns true when this value is less", () =>
-            {
+            it("returns true when this value is less", () => {
                 expect(Fraction.fromParts(0, 1).value!.isLessThan(1.5)).toEqual(true);
                 expect(Fraction.fromParts(0, 1).value!.isLessThan(Fraction.fromParts(1, 1, 2).value!)).toEqual(true);
 
@@ -511,8 +454,7 @@ describe("Fraction", () =>
             });
 
 
-            it("returns false when this value is greater", () =>
-            {
+            it("returns false when this value is greater", () => {
                 expect(Fraction.fromParts(0, 1).value!.isLessThan(-0.5)).toEqual(false);
                 expect(Fraction.fromParts(0, 1).value!.isLessThan(Fraction.fromParts(-1, 2).value!)).toEqual(false);
 
@@ -524,11 +466,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("isGreaterThan()", () =>
-        {
+        describe("isGreaterThan()", () => {
 
-            it("returns true when this value is greater", () =>
-            {
+            it("returns true when this value is greater", () => {
                 expect(Fraction.fromParts(0, 1).value!.isGreaterThan(-1.5)).toEqual(true);
                 expect(Fraction.fromParts(0, 1).value!.isGreaterThan(
                     Fraction.fromParts(-1, 1, 2).value!
@@ -542,8 +482,7 @@ describe("Fraction", () =>
             });
 
 
-            it("returns false when this value is less", () =>
-            {
+            it("returns false when this value is less", () => {
                 expect(Fraction.fromParts(0, 1).value!.isGreaterThan(0.5)).toEqual(false);
                 expect(Fraction.fromParts(0, 1).value!.isGreaterThan(Fraction.fromParts(1, 2).value!)).toEqual(false);
 
@@ -555,11 +494,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("add()", () =>
-        {
+        describe("add()", () => {
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromString("0").value!.add(Fraction.fromString("0").value!).toString()).toEqual("0");
                 expect(Fraction.fromString("0").value!.add(Fraction.fromString("1/4").value!).toString()).toEqual("1/4");
                 expect(Fraction.fromString("1/4").value!.add(Fraction.fromString("0").value!).toString()).toEqual("1/4");
@@ -576,11 +513,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("subtract()", () =>
-        {
+        describe("subtract()", () => {
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromString("0").value!.subtract(Fraction.fromString("0").value!).toString()).toEqual("0");
                 expect(Fraction.fromString("0").value!.subtract(Fraction.fromString("1/4").value!).toString()).toEqual("-1/4");
                 expect(Fraction.fromString("1/4").value!.subtract(Fraction.fromString("0").value!).toString()).toEqual("1/4");
@@ -598,11 +533,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("multiply()", () =>
-        {
+        describe("multiply()", () => {
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromString("0").value!.multiply(Fraction.fromString("0").value!).toString()).toEqual("0");
                 expect(Fraction.fromString("1").value!.multiply(Fraction.fromString("0").value!).toString()).toEqual("0");
                 expect(Fraction.fromString("0").value!.multiply(Fraction.fromString("1").value!).toString()).toEqual("0");
@@ -620,25 +553,20 @@ describe("Fraction", () =>
         });
 
 
-        describe("divide()", () =>
-        {
+        describe("divide()", () => {
 
-            it("will throw when asked to divide by zero", () =>
-            {
-                expect(() =>
-                {
+            it("will throw when asked to divide by zero", () => {
+                expect(() => {
                     Fraction.fromString("3/4").value!.divide(Fraction.fromString("0/1").value!);
                 }).toThrow();
 
-                expect(() =>
-                {
+                expect(() => {
                     Fraction.fromString("3/4").value!.divide(0);
                 }).toThrow();
             });
 
 
-            it("returns the expected value", () =>
-            {
+            it("returns the expected value", () => {
                 expect(Fraction.fromString("0/1").value!.divide(Fraction.fromString("1/1").value!).toString()).toEqual("0");
                 expect(Fraction.fromString("1/1").value!.divide(Fraction.fromString("1/2").value!).toString()).toEqual("2");
                 expect(Fraction.fromString("-1/1").value!.divide(Fraction.fromString("1/2").value!).toString()).toEqual("-2");
@@ -654,11 +582,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("floor()", () =>
-        {
+        describe("floor()", () => {
 
-            it("rounds down to the next smallest whole integer", () =>
-            {
+            it("rounds down to the next smallest whole integer", () => {
                 expect(Fraction.from(5.95).value!.floor()).toEqual(5);
                 expect(Fraction.from(5.05).value!.floor()).toEqual(5);
                 expect(Fraction.from(5).value!.floor()).toEqual(5);
@@ -670,11 +596,9 @@ describe("Fraction", () =>
         });
 
 
-        describe("ceil()", () =>
-        {
+        describe("ceil()", () => {
 
-            it("rounds up to the next greatest whole integer", () =>
-            {
+            it("rounds up to the next greatest whole integer", () => {
                 expect(Fraction.from(0.95).value!.ceil()).toEqual(1);
                 expect(Fraction.from(4).value!.ceil()).toEqual(4);
                 expect(Fraction.from(7.004).value!.ceil()).toEqual(8);
@@ -686,25 +610,21 @@ describe("Fraction", () =>
         });
 
 
-        describe("abs()", () =>
-        {
+        describe("abs()", () => {
 
-            it("returns the absolute value when the value is negative", () =>
-            {
+            it("returns the absolute value when the value is negative", () => {
                 const val = Fraction.from(-2.125).value!;
                 expect(val.abs().toString()).toEqual("2 125/1000");
             });
 
 
-            it("returns the absolute value when the value is zero", () =>
-            {
+            it("returns the absolute value when the value is zero", () => {
                 const val = Fraction.from(0).value!;
                 expect(val.abs().toString()).toEqual("0");
             });
 
 
-            it("returns the absolute value when the value is positive", () =>
-            {
+            it("returns the absolute value when the value is positive", () => {
                 const val = Fraction.from(2.125).value!;
                 expect(val.abs().toString()).toEqual("2 125/1000");
             });
@@ -713,32 +633,27 @@ describe("Fraction", () =>
         });
 
 
-        describe("bracket()", () =>
-        {
+        describe("bracket()", () => {
 
-            it("throws when the increment is negative", () =>
-            {
+            it("throws when the increment is negative", () => {
                 const val = Fraction.from(0.5).value!;
                 expect(() => { val.bracket(-0.25); }).toThrow();
             });
 
 
-            it("throws when the increment is zero", () =>
-            {
+            it("throws when the increment is zero", () => {
                 const val = Fraction.from(0.5).value!;
                 expect(() => { val.bracket(-0.25); }).toThrow();
             });
 
 
-            it("throws when 1 is not divisible by the increment", () =>
-            {
+            it("throws when 1 is not divisible by the increment", () => {
                 const val = Fraction.from(0.5).value!;
                 expect(() => { val.bracket(Fraction.from("7/8").value!); }).toThrow();
             });
 
 
-            it("will return equal floor and ceil values when the value falls on an increment", () =>
-            {
+            it("will return equal floor and ceil values when the value falls on an increment", () => {
                 const val = Fraction.from("1/2").value!.add(Fraction.from("1/32").value!);  // 17/32
                 const increment = Fraction.from("1/32").value!;
                 const bracketResult = val.bracket(increment);
@@ -748,8 +663,7 @@ describe("Fraction", () =>
             });
 
 
-            it("will return equal floor and ceil values when the value is negative and falls on an increment", () =>
-            {
+            it("will return equal floor and ceil values when the value is negative and falls on an increment", () => {
                 const val = Fraction.from("-1/2").value!.add(Fraction.from("-1/32").value!);  // -17/32
                 const increment = Fraction.from("1/32").value!;
                 const bracketResult = val.bracket(increment);
@@ -759,8 +673,7 @@ describe("Fraction", () =>
             });
 
 
-            it("will return the expected floor and ceil values when the value does not fall on an increment", () =>
-            {
+            it("will return the expected floor and ceil values when the value does not fall on an increment", () => {
                 const val = Fraction.from("1/2").value!.add(Fraction.from("1/32").value!);  // 17/32, 4.25/8
                 const increment = Fraction.from("1/8").value!;
                 const bracketResult = val.bracket(increment);
@@ -770,8 +683,7 @@ describe("Fraction", () =>
             });
 
 
-            it("will return the expected floor and ceil values when the value does not fall on an increment and is negative", () =>
-            {
+            it("will return the expected floor and ceil values when the value does not fall on an increment and is negative", () => {
                 const val = Fraction.from("-1/2").value!.add(Fraction.from("-1/32").value!);
                 const increment = Fraction.from("1/8").value!;
                 const bracketResult = val.bracket(increment);
@@ -781,8 +693,7 @@ describe("Fraction", () =>
             });
 
 
-            it("makes it possible to round to the nearest 1/16", () =>
-            {
+            it("makes it possible to round to the nearest 1/16", () => {
                 expect(Fraction.from("45/64").value!.bracket(Fraction.from("1/16").value!).nearest.toString()).toEqual("11/16");
             });
 
@@ -796,27 +707,22 @@ describe("Fraction", () =>
 });
 
 
-describe("greatestCommonDivisor()", () =>
-{
+describe("greatestCommonDivisor()", () => {
 
-    it("will throw when both of the values are 0", () =>
-    {
-        expect(() =>
-        {
+    it("will throw when both of the values are 0", () => {
+        expect(() => {
             greatestCommonDivisor(0, 0);
         }).toThrow();
     });
 
 
-    it("will return k when given 0 and k", () =>
-    {
+    it("will return k when given 0 and k", () => {
         expect(greatestCommonDivisor(0, 5)).toEqual(5);
         expect(greatestCommonDivisor(5, 0)).toEqual(5);
     });
 
 
-    it("finds the greatest common divisor", () =>
-    {
+    it("finds the greatest common divisor", () => {
 
         expect(greatestCommonDivisor(4, 8)).toEqual(4);
 
@@ -828,12 +734,10 @@ describe("greatestCommonDivisor()", () =>
 });
 
 
-describe("leastCommonMultiple()", () =>
-{
+describe("leastCommonMultiple()", () => {
 
 
-    it("find the least common multiple", () =>
-    {
+    it("find the least common multiple", () => {
 
         expect(leastCommonMultiple(0, 1)).toEqual(0);
 

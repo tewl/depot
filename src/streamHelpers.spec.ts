@@ -4,11 +4,9 @@ import {File} from "./file";
 import {readableStreamToText} from "./streamHelpers";
 
 
-describe("readableStreamToText()", () =>
-{
+describe("readableStreamToText()", () => {
 
-    it("will resolve with the text in the readable stream", async () =>
-    {
+    it("will resolve with the text in the readable stream", async () => {
         const inputFile = new File(tmpDir, "inputFile.txt");
         inputFile.writeSync("hello xyzzy");
         const theStream = createReadStream(inputFile.toString());

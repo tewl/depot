@@ -5,14 +5,12 @@ import {File} from "./file";
 import {getUniqueProcessStr} from "./uniqueProcessStr";
 
 
-export enum CertificateCountryCode
-{
+export enum CertificateCountryCode {
     US = "US"
 }
 
 
-export class SelfSignedCertificate
-{
+export class SelfSignedCertificate {
 
     public static async create(
         countryCode: string,
@@ -21,8 +19,7 @@ export class SelfSignedCertificate
         organization: string,
         organizationalUnit: string,
         commonName: string
-    ): Promise<SelfSignedCertificate>
-    {
+    ): Promise<SelfSignedCertificate> {
         const id = getUniqueProcessStr();
         const tmpDir = new Directory(tmpdir());
         const keyFile = new File(tmpDir, `${id}_selfsignedcert.key`);
@@ -80,8 +77,7 @@ export class SelfSignedCertificate
         commonName: string,
         keyData: string,
         certData: string
-    )
-    {
+    ) {
         this._countryCode        = countryCode;
         this._state              = state;
         this._location           = location;

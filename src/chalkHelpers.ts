@@ -15,11 +15,9 @@ export function highlightMatches(
     str: string,
     regex: RegExp,
     highlightStyle: chalk.Chalk
-): [numHighlights: number, highlightedStr: string]
-{
+): [numHighlights: number, highlightedStr: string] {
     let numReplacements = 0;
-    const highlightedStr = str.replace(regex, (matchedText) =>
-    {
+    const highlightedStr = str.replace(regex, (matchedText) => {
         numReplacements += 1;
         return highlightStyle(matchedText);
     });

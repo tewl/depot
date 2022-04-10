@@ -28,44 +28,37 @@ import * as inquirer from "inquirer";
 const argv = yargs.help(false).argv;
 
 
-class ArgInquirer
-{
+class ArgInquirer {
     // region Data Members
     private readonly _questions: Array<inquirer.Question>;
     // endregion
 
 
-    public constructor(questions: _.ListOfRecursiveArraysOrValues<inquirer.Question>)
-    {
+    public constructor(questions: _.ListOfRecursiveArraysOrValues<inquirer.Question>) {
         this._questions = _.flattenDeep<inquirer.Question>(questions);
     }
 
 
-    public getArgNames(): Array<string>
-    {
+    public getArgNames(): Array<string> {
         const argNames = _.map<inquirer.Question, string>(this._questions, (curQuestion) => curQuestion.name!);
         return _.uniq<string>(argNames);
     }
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public getArgs(): Promise<{[key: string]: any} | undefined>
-    {
+    public getArgs(): Promise<{[key: string]: any} | undefined> {
         const argNames = this.getArgNames();
 
-        if (argv.help)
-        {
+        if (argv.help) {
             this.printUsage();
             return Promise.resolve(undefined);
         }
-        else if (argv._.length === argNames.length)
-        {
+        else if (argv._.length === argNames.length) {
             // TODO: Run the values through each question's validate() method.
 
             // The user has passed in the correct number or arguments.
             const argValues: {[key: string]: string} = {};
-            _.forEach(argv._, (curArg, index) =>
-            {
+            _.forEach(argv._, (curArg, index) => {
                 argValues[argNames[index]] = curArg;
             });
             // Copy any other command line arguments onto the returned object.
@@ -73,18 +66,15 @@ class ArgInquirer
             return Promise.resolve(argValues);
 
         }
-        else
-        {
+        else {
             // The user has not provided the correct number of arguments.
             // Interactively prompt them for answers using the inquirer package.
             return inquirer.prompt(this._questions)
-            .then((argValues) =>
-            {
+            .then((argValues) => {
                 // If the user has specified --cli, we should print out a
                 // command line that shows how to invoke with the current set of
                 // arguments.
-                if (argv.cli)
-                {
+                if (argv.cli) {
                     // Get the executable name.
                     let execName = process.argv[1];
                     execName = execName.split(path.sep).slice(-1)[0];
@@ -103,8 +93,7 @@ class ArgInquirer
         }
     }
 
-    public printUsage(): void
-    {
+    public printUsage(): void {
         // Typically argv[1] is the full path to the main module.  We only want
         // to show the last part of this path, so split it by the OS's directory
         // separator then take the last part.
@@ -112,8 +101,7 @@ class ArgInquirer
         execName = execName.split(path.sep).slice(-1)[0];
 
         // Create a string for each argument in the form <name>.
-        const argStrings = _.map(this.getArgNames(), (curArgName) =>
-        {
+        const argStrings = _.map(this.getArgNames(), (curArgName) => {
             return `<${curArgName}>`;
         });
 
@@ -142,8 +130,7 @@ class ArgInquirer
  */
 export function getArgs(
     argQuestions: _.ListOfRecursiveArraysOrValues<inquirer.Question>
-): Promise<{ [key: string]: any; } | undefined>  // eslint-disable-line @typescript-eslint/no-explicit-any
-{
+): Promise<{ [key: string]: any; } | undefined> {  // eslint-disable-line @typescript-eslint/no-explicit-any
     const argInquirer = new ArgInquirer(argQuestions);
     return argInquirer.getArgs();
 }

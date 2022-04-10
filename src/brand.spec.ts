@@ -5,8 +5,7 @@ import { Brand } from "./brand";
 type FooId = Brand<Uuid, "FooId">;
 type BarId = Brand<Uuid, "BarId">;
 
-function fooOp(foo: FooId): void
-{
+function fooOp(foo: FooId): void {
 }
 
 

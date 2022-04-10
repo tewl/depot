@@ -13,8 +13,7 @@ const gitUrlRegexp = /.*\/(.*)\.git$/;
  * @param gitUrl - The string to test
  * @return true if valid; false otherwise
  */
-export function isGitUrl(gitUrl: string): boolean
-{
+export function isGitUrl(gitUrl: string): boolean {
     return !!gitUrl.match(gitUrlRegexp);
 }
 
@@ -25,11 +24,9 @@ export function isGitUrl(gitUrl: string): boolean
  * @return The name of the project.  This method will throw an Error if the
  * provided URL is invalid.
  */
-export function gitUrlToProjectName(gitUrl: string): string
-{
+export function gitUrlToProjectName(gitUrl: string): string {
     const match = gitUrl.match(gitUrlRegexp);
-    if (!match)
-    {
+    if (!match) {
         throw new Error("Tried to get project name from invalid Git URL.");
     }
 
@@ -42,7 +39,6 @@ export function gitUrlToProjectName(gitUrl: string): string
  * @param dir - The directory path
  * @return The project name
  */
-export function dirToProjectName(dir: Directory): string
-{
+export function dirToProjectName(dir: Directory): string {
     return dir.dirName;
 }

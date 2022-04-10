@@ -2,11 +2,9 @@
 
 const commitHashRegexp = /^[0-9a-fA-F]{7,40}$/;
 
-export class CommitHash
-{
+export class CommitHash {
 
-    public static fromString(hash: string): CommitHash | undefined
-    {
+    public static fromString(hash: string): CommitHash | undefined {
         const results = commitHashRegexp.exec(hash);
         return results ? new CommitHash(hash) : undefined;
     }
@@ -17,20 +15,17 @@ export class CommitHash
     // endregion
 
 
-    private constructor(hash: string)
-    {
+    private constructor(hash: string) {
         this._hash = hash;
     }
 
 
-    public toString(): string
-    {
+    public toString(): string {
         return this._hash;
     }
 
 
-    public toShortString(): string
-    {
+    public toShortString(): string {
         return this._hash.slice(0, 7);
     }
 }

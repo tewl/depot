@@ -6,33 +6,27 @@ import { Result, succeededResult, failedResult, succeeded, failed } from "./resu
 ////////////////////////////////////////////////////////////////////////////////
 // Test Infrastructure
 
-enum OperationError
-{
+enum OperationError {
     Timeout,
     ServiceNotAvailable
 }
 
-const successfulOperation = (): Result<number, OperationError> =>
-{
+const successfulOperation = (): Result<number, OperationError> => {
     return succeededResult(5);
 };
 
-const failureOperation = (): Result<number, OperationError> =>
-{
+const failureOperation = (): Result<number, OperationError> => {
     return failedResult(OperationError.ServiceNotAvailable);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
 
-describe("example", () =>
-{
+describe("example", () => {
 
-    it("of exhaustiveness checking", (): void =>
-    {
+    it("of exhaustiveness checking", (): void => {
         const result = successfulOperation();
-        switch (result.state)
-        {
+        switch (result.state) {
             case "succeeded":
                 break;
 
@@ -48,11 +42,9 @@ describe("example", () =>
 });
 
 
-describe("succeededResult()", () =>
-{
+describe("succeededResult()", () => {
 
-    it("returns an object describing a successful result", () =>
-    {
+    it("returns an object describing a successful result", () => {
         const result = succeededResult(5);
         expect(result.state).toEqual("succeeded");
         expect(result.value).toEqual(5);
@@ -61,11 +53,9 @@ describe("succeededResult()", () =>
 });
 
 
-describe("failedResult()", () =>
-{
+describe("failedResult()", () => {
 
-    it("returns an object describing a failed result", () =>
-    {
+    it("returns an object describing a failed result", () => {
         const result = failedResult(3);
         expect(result.state).toEqual("failed");
         expect(result.error).toEqual(3);
@@ -74,18 +64,15 @@ describe("failedResult()", () =>
 });
 
 
-describe("succeeded()", () =>
-{
+describe("succeeded()", () => {
 
-    it("returns true when given a successful result", () =>
-    {
+    it("returns true when given a successful result", () => {
         const result = successfulOperation();
         expect(succeeded(result)).toBeTruthy();
     });
 
 
-    it("returns false when given a failure result", () =>
-    {
+    it("returns false when given a failure result", () => {
         const result = failureOperation();
         expect(succeeded(result)).toBeFalsy();
     });
@@ -93,18 +80,15 @@ describe("succeeded()", () =>
 });
 
 
-describe("failed()", () =>
-{
+describe("failed()", () => {
 
-    it("returns true when given a failure result", () =>
-    {
+    it("returns true when given a failure result", () => {
         const result = failureOperation();
         expect(failed(result)).toBeTruthy();
     });
 
 
-    it("returns false when given a successful result", () =>
-    {
+    it("returns false when given a successful result", () => {
         const result = successfulOperation();
         expect(failed(result)).toBeFalsy();
     });

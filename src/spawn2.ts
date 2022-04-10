@@ -13,8 +13,7 @@ import { assertNever } from "./never";
  * A Node.js error type that is not defined within the Node.js type definitions.
  * https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33217
  */
-export interface ISystemError
-{
+export interface ISystemError {
     address?: string;  // If present, the address to which a network connection failed
     code?:    string;  // The string error code
     dest?:    string;  // If present, the file path destination when reporting a file system error
@@ -31,13 +30,11 @@ export interface ISystemError
 /**
  * Describes a spawn failure where the process could not be started.
  */
-export interface ISpawnSystemError extends ISystemError
-{
+export interface ISpawnSystemError extends ISystemError {
     type: "ISpawnSystemError";
 }
 
-export function isISpawnSystemError(a: unknown): a is ISpawnSystemError
-{
+export function isISpawnSystemError(a: unknown): a is ISpawnSystemError {
     return (a as ISpawnSystemError).type === "ISpawnSystemError";
 }
 
@@ -45,8 +42,7 @@ export function isISpawnSystemError(a: unknown): a is ISpawnSystemError
 /**
  * Describes a spawn failure where the process returned a non-zero exit code.
  */
-export interface ISpawnExitError
-{
+export interface ISpawnExitError {
     type:     "ISpawnExitError";
     /**
      * The process's exit code.  May be _null_ if the process was killed.
@@ -56,8 +52,7 @@ export interface ISpawnExitError
     stdout:   string;
 }
 
-export function isISpawnExitError(a: unknown): a is ISpawnExitError
-{
+export function isISpawnExitError(a: unknown): a is ISpawnExitError {
     return (a as ISpawnExitError).type === "ISpawnExitError";
 }
 
@@ -72,10 +67,8 @@ export type SpawnError = ISpawnSystemError | ISpawnExitError;
  * @param err - The error to convert
  * @return The string representation
  */
-export function spawnErrorToString(err: SpawnError): string
-{
-    switch (err.type)
-    {
+export function spawnErrorToString(err: SpawnError): string {
+    switch (err.type) {
         case "ISpawnSystemError":
             return `System error: ${JSON.stringify(err)}`;
 
@@ -91,8 +84,7 @@ export function spawnErrorToString(err: SpawnError): string
 /**
  * The return value when calling spawn().
  */
-export interface ISpawnOutput
-{
+export interface ISpawnOutput {
     /**
      * The underlying child process.  This is provided so that clients can do
      * things like kill() them.
@@ -132,12 +124,10 @@ export function spawn(
     description?:  string,
     stdoutStream?: stream.Writable,
     stderrStream?: stream.Writable
-): ISpawnOutput
-{
+): ISpawnOutput {
     const cmdLineRepresentation = getCommandLineRepresentation(cmd, args);
 
-    if (description)
-    {
+    if (description) {
         console.log("--------------------------------------------------------------------------------");
         console.log(`${description}`);
         console.log(`    ${cmdLineRepresentation}`);
@@ -149,8 +139,7 @@ export function spawn(
     let childProcess: cp.ChildProcess;
 
     const closePromise = new Promise(
-        (resolve: (result: Result<string, SpawnError>) => void) =>
-        {
+        (resolve: (result: Result<string, SpawnError>) => void) => {
             const spawnOptions: cp.SpawnOptions = _.defaults(
                 {},
                 options,
@@ -171,30 +160,23 @@ export function spawn(
             .pipe(stderrCollector)  // to capture stderr in case child process errors
             .pipe(errorStream);
 
-            childProcess.once("error", (err: ISystemError) =>
-            {
+            childProcess.once("error", (err: ISystemError) => {
                 resolve(failedResult({ type: "ISpawnSystemError", ...err }));
             });
 
-            childProcess.once("exit", (exitCode: number) =>
-            {
+            childProcess.once("exit", (exitCode: number) => {
                 // Wait for all steams to flush before reporting that the child
                 // process has finished.
                 eventToPromise(childProcess, "close")
-                .then(() =>
-                {
-                    if (exitCode === 0)
-                    {
-                        if (description)
-                        {
+                .then(() => {
+                    if (exitCode === 0) {
+                        if (description) {
                             console.log(`Child process succeeded: ${cmdLineRepresentation}`);
                         }
                         resolve(succeededResult(_.trim(stdoutCollector.collected)));
                     }
-                    else
-                    {
-                        if (description)
-                        {
+                    else {
+                        if (description) {
                             console.log(`Child process failed: ${cmdLineRepresentation}`);
                         }
                         resolve(failedResult({
@@ -217,16 +199,12 @@ export function spawn(
 }
 
 
-function getCommandLineRepresentation(cmd: string, args: Array<string>): string
-{
-    args = args.map((curArg) =>
-    {
-        if (_.includes(curArg, " "))
-        {
+function getCommandLineRepresentation(cmd: string, args: Array<string>): string {
+    args = args.map((curArg) => {
+        if (_.includes(curArg, " ")) {
             return `"${curArg}"`;
         }
-        else
-        {
+        else {
             return curArg;
         }
     });

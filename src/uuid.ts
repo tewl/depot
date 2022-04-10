@@ -15,8 +15,7 @@ const uuidv4: () => string = require("uuid/v4");
  * page:
  * https://docs.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=net-5.0
  */
-export enum UuidFormat
-{
+export enum UuidFormat {
     /**
      * Dashed format.  Example: "9f7bc8b7-a483-43a7-8c3a-df36fe59e9b4"
      */
@@ -46,11 +45,9 @@ export const reStrUuidFormatN = "[0-9a-f]{32}";
  * @param format - The format of the returned uuid string (default: dashed)
  * @return The generated uuid
  */
-export function generateUuid(format: UuidFormat = UuidFormat.D): string
-{
+export function generateUuid(format: UuidFormat = UuidFormat.D): string {
     let uuid = uuidv4();
-    if (format === UuidFormat.N)
-    {
+    if (format === UuidFormat.N) {
         uuid = uuid.replace(/-/g, "");
     }
     return uuid;
@@ -60,8 +57,7 @@ export function generateUuid(format: UuidFormat = UuidFormat.D): string
 
 
 
-export class Uuid extends ValueObject<Uuid>
-{
+export class Uuid extends ValueObject<Uuid> {
     /**
      * Creates a standardized representation of the specified UUID string to make
      * validation and comparison simpler.
@@ -69,8 +65,7 @@ export class Uuid extends ValueObject<Uuid>
      * @param uuidStr - The string UUID to be normalized
      * @return The normalized version of the specified UUID string.
      */
-    private static toNormalizedString(uuidStr: string): string
-    {
+    private static toNormalizedString(uuidStr: string): string {
         return uuidStr.toLowerCase().replace(/-/g, "");
     }
 
@@ -81,8 +76,7 @@ export class Uuid extends ValueObject<Uuid>
      * @param uuidStr - The UUID string to be validated
      * @returns Whether the specified string is valid
      */
-    public static isValid(uuidStr: string): boolean
-    {
+    public static isValid(uuidStr: string): boolean {
         const normalized = Uuid.toNormalizedString(uuidStr);
         const regex = new RegExp(`^${reStrUuidFormatN}$`);
         const isValid = regex.test(normalized);
@@ -96,8 +90,7 @@ export class Uuid extends ValueObject<Uuid>
      * @param format - The format that should be used for the generated UUID.
      * @return The new Uuid instance.
      */
-    public static create(format: UuidFormat = UuidFormat.D): Uuid
-    {
+    public static create(format: UuidFormat = UuidFormat.D): Uuid {
         const uuidStr = generateUuid(format);
         const instance = new Uuid(uuidStr);
         return instance;
@@ -111,11 +104,9 @@ export class Uuid extends ValueObject<Uuid>
      * @return A successful result containing the new instance or a failed result
      * containing an error message.
      */
-    public static fromString(uuidStr: string): Result<Uuid, string>
-    {
+    public static fromString(uuidStr: string): Result<Uuid, string> {
         const isValid = Uuid.isValid(uuidStr);
-        if (!isValid)
-        {
+        if (!isValid) {
             return failedResult(`The string "${uuidStr}" is not a valid Uuid string.`);
         }
 
@@ -128,8 +119,7 @@ export class Uuid extends ValueObject<Uuid>
 
 
     // Private constructor.  Use static methods to create instances.
-    protected constructor(uuidStr: string)
-    {
+    protected constructor(uuidStr: string) {
         super();
         // Store the uuid using the format and case the caller is using.  If we
         // need to compare it to another Uuid, we will compare a normalized
@@ -147,8 +137,7 @@ export class Uuid extends ValueObject<Uuid>
      * @param other - The Uuid instance to compare this instance to
      * @return Whether this instance equals `other`.
      */
-    public equals(other: Uuid): boolean
-    {
+    public equals(other: Uuid): boolean {
         const thisNormalized = Uuid.toNormalizedString(this._uuidStr);
         const otherNormalized = Uuid.toNormalizedString(other._uuidStr);
         return thisNormalized === otherNormalized;
@@ -160,8 +149,7 @@ export class Uuid extends ValueObject<Uuid>
      *
      * @return The string representation of this Uuid.
      */
-    public override toString(): string
-    {
+    public override toString(): string {
         return this._uuidStr;
     }
 }

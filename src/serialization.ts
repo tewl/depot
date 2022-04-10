@@ -8,8 +8,7 @@ import {SerializationRegistry} from "./serializationRegistry";
 // Helper Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-export function createId(prefix: string): string
-{
+export function createId(prefix: string): string {
     const timeMs = Date.now();
     const uuid = generateUuid();
     return `${prefix}_${timeMs}_${uuid}`;
@@ -20,8 +19,7 @@ export function createId(prefix: string): string
 // Data Structures
 ////////////////////////////////////////////////////////////////////////////////
 
-export interface ISerializableMap
-{
+export interface ISerializableMap {
     [id: string]: ISerializable;
 }
 
@@ -44,16 +42,14 @@ export type IdString = string;
 ////////////////////////////////////////////////////////////////////////////////
 
 
-export interface ISerialized
-{
+export interface ISerialized {
     type:   string;
     id:     IdString;
     schema: string;
 }
 
 
-export interface IDeserializeResult
-{
+export interface IDeserializeResult {
     // The result of the first phase of deserialization.
     deserializedObj: ISerializable;
     // Other objects that need to be deserialized so that this object can
@@ -65,8 +61,7 @@ export interface IDeserializeResult
 }
 
 
-export interface ISerializableStatic
-{
+export interface ISerializableStatic {
     type: string;
 
     /**
@@ -82,22 +77,19 @@ export interface ISerializableStatic
 }
 
 
-export interface ISerializeResult
-{
+export interface ISerializeResult {
     serialized: ISerialized;
     othersToSerialize: Array<ISerializable>;
 }
 
 
-export interface ISerializable
-{
+export interface ISerializable {
     readonly id: string;
     serialize(): ISerializeResult;
 }
 
 
-export function isISerializable(obj: unknown): obj is ISerializable
-{
+export function isISerializable(obj: unknown): obj is ISerializable {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const candidate = (obj as any);
     return _.isString(candidate.id) &&
@@ -106,14 +98,12 @@ export function isISerializable(obj: unknown): obj is ISerializable
 }
 
 
-export interface ISerializableWithStow<TStow> extends ISerializable
-{
+export interface ISerializableWithStow<TStow> extends ISerializable {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     __stow: TStow;
 }
 
-export function isISerializableWithStow<TStow>(obj: unknown): obj is ISerializableWithStow<TStow>
-{
+export function isISerializableWithStow<TStow>(obj: unknown): obj is ISerializableWithStow<TStow> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const candidate = obj as any;
     return isISerializable(candidate) &&
@@ -130,8 +120,7 @@ export function isISerializableWithStow<TStow>(obj: unknown): obj is ISerializab
 ////////////////////////////////////////////////////////////////////////////////
 
 
-export interface IStoreGetResult<TStow>
-{
+export interface IStoreGetResult<TStow> {
     /**
      * The serialized form of the saved data.
      */
@@ -145,8 +134,7 @@ export interface IStoreGetResult<TStow>
 }
 
 
-export interface IStorePutResult<TStow>
-{
+export interface IStorePutResult<TStow> {
     /**
      * The new stow data that must be applied to the original object following
      * this put() operation.
@@ -155,8 +143,7 @@ export interface IStorePutResult<TStow>
 }
 
 
-export interface ILoadResult<T extends ISerializable>
-{
+export interface ILoadResult<T extends ISerializable> {
     // The requested deserialized object.
     obj: T;
 
@@ -175,21 +162,18 @@ export interface ILoadResult<T extends ISerializable>
 // write data in a manner that is specific to each backing store.
 //
 ////////////////////////////////////////////////////////////////////////////////
-export abstract class AStore<TStow>
-{
+export abstract class AStore<TStow> {
     // region Data Members
     protected readonly _registry: SerializationRegistry;
     // endregion
 
 
-    protected constructor(registry: SerializationRegistry)
-    {
+    protected constructor(registry: SerializationRegistry) {
         this._registry = registry;
     }
 
 
-    public async load<T extends ISerializable>(id: IdString): Promise<ILoadResult<T>>
-    {
+    public async load<T extends ISerializable>(id: IdString): Promise<ILoadResult<T>> {
         // An object that keeps track of all objects deserialized so far.
         // The key is the id and the value is the deserialized result.
         const deserializedSoFar: ISerializableMap = {};
@@ -202,8 +186,7 @@ export abstract class AStore<TStow>
 
         // Second pass:  Run all completion functions so that each object can
         // set its references to other objects.
-        await mapAsync(completionFuncs, (curCompletionFunc) =>
-        {
+        await mapAsync(completionFuncs, (curCompletionFunc) => {
             // Wrap the return value from each completion function in a promise
             // in the event the function returns void instead of Promise<void>.
             return Promise.resolve(curCompletionFunc(deserializedSoFar));
@@ -216,15 +199,13 @@ export abstract class AStore<TStow>
     }
 
 
-    public async save(obj: ISerializable): Promise<void>
-    {
+    public async save(obj: ISerializable): Promise<void> {
         const alreadySerialized: ISerializableMap = {};
         const needToSerialize: Array<ISerializable> = [obj];
 
         await promiseWhile(
             () => needToSerialize.length > 0,
-            async () =>
-            {
+            async () => {
                 const curObj = needToSerialize.shift()!;
 
                 // Note: We could perform a sanity check here to make sure that
@@ -238,8 +219,7 @@ export abstract class AStore<TStow>
 
                 // Check to see if the object has already been serialized.  If
                 // so, do nothing.
-                if (alreadySerialized[curObj.id] !== undefined)
-                {
+                if (alreadySerialized[curObj.id] !== undefined) {
                     return;
                 }
 
@@ -251,8 +231,7 @@ export abstract class AStore<TStow>
                 const putPromise = this.put(serializeResult.serialized, stow);
 
                 // If other objects need to be serialized, queue them up.
-                while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0)
-                {
+                while (serializeResult.othersToSerialize && serializeResult.othersToSerialize.length > 0) {
                     needToSerialize.push(serializeResult.othersToSerialize.shift()!);
                 }
 
@@ -316,13 +295,11 @@ export abstract class AStore<TStow>
         id: string,
         deserializedSoFar: ISerializableMap,
         completionFuncs: Array<DeserializePhase2Func>
-    ): Promise<ISerializable>
-    {
+    ): Promise<ISerializable> {
         // If the id being requested already appears in the dictionary of object
         // that have undergone a first pass deserialization, then return
         // immediately.
-        if (deserializedSoFar[id] !== undefined)
-        {
+        if (deserializedSoFar[id] !== undefined) {
             return deserializedSoFar[id];
         }
 
@@ -330,8 +307,7 @@ export abstract class AStore<TStow>
         const serialized = getResult.serialized;
 
         const foundClass = this._registry.getClass(serialized.type);
-        if (!foundClass)
-        {
+        if (!foundClass) {
             throw new Error(`No class registered for type "${serialized.type}".`);
         }
 
@@ -349,8 +325,7 @@ export abstract class AStore<TStow>
         objWithStow.__stow = getResult.stow;
 
         // If needed, update the list of completion functions that need to be run.
-        while (deserializeResult.completionFuncs && deserializeResult.completionFuncs.length > 0)
-        {
+        while (deserializeResult.completionFuncs && deserializeResult.completionFuncs.length > 0) {
             const completionFunc = deserializeResult.completionFuncs.shift()!;
             completionFuncs.push(completionFunc);
         }
@@ -358,17 +333,14 @@ export abstract class AStore<TStow>
         // If the deserialized object has returned IDs of other objects that
         // need to be deserialized, recurse and do a first pass deserialization
         // on those objects as well.
-        if (deserializeResult.neededIds)
-        {
+        if (deserializeResult.neededIds) {
             // Create tasks that will do a first pass deserialization on the
             // needed objects.  We will then execute them serially so that we
             // won't deserialize the same object more than once.  That would
             // result in references to different objects where we need to have
             // references that point to the same object.
-            const tasks = _.map(deserializeResult.neededIds, (curNeededId) =>
-            {
-                return () =>
-                {
+            const tasks = _.map(deserializeResult.neededIds, (curNeededId) => {
+                return () => {
                     return this.doFirstPassDeserialize(curNeededId, deserializedSoFar, completionFuncs);
                 };
             });
@@ -388,18 +360,15 @@ export abstract class AStore<TStow>
 
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IMemoryStow
-{
+interface IMemoryStow {
     // Intentionally left empty.
     // MemoryStore does not require any stowed data.
 }
 
 
-export class MemoryStore extends AStore<IMemoryStow>
-{
+export class MemoryStore extends AStore<IMemoryStow> {
 
-    public static create(registry: SerializationRegistry): Promise<MemoryStore>
-    {
+    public static create(registry: SerializationRegistry): Promise<MemoryStore> {
         const instance = new MemoryStore(registry);
         return Promise.resolve(instance);
     }
@@ -410,18 +379,15 @@ export class MemoryStore extends AStore<IMemoryStow>
     // endregion
 
 
-    private constructor(registry: SerializationRegistry)
-    {
+    private constructor(registry: SerializationRegistry) {
         super(registry);
         this._store = {};
     }
 
 
-    public getIds(regexp?: RegExp): Promise<Array<IdString>>
-    {
+    public getIds(regexp?: RegExp): Promise<Array<IdString>> {
         let ids: Array<IdString> = _.keys(this._store);
-        if (regexp === undefined)
-        {
+        if (regexp === undefined) {
             return Promise.resolve(ids);
         }
 
@@ -432,8 +398,7 @@ export class MemoryStore extends AStore<IMemoryStow>
     }
 
 
-    protected get(id: IdString): Promise<IStoreGetResult<IMemoryStow>>
-    {
+    protected get(id: IdString): Promise<IStoreGetResult<IMemoryStow>> {
         // Read the specified data from the backing store.
         const serialized = this._store[id];
 
@@ -447,8 +412,7 @@ export class MemoryStore extends AStore<IMemoryStow>
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>>
-    {
+    protected put(serialized: ISerialized, stow: undefined | IMemoryStow): Promise<IStorePutResult<IMemoryStow>> {
         // Transform `serialized` into the backing store's representation.
         // This is not needed for MemoryStore, because it stores the data as
         // an ISerialized.

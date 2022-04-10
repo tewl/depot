@@ -14,15 +14,13 @@ import {
 import * as _ from "lodash";
 
 
-interface IModelSerialized1 extends ISerialized
-{
+interface IModelSerialized1 extends ISerialized {
     schema: "1";
     rootPerson: undefined | string;
 }
 
 
-function isIModelSerialized1(serialized: ISerialized): serialized is IModelSerialized1
-{
+function isIModelSerialized1(serialized: ISerialized): serialized is IModelSerialized1 {
     const suspect = serialized as IModelSerialized1;
 
     return serialized.type === Model.type &&
@@ -31,20 +29,16 @@ function isIModelSerialized1(serialized: ISerialized): serialized is IModelSeria
 }
 
 
-export class Model implements ISerializable
-{
+export class Model implements ISerializable {
     // region ISerializableStatic
 
-    public static get type(): "model"
-    {
+    public static get type(): "model" {
         return "model";
     }
 
 
-    public static deserialize(serialized: ISerialized): IDeserializeResult
-    {
-        if (!isIModelSerialized1(serialized))
-        {
+    public static deserialize(serialized: ISerialized): IDeserializeResult {
+        if (!isIModelSerialized1(serialized)) {
             throw new Error(`Unsupported serialized Model: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
@@ -52,11 +46,9 @@ export class Model implements ISerializable
         const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
-        if (serialized.rootPerson)
-        {
+        if (serialized.rootPerson) {
             neededIds.push(serialized.rootPerson);
-            additionalWork.push((objects: ISerializableMap) =>
-            {
+            additionalWork.push((objects: ISerializableMap) => {
                 deserialized.rootPerson = objects[serialized.rootPerson!] as Person;
             });
         }
@@ -86,8 +78,7 @@ export class Model implements ISerializable
      * @param rootPerson - The person at the root of this Model.
      * @return The newly created Model instance
      */
-    public static create(rootPerson: Person): Model
-    {
+    public static create(rootPerson: Person): Model {
         const instance = new Model(createId("model"));
         instance.rootPerson = rootPerson;
         return instance;
@@ -101,32 +92,27 @@ export class Model implements ISerializable
     // endregion
 
 
-    private constructor(id: IdString)
-    {
+    private constructor(id: IdString) {
         this._id         = id;
     }
 
 
-    public get rootPerson(): undefined | Person
-    {
+    public get rootPerson(): undefined | Person {
         return this._rootPerson;
     }
 
 
-    public set rootPerson(value: undefined | Person)
-    {
+    public set rootPerson(value: undefined | Person) {
         this._rootPerson = value;
     }
 
 
     // region ISerializable
-    public get id(): string
-    {
+    public get id(): string {
         return this._id;
     }
 
-    public serialize(): ISerializeResult
-    {
+    public serialize(): ISerializeResult {
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IModelSerialized1 = {
@@ -136,8 +122,7 @@ export class Model implements ISerializable
             rootPerson: undefined
         };
 
-        if (this._rootPerson)
-        {
+        if (this._rootPerson) {
             serialized.rootPerson = this._rootPerson.id;
             othersToSerialize.push(this._rootPerson);
         }
@@ -153,8 +138,7 @@ export class Model implements ISerializable
 // Person
 ////////////////////////////////////////////////////////////////////////////////
 
-interface IPersonSerialized1 extends ISerialized
-{
+interface IPersonSerialized1 extends ISerialized {
     schema: "1";
     firstName: string;
     lastName: string;
@@ -162,8 +146,7 @@ interface IPersonSerialized1 extends ISerialized
     father: undefined | IdString;
 }
 
-function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSerialized1
-{
+function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSerialized1 {
     const suspect = serialized as IPersonSerialized1;
 
     return serialized.type === Person.type &&
@@ -175,21 +158,17 @@ function isIPersonSerialized1(serialized: ISerialized): serialized is IPersonSer
 }
 
 
-export class Person implements ISerializable
-{
+export class Person implements ISerializable {
 
     // region ISerializableStatic
 
-    public static get type(): "person"
-    {
+    public static get type(): "person" {
         return "person";
     }
 
 
-    public static deserialize(serialized: ISerialized): IDeserializeResult
-    {
-        if (!isIPersonSerialized1(serialized))
-        {
+    public static deserialize(serialized: ISerialized): IDeserializeResult {
+        if (!isIPersonSerialized1(serialized)) {
             throw new Error(`Unsupported serialized Person: ${JSON.stringify(serialized, undefined, 4)}`);
         }
 
@@ -199,20 +178,16 @@ export class Person implements ISerializable
         const neededIds: Array<IdString>                   = [];
         const additionalWork: Array<DeserializePhase2Func> = [];
 
-        if (serialized.mother)
-        {
+        if (serialized.mother) {
             neededIds.push(serialized.mother);
-            additionalWork.push((objects: ISerializableMap) =>
-            {
+            additionalWork.push((objects: ISerializableMap) => {
                 deserialized.mother = objects[serialized.mother!] as Person;
             });
         }
 
-        if (serialized.father)
-        {
+        if (serialized.father) {
             neededIds.push(serialized.father);
-            additionalWork.push((objects) =>
-            {
+            additionalWork.push((objects) => {
                 deserialized.father = objects[serialized.father!] as Person;
             });
         }
@@ -226,8 +201,7 @@ export class Person implements ISerializable
 
     // endregion
 
-    public static create(firstName: string, lastName: string): Person
-    {
+    public static create(firstName: string, lastName: string): Person {
         return new Person(createId("person"), firstName, lastName);
     }
 
@@ -240,53 +214,44 @@ export class Person implements ISerializable
     private          _father:    undefined | Person;
     // endregion
 
-    private constructor(id: IdString, firstName: string, lastName: string)
-    {
+    private constructor(id: IdString, firstName: string, lastName: string) {
         this._id = id;
         this._firstName = firstName;
         this._lastName = lastName;
     }
 
-    public get firstName(): string
-    {
+    public get firstName(): string {
         return this._firstName;
     }
 
-    public get lastName(): string
-    {
+    public get lastName(): string {
         return this._lastName;
     }
 
-    public get mother(): undefined | Person
-    {
+    public get mother(): undefined | Person {
         return this._mother;
     }
 
-    public set mother(value: undefined | Person)
-    {
+    public set mother(value: undefined | Person) {
         this._mother = value;
     }
 
-    public get father(): undefined | Person
-    {
+    public get father(): undefined | Person {
         return this._father;
     }
 
-    public set father(value: undefined | Person)
-    {
+    public set father(value: undefined | Person) {
         this._father = value;
     }
 
 
     // region ISerializable
 
-    public get id(): string
-    {
+    public get id(): string {
         return this._id;
     }
 
-    public serialize(): ISerializeResult
-    {
+    public serialize(): ISerializeResult {
         const othersToSerialize: Array<ISerializable> = [];
 
         const serialized: IPersonSerialized1 = {
@@ -299,14 +264,12 @@ export class Person implements ISerializable
             father:    undefined
         };
 
-        if (this._mother)
-        {
+        if (this._mother) {
             serialized.mother = this._mother.id;
             othersToSerialize.push(this._mother);
         }
 
-        if (this._father)
-        {
+        if (this._father) {
             serialized.father = this._father.id;
             othersToSerialize.push(this._father);
         }

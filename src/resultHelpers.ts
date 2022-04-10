@@ -16,15 +16,12 @@ import { failed, failedResult, Result, succeeded, succeededResult } from "./resu
 export function bindResult<TInputSuccess, TOutputSuccess, TError>(
     fn: (x: TInputSuccess) => Result<TOutputSuccess, TError>,
     input: Result<TInputSuccess, TError>
-): Result<TOutputSuccess, TError>
-{
-    if (succeeded(input))
-    {
+): Result<TOutputSuccess, TError> {
+    if (succeeded(input)) {
         const funcResult = fn(input.value);
         return funcResult;
     }
-    else
-    {
+    else {
         return input;
     }
 }
@@ -40,15 +37,12 @@ export function bindResult<TInputSuccess, TOutputSuccess, TError>(
 export function mapSuccess<TInputSuccess, TOutputSuccess, TError>(
     fn: (input: TInputSuccess) => TOutputSuccess,
     input: Result<TInputSuccess, TError>
-): Result<TOutputSuccess, TError>
-{
-    if (succeeded(input))
-    {
+): Result<TOutputSuccess, TError> {
+    if (succeeded(input)) {
         const mappedValue = fn(input.value);
         return succeededResult(mappedValue);
     }
-    else
-    {
+    else {
         return input;
     }
 }
@@ -64,14 +58,11 @@ export function mapSuccess<TInputSuccess, TOutputSuccess, TError>(
 export function mapError<TSuccess, TInputError, TOutputError>(
     fn: (input: TInputError) => TOutputError,
     input: Result<TSuccess, TInputError>
-): Result<TSuccess, TOutputError>
-{
-    if (succeeded(input))
-    {
+): Result<TSuccess, TOutputError> {
+    if (succeeded(input)) {
         return input;
     }
-    else
-    {
+    else {
         const mappedError = fn(input.error);
         return failedResult(mappedError);
     }
@@ -91,29 +82,24 @@ export function mapError<TSuccess, TInputError, TOutputError>(
 export function mapWhileSuccessful<TInput, TOutput, TError>(
     srcCollection: Array<TInput>,
     mappingFunc: (curItem: TInput) => Result<TOutput, TError>
-): Result<Array<TOutput>, TError>
-{
+): Result<Array<TOutput>, TError> {
     return _.reduce(
         srcCollection,
-        (acc, curItem) =>
-        {
+        (acc, curItem) => {
             // If we have already failed, just return the error.
-            if (failed(acc))
-            {
+            if (failed(acc)) {
                 return acc;
             }
 
             // We have not yet failed, so process the current item.
             const res = mappingFunc(curItem);
-            if (succeeded(res))
-            {
+            if (succeeded(res)) {
                 // Note:  Do not use array.concat() here, because if the current
                 // result's value is an array, it will be flattened.
                 acc.value.push(res.value);
                 return acc;
             }
-            else
-            {
+            else {
                 return res;
             }
         },
@@ -268,29 +254,24 @@ export function executeWhileSuccessful<TAS, TAE, TBS, TBE, TCS, TCE, TDS, TDE, T
 export function executeWhileSuccessful(
     // eslint-disable-next-line @typescript-eslint/ban-types
     ...funcs: Array<Function>
-): Result<Array<unknown>, unknown>
-{
+): Result<Array<unknown>, unknown> {
     return _.reduce(
         funcs,
-        (acc, curFn) =>
-        {
+        (acc, curFn) => {
             // If we have already failed, just return the error.
-            if (failed(acc))
-            {
+            if (failed(acc)) {
                 return acc;
             }
 
             // We have not failed yet, so execute the current function.
             const res = curFn();
-            if (succeeded(res))
-            {
+            if (succeeded(res)) {
                 // Note:  Do not use array.concat() here, because if the current
                 // result's value is an array, it will be flattened.
                 acc.value.push(res.value);
                 return acc;
             }
-            else
-            {
+            else {
                 return res;
             }
         },
@@ -313,8 +294,7 @@ export function boolToResult<TSuccess, TError>(
     condition: unknown,
     trueSuccessVal: TSuccess,
     falseErrorVal: TError
-): Result<TSuccess, TError>
-{
+): Result<TSuccess, TError> {
     return condition ?
         succeededResult(trueSuccessVal) :
         failedResult(falseErrorVal);

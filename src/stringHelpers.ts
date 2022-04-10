@@ -9,18 +9,15 @@ import {createEolRegex} from "./regexpHelpers";
  * @param padStr - The substring to count occurrences of
  * @return The number of times padStr occurs at the beginning of str
  */
-export function numInitial(str: string, padStr: string): number
-{
-    if (padStr === "")
-    {
+export function numInitial(str: string, padStr: string): number {
+    if (padStr === "") {
         return 0;
     }
 
     let curStr = str;
     let numOccurrences = 0;
 
-    while (_.startsWith(curStr, padStr))
-    {
+    while (_.startsWith(curStr, padStr)) {
         ++numOccurrences;
         curStr = curStr.slice(padStr.length);
     }
@@ -40,14 +37,11 @@ export function indent(
     src: string,
     numSpacesOrPad: number | string,
     skipFirstLine = false
-): string
-{
-    if (numSpacesOrPad === 0)
-    {
+): string {
+    if (numSpacesOrPad === 0) {
         return src;
     }
-    else
-    {
+    else {
         // If the caller specified a string, use that as the pad.  Otherwise,
         // treat the number as the number of spaces.
         const pad: string = typeof numSpacesOrPad === "string" ?
@@ -64,8 +58,7 @@ export function indent(
             match: string,
             group1: string,
             offset: number
-        ): string
-        {
+        ): string {
             // If told to skip the first line and this is the first line, skip it.
             return skipFirstLine && (offset === 0) ?
                    group1 :
@@ -85,13 +78,11 @@ export function indent(
  *     possible.  If `false`, only one occurrence will be removed.
  * @return A new version of str without the indentations
  */
-export function outdent(str: string, padStr = " ", greedy = true): string
-{
+export function outdent(str: string, padStr = " ", greedy = true): string {
     const lines = splitIntoLines(str, true);
     const initOccurrences = _.map(lines, (curLine) => numInitial(curLine, padStr));
     let numToRemove = _.min(initOccurrences);
-    if (!greedy)
-    {
+    if (!greedy) {
         // We should not be greedy, so only remove (at most) 1 occurrence of
         // `padStr`.
         numToRemove = _.min([numToRemove, 1]);
@@ -113,19 +104,16 @@ const blankLineRegex = /^\s*$/;
  * @param str - The original string
  * @return A version of str without leading and trailing blank lines
  */
-export function trimBlankLines(str: string): string
-{
+export function trimBlankLines(str: string): string {
     const lines = splitIntoLines(str, true);
 
     while ((lines.length > 0) &&
-          blankLineRegex.test(lines[0]))
-    {
+          blankLineRegex.test(lines[0])) {
         lines.shift();
     }
 
     while ((lines.length > 0) &&
-          blankLineRegex.test(_.last(lines)!))
-    {
+          blankLineRegex.test(_.last(lines)!)) {
         lines.pop();
     }
 
@@ -142,10 +130,8 @@ export function trimBlankLines(str: string): string
  * @param str - The source string
  * @return A new string with blank lines removed
  */
-export function removeBlankLines(str: string): string
-{
-    if (str.length === 0)
-    {
+export function removeBlankLines(str: string): string {
+    if (str.length === 0) {
         return "";
     }
 
@@ -153,8 +139,7 @@ export function removeBlankLines(str: string): string
     lines = _.filter(lines, (curLine) => !isBlank(curLine));
 
     // If all processed lines were blank, just return an empty string.
-    if (lines.length === 0)
-    {
+    if (lines.length === 0) {
         return "";
     }
 
@@ -171,8 +156,7 @@ export function removeBlankLines(str: string): string
  * @param text - The string to analyze
  * @return true if `text` is nothing but whitespace; false otherwise.
  */
-export function isBlank(text: string): boolean
-{
+export function isBlank(text: string): boolean {
     return blankLineRegex.test(text);
 }
 
@@ -185,8 +169,7 @@ const whitespaceRegex = /\s+/g;
  * @param str - The original string to remove whitespace from
  * @return A new string in which all whitespace has been removed.
  */
-export function removeWhitespace(str: string): string
-{
+export function removeWhitespace(str: string): string {
     return str.replace(whitespaceRegex, "");
 }
 
@@ -197,10 +180,8 @@ export function removeWhitespace(str: string): string
  * @param retainLineEndings - Whether each line should include the original line endings
  * @return An array containing the individual lines from `text`.
  */
-export function splitIntoLines(text: string, retainLineEndings = false): Array<string>
-{
-    if (text.length === 0)
-    {
+export function splitIntoLines(text: string, retainLineEndings = false): Array<string> {
+    if (text.length === 0) {
         return [];
     }
 
@@ -208,25 +189,21 @@ export function splitIntoLines(text: string, retainLineEndings = false): Array<s
     const eolRegex = createEolRegex("g");
     let done = false;
 
-    while (!done)
-    {
+    while (!done) {
 
         const startIndex = eolRegex.lastIndex;
 
         const match = eolRegex.exec(text);
-        if (match)
-        {
+        if (match) {
 
             let line: string = text.slice(startIndex, match.index);
-            if (retainLineEndings)
-            {
+            if (retainLineEndings) {
                 line += match[0];
             }
             lines.push(line);
 
         }
-        else
-        {
+        else {
             const line = text.slice(startIndex);
             lines.push(line);
             done = true;
@@ -243,28 +220,23 @@ export function splitIntoLines(text: string, retainLineEndings = false): Array<s
  * @param src - The string to be split.
  * @return An array of string segments
  */
-export function splitLinesOsIndependent(src: string): Array<string>
-{
+export function splitLinesOsIndependent(src: string): Array<string> {
     let lines = _.split(src, "\n");
-    lines = _.map(lines, (curLine) =>
-    {
+    lines = _.map(lines, (curLine) => {
         return _.trimEnd(curLine, "\r");
     });
     return lines;
 }
 
 
-export function padLeft(src: string, pad: string, desiredLength: number): string
-{
+export function padLeft(src: string, pad: string, desiredLength: number): string {
     const numPadChars = desiredLength - src.length;
-    if (numPadChars <= 0)
-    {
+    if (numPadChars <= 0) {
         return src;
     }
 
     let fullPad = "";
-    while (fullPad.length < numPadChars)
-    {
+    while (fullPad.length < numPadChars) {
         fullPad = fullPad + pad;
     }
 
@@ -273,17 +245,14 @@ export function padLeft(src: string, pad: string, desiredLength: number): string
 }
 
 
-export function padRight(src: string, pad: string, desiredLength: number): string
-{
+export function padRight(src: string, pad: string, desiredLength: number): string {
     const numPadChars = desiredLength - src.length;
-    if (numPadChars <= 0)
-    {
+    if (numPadChars <= 0) {
         return src;
     }
 
     let fullPad = "";
-    while (fullPad.length < numPadChars)
-    {
+    while (fullPad.length < numPadChars) {
         fullPad = fullPad + pad;
     }
 
@@ -298,15 +267,12 @@ export function padRight(src: string, pad: string, desiredLength: number): strin
  * @return A string representing the EOL characters being used in `text`.  If no
  * end-of-line is found, and empty string is returned.
  */
-export function getEol(text: string): string
-{
+export function getEol(text: string): string {
     const match = createEolRegex().exec(text);
-    if (!match)
-    {
+    if (!match) {
         return "";
     }
-    else
-    {
+    else {
         return match[0];
     }
 }
@@ -319,8 +285,7 @@ export function getEol(text: string): string
  * @param sep - The separator to insert between each array element
  * @return Description
  */
-export function concatStrings(strings: Array<string>, sep: string = os.EOL): string
-{
+export function concatStrings(strings: Array<string>, sep: string = os.EOL): string {
     return strings.join(sep);
 }
 
@@ -332,8 +297,7 @@ export function concatStrings(strings: Array<string>, sep: string = os.EOL): str
  * @return A new string containing _str_ repeated until the specified length is
  * achieved.
  */
-export function repeat(str: string, numChars: number): string
-{
+export function repeat(str: string, numChars: number): string {
     const repeatCount = Math.ceil(numChars / str.length);
     const tooLong = _.repeat(str, repeatCount);
     const res = tooLong.slice(0, numChars);
@@ -349,14 +313,11 @@ export function repeat(str: string, numChars: number): string
  * @param insert - The string to be inserted
  * @returns The resulting string
  */
-export function splice(str: string, index: number, numCharsToDelete: number, insert: string): string
-{
+export function splice(str: string, index: number, numCharsToDelete: number, insert: string): string {
     // We cannot pass negative indexes directly to the 2nd slicing operation.
-    if (index < 0)
-    {
+    if (index < 0) {
         index = str.length + index;
-        if (index < 0)
-        {
+        if (index < 0) {
             index = 0;
         }
     }

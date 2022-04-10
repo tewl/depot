@@ -13,8 +13,7 @@ import * as inquirer from "inquirer";
 export async function promptToContinue(
     message:          string,
     defaultToConfirm: boolean
-): Promise<boolean>
-{
+): Promise<boolean> {
     const questionConfirmation: inquirer.Question = {
         type:    "confirm",
         name:    "confirm",
@@ -36,8 +35,7 @@ export async function promptToContinue(
 export function promptForString(
     message: string,
     defaultValue?: string
-): Promise<string>
-{
+): Promise<string> {
     const question: inquirer.Question = {
         type:    "input",
         name:    "inputValue",
@@ -46,8 +44,7 @@ export function promptForString(
     };
 
     return inquirer.prompt<{inputValue: string}>([question])
-    .then((answers) =>
-    {
+    .then((answers) => {
         return answers.inputValue;
     });
 }
@@ -71,8 +68,7 @@ export interface IChoiceString {
 export async function promptForChoice(
     message: string,
     choices: Array<IChoiceString>
-): Promise<string>
-{
+): Promise<string> {
     const actualChoices = _.chain(choices)
     .map((curChoice) => ({name: curChoice.name, value: curChoice.value, short: curChoice.name}))
     .value();
@@ -101,8 +97,7 @@ export async function promptForChoice(
 export async function promptForStringWithChoices(
     message: string,
     choices: Array<IChoiceString>
-): Promise<string>
-{
+): Promise<string> {
     const otherValue = "otherValueXyzzy";
     const actualChoices =
         _.chain(choices)
@@ -133,8 +128,7 @@ export async function promptForStringWithChoices(
 export function promptForStringInEditor(
     message: string,
     defaultValue?: string
-): Promise<string>
-{
+): Promise<string> {
     const question: inquirer.Question = {
         type:    "editor",
         name:    "editorInput",
@@ -143,8 +137,7 @@ export function promptForStringInEditor(
     };
 
     return inquirer.prompt<{editorInput: string}>([question])
-    .then((answers) =>
-    {
+    .then((answers) => {
         return answers.editorInput;
     });
 }

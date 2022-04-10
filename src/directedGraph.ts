@@ -5,27 +5,23 @@ import { difference } from "./setHelpers";
 // Types
 ////////////////////////////////////////////////////////////////////////////////
 
-export interface IAdjacencyInfo<TVertex, TEdge>
-{
+export interface IAdjacencyInfo<TVertex, TEdge> {
     edgeAttr: TEdge;
     toVertex: TVertex;
 }
 
 
-export type AdjacencyMap<TVertex, TEdge> =
-    Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdge>>>;
+export type AdjacencyMap<TVertex, TEdge> = Map<TVertex, Array<IAdjacencyInfo<TVertex, TEdge>>>;
 
 
-export interface IEdge<TVertex, TEdge>
-{
+export interface IEdge<TVertex, TEdge> {
     fromVertex: TVertex;
     toVertex: TVertex;
     edgeAttr: TEdge;
 }
 
 
-export interface IBfsResult<TVertex>
-{
+export interface IBfsResult<TVertex> {
     /**
      * The distance from the keyed vertex to the source node. Vertices that have
      * no path to the source vertex will have a distance of Infinity.
@@ -43,16 +39,14 @@ export interface IBfsResult<TVertex>
 /**
  * Colors nodes are painted with while traversing a graph.
  */
-enum PaintedColor
-{
+enum PaintedColor {
     White = 0,    // Undiscovered
     Gray = 1,     // Discovered but some neighbors are undiscovered
     Black = 2     // Discovered and all neighbors are discovered (all neighbors are black or gray)
 }
 
 
-export enum EdgeClassification
-{
+export enum EdgeClassification {
     Tree,     // An edge in the depth-first forest defined by the predecessor tree
     Back,     // An edge (u, v) connecting u to an ancestor v, including self-loops
     Forward,  // Non-tree edges connecting u to a descendant v
@@ -62,8 +56,7 @@ export enum EdgeClassification
 }
 
 
-export interface IDfsResult<TVertex>
-{
+export interface IDfsResult<TVertex> {
     /**
      * Each vertex's predecessor within a tree of the resulting depth-first
      * forest.  Undefined indicates the vertex is the root of tree within the
@@ -96,8 +89,7 @@ export interface IDfsResult<TVertex>
  * Models a directed graph.  Each vertex has type TVertex and each edge has
  * attached data of type TEdge.
  */
-export class DirectedGraph<TVertex, TEdge>
-{
+export class DirectedGraph<TVertex, TEdge> {
     /**
      * Creates a new DirectedGraph instance.
      * @param vertices - The vertices of the graph
@@ -109,26 +101,21 @@ export class DirectedGraph<TVertex, TEdge>
     public static create<TVertex, TEdge>(
         vertices: Set<TVertex>,
         edges: Array<IEdge<TVertex, TEdge>>
-    ): Result<DirectedGraph<TVertex, TEdge>, string>
-    {
+    ): Result<DirectedGraph<TVertex, TEdge>, string> {
         const adjMap: AdjacencyMap<TVertex, TEdge> = new Map();
 
         // Create an empty adjacency map with an entry for each vertex.
-        for (const curVertex of vertices)
-        {
+        for (const curVertex of vertices) {
             adjMap.set(curVertex, []);
         }
 
         // Move each edge into the adjacency list.
-        for (const curEdge of edges)
-        {
-            if (!adjMap.has(curEdge.fromVertex))
-            {
+        for (const curEdge of edges) {
+            if (!adjMap.has(curEdge.fromVertex)) {
                 const vertexStr = JSON.stringify(curEdge.fromVertex);
                 return failedResult(`Edge specifies a fromVertex of ${vertexStr} which is not in the vertex collection.`);
             }
-            if (!adjMap.has(curEdge.toVertex))
-            {
+            if (!adjMap.has(curEdge.toVertex)) {
                 const vertexStr = JSON.stringify(curEdge.toVertex);
                 return failedResult(`Edge specifies a toVertex of ${vertexStr} which is not in the vertex collection.`);
             }
@@ -152,25 +139,20 @@ export class DirectedGraph<TVertex, TEdge>
      * Private constructor.  Use static methods to create instances.
      * @param adjMap - The adjacency map defining the graph.
      */
-    private constructor(adjMap: AdjacencyMap<TVertex, TEdge>)
-    {
+    private constructor(adjMap: AdjacencyMap<TVertex, TEdge>) {
         this._adjMap = adjMap;
     }
 
 
-    public get vertices(): Set<TVertex>
-    {
+    public get vertices(): Set<TVertex> {
         return new Set(this._adjMap.keys());
     }
 
 
-    public get edges(): Array<IEdge<TVertex, TEdge>>
-    {
+    public get edges(): Array<IEdge<TVertex, TEdge>> {
         const edges: Array<IEdge<TVertex, TEdge>> = [];
-        for (const [fromVertex, adjList] of this._adjMap.entries())
-        {
-            for (const adjInfo of adjList)
-            {
+        for (const [fromVertex, adjList] of this._adjMap.entries()) {
+            for (const adjInfo of adjList) {
                 edges.push({
                     fromVertex: fromVertex,
                     toVertex:   adjInfo.toVertex,
@@ -189,8 +171,7 @@ export class DirectedGraph<TVertex, TEdge>
      * @param source  - The vertex to start searching from
      * @returns The result of the search
      */
-    public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string>
-    {
+    public breadthFirstSearch(source: TVertex): Result<IBfsResult<TVertex>, string> {
         return bfs(this._adjMap, source);
     }
 
@@ -198,12 +179,19 @@ export class DirectedGraph<TVertex, TEdge>
      * Performs a depth-first search of this graph.
      * @returns The results of the search
      */
-    public depthFirstSearch(): IDfsResult<TVertex>
-    {
+    public depthFirstSearch(): IDfsResult<TVertex> {
         return dfs(this._adjMap);
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Dag (Directed Acyclic Graph)
+////////////////////////////////////////////////////////////////////////////////
+export class Dag {
+    private constructor() {
+        // TODO: Implement this.
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper Functions
@@ -223,11 +211,9 @@ function bfs<TVertex, TEdge>(
     adjMap: AdjacencyMap<TVertex, TEdge>,
     source: TVertex,
     stopPred: (discovered: Set<TVertex>) => boolean = () => false
-): Result<IBfsResult<TVertex>, string>
-{
+): Result<IBfsResult<TVertex>, string> {
     const allVertices = new Set(adjMap.keys());
-    if (!allVertices.has(source))
-    {
+    if (!allVertices.has(source)) {
         const sourceText = JSON.stringify(source);
         return failedResult(`Source vertex ${sourceText} is not a vertex in the graph.`);
     }
@@ -239,8 +225,7 @@ function bfs<TVertex, TEdge>(
     const discovered: Set<TVertex> = new Set();
 
     const nonSourceVertices = difference(allVertices, new Set([source]));
-    for (const curNonSourceVertex of nonSourceVertices)
-    {
+    for (const curNonSourceVertex of nonSourceVertices) {
         color.set(curNonSourceVertex, PaintedColor.White);
         dist.set(curNonSourceVertex, Infinity);
         pred.set(curNonSourceVertex, undefined);
@@ -255,14 +240,11 @@ function bfs<TVertex, TEdge>(
     // undiscovered.
     const q: Array<TVertex> = [source];
 
-    while (q.length !== 0)
-    {
+    while (q.length !== 0) {
         const u = q[0];
-        for (const curAdjInfo of adjMap.get(u)!)
-        {
+        for (const curAdjInfo of adjMap.get(u)!) {
             const v = curAdjInfo.toVertex;
-            if (color.get(v) === PaintedColor.White)
-            {
+            if (color.get(v) === PaintedColor.White) {
                 // Vertex v is now discovered.
                 color.set(v, PaintedColor.Gray);
                 dist.set(v, dist.get(u)! + 1);
@@ -270,8 +252,7 @@ function bfs<TVertex, TEdge>(
                 discovered.add(v);
 
                 // Invoke the stop predicate to see if we should stop searching.
-                if (stopPred(discovered))
-                {
+                if (stopPred(discovered)) {
                     return succeededResult({distance: dist, predecessor: pred});
                 }
 
@@ -298,25 +279,21 @@ function bfs<TVertex, TEdge>(
  */
 function dfs<TVertex, TEdge>(
     adjMap: AdjacencyMap<TVertex, TEdge>
-): IDfsResult<TVertex>
-{
+): IDfsResult<TVertex> {
     const color: Map<TVertex, PaintedColor> = new Map();
     const pred: Map<TVertex, TVertex | undefined> = new Map();
     const discoveryTimestamp: Map<TVertex, number> = new Map();
     const finishTimestamp: Map<TVertex, number> = new Map();
     const edgeClassification: AdjacencyMap<TVertex, EdgeClassification> = new Map();
 
-    for (const curVertex of adjMap.keys())
-    {
+    for (const curVertex of adjMap.keys()) {
         color.set(curVertex, PaintedColor.White);
         pred.set(curVertex, undefined);
         edgeClassification.set(curVertex, []);
     }
     let time = 0;
-    for (const curVertex of adjMap.keys())
-    {
-        if (color.get(curVertex) === PaintedColor.White)
-        {
+    for (const curVertex of adjMap.keys()) {
+        if (color.get(curVertex) === PaintedColor.White) {
             // curVertex has become the root of a new tree in the depth-first
             // forest.
             dfsVisit(curVertex);
@@ -332,29 +309,24 @@ function dfs<TVertex, TEdge>(
         edgeClassification: edgeClassification
     };
 
-    function dfsVisit(u: TVertex)
-    {
+    function dfsVisit(u: TVertex) {
         // White vertex u has just been discovered.
         color.set(u, PaintedColor.Gray);
         discoveryTimestamp.set(u, ++time);
 
         // Explore u's neighbors.
         const neighborVertices = adjMap.get(u)!.map((adjInfo) => adjInfo.toVertex);
-        for (const v of neighborVertices)
-        {
+        for (const v of neighborVertices) {
             const vColor = color.get(v);
-            if (vColor === PaintedColor.White)
-            {
+            if (vColor === PaintedColor.White) {
                 pred.set(v, u);
                 setEdgeClassificationIfClear(u, v, EdgeClassification.Tree);
                 dfsVisit(v);
             }
-            else if (vColor === PaintedColor.Gray)
-            {
+            else if (vColor === PaintedColor.Gray) {
                 setEdgeClassificationIfClear(u, v, EdgeClassification.Back);
             }
-            else if (vColor === PaintedColor.Black)
-            {
+            else if (vColor === PaintedColor.Black) {
                 // The edge is either Forward or Cross.  We'll set it to Cross
                 // here and then use the discovery timestamp at the end to
                 // distinguish between the two.
@@ -367,28 +339,22 @@ function dfs<TVertex, TEdge>(
         finishTimestamp.set(u, ++time);
     }
 
-    function setEdgeClassificationIfClear(u: TVertex, v: TVertex, classification: EdgeClassification): void
-    {
+    function setEdgeClassificationIfClear(u: TVertex, v: TVertex, classification: EdgeClassification): void {
         const adjList = edgeClassification.get(u)!;
         const foundAdjInfo = adjList.find((adjInfo) => adjInfo.toVertex === v);
-        if (foundAdjInfo === undefined)
-        {
+        if (foundAdjInfo === undefined) {
             adjList.push({edgeAttr: classification, toVertex: v});
         }
     }
 
-    function fixForwardCrossEdgeClassifications(): void
-    {
+    function fixForwardCrossEdgeClassifications(): void {
         // Inspect all of the "Cross" classifications and change the appropriate
         // ones to "Forward" based on the discovery timestamps.
-        for (const fromVertex of edgeClassification.keys())
-        {
+        for (const fromVertex of edgeClassification.keys()) {
             const adjList = edgeClassification.get(fromVertex)!;
-            for (const adjInfo of adjList)
-            {
+            for (const adjInfo of adjList) {
                 if (adjInfo.edgeAttr === EdgeClassification.Cross &&
-                    discoveryTimestamp.get(fromVertex)! < discoveryTimestamp.get(adjInfo.toVertex)!)
-                {
+                    discoveryTimestamp.get(fromVertex)! < discoveryTimestamp.get(adjInfo.toVertex)!) {
                     adjInfo.edgeAttr = EdgeClassification.Forward;
                 }
             }

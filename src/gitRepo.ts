@@ -15,8 +15,7 @@ import {Result, failedResult, succeededResult, succeeded, failed} from "./result
 import {mapAsync} from "./promiseHelpers";
 
 
-interface IGitLogEntry
-{
+interface IGitLogEntry {
     // TODO: Change the following to an instance of CommitHash.
     commitHash: string;
     author: string;
@@ -31,8 +30,7 @@ interface IGitLogEntry
  * the /g flag.
  * @return Description
  */
-function getLogEntryRegex(): RegExp
-{
+function getLogEntryRegex(): RegExp {
     //
     // A regex for parsing "git log" output.
     // match[1]: commit hash
@@ -54,14 +52,12 @@ function getLogEntryRegex(): RegExp
  * @return A promise for a boolean indicating whether dir contains a Git
  * repository.  This promise will never reject.
  */
-export function isGitRepoDir(dir: Directory): Promise<boolean>
-{
+export function isGitRepoDir(dir: Directory): Promise<boolean> {
     return Promise.all([
         dir.exists(),                        // The directory exists
         new Directory(dir, ".git").exists()  // The directory contains a .git directory
     ])
-    .then(([dirExists, dotGitExists]) =>
-    {
+    .then(([dirExists, dotGitExists]) => {
         return Boolean(dirExists && dotGitExists);
     });
 }
@@ -73,8 +69,7 @@ export type FilesRelativeTo = "cwd" | "repo";
 /**
  * Represents a Git repository within the local filesystem.
  */
-export class GitRepo
-{
+export class GitRepo {
     /**
      * Creates a new GitRepo instance, pointing it at the specified directory.
      *
@@ -83,8 +78,7 @@ export class GitRepo
      * instance when successful.  Resolves with an error result containing a
      * descriptive error message upon failure.
      */
-    public static async fromDirectory(dir: Directory): Promise<Result<GitRepo, string>>
-    {
+    public static async fromDirectory(dir: Directory): Promise<Result<GitRepo, string>> {
         const isGitRepo = await isGitRepoDir(dir);
         return isGitRepo ?
                succeededResult(new GitRepo(dir)) :
@@ -106,21 +100,18 @@ export class GitRepo
         parentDir: Directory,
         dirName?: string,
         bare: boolean = false
-    ): Promise<GitRepo>
-    {
+    ): Promise<GitRepo> {
         let repoDirName: string;
         let srcStr: string;
 
-        if (src instanceof Url)
-        {
+        if (src instanceof Url) {
             repoDirName = dirName || gitUrlToProjectName(src.toString());
             const protocols = src.getProtocols();
             srcStr = protocols.length < 2 ?
                 src.toString() :
                 src.replaceProtocol("https").toString();
         }
-        else
-        {
+        else {
             repoDirName = dirName || src.dirName;
             // The path to the source repo must be made absolute, because when
             // we execute the "git clone" command, the cwd will be `parentDir`.
@@ -130,15 +121,12 @@ export class GitRepo
         const repoDir = new Directory(parentDir, repoDirName);
 
         return parentDir.exists()
-        .then((parentDirExists) =>
-        {
-            if (!parentDirExists)
-            {
+        .then((parentDirExists) => {
+            if (!parentDirExists) {
                 throw new Error(`${parentDir} is not a directory.`);
             }
         })
-        .then(() =>
-        {
+        .then(() => {
             return spawn(
                 "git",
                 [
@@ -151,8 +139,7 @@ export class GitRepo
             )
             .closePromise;
         })
-        .then(() =>
-        {
+        .then(() => {
             return new GitRepo(repoDir);
         });
     }
@@ -171,8 +158,7 @@ export class GitRepo
      *
      * @param dir - The directory containing the Git repo.
      */
-    private constructor(dir: Directory)
-    {
+    private constructor(dir: Directory) {
         this._dir = dir;
     }
 
@@ -181,8 +167,7 @@ export class GitRepo
      * Gets the directory containing this Git repo.
      * @return The directory containing this git repo.
      */
-    public get directory(): Directory
-    {
+    public get directory(): Directory {
         return this._dir;
     }
 
@@ -194,8 +179,7 @@ export class GitRepo
      * @param other - The other GitRepo to compare with
      * @return Whether the two GitRepo instances are equal
      */
-    public equals(other: GitRepo): boolean
-    {
+    public equals(other: GitRepo): boolean {
         return this._dir.equals(other._dir);
     }
 
@@ -204,15 +188,12 @@ export class GitRepo
      * Gets the files that are under Git version control.
      * @return A Promise for an array of files under Git version control.
      */
-    public files(): Promise<Array<File>>
-    {
+    public files(): Promise<Array<File>> {
         return spawn("git", ["ls-files"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const relativeFilePaths = splitIntoLines(stdout);
-            return _.map(relativeFilePaths, (curRelFilePath) =>
-            {
+            return _.map(relativeFilePaths, (curRelFilePath) => {
                 return new File(this._dir, curRelFilePath);
             });
         });
@@ -221,19 +202,15 @@ export class GitRepo
 
     // TODO: Write unit tests for this method and make sure the files have the
     // correct preceding path.
-    public modifiedFiles(): Promise<Array<File>>
-    {
+    public modifiedFiles(): Promise<Array<File>> {
         return spawn("git", ["ls-files", "-m"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
-            if (stdout === "")
-            {
+        .then((stdout) => {
+            if (stdout === "") {
                 return [];
             }
             const relativeFilePaths = splitIntoLines(stdout);
-            return _.map(relativeFilePaths, (curRelativeFilePath) =>
-            {
+            return _.map(relativeFilePaths, (curRelativeFilePath) => {
                 return new File(this._dir, curRelativeFilePath);
             });
         });
@@ -242,19 +219,15 @@ export class GitRepo
 
     // TODO: Write unit tests for this method and make sure the files have the
     // correct preceding path.
-    public untrackedFiles(): Promise<Array<File>>
-    {
+    public untrackedFiles(): Promise<Array<File>> {
         return spawn("git", ["ls-files",  "--others",  "--exclude-standard"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
-            if (stdout === "")
-            {
+        .then((stdout) => {
+            if (stdout === "") {
                 return [];
             }
             const relativeFilePaths = splitIntoLines(stdout);
-            return _.map(relativeFilePaths, (curRelativePath) =>
-            {
+            return _.map(relativeFilePaths, (curRelativePath) => {
                 return new File(this._dir, curRelativePath);
             });
         });
@@ -262,15 +235,12 @@ export class GitRepo
 
 
     // TODO: Write unit tests for this method.  Make sure there is no leading or trailing whitespace.
-    public currentCommitHash(): Promise<CommitHash>
-    {
+    public currentCommitHash(): Promise<CommitHash> {
         return spawn("git", ["rev-parse", "--verify", "HEAD"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const hash = CommitHash.fromString(stdout);
-            if (!hash)
-            {
+            if (!hash) {
                 throw new Error("Failed to construct CommitHash.");
             }
             return hash;
@@ -283,21 +253,17 @@ export class GitRepo
      * @return A Promise for an object where the remote names are the keys and
      * the remote URL is the value.
      */
-    public remotes(): Promise<{[name: string]: string}>
-    {
+    public remotes(): Promise<{[name: string]: string}> {
         return spawn("git", ["remote", "-vv"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const lines = splitIntoLines(stdout);
             const remotes: {[name: string]: string} = {};
-            lines.forEach((curLine) =>
-            {
+            lines.forEach((curLine) => {
                 // TODO: Convert the following regex to use named capture groups.
                 // eslint-disable-next-line prefer-named-capture-group
                 const match = curLine.match(/^(\w+)\s+(.*)\s+\(\w+\)$/);
-                if (match)
-                {
+                if (match) {
                     remotes[match[1]] = match[2];
                 }
             });
@@ -314,50 +280,40 @@ export class GitRepo
      * name will be the name of the folder the repo is in.
      * @return A Promise for the name of this repository.
      */
-    public name(): Promise<string>
-    {
+    public name(): Promise<string> {
         return this.remotes()
-        .then((remotes) =>
-        {
+        .then((remotes) => {
             const remoteNames = Object.keys(remotes);
-            if (remoteNames.length > 0)
-            {
+            if (remoteNames.length > 0) {
                 const remoteUrl = remotes[remoteNames[0]];
 
-                if (isGitUrl(remoteUrl))
-                {
+                if (isGitUrl(remoteUrl)) {
                     return gitUrlToProjectName(remoteUrl);
                 }
             }
 
             return undefined;
         })
-        .then((projName) =>
-        {
-            if (projName)
-            {
+        .then((projName) => {
+            if (projName) {
                 return projName;
             }
 
             // Look for the project name in package.json.
             const packageJson = new File(this._dir, "package.json").readJsonSync<IPackageJson>();
-            if (packageJson)
-            {
+            if (packageJson) {
                 return packageJson.name;
             }
 
             return undefined;
         })
-        .then((projName) =>
-        {
-            if (projName)
-            {
+        .then((projName) => {
+            if (projName) {
                 return projName;
             }
 
             const dirName = this._dir.dirName;
-            if (dirName === "/")
-            {
+            if (dirName === "/") {
                 throw new Error("Unable to determine Git repo name.");
             }
 
@@ -371,14 +327,11 @@ export class GitRepo
      * @return A Promise for an array of tag names.  An empty array is returned
      * when there are no tags.
      */
-    public tags(): Promise<Array<string>>
-    {
+    public tags(): Promise<Array<string>> {
         return spawn("git", ["tag"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
-            if (stdout.length === 0)
-            {
+        .then((stdout) => {
+            if (stdout.length === 0) {
                 return [];
             }
 
@@ -392,11 +345,9 @@ export class GitRepo
      * @param tagName - The tag to search for
      * @return A Promise for a boolean indicating whether `tagName` exists.
      */
-    public hasTag(tagName: string): Promise<boolean>
-    {
+    public hasTag(tagName: string): Promise<boolean> {
         return this.tags()
-        .then((tags) =>
-        {
+        .then((tags) => {
             return tags.includes(tagName);
         });
     }
@@ -412,12 +363,10 @@ export class GitRepo
      * @return A Promise for this GitRepo instance (so that other calls may be
      * chained).
      */
-    public createTag(tagName: string, message = "", force = false): Promise<GitRepo>
-    {
+    public createTag(tagName: string, message = "", force = false): Promise<GitRepo> {
         let args = ["tag"];
 
-        if (force)
-        {
+        if (force) {
             args.push("-f");
         }
 
@@ -426,8 +375,7 @@ export class GitRepo
 
         return spawn("git", args, {cwd: this._dir.toString()})
         .closePromise
-        .then(() =>
-        {
+        .then(() => {
             return this;
         });
     }
@@ -439,24 +387,19 @@ export class GitRepo
      * @return A Promise for this GitRepo instance (so that other calls may be
      * chained).
      */
-    public deleteTag(tagName: string): Promise<GitRepo>
-    {
+    public deleteTag(tagName: string): Promise<GitRepo> {
         return spawn("git", ["tag", "--delete", tagName], {cwd: this._dir.toString()})
         .closePromise
-        .catch((err) =>
-        {
-            if (err.stderr.includes("not found"))
-            {
+        .catch((err) => {
+            if (err.stderr.includes("not found")) {
                 // The specified tag name was not found.  We are still
                 // successful.
             }
-            else
-            {
+            else {
                 throw err;
             }
         })
-        .then(() =>
-        {
+        .then(() => {
             return this;
         });
     }
@@ -475,12 +418,10 @@ export class GitRepo
         tagName: string,
         remoteName: string,
         force = false
-    ): Promise<GitRepo>
-    {
+    ): Promise<GitRepo> {
         let args = ["push"];
 
-        if (force)
-        {
+        if (force) {
             args.push("--force");
         }
 
@@ -488,8 +429,7 @@ export class GitRepo
 
         return spawn("git", args, {cwd: this._dir.toString()})
         .closePromise
-        .then(() =>
-        {
+        .then(() => {
             return this;
         });
     }
@@ -501,10 +441,8 @@ export class GitRepo
      * available); true to retrieve the latest list of branches.
      * @return A Promise for the branches found
      */
-    public getBranches(forceUpdate = false): Promise<Array<GitBranch>>
-    {
-        if (forceUpdate)
-        {
+    public getBranches(forceUpdate = false): Promise<Array<GitBranch>> {
+        if (forceUpdate) {
             // Invalidate the cache.  If this update fails, subsequent requests
             // will have to update the cache.
             this._branches = undefined;
@@ -512,24 +450,20 @@ export class GitRepo
 
         let updatePromise: Promise<void>;
 
-        if (this._branches === undefined)
-        {
+        if (this._branches === undefined) {
             // The internal cache of branches needs to be updated.
             updatePromise = GitBranch.enumerateGitRepoBranches(this)
-            .then((branches: Array<GitBranch>) =>
-            {
+            .then((branches: Array<GitBranch>) => {
                 this._branches = branches;
             });
         }
-        else
-        {
+        else {
             // The internal cache does not need to be updated.
             updatePromise = Promise.resolve();
         }
 
         return updatePromise
-        .then(() =>
-        {
+        .then(() => {
             // Since updatePromise resolved, we know that this._branches has been
             // set.
             return this._branches!;
@@ -542,8 +476,7 @@ export class GitRepo
      * @return A Promise for the current working branch or undefined (when
      * working in a detached head state).
      */
-    public getCurrentBranch(): Promise<GitBranch | undefined>
-    {
+    public getCurrentBranch(): Promise<GitBranch | undefined> {
         // When on master:
         // git symbolic-ref HEAD
         // refs/heads/master
@@ -557,15 +490,12 @@ export class GitRepo
         // HEAD
 
         return spawn("git", ["rev-parse", "--abbrev-ref", "HEAD"], {cwd: this._dir.toString()}).closePromise
-        .then((branchName) =>
-        {
-            if (branchName === "HEAD")
-            {
+        .then((branchName) => {
+            if (branchName === "HEAD") {
                 // The repo is in detached head state.
                 return Promise.resolve(undefined);
             }
-            else
-            {
+            else {
                 return toPromise(GitBranch.create(this, branchName));
             }
         });
@@ -579,20 +509,16 @@ export class GitRepo
      * exist; false if your intention is to checkout an existing branch
      * @return A Promise that resolves when the branch is checked out.
      */
-    public checkoutBranch(branch: GitBranch, createIfNonexistent: boolean): Promise<void>
-    {
+    public checkoutBranch(branch: GitBranch, createIfNonexistent: boolean): Promise<void> {
         return this.getBranches()
-        .then((allBranches) =>
-        {
+        .then((allBranches) => {
             // If there is a branch with the same name, we should not try to
             // create it.  Instead, we should just check it out.
-            if (_.some(allBranches, {name: branch.name}))
-            {
+            if (_.some(allBranches, {name: branch.name})) {
                 createIfNonexistent = false;
             }
         })
-        .then(() =>
-        {
+        .then(() => {
             const args = [
                 "checkout",
                 ...(createIfNonexistent ? ["-b"] : []),
@@ -601,8 +527,7 @@ export class GitRepo
 
             return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
-        .then(() =>
-        {
+        .then(() => {
             // TODO: If the branch was created, add it to the cache of branches.
             // Also, write a unit test for this case.
             return;
@@ -615,8 +540,7 @@ export class GitRepo
      * @param commit - The commit to checkout
      * @return A Promise that resolves when the commit is checked out.
      */
-    public checkoutCommit(commit: CommitHash): Promise<void>
-    {
+    public checkoutCommit(commit: CommitHash): Promise<void> {
         return spawn("git", ["checkout", commit.toString()], {cwd: this._dir.toString()}).closePromise
         .then(() => { return; });
     }
@@ -627,11 +551,9 @@ export class GitRepo
      * @return A Promise for this GitRepo instance (so that other calls may be
      * chained).
      */
-    public stageAll(): Promise<GitRepo>
-    {
+    public stageAll(): Promise<GitRepo> {
         return spawn("git", ["add", "."], {cwd: this._dir.toString()}).closePromise
-        .then(() =>
-        {
+        .then(() => {
             return this;
         });
     }
@@ -646,8 +568,7 @@ export class GitRepo
      * successful result contains the File passed in.  A failed result will
      * contain an error message.
      */
-    public async stage(file: File): Promise<Result<File, string>>
-    {
+    public async stage(file: File): Promise<Result<File, string>> {
         // Get a File representing the file's path within this repo.
         const repoFile = File.relative(this._dir, file);
 
@@ -657,12 +578,10 @@ export class GitRepo
         const result = await spawn2("git", ["add", repoFile.toString()], {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result))
-        {
+        if (succeeded(result)) {
             return succeededResult(file);
         }
-        else
-        {
+        else {
             return failedResult(spawnErrorToString(result.error));
         }
     }
@@ -676,13 +595,10 @@ export class GitRepo
      * @return A Promise that is resolved when the push has completed.  The
      * promise will reject when working in a detached head state.
      */
-    public pushCurrentBranch(remoteName = "origin", setUpstream = false): Promise<void>
-    {
+    public pushCurrentBranch(remoteName = "origin", setUpstream = false): Promise<void> {
         return this.getCurrentBranch()
-        .then((curBranch) =>
-        {
-            if (!curBranch)
-            {
+        .then((curBranch) => {
+            if (!curBranch) {
                 throw new Error("There is no current branch to push.");
             }
 
@@ -694,12 +610,10 @@ export class GitRepo
             ];
             return spawn("git", args, {cwd: this._dir.toString()}).closePromise;
         })
-        .then(() =>
-        {
+        .then(() => {
             return;
         })
-        .catch((err) =>
-        {
+        .catch((err) => {
             console.log(`Error pushing current branch: ${JSON.stringify(err)}`);
             throw err;
         });
@@ -711,15 +625,12 @@ export class GitRepo
      * @param trackingRemote - The remote containing the tracking branch
      * @return A Promise for an object containing the result
      */
-    public getCommitDeltas(trackingRemote = "origin"): Promise<{ahead: number, behind: number}>
-    {
+    public getCommitDeltas(trackingRemote = "origin"): Promise<{ahead: number, behind: number}> {
         // TODO: Write unit tests for this method.
 
         return this.getCurrentBranch()
-        .then((branch) =>
-        {
-            if (!branch)
-            {
+        .then((branch) => {
+            if (!branch) {
                 throw new Error("Cannot getNumCommitsAhead() when HEAD is not on a branch.");
             }
 
@@ -741,8 +652,7 @@ export class GitRepo
 
             return Promise.all([numAheadPromise, numBehindPromise]);
         })
-        .then((results) =>
-        {
+        .then((results) => {
             return {
                 ahead:  parseInt(results[0], 10),
                 behind: parseInt(results[1], 10)
@@ -761,13 +671,11 @@ export class GitRepo
      */
     public async getStagedFiles(
         resultsRelativeTo: FilesRelativeTo
-    ): Promise<Result<Array<File>, string>>
-    {
+    ): Promise<Result<Array<File>, string>> {
         const result = await spawn2("git", ["diff", "--name-only", "--cached"], {cwd: this._dir.toString()})
         .closePromise;
 
-        if (failed(result))
-        {
+        if (failed(result)) {
             return failedResult(spawnErrorToString(result.error));
         }
 
@@ -778,8 +686,7 @@ export class GitRepo
         .map((curLine) => new File(curLine))
         .value();
 
-        if (resultsRelativeTo === "cwd")
-        {
+        if (resultsRelativeTo === "cwd") {
             stagedFiles = stagedFiles.map(
                 (curStagedFile) => new File(this.directory, curStagedFile.toString())
             );
@@ -793,27 +700,22 @@ export class GitRepo
      * @param msg - The commit message
      * @return A Promise for the newly created Git log entry
      */
-    public commit(msg = ""): Promise<IGitLogEntry>
-    {
+    public commit(msg = ""): Promise<IGitLogEntry> {
         // TODO: Add unit tests for this method.
 
         return spawn("git", ["commit", "-m", msg], {cwd: this._dir.toString()})
         .closePromise
-        .then(() =>
-        {
+        .then(() => {
             // Get the commit hash
             return spawn("git", ["rev-parse", "HEAD"], {cwd: this._dir.toString()}).closePromise;
         })
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const commitHash = _.trim(stdout);
             return spawn("git", ["show", commitHash], {cwd: this._dir.toString()}).closePromise;
         })
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const match = getLogEntryRegex().exec(stdout);
-            if (!match)
-            {
+            if (!match) {
                 throw new Error(`Could not parse "git show" output:\n${stdout}`);
             }
             return {
@@ -834,8 +736,7 @@ export class GitRepo
      * @return A promise that is resolved when the command completes
      * successfully
      */
-    public fetch(remoteName = "origin", fetchTags = false): Promise<void>
-    {
+    public fetch(remoteName = "origin", fetchTags = false): Promise<void> {
         const args = [
             "fetch",
             ...insertIf(fetchTags, "--tags"),
@@ -845,8 +746,7 @@ export class GitRepo
         return spawn("git", args, {cwd: this._dir.toString()}).closePromise
         .then(
             () => { return; },
-            (err) =>
-            {
+            (err) => {
                 console.log(`Error fetching from ${remoteName} remote: ${JSON.stringify(err)}`);
                 throw err;
             }
@@ -860,31 +760,25 @@ export class GitRepo
      * false if a previously cached log can be used (more performant)
      * @return A Promise for an array of Git log entries
      */
-    public getLog(forceUpdate?: boolean): Promise<Array<IGitLogEntry>>
-    {
-        if (forceUpdate)
-        {
+    public getLog(forceUpdate?: boolean): Promise<Array<IGitLogEntry>> {
+        if (forceUpdate) {
             this._log = undefined;
         }
 
         let updatePromise: Promise<void>;
 
-        if (this._log === undefined)
-        {
+        if (this._log === undefined) {
             updatePromise = this.getLogEntries()
-            .then((log: Array<IGitLogEntry>) =>
-            {
+            .then((log: Array<IGitLogEntry>) => {
                 this._log = log;
             });
         }
-        else
-        {
+        else {
             updatePromise = Promise.resolve();
         }
 
         return updatePromise
-        .then(() =>
-        {
+        .then(() => {
             return this._log!;
         });
     }
@@ -896,8 +790,7 @@ export class GitRepo
      * @return Successful results contain this GitRepo instance (to enable
      * chaining).  Failed results contain a descriptive error message.
      */
-    public async merge(sourceBranch: GitBranch): Promise<Result<GitRepo, string>>
-    {
+    public async merge(sourceBranch: GitBranch): Promise<Result<GitRepo, string>> {
         // TODO: Need to enhance this method to account for things that prevent
         // this merge from succeeding, like merge conflicts.
 
@@ -926,20 +819,17 @@ export class GitRepo
     public async deleteBranch(
         branch: GitBranch,
         force: boolean = false
-    ): Promise<Result<GitRepo, string>>
-    {
+    ): Promise<Result<GitRepo, string>> {
         let args: Array<string>;
 
-        if (branch.isLocal())
-        {
+        if (branch.isLocal()) {
             args = [
                 "branch",
                 force ? "-D" : "-d",
                 branch.toString()
             ];
         }
-        else
-        {
+        else {
             args = [
                 "push",
                 branch.remoteName!,
@@ -950,8 +840,7 @@ export class GitRepo
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result))
-        {
+        if (succeeded(result)) {
             this._branches = undefined;
         }
 
@@ -965,8 +854,7 @@ export class GitRepo
         destBranch: undefined | GitBranch,
         findLocalBranches: boolean,
         findRemoteBranches: boolean
-    ): Promise<Result<Array<GitBranch>, string>>
-    {
+    ): Promise<Result<Array<GitBranch>, string>> {
         // We will not be able to get the current branch when working in a
         // detached head state.  That is fine, because when that is true, we
         // will not have to remove it from the results either.
@@ -974,8 +862,7 @@ export class GitRepo
 
         // Do a reality check.  The caller should be asking for either local or
         // remote branches, or both.
-        if (!findLocalBranches && !findRemoteBranches)
-        {
+        if (!findLocalBranches && !findRemoteBranches) {
             throw new Error("getMergedBranches() called requesting neither local nor remote branches.");
         }
 
@@ -987,14 +874,12 @@ export class GitRepo
             "-a"
         ];
 
-        if (destBranch)
-        {
+        if (destBranch) {
             // If the user specified the destination branch, provide it as the
             // argument to the --merged switch.
             args = [...args, "--merged", destBranch.toString()];
         }
-        else
-        {
+        else {
             // If the user wants to get branches merged into the current branch,
             args = [...args, "--merged"];
         }
@@ -1002,8 +887,7 @@ export class GitRepo
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result))
-        {
+        if (succeeded(result)) {
             // Output looks like the following.  Please note how spawn2() trims
             // the output so the first line does not start with whitespace.
             // 1828-column_sorting_in_new_proj_list
@@ -1021,45 +905,37 @@ export class GitRepo
             // Map each line to a GitBranch instance.
             let branches = await mapAsync<string, GitBranch>(
                 lines,
-                async (curLine) =>
-                {
+                async (curLine) => {
                     const match = reOutputLine.exec(curLine);
-                    if (!match)
-                    {
+                    if (!match) {
                         throw new Error("Command output did not match parsing regex.");
                     }
 
                     const branchName = match.groups!.branchName;
                     const remoteName = match.groups!.remoteName;
                     const branchResult = await GitBranch.create(this, branchName, remoteName);
-                    if (failed(branchResult))
-                    {
+                    if (failed(branchResult)) {
                         throw new Error(branchResult.error);
                     }
                     return branchResult.value;
                 }
             );
 
-            if (findLocalBranches && findRemoteBranches)
-            {
+            if (findLocalBranches && findRemoteBranches) {
                 // Intentionally empty.
             }
-            else if (findLocalBranches)
-            {
+            else if (findLocalBranches) {
                 branches = _.filter(branches, (curBranch) => curBranch.isLocal());
             }
-            else if (findRemoteBranches)
-            {
+            else if (findRemoteBranches) {
                 branches = _.filter(branches, (curBranch) => curBranch.isRemote());
             }
 
-            if (destBranch)
-            {
+            if (destBranch) {
                 // Remove the destination branch from the results.
                 branches = _.filter(branches, (curBranch) => !curBranch.equals(destBranch));
             }
-            else if (currentBranch)
-            {
+            else if (currentBranch) {
                 // No destination branch was specified.  Remove the current
                 // branch from the results.
                 branches = _.filter(branches, (curBranch) => !curBranch.equals(currentBranch));
@@ -1067,8 +943,7 @@ export class GitRepo
 
             return succeededResult(branches);
         }
-        else
-        {
+        else {
             return failedResult(spawnErrorToString(result.error));
         }
 
@@ -1081,17 +956,14 @@ export class GitRepo
      *
      * @return A promise for an array of structures describing each commit.
      */
-    private getLogEntries(): Promise<Array<IGitLogEntry>>
-    {
+    private getLogEntries(): Promise<Array<IGitLogEntry>> {
         return spawn("git", ["log"], {cwd: this._dir.toString()})
         .closePromise
-        .then((stdout) =>
-        {
+        .then((stdout) => {
             const logEntryRegex = getLogEntryRegex();
             const entries: Array<IGitLogEntry> = [];
             let match: RegExpExecArray | null;
-            while ((match = logEntryRegex.exec(stdout)) !== null)
-            {
+            while ((match = logEntryRegex.exec(stdout)) !== null) {
                 entries.push(
                     {
                         commitHash: match[1],

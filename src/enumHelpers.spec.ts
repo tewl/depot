@@ -25,11 +25,9 @@ enum DayOfWeek {
     SATURDAY  = "Saturday"
 }
 
-describe("numericEnumRandomKey()", () =>
-{
+describe("numericEnumRandomKey()", () => {
 
-    it("will return a random sampling of the enumeration's keys", () =>
-    {
+    it("will return a random sampling of the enumeration's keys", () => {
         const groups = _.groupBy(_.range(100), () => numericEnumRandomKey(Color));
 
         expect(Object.keys(groups).length).toEqual(3);
@@ -42,11 +40,9 @@ describe("numericEnumRandomKey()", () =>
 });
 
 
-describe("numericEnumRandomValue()", () =>
-{
+describe("numericEnumRandomValue()", () => {
 
-    it("will return a random sampling of the enumeration's values", () =>
-    {
+    it("will return a random sampling of the enumeration's values", () => {
         const groups = _.groupBy(_.range(100), () => numericEnumRandomValue(Color));
 
         expect(Object.keys(groups).length).toEqual(3);
@@ -59,11 +55,9 @@ describe("numericEnumRandomValue()", () =>
 });
 
 
-describe("stringEnumRandomKey()", () =>
-{
+describe("stringEnumRandomKey()", () => {
 
-    it("description", () =>
-    {
+    it("description", () => {
         const groups = _.groupBy(_.range(100), () => stringEnumRandomKey(DayOfWeek));
 
         expect(Object.keys(groups).length).toEqual(7);
@@ -80,11 +74,9 @@ describe("stringEnumRandomKey()", () =>
 });
 
 
-describe("stringEnumRandomValue()", () =>
-{
+describe("stringEnumRandomValue()", () => {
 
-    it("will return a random sampling of the enumeration's values", () =>
-    {
+    it("will return a random sampling of the enumeration's values", () => {
         const groups = _.groupBy(_.range(100), () => stringEnumRandomValue(DayOfWeek));
 
         expect(Object.keys(groups).length).toEqual(7);
@@ -101,11 +93,9 @@ describe("stringEnumRandomValue()", () =>
 });
 
 
-describe("numericEnumValToString()", () =>
-{
+describe("numericEnumValToString()", () => {
 
-    it("wil convert an enumeration's values to their string keys", () =>
-    {
+    it("wil convert an enumeration's values to their string keys", () => {
         expect(numericEnumValToString(Color, Color.RED)).toEqual("RED");
         expect(numericEnumValToString(Color, Color.GREEN)).toEqual("GREEN");
         expect(numericEnumValToString(Color, Color.BLUE)).toEqual("BLUE");

@@ -283,10 +283,8 @@ export function pipe(
     qr?: Function,
     rs?: Function,
     st?: Function
-): unknown
-{
-    switch (arguments.length)
-    {
+): unknown {
+    switch (arguments.length) {
         case 1:
             return a;
         case 2:

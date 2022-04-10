@@ -3,8 +3,7 @@ import {removeBlankLines, splitIntoLines, numInitial, isBlank, getEol} from "./s
 import { insertIf } from "./arrayHelpers";
 
 
-function getCommentToken(): string
-{
+function getCommentToken(): string {
     return "//";
 }
 
@@ -21,28 +20,22 @@ function getCommentToken(): string
 export function comment(
     linesToComment: string,
     precedingLine?: string
-): string | undefined
-{
+): string | undefined {
     // TODO: Convert the regex to used named captures.
     // eslint-disable-next-line prefer-named-capture-group
     const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
 
-    if (linesToComment.length === 0 || /^\s*$/.test(linesToComment))
-    {
-        if (precedingLine)
-        {
+    if (linesToComment.length === 0 || /^\s*$/.test(linesToComment)) {
+        if (precedingLine) {
             const match = commentedLineRegex.exec(precedingLine);
-            if (match)
-            {
+            if (match) {
                 return `${match.groups!.begin_ws}${match.groups!.comment_token}`;
             }
-            else
-            {
+            else {
                 return undefined;
             }
         }
-        else
-        {
+        else {
             // There is nothing to comment and nothing to continue from above.
             return undefined;
         }
@@ -50,8 +43,7 @@ export function comment(
 
     const sourceLines = splitIntoLines(linesToComment, true);
     const nonEmptyLines = splitIntoLines(removeBlankLines(linesToComment), true);
-    if (nonEmptyLines.length === 0)
-    {
+    if (nonEmptyLines.length === 0) {
         // All lines were empty.  There really isn't a need to comment them.
         return undefined;
     }
@@ -60,12 +52,10 @@ export function comment(
 
     // If the first character is non-whitespace, the comment must start in
     // column 0.
-    if (!/\s/.test(nonEmptyLines[0][0]))
-    {
+    if (!/\s/.test(nonEmptyLines[0][0])) {
         indentStr = "";
     }
-    else
-    {
+    else {
         // We will assume the the whitespace used for indentation is the first
         // character of the first non-empty line.  This will (hopefully) figure
         // out whether the user is using spaces or tabs.
@@ -87,8 +77,7 @@ export function comment(
     }
 
     const result: string = _.chain(sourceLines)
-    .map((curLine) =>
-    {
+    .map((curLine) => {
         // The original text that will follow the comment token.
         // If the current line is a blank one, it may be zero-length, so we will
         // use the whole line in order to get the EOL.  If it is not blank, it
@@ -115,10 +104,8 @@ export function comment(
  * `undefined` is returned if there was an error and the original source should
  * not be replaced.
  */
-export function uncomment(linesToUncomment: string): string | undefined
-{
-    if (linesToUncomment.length === 0 || /^\s*$/.test(linesToUncomment))
-    {
+export function uncomment(linesToUncomment: string): string | undefined {
+    if (linesToUncomment.length === 0 || /^\s*$/.test(linesToUncomment)) {
         // There is nothing in need of uncommenting.
         return undefined;
     }
@@ -129,11 +116,9 @@ export function uncomment(linesToUncomment: string): string | undefined
     const commentedLineRegex = /^(?<begin_ws>\s*)(?<comment_token>(\/\/)|(#))(?<post_comment_ws>\s*)(?<text>.*)/;
 
     const resultLines = _.chain(sourceLines)
-    .map((curLine) =>
-    {
+    .map((curLine) => {
         const match = commentedLineRegex.exec(curLine);
-        if (!match)
-        {
+        if (!match) {
             return curLine;
         }
 
@@ -161,18 +146,15 @@ export function uncomment(linesToUncomment: string): string | undefined
  * returned if there was an error and the original source should not be
  * replaced.
  */
-export function toggleComment(linesToToggle: string, precedingLine?: string): string | undefined
-{
+export function toggleComment(linesToToggle: string, precedingLine?: string): string | undefined {
     // TODO: Convert the following regex to use named capture groups.
     // eslint-disable-next-line prefer-named-capture-group
     const firstNonWhitespace = /\s*(\S\S)/m;
     const match = firstNonWhitespace.exec(linesToToggle);
-    if (match && match[1] === "//")
-    {
+    if (match && match[1] === "//") {
         return uncomment(linesToToggle);
     }
-    else
-    {
+    else {
         return comment(linesToToggle, precedingLine);
     }
 }

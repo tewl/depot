@@ -5,8 +5,7 @@
  * less error prone than using undefined | boolean because both undefined and
  * false are falsy values.
  */
-export class TriState
-{
+export class TriState {
     // All possible TriState values.
     public static readonly false         = new TriState(false);
     public static readonly true          = new TriState(true);
@@ -20,8 +19,7 @@ export class TriState
      * provided by this class.
      * @param value - The value of the new TriState instance.
      */
-    private constructor(value: undefined | boolean)
-    {
+    private constructor(value: undefined | boolean) {
         this._value = value;
     }
 
@@ -29,18 +27,14 @@ export class TriState
      * Gets a string representation of this TriState instance (not localized).
      * @return The string representation
      */
-    public toString(): string
-    {
-        if (this._value === undefined)
-        {
+    public toString(): string {
+        if (this._value === undefined) {
             return "indeterminate";
         }
-        else if (this._value)
-        {
+        else if (this._value) {
             return "true";
         }
-        else
-        {
+        else {
             return "false";
         }
     }

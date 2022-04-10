@@ -6,27 +6,21 @@ import {Deferred} from "./deferred";
 import {CertificateCountryCode, SelfSignedCertificate} from "./selfSignedCertificate";
 
 
-describe("QuickServer", () =>
-{
+describe("QuickServer", () => {
 
-    describe("derived class", () =>
-    {
+    describe("derived class", () => {
 
         // An example derived class.
-        class DerivedServer extends QuickServer
-        {
+        class DerivedServer extends QuickServer {
 
-            public static create(portConfig?: IPortConfig, sslConfig?: ISslConfig): Promise<DerivedServer>
-            {
+            public static create(portConfig?: IPortConfig, sslConfig?: ISslConfig): Promise<DerivedServer> {
                 return determinePort(portConfig)
-                .then((port) =>
-                {
+                .then((port) => {
                     const expressApp = express();
                     const derivedServer = new DerivedServer(port, sslConfig, expressApp);
 
                     // expressApp.use(bodyParser.json({limit: "1mb"}));
-                    expressApp.get("/derived", (req, res) =>
-                    {
+                    expressApp.get("/derived", (req, res) => {
                         derivedServer.numDerivedHandlerInvocations++;
                         res.status(200).send("derived");
                     });
@@ -40,8 +34,7 @@ describe("QuickServer", () =>
         }
 
 
-        it("can create a http server and add routes that can be accessed", async () =>
-        {
+        it("can create a http server and add routes that can be accessed", async () => {
             const server = await DerivedServer.create();
             await server.listen(false);
             const res = await server.request.get("/derived");
@@ -50,26 +43,20 @@ describe("QuickServer", () =>
         });
 
 
-        describe("close()", () =>
-        {
+        describe("close()", () => {
 
-            it("can forcibly terminate connections to the server", (done) =>
-            {
+            it("can forcibly terminate connections to the server", (done) => {
                 let derivedServer: DerivedServer;
                 const errorCodeDfd = new Deferred<string>();
 
                 DerivedServer.create()
-                .then((theServer) =>
-                {
+                .then((theServer) => {
                     derivedServer = theServer;
                     return derivedServer.listen(false);
                 })
-                .then(() =>
-                {
-                    return new Promise((resolve) =>
-                    {
-                        derivedServer.server!.on("connection", () =>
-                        {
+                .then(() => {
+                    return new Promise((resolve) => {
+                        derivedServer.server!.on("connection", () => {
                             // Now that we have a connection, close the server
                             // forcibly closing all existing connections.
                             const closePromise = derivedServer.close(true);
@@ -81,18 +68,15 @@ describe("QuickServer", () =>
                         // terminate the connection, so this request should fail
                         // with ECONNRESET.
                         derivedServer.request.get("/derived")
-                        .catch((err) =>
-                        {
+                        .catch((err) => {
                             errorCodeDfd.resolve(err.cause.code);
                         });
                     });
                 })
-                .then(() =>
-                {
+                .then(() => {
                     return errorCodeDfd.promise;
                 })
-                .then((errorCode) =>
-                {
+                .then((errorCode) => {
                     expect(errorCode).toEqual("ECONNRESET");
                     done();
                 });
@@ -102,11 +86,9 @@ describe("QuickServer", () =>
         });
 
 
-        describe("when creating a https server", () =>
-        {
+        describe("when creating a https server", () => {
 
-            it("can add routes that can be accessed", async () =>
-            {
+            it("can add routes that can be accessed", async () => {
                 const ipAddress = getFirstExternalIpv4Address();
 
                 const selfSignedCertificate = await SelfSignedCertificate.create(
@@ -127,8 +109,7 @@ describe("QuickServer", () =>
             });
 
 
-            it("will use 'https' in the server's URL", async () =>
-            {
+            it("will use 'https' in the server's URL", async () => {
                 const ipAddress = getFirstExternalIpv4Address();
 
                 const selfSignedCertificate = await SelfSignedCertificate.create(

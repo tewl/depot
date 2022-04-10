@@ -24,8 +24,7 @@ import BBPromise = require("bluebird");
  * @returns A promise that will be resolved with an inspection object for each
  * input promise.
  */
-export function allSettled(promises: Array<Promise<unknown>>): Promise<Array<BBPromise.Inspection<unknown>>>
-{
+export function allSettled(promises: Array<Promise<unknown>>): Promise<Array<BBPromise.Inspection<unknown>>> {
     const wrappedPromises: Array<BBPromise.Inspection<unknown>> = _.map(
         promises,
         (curPromise: Promise<unknown>) => BBPromise.resolve(curPromise).reflect()

@@ -5,31 +5,26 @@ import {File} from "./file";
 import { findAngularProjectDirs, lintFiles } from "./angular";
 
 
-function createAngularConfigFile(dir: Directory): File
-{
+function createAngularConfigFile(dir: Directory): File {
     const projectFile = new File(dir, "angular.json");
     projectFile.writeSync("Phony Angular config file for purposes of unit tests");
     return projectFile;
 }
 
 
-describe("findAngularProjectDirs()", () =>
-{
-    beforeEach(() =>
-    {
+describe("findAngularProjectDirs()", () => {
+    beforeEach(() => {
         tmpDir.emptySync();
     });
 
 
-    it("returns an empty array when no Angular projects exist", async () =>
-    {
+    it("returns an empty array when no Angular projects exist", async () => {
         const projectDirs = await findAngularProjectDirs(tmpDir);
         expect(projectDirs.length).toEqual(0);
     });
 
 
-    it("finds an Angular project in the specified root directory", async () =>
-    {
+    it("finds an Angular project in the specified root directory", async () => {
         createAngularConfigFile(tmpDir);
 
         const projectDirs = await findAngularProjectDirs(tmpDir);
@@ -38,8 +33,7 @@ describe("findAngularProjectDirs()", () =>
     });
 
 
-    it("finds an Angular project in a subdirectory", async () =>
-    {
+    it("finds an Angular project in a subdirectory", async () => {
         const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
         const dir2 = await new Directory(tmpDir, "dir2").ensureExists();
         createAngularConfigFile(dir2);
@@ -50,8 +44,7 @@ describe("findAngularProjectDirs()", () =>
     });
 
 
-    it("finds multiple Angular projects in subdirectories", async () =>
-    {
+    it("finds multiple Angular projects in subdirectories", async () => {
         const dir1 = await new Directory(tmpDir, "dir1").ensureExists();
         const dir2 = await new Directory(tmpDir, "dir2").ensureExists();
         const dir3 = await new Directory(tmpDir, "dir3").ensureExists();
@@ -66,8 +59,7 @@ describe("findAngularProjectDirs()", () =>
 });
 
 
-describe("lintFiles()", () =>
-{
+describe("lintFiles()", () => {
     // Setting up a sample Angular project configured to use ESLint is currently
     // beyond the scope of these unit tests.
 });

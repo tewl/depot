@@ -2,23 +2,19 @@ import { comment, uncomment, toggleComment } from "./comment";
 import {splitIntoLines} from "./stringHelpers";
 
 
-describe("comment()", () =>
-{
+describe("comment()", () => {
 
-    it("will return undefined when given an empty string", () =>
-    {
+    it("will return undefined when given an empty string", () => {
         expect(comment("")).toEqual(undefined);
     });
 
 
-    it("will return undefined when given a single line of whitespace", () =>
-    {
+    it("will return undefined when given a single line of whitespace", () => {
         expect(comment("  \t  ")).toEqual(undefined);
     });
 
 
-    it("will return undefined when given multiple lines of whitespace", () =>
-    {
+    it("will return undefined when given multiple lines of whitespace", () => {
         const text = [
             "",
             "    \t",
@@ -33,20 +29,17 @@ describe("comment()", () =>
     });
 
 
-    it("will place a comment token at the beginning when there is no indentation", () =>
-    {
+    it("will place a comment token at the beginning when there is no indentation", () => {
         expect(comment("xyzzy")).toEqual("// xyzzy");
     });
 
 
-    it("will place a comment token between initial whitespace and non-whitespace when there is indentation", () =>
-    {
+    it("will place a comment token between initial whitespace and non-whitespace when there is indentation", () => {
         expect(comment("    xyzzy")).toEqual("    // xyzzy");
     });
 
 
-    it("will place the comment token at the same place on all lines",  () =>
-    {
+    it("will place the comment token at the same place on all lines",  () => {
         const text = [
             "",
             "        one",
@@ -70,14 +63,12 @@ describe("comment()", () =>
     });
 
 
-    it("will comment source that already has a comment in it (single line)", () =>
-    {
+    it("will comment source that already has a comment in it (single line)", () => {
         expect(comment("    // xyzzy")).toEqual("    // // xyzzy");
     });
 
 
-    it("will comment source that already has a comment in it (multi line)", () =>
-    {
+    it("will comment source that already has a comment in it (multi line)", () => {
         const text = [
             "",
             "        one",
@@ -101,8 +92,7 @@ describe("comment()", () =>
     });
 
 
-    it("will comment a single line of code, matching the comment that precedes it.", () =>
-    {
+    it("will comment a single line of code, matching the comment that precedes it.", () => {
         const text = [
             "    // Preceding line",
             "        will be commented"
@@ -117,8 +107,7 @@ describe("comment()", () =>
     });
 
 
-    it("will continue a comment onto an empty line", () =>
-    {
+    it("will continue a comment onto an empty line", () => {
         const text = [
             "    // Preceding line",
             ""
@@ -133,8 +122,7 @@ describe("comment()", () =>
     });
 
 
-    it("will indent appropriately when preceding line has no comment", () =>
-    {
+    it("will indent appropriately when preceding line has no comment", () => {
         const text = [
             "    {",
             "        codeToBeCommented();"
@@ -151,41 +139,34 @@ describe("comment()", () =>
 });
 
 
-describe("uncomment()", () =>
-{
+describe("uncomment()", () => {
 
-    it("returns undefined when given an empty string", () =>
-    {
+    it("returns undefined when given an empty string", () => {
         expect(uncomment("")).toEqual(undefined);
     });
 
 
-    it("returns undefined when given a single line of whitespace", () =>
-    {
+    it("returns undefined when given a single line of whitespace", () => {
         expect(uncomment("  \t  ")).toEqual(undefined);
     });
 
 
-    it("returns undefined when given multiple lines of whitespace", () =>
-    {
+    it("returns undefined when given multiple lines of whitespace", () => {
         expect(uncomment("\t\n    \n  \t  \n")).toEqual(undefined);
     });
 
 
-    it("will remove the comment token when there is no indentation", () =>
-    {
+    it("will remove the comment token when there is no indentation", () => {
         expect(uncomment("// xyzzy")).toEqual("xyzzy");
     });
 
 
-    it("will remove the comment token when there is indentation", () =>
-    {
+    it("will remove the comment token when there is indentation", () => {
         expect(uncomment("    // xyzzy")).toEqual("    xyzzy");
     });
 
 
-    it("will remove the comment token when it appears in different columns", () =>
-    {
+    it("will remove the comment token when it appears in different columns", () => {
         const orig = [
             "    // foo",
             "        // bar",
@@ -205,17 +186,14 @@ describe("uncomment()", () =>
 });
 
 
-describe("toggleComment()", () =>
-{
+describe("toggleComment()", () => {
 
-    it("returns undefined when there is nothing to comment or uncomment", () =>
-    {
+    it("returns undefined when there is nothing to comment or uncomment", () => {
         expect(toggleComment("")).toEqual(undefined);
     });
 
 
-    it("will comment out code that is not commented", () =>
-    {
+    it("will comment out code that is not commented", () => {
         const orig = [
             "    // preceding",
             "        blah",
@@ -235,8 +213,7 @@ describe("toggleComment()", () =>
     });
 
 
-    it("will uncomment code this is commented", () =>
-    {
+    it("will uncomment code this is commented", () => {
         const orig = [
             "    //     blah",
             "    //     blah",

@@ -5,14 +5,12 @@ import { pipe } from "./pipe";
 ////////////////////////////////////////////////////////////////////////////////
 // Test Infrastructure
 
-function someOperation(): Option<number>
-{
+function someOperation(): Option<number> {
     return someOption(5);
 }
 
 
-function noneOperation(): Option<number>
-{
+function noneOperation(): Option<number> {
     return noneOption();
 }
 
@@ -20,13 +18,10 @@ function noneOperation(): Option<number>
 ////////////////////////////////////////////////////////////////////////////////
 
 
-describe("example", () =>
-{
-    it("of exhaustiveness checking", () =>
-    {
+describe("example", () => {
+    it("of exhaustiveness checking", () => {
         const opt = someOperation();
-        switch (opt.state)
-        {
+        switch (opt.state) {
             // If this switch is made non-exhaustive, this code will no longer
             // compile.
             case "some":
@@ -44,10 +39,8 @@ describe("example", () =>
 });
 
 
-describe("someOption()", () =>
-{
-    it("returns an object describing an option with a value", () =>
-    {
+describe("someOption()", () => {
+    it("returns an object describing an option with a value", () => {
         const opt = someOption(5);
         expect(opt.state).toEqual("some");
         expect(opt.value).toEqual(5);
@@ -55,10 +48,8 @@ describe("someOption()", () =>
 });
 
 
-describe("noneOption()", () =>
-{
-    it("returns an object describing an option with no value", () =>
-    {
+describe("noneOption()", () => {
+    it("returns an object describing an option with no value", () => {
         const opt = noneOption();
         expect(opt.state).toEqual("none");
         expect(opt.value).toEqual(undefined);
@@ -66,40 +57,32 @@ describe("noneOption()", () =>
 });
 
 
-describe("isSome()", () =>
-{
-    it("returns true when given an option with a value", () =>
-    {
+describe("isSome()", () => {
+    it("returns true when given an option with a value", () => {
         expect(isSome(someOperation())).toBeTruthy();
     });
 
 
-    it("returns false when given an option with no value", () =>
-    {
+    it("returns false when given an option with no value", () => {
         expect(isSome(noneOperation())).toBeFalsy();
     });
 });
 
 
-describe("isNone()", () =>
-{
-    it("returns true when given an option with no value", () =>
-    {
+describe("isNone()", () => {
+    it("returns true when given an option with no value", () => {
         expect(isNone(noneOperation())).toBeTruthy();
     });
 
 
-    it("returns false when given an option with a value", () =>
-    {
+    it("returns false when given an option with a value", () => {
         expect(isNone(someOperation())).toBeFalsy();
     });
 });
 
 
-describe("bindOption", () =>
-{
-    it("with none input the option is passed along and the function is not invoked", () =>
-    {
+describe("bindOption", () => {
+    it("with none input the option is passed along and the function is not invoked", () => {
         let numInvocations = 0;
         const fn = (x: number) => { numInvocations++; return someOption(x + 1); };
 
@@ -109,8 +92,7 @@ describe("bindOption", () =>
     });
 
 
-    it("with some input the function is invoked and the returned option is returned", () =>
-    {
+    it("with some input the function is invoked and the returned option is returned", () => {
         let numInvocations = 0;
         const fn = (x: number) => { numInvocations++; return someOption(x + 1); };
 
@@ -121,8 +103,7 @@ describe("bindOption", () =>
     });
 
 
-    it("can be used easily with pipe()", () =>
-    {
+    it("can be used easily with pipe()", () => {
         const subtract1 = (x: number) => x <= 0 ? noneOption() : someOption(x - 1);
 
         const opt1 = pipe(
@@ -145,10 +126,8 @@ describe("bindOption", () =>
 });
 
 
-describe("mapSome()", () =>
-{
-    it("with none input the option is passed along and the function is not invoked", () =>
-    {
+describe("mapSome()", () => {
+    it("with none input the option is passed along and the function is not invoked", () => {
         let numInvocations = 0;
         const add1 = (x: number) => { numInvocations++; return x + 1; };
 
@@ -158,8 +137,7 @@ describe("mapSome()", () =>
     });
 
 
-    it("with some input the function is invoked and its return values is wrapped in a some option", () =>
-    {
+    it("with some input the function is invoked and its return values is wrapped in a some option", () => {
         let numInvocations = 0;
         const add1 = (x: number) => { numInvocations++; return x + 1; };
 
@@ -170,8 +148,7 @@ describe("mapSome()", () =>
     });
 
 
-    it("can be used easily with pipe()", () =>
-    {
+    it("can be used easily with pipe()", () => {
         const add1 = (x: number) => x + 1;
 
         const opt = pipe(
@@ -187,16 +164,13 @@ describe("mapSome()", () =>
 });
 
 
-describe("boolToOption()", () =>
-{
-    it("returns some value when condition is true", () =>
-    {
+describe("boolToOption()", () => {
+    it("returns some value when condition is true", () => {
         expect(boolToOption(true, 5)).toEqual(someOption(5));
     });
 
 
-    it("returns none value when condition is false", () =>
-    {
+    it("returns none value when condition is false", () => {
         expect(boolToOption(false, 5)).toEqual(noneOption());
     });
 });

@@ -68,7 +68,6 @@ export type RecursivePartial<T> = {
  * @param partial - The partial object containing some properties of T.
  * @returns The partial object casted as T
  */
-export function createStub<T>(partial: RecursivePartial<T>): T
-{
+export function createStub<T>(partial: RecursivePartial<T>): T {
     return partial as T;
 }

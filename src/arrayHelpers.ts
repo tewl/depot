@@ -6,13 +6,10 @@ import * as _ from "lodash";
  * @param regex - The pattern to search for
  * @returns The first match found.  undefined if no match was found.
  */
-export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExecArray | undefined
-{
-    for (const curString of strings)
-    {
+export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExecArray | undefined {
+    for (const curString of strings) {
         const curMatch: RegExpExecArray|null = regex.exec(curString);
-        if (curMatch)
-        {
+        if (curMatch) {
             return curMatch;
         }
     }
@@ -43,8 +40,7 @@ export function anyMatchRegex(strings: Array<string>, regex: RegExp): RegExpExec
 export function insertIf<TItem>(
     condition: unknown,  // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
     ...items: Array<TItem>
-): Array<TItem>
-{
+): Array<TItem> {
     return condition ? items : [];
 }
 
@@ -55,15 +51,12 @@ export function insertIf<TItem>(
  * @returns An array in which each value is an array representing one
  * permutation of the original array.
  */
-export function permutations<T>(vals: Array<T>): Array<Array<T>>
-{
-    if (vals.length === 0)
-    {
+export function permutations<T>(vals: Array<T>): Array<Array<T>> {
+    if (vals.length === 0) {
         return [];
     }
 
-    if (vals.length === 1)
-    {
+    if (vals.length === 1) {
         return [vals];
     }
 
@@ -71,8 +64,7 @@ export function permutations<T>(vals: Array<T>): Array<Array<T>>
 
     // To calculate the permutations, calculate the permutations where each
     // element is the first element.
-    for (let curIndex = 0; curIndex < vals.length; ++curIndex)
-    {
+    for (let curIndex = 0; curIndex < vals.length; ++curIndex) {
         const rest = _.filter(vals, (val, index) => index !== curIndex);
         const restPermutations = permutations(rest);
         allPermutations = allPermutations.concat(
@@ -90,10 +82,8 @@ export function permutations<T>(vals: Array<T>): Array<Array<T>>
  * array)
  * @returns - The resulting array.
  */
-export function toArray<T>(val: undefined | null | T | Array<T>): Array<T>
-{
-    if (val === undefined || val === null)
-    {
+export function toArray<T>(val: undefined | null | T | Array<T>): Array<T> {
+    if (val === undefined || val === null) {
         return [];
     }
 

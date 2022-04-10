@@ -5,8 +5,7 @@ import { MakePropsNonNullable,
          RecursivePartial} from "./typeUtils";
 
 
-interface IAllRequired
-{
+interface IAllRequired {
     propA: number;
     propB: boolean;
     propC: string;
@@ -97,8 +96,7 @@ interface ITypeA {
 
 type TypeB = RecursivePartial<ITypeA>;
 
-describe("RecursivePartial", () =>
-{
+describe("RecursivePartial", () => {
     // The following will fail to compile.
     //
     // const a: ITypeA = {

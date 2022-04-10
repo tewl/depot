@@ -2,14 +2,11 @@ import {List, Iterator, MoveIteratorRetType} from "./list";
 import {randomizedArray} from "./random_data.spec";
 
 
-describe("List", () =>
-{
+describe("List", () => {
 
-    describe("static", () =>
-    {
+    describe("static", () => {
 
-        it("fromArray() can be used to populate a list", () =>
-        {
+        it("fromArray() can be used to populate a list", () => {
             const list = List.fromArray([1, 2, 3]);
 
             expect(list.getAt(0)).toEqual(1);
@@ -20,30 +17,26 @@ describe("List", () =>
     });
 
 
-    it("can be constructed", () =>
-    {
+    it("can be constructed", () => {
         const list = new List<number>();
         expect(list).toBeDefined();
     });
 
 
-    it("initially length should be 0", () =>
-    {
+    it("initially length should be 0", () => {
         const list = new List<number>();
         expect(list.length).toEqual(0);
     });
 
 
-    it("isEmpty() should return true for an empty list", () =>
-    {
+    it("isEmpty() should return true for an empty list", () => {
         const list = new List<number>();
         expect(list.length).toEqual(0);
         expect(list.isEmpty).toEqual(true);
     });
 
 
-    it("isEmpty() should return false for a non-empty list", () =>
-    {
+    it("isEmpty() should return false for a non-empty list", () => {
         const list = new List<number>();
         list.push(1);
         expect(list.length).toEqual(1);
@@ -51,8 +44,7 @@ describe("List", () =>
     });
 
 
-    it("begin(), end() and value() can be used to iterate values in a List", () =>
-    {
+    it("begin(), end() and value() can be used to iterate values in a List", () => {
         const list = new List<number>();
         list.push(1);
         list.push(2);
@@ -60,16 +52,14 @@ describe("List", () =>
 
         let expected = 1;
 
-        for (const it = list.begin(); !it.equals(list.end()); it.next())
-        {
+        for (const it = list.begin(); !it.equals(list.end()); it.next()) {
             expect(it.value).toEqual(expected);
             ++expected;
         }
     });
 
 
-    it("push() should add an item to the end of the list", () =>
-    {
+    it("push() should add an item to the end of the list", () => {
         const list: List<number> = new List<number>();
         list.push(1);
         expect(list.length).toEqual(1);
@@ -83,8 +73,7 @@ describe("List", () =>
     });
 
 
-    it("pop() should remove an item from the end of the list", () =>
-    {
+    it("pop() should remove an item from the end of the list", () => {
         const list: List<number> = new List<number>();
         list.push(1).push(2).push(3);
         expect(list.length).toEqual(3);
@@ -98,23 +87,19 @@ describe("List", () =>
     });
 
 
-    it("pop() will throw when the list is empty", () =>
-    {
+    it("pop() will throw when the list is empty", () => {
         const list = new List<number>();
         expect(list.length).toEqual(0);
-        expect(() =>
-        {
+        expect(() => {
             list.pop();
         }).toThrowError("Attempted to pop() an empty List.");
         expect(list.length).toEqual(0);
     });
 
 
-    describe("remove()", () =>
-    {
+    describe("remove()", () => {
 
-        it("should be able to remove the specified element", () =>
-        {
+        it("should be able to remove the specified element", () => {
             const list = new List<number>();
             list.push(1).push(2).push(3);
 
@@ -127,8 +112,7 @@ describe("List", () =>
         });
 
 
-        it("should be able to remove the last element", () =>
-        {
+        it("should be able to remove the last element", () => {
             const list = List.fromArray([1, 2, 3]);
             let it = list.begin().offset(2);
             list.remove(it);
@@ -145,8 +129,7 @@ describe("List", () =>
     });
 
 
-    it("getAt() should return the value at the specified index", () =>
-    {
+    it("getAt() should return the value at the specified index", () => {
         const list: List<number> = new List<number>();
         list.push(1).push(2).push(3);
 
@@ -156,37 +139,31 @@ describe("List", () =>
     });
 
 
-    it("getAt() should throw if the index specified is too low", () =>
-    {
+    it("getAt() should throw if the index specified is too low", () => {
         const list = new List<number>();
         list.push(1).push(2).push(3);
 
-        expect(() =>
-        {
+        expect(() => {
             list.getAt(-1);
         }).toThrowError("Index cannot be negative.");
     });
 
 
-    it("getAt() should throw if the index specified is too high", () =>
-    {
+    it("getAt() should throw if the index specified is too high", () => {
         const list = new List<number>();
         list.push(1).push(2).push(3);
 
-        expect(() =>
-        {
+        expect(() => {
             list.getAt(3);
         }).toThrowError("Index out of range.");
 
-        expect(() =>
-        {
+        expect(() => {
             list.getAt(5);
         }).toThrowError("Index out of range.");
     });
 
 
-    it("insert() should insert the specified value in front of the specified element", () =>
-    {
+    it("insert() should insert the specified value in front of the specified element", () => {
         const list = new List<number>();
         list.push(2).push(4).push(6);
         const it = list.begin();
@@ -202,8 +179,7 @@ describe("List", () =>
     });
 
 
-    it("insert() can insert multiple elements", () =>
-    {
+    it("insert() can insert multiple elements", () => {
         const list = List.fromArray([5, 10, 15]);
         const it = list.begin();
         it.next();
@@ -220,8 +196,7 @@ describe("List", () =>
     });
 
 
-    it("toArray() should return an array with the same contents", () =>
-    {
+    it("toArray() should return an array with the same contents", () => {
         const list = List.fromArray([1, 2, 3]);
         const arr = list.toArray();
 
@@ -231,11 +206,9 @@ describe("List", () =>
     });
 
 
-    describe("quicksort()", () =>
-    {
+    describe("quicksort()", () => {
 
-        it("can sort a List of numbers", () =>
-        {
+        it("can sort a List of numbers", () => {
             const list: List<number> = List.fromArray([8, 3, 6, 1, 5, 4, 9, 2, 7]);
             list.quicksort();
 
@@ -253,15 +226,13 @@ describe("List", () =>
         });
 
 
-        it("can sort a very large List", () =>
-        {
+        it("can sort a very large List", () => {
             const list = List.fromArray(randomizedArray);
             list.quicksort();
 
             expect(list.length).toEqual(1000);
 
-            for (let i = 0; i < 1000; ++i)
-            {
+            for (let i = 0; i < 1000; ++i) {
                 expect(list.getAt(i)).toEqual(i);
             }
         });
@@ -270,8 +241,7 @@ describe("List", () =>
     });
 
 
-    it("can survive being emptied and then repopulated", () =>
-    {
+    it("can survive being emptied and then repopulated", () => {
         const list = List.fromArray([1, 2]);
         list.pop();
         list.pop();
@@ -291,19 +261,16 @@ describe("List", () =>
     });
 
 
-    describe("Iterator", () =>
-    {
+    describe("Iterator", () => {
 
-        it("can traverse a 0-length list", () =>
-        {
+        it("can traverse a 0-length list", () => {
             const list = new List<number>();
             const it = list.begin();
             expect(it.next().done).toBeTruthy();
         });
 
 
-        it("is equal to another iterator that is pointing at the same node", () =>
-        {
+        it("is equal to another iterator that is pointing at the same node", () => {
             const list = new List<number>();
             list.push(1);
             expect(list.length).toEqual(1);
@@ -315,8 +282,7 @@ describe("List", () =>
         });
 
 
-        it("is not euqal to another iterator pointing at a different node", () =>
-        {
+        it("is not euqal to another iterator pointing at a different node", () => {
             const list = new List<number>();
             list.push(1);
             expect(list.length).toEqual(1);
@@ -328,8 +294,7 @@ describe("List", () =>
         });
 
 
-        it("offset(0) will create an equal but independent Iterator", () =>
-        {
+        it("offset(0) will create an equal but independent Iterator", () => {
             const list = List.fromArray([1, 2, 3]);
             const itA = list.begin();
             const itB = itA.offset(0);
@@ -345,8 +310,7 @@ describe("List", () =>
         });
 
 
-        it("offset() will create an appropriate Iterator when given positive offsets", () =>
-        {
+        it("offset() will create an appropriate Iterator when given positive offsets", () => {
             const list = List.fromArray([1, 2, 3, 4, 5]);
             let it = list.begin().offset(1);
             expect(it.value).toEqual(2);
@@ -362,8 +326,7 @@ describe("List", () =>
         });
 
 
-        it("offset() will create an appropriate Iterator when given negative offsets", () =>
-        {
+        it("offset() will create an appropriate Iterator when given negative offsets", () => {
             const list = List.fromArray([1, 2, 3, 4, 5]);
 
             let it = list.end().offset(0);
@@ -386,8 +349,7 @@ describe("List", () =>
         });
 
 
-        it("can traverse a 1-element list", () =>
-        {
+        it("can traverse a 1-element list", () => {
             const list = new List<number>();
             list.push(1);
             expect(list.length).toEqual(1);
@@ -396,8 +358,7 @@ describe("List", () =>
 
             let res: MoveIteratorRetType<number> = it.next();
             expect(res.done).toEqual(false);
-            if (!res.done)
-            {
+            if (!res.done) {
                 expect(res.value).toEqual(1);
             }
 
@@ -406,8 +367,7 @@ describe("List", () =>
         });
 
 
-        it("can traverse a 3-element list", () =>
-        {
+        it("can traverse a 3-element list", () => {
             const list = new List<number>();
             list.push(1);
             list.push(2);
@@ -418,22 +378,19 @@ describe("List", () =>
 
             let res: MoveIteratorRetType<number> = it.next();
             expect(res.done).toEqual(false);
-            if (!res.done)
-            {
+            if (!res.done) {
                 expect(res.value).toEqual(1);
             }
 
             res = it.next();
             expect(res.done).toEqual(false);
-            if (!res.done)
-            {
+            if (!res.done) {
                 expect(res.value).toEqual(2);
             }
 
             res = it.next();
             expect(res.done).toEqual(false);
-            if (!res.done)
-            {
+            if (!res.done) {
                 expect(res.value).toEqual(3);
             }
 
@@ -442,8 +399,7 @@ describe("List", () =>
         });
 
 
-        it("can move to previous element", () =>
-        {
+        it("can move to previous element", () => {
             const list = List.fromArray([1, 2, 3, 4, 5]);
             let it = list.begin();
 
@@ -451,8 +407,7 @@ describe("List", () =>
             expect(list.begin().equals(it)).toBeTruthy();  // Will to move in front of the beginning node.
 
             it = list.end();
-            expect(() =>
-            {
+            expect(() => {
                 it.value;   // eslint-disable-line @typescript-eslint/no-unused-expressions
             }).toThrowError("Attempted to get value from an iterator at end().");
 

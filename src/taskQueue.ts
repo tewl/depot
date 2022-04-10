@@ -10,8 +10,7 @@ interface ITaskInfo<TResolve> {
 }
 
 
-export class TaskQueue extends EventEmitter
-{
+export class TaskQueue extends EventEmitter {
     // region Events
     public static eventNameDrained: "drained" = "drained";
     // endregion
@@ -37,14 +36,12 @@ export class TaskQueue extends EventEmitter
      *   run automatically.
      * @return The new TaskQueue instance
      */
-    public constructor(numConcurrent: number | undefined, pauseWhenDrained = false)
-    {
+    public constructor(numConcurrent: number | undefined, pauseWhenDrained = false) {
         super();
 
         // numConcurrent set to 0 does not make any sense.  We will assume that
         // the caller wants to allow maximum concurrency.
-        if (numConcurrent === 0)
-        {
+        if (numConcurrent === 0) {
             numConcurrent = undefined;
         }
 
@@ -64,8 +61,7 @@ export class TaskQueue extends EventEmitter
      * Returns the number of pending tasks not yet started.
      * @returns The number of tasks yet to be started
      */
-    public get length(): number
-    {
+    public get length(): number {
         return this._tasks.length;
     }
 
@@ -77,8 +73,7 @@ export class TaskQueue extends EventEmitter
      * @returns A promise that will be resolved or rejected once
      * the task eventually executes.
      */
-    public push<TResolve>(task: Task<TResolve>, priority = 0): Promise<TResolve>
-    {
+    public push<TResolve>(task: Task<TResolve>, priority = 0): Promise<TResolve> {
         const dfd = new Deferred<TResolve>();
         this._tasks.push({task: task, deferred: dfd}, priority);
         this.startTasks(true);
@@ -90,15 +85,12 @@ export class TaskQueue extends EventEmitter
      * Cancels all pending tasks that have not been started.
      * @param err - The error that pending tasks will reject with
      */
-    public cancelAllPending(err?: unknown): void
-    {
+    public cancelAllPending(err?: unknown): void {
         err = err || new Error("Task cancelled because its TaskQueue was cancelled.");
 
-        while (this._tasks.length > 0)
-        {
+        while (this._tasks.length > 0) {
             const curTask = this._tasks.pop();
-            if (curTask)
-            {
+            if (curTask) {
                 curTask.deferred.reject(err);
             }
         }
@@ -113,42 +105,36 @@ export class TaskQueue extends EventEmitter
      * @returns A Promise that will be fulfilled (with undefined) the next time
      * this TaskQueue is completely drained.
      */
-    public drain(): Promise<void>
-    {
+    public drain(): Promise<void> {
         // This TaskQueue is already drained if...
         if ((this._tasks.length === 0) &&         // there are no pending tasks
             (this._numRunning === 0) &&           // there are no tasks currently running
             (!this._isProcessingLastFulfillment)  // we are not waiting for the last client fulfillment handler to run
                                                   // (if this._isProcessingLastFulfillment is true
                                                   // there will be a drained event fired in the future)
-        )
-        {
+        ) {
             return Promise.resolve();
         }
 
         // Return a Promise that will be resolved when this TaskQueue eventually
         // drains.
-        return new Promise<void>((resolve: () => void) =>
-        {
+        return new Promise<void>((resolve: () => void) => {
             this.once(TaskQueue.eventNameDrained, resolve);
         });
     }
 
 
-    public run(): void
-    {
+    public run(): void {
         // Only start running if we are currently not running and there is a
         // task queued.
-        if (!this._isRunning && (this._tasks.length > 0))
-        {
+        if (!this._isRunning && (this._tasks.length > 0)) {
             this._isRunning = true;
             this.startTasks(false);
         }
     }
 
 
-    public pause(): void
-    {
+    public pause(): void {
         this._isRunning = false;
     }
 
@@ -160,16 +146,13 @@ export class TaskQueue extends EventEmitter
     /**
      * Helper function that starts executing queued tasks.
      */
-    private startTasks(justAddedNewTask: boolean): void
-    {
-        if (justAddedNewTask)
-        {
+    private startTasks(justAddedNewTask: boolean): void {
+        if (justAddedNewTask) {
             // console.log("New tasks have been added to TaskQueue.");
             this._isProcessingLastFulfillment = false;
         }
 
-        if (this._tasks.length === 0 && this._numRunning === 0)
-        {
+        if (this._tasks.length === 0 && this._numRunning === 0) {
             // The queue of tasks is empty.  Assume that we are running the last
             // fulfillment handler and wait one more tick to see if any new
             // tasks get enqueued.  If the last fulfillment handler enqueues a
@@ -178,17 +161,14 @@ export class TaskQueue extends EventEmitter
             // console.log("Looks like we might be done.  Waiting for handlers to run.");
 
             this._lastSettledInternalRunPromise!
-            .then(() =>
-            {
-                if (this._isProcessingLastFulfillment)
-                {
+            .then(() => {
+                if (this._isProcessingLastFulfillment) {
                     // console.log("No additional tasks queued. TaskQueue is now drained.");
 
                     // We waited one more tick and no new tasks have been
                     // enqueued.  It is safe to say that this queue is now
                     // drained.
-                    if (this._pauseWhenDrained)
-                    {
+                    if (this._pauseWhenDrained) {
                         this.pause();
                     }
                     this.emit(TaskQueue.eventNameDrained);
@@ -206,25 +186,21 @@ export class TaskQueue extends EventEmitter
                 (this._numConcurrentTasks === undefined) ||
                 this._numRunning < this._numConcurrentTasks
             )
-        )
-        {
+        ) {
             // Run another task.
             const curTask = this._tasks.pop();
 
-            if (curTask)
-            {
+            if (curTask) {
                 ++this._numRunning;
 
                 const curRunPromise: Promise<void> = curTask.task()
-                .then((value) =>
-                {
+                .then((value) => {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.resolve(value);
                     --this._numRunning;
                     this.startTasks(false);
                 })
-                .catch((err: unknown) =>
-                {
+                .catch((err: unknown) => {
                     this._lastSettledInternalRunPromise = curRunPromise;
                     curTask.deferred.reject(err);
                     --this._numRunning;

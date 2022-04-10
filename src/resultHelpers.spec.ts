@@ -4,14 +4,11 @@ import { failed, failedResult, Result, succeeded, succeededResult } from "./resu
 import { bindResult, boolToResult, executeWhileSuccessful, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
 
 
-describe("bindResult()", () =>
-{
+describe("bindResult()", () => {
 
-    it("with failed input the error is passed along and the function is not invoked", () =>
-    {
+    it("with failed input the error is passed along and the function is not invoked", () => {
         let numInvocations = 0;
-        function sqrt(x: number): Result<number, string>
-        {
+        function sqrt(x: number): Result<number, string> {
             numInvocations += 1;
             return x < 0 ? failedResult("Cannot take the square root of a negative numbwer.") :
                            succeededResult(Math.sqrt(x));
@@ -24,11 +21,9 @@ describe("bindResult()", () =>
     });
 
 
-    it("with successful input the function is invoked and its result returned", () =>
-    {
+    it("with successful input the function is invoked and its result returned", () => {
         let numInvocations = 0;
-        function sqrt(x: number): Result<number, string>
-        {
+        function sqrt(x: number): Result<number, string> {
             numInvocations += 1;
             return x < 0 ? failedResult("Cannot take the square root of a negative numbwer.") :
                            succeededResult(Math.sqrt(x));
@@ -41,24 +36,20 @@ describe("bindResult()", () =>
     });
 
 
-    it("can be used easily with pipe()", () =>
-    {
+    it("can be used easily with pipe()", () => {
 
-        function parse(text: string): Result<number, string>
-        {
+        function parse(text: string): Result<number, string> {
             const parsed = parseInt(text, 10);
             return _.isNaN(parsed) ? failedResult(`Invalid integer value "${text}".`) :
                                      succeededResult(parsed);
         }
 
-        function sqrt(x: number): Result<number, string>
-        {
+        function sqrt(x: number): Result<number, string> {
             return x < 0 ? failedResult("Cannot take the square root of a negative number.") :
                            succeededResult(Math.sqrt(x));
         }
 
-        function stringify(x: number): Result<string, string>
-        {
+        function stringify(x: number): Result<string, string> {
             return succeededResult(`${x}`);
         }
 
@@ -78,10 +69,8 @@ describe("bindResult()", () =>
 
 
 
-describe("mapSuccess()", () =>
-{
-    it("with failed input the error is passed along and the function is not invoked", () =>
-    {
+describe("mapSuccess()", () => {
+    it("with failed input the error is passed along and the function is not invoked", () => {
         let numInvocations = 0;
         const fn = (x: number) => { numInvocations++; return x + 1; };
 
@@ -92,8 +81,7 @@ describe("mapSuccess()", () =>
     });
 
 
-    it("with successful input the function is invoked and its result is wrapped in a successful Result", () =>
-    {
+    it("with successful input the function is invoked and its result is wrapped in a successful Result", () => {
         let numInvocations = 0;
         const fn = (x: number) => { numInvocations++; return x + 1; };
 
@@ -105,10 +93,8 @@ describe("mapSuccess()", () =>
 });
 
 
-describe("mapError()", () =>
-{
-    it("with successful input the value is passed along and the function is not invoked", () =>
-    {
+describe("mapError()", () => {
+    it("with successful input the value is passed along and the function is not invoked", () => {
         let numInvocations = 0;
         const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
 
@@ -119,8 +105,7 @@ describe("mapError()", () =>
     });
 
 
-    it("with failed input the function is invoked and its result is wrapped in a failed Result", () =>
-    {
+    it("with failed input the function is invoked and its result is wrapped in a failed Result", () => {
         let numInvocations = 0;
         const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
 
@@ -132,14 +117,11 @@ describe("mapError()", () =>
 });
 
 
-describe("mapWhileSuccessful()", () =>
-{
+describe("mapWhileSuccessful()", () => {
 
-    it("returns a successful result with the mapped array when all succeed", () =>
-    {
+    it("returns a successful result with the mapped array when all succeed", () => {
         const arr = [1, 2, 3, 4, 5];
-        const squareWithMaxOfFifty = (n: number) =>
-        {
+        const squareWithMaxOfFifty = (n: number) => {
             const square = n * n;
             return square < 50 ?
                 succeededResult(square) :
@@ -152,11 +134,9 @@ describe("mapWhileSuccessful()", () =>
     });
 
 
-    it("returns a failure result with the first failure", () =>
-    {
+    it("returns a failure result with the first failure", () => {
         const arr = [5, 6, 7, 8, 9];
-        const squareWithMaxOfFifty = (n: number) =>
-        {
+        const squareWithMaxOfFifty = (n: number) => {
             const square = n * n;
             return square < 50 ?
                 succeededResult(square) :
@@ -169,12 +149,10 @@ describe("mapWhileSuccessful()", () =>
     });
 
 
-    it("invokes the mapping function once for each success and once for the first failure", () =>
-    {
+    it("invokes the mapping function once for each success and once for the first failure", () => {
         let numFuncInvocations = 0;
         const arr = [5, 6, 7, 8, 9];
-        const squareWithMaxOfFifty = (n: number) =>
-        {
+        const squareWithMaxOfFifty = (n: number) => {
             numFuncInvocations++;
             const square = n * n;
             return square < 50 ?
@@ -188,11 +166,9 @@ describe("mapWhileSuccessful()", () =>
     });
 
 
-    it("adds each result value to the returned array even when they are arrays", () =>
-    {
+    it("adds each result value to the returned array even when they are arrays", () => {
         const inputs = [1, 2, 3];
-        const mapFn = (curInt: number): Result<[number, number], string> =>
-        {
+        const mapFn = (curInt: number): Result<[number, number], string> => {
             return succeededResult([curInt, curInt + 1]);
         };
         const result = mapWhileSuccessful(inputs, mapFn);
@@ -203,22 +179,17 @@ describe("mapWhileSuccessful()", () =>
 });
 
 
-describe("executeWhileSuccessful()", () =>
-{
-    it("returns a successful result with typed array elements when all functions succeed", () =>
-    {
-        function boolResultFn(): Result<boolean, string>
-        {
+describe("executeWhileSuccessful()", () => {
+    it("returns a successful result with typed array elements when all functions succeed", () => {
+        function boolResultFn(): Result<boolean, string> {
             return succeededResult(true);
         }
 
-        function stringResultFn(): Result<string, string>
-        {
+        function stringResultFn(): Result<string, string> {
             return succeededResult("xyzzy");
         }
 
-        function numberResultFn(): Result<number, string>
-        {
+        function numberResultFn(): Result<number, string> {
             return succeededResult(5);
         }
 
@@ -239,18 +210,15 @@ describe("executeWhileSuccessful()", () =>
 });
 
 
-describe("boolToResult()", () =>
-{
-    it("returns a Result wrapping the truty value when the condition is truthy", () =>
-    {
+describe("boolToResult()", () => {
+    it("returns a Result wrapping the truty value when the condition is truthy", () => {
         const result = boolToResult(1, "yes", "no");
         expect(succeeded(result)).toBeTrue();
         expect(result.value).toEqual("yes");
     });
 
 
-    it("returns a Result wrapping the falsy value when the condition is falsy", () =>
-    {
+    it("returns a Result wrapping the falsy value when the condition is falsy", () => {
         const result = boolToResult(0, "yes", "no");
         expect(failed(result)).toBeTrue();
         expect(result.error).toEqual("no");

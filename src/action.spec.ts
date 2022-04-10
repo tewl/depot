@@ -2,20 +2,16 @@ import {Action} from "./action";
 import { getTimerPromise } from "./promiseHelpers";
 
 
-describe("Action", () =>
-{
+describe("Action", () => {
 
-    it("can be constructed", () =>
-    {
+    it("can be constructed", () => {
         new Action(() => {});
     });
 
 
-    describe("description", () =>
-    {
+    describe("description", () => {
 
-        it("can be read after creation", () =>
-        {
+        it("can be read after creation", () => {
             const action = new Action(() => {}, "Do something interesting.");
             expect(action.description).toEqual("Do something interesting.");
         });
@@ -23,11 +19,9 @@ describe("Action", () =>
     });
 
 
-    describe("execute()", () =>
-    {
+    describe("execute()", () => {
 
-        it("will run a synchronous function", async () =>
-        {
+        it("will run a synchronous function", async () => {
             let theValue = 0;
             const theFunc = () => { theValue++; };
 
@@ -39,11 +33,9 @@ describe("Action", () =>
         });
 
 
-        it("will run an async function", async () =>
-        {
+        it("will run an async function", async () => {
             let theValue = 0;
-            const theFunc = async () =>
-            {
+            const theFunc = async () => {
                 await getTimerPromise(20, undefined);
                 theValue++;
             };
@@ -57,17 +49,14 @@ describe("Action", () =>
         });
 
 
-        it("rejects when contained action rejects", (done) =>
-        {
-            const action = new Action(() =>
-            {
+        it("rejects when contained action rejects", (done) => {
+            const action = new Action(() => {
                 return getTimerPromise(20, undefined)
                 .then(() => Promise.reject(new Error("The error.")));
             });
 
             action.execute()
-            .catch(() =>
-            {
+            .catch(() => {
                 done();
             });
         });

@@ -1,5 +1,4 @@
-export interface IGulpError extends Error
-{
+export interface IGulpError extends Error {
     showStack: false;
 }
 
@@ -15,28 +14,22 @@ export interface IGulpError extends Error
  */
 export function toGulpError(
     err: Error | string | {message: string} | undefined
-): IGulpError
-{
+): IGulpError {
     const defaultErrorMsg = "Gulp encountered one or more errors.";
     let gulpError: IGulpError;
-    if (err === undefined)
-    {
+    if (err === undefined) {
         gulpError = new Error(defaultErrorMsg) as IGulpError;
     }
-    else if (err instanceof Error && err.message.trim())
-    {
+    else if (err instanceof Error && err.message.trim()) {
         gulpError = err as IGulpError;
     }
-    else if (typeof err === "string")
-    {
+    else if (typeof err === "string") {
         gulpError = new Error(err) as IGulpError;
     }
-    else if (typeof err.message === "string" &&  err.message.trim())
-    {
+    else if (typeof err.message === "string" &&  err.message.trim()) {
         gulpError = new Error(err.message) as IGulpError;
     }
-    else
-    {
+    else {
         gulpError = new Error(defaultErrorMsg) as IGulpError;
     }
 

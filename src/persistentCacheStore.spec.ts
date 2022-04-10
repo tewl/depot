@@ -6,20 +6,16 @@ import {ISerialized} from "./serialization";
 import {Model, Person} from "./serializationObjects.spec";
 
 
-describe("PersistentCacheStore", () =>
-{
+describe("PersistentCacheStore", () => {
     const tmpDir = new Directory(__dirname, "..", "tmp");
 
-    beforeEach(() =>
-    {
+    beforeEach(() => {
         tmpDir.emptySync();
     });
 
-    describe("instance", () =>
-    {
+    describe("instance", () => {
 
-        it("can save data and then load it", async () =>
-        {
+        it("can save data and then load it", async () => {
             const registry = new SerializationRegistry();
             registry.register(Person);
             registry.register(Model);
@@ -27,8 +23,7 @@ describe("PersistentCacheStore", () =>
             const cacheName = "test";
 
             // An IIFE to save the data.
-            await (async () =>
-            {
+            await (async () => {
                 const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
                 const store = await PersistentCacheStore.create(registry, cache);
 
@@ -49,14 +44,12 @@ describe("PersistentCacheStore", () =>
             })();
 
             // An IIFE to load the data.
-            await (async () =>
-            {
+            await (async () => {
                 const cache = await PersistentCache.create<ISerialized>(cacheName, {dir: tmpDir.toString()});
                 const store = await PersistentCacheStore.create(registry, cache);
 
                 const modelIds = await store.getIds(/^model/);
-                if (modelIds.length === 0)
-                {
+                if (modelIds.length === 0) {
                     fail("Unable to find model in persistent cache.");
                 }
                 const modelId = modelIds[0];

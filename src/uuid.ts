@@ -1,5 +1,5 @@
 import { failedResult, Result, succeededResult } from ".";
-import { ValueObject } from "./valueObject";
+import { IEquatable } from "./equate";
 
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -54,10 +54,7 @@ export function generateUuid(format: UuidFormat = UuidFormat.D): string {
 }
 
 
-
-
-
-export class Uuid extends ValueObject<Uuid> {
+export class Uuid implements IEquatable<Uuid> {
     /**
      * Creates a standardized representation of the specified UUID string to make
      * validation and comparison simpler.
@@ -120,7 +117,6 @@ export class Uuid extends ValueObject<Uuid> {
 
     // Private constructor.  Use static methods to create instances.
     protected constructor(uuidStr: string) {
-        super();
         // Store the uuid using the format and case the caller is using.  If we
         // need to compare it to another Uuid, we will compare a normalized
         // version.
@@ -149,7 +145,7 @@ export class Uuid extends ValueObject<Uuid> {
      *
      * @return The string representation of this Uuid.
      */
-    public override toString(): string {
+    public toString(): string {
         return this._uuidStr;
     }
 }

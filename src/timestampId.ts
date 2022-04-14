@@ -1,9 +1,9 @@
 import { generateUuid, UuidFormat } from "./uuid";
 import { CompareResult } from "./compare";
-import { ValueObject } from "./valueObject";
+import { IEquatable } from "./equate";
 
 
-export class TimestampId extends ValueObject<TimestampId> {
+export class TimestampId implements IEquatable<TimestampId> {
     public static create(): TimestampId {
         return new TimestampId(Date.now(), generateUuid(UuidFormat.N));
     }
@@ -19,8 +19,6 @@ export class TimestampId extends ValueObject<TimestampId> {
 
 
     private constructor(timestamp: number, uuid: string) {
-        super();
-
         this._timestamp = timestamp;
         this._uuid      = uuid;
 

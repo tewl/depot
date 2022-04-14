@@ -532,7 +532,7 @@
             "off"
         ],
         "space-infix-ops": [
-          "error"
+            "error"
         ],
         "space-unary-ops": [
             "error",

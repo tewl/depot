@@ -265,12 +265,12 @@ export function padRight(src: string, pad: string, desiredLength: number): strin
  * Figures our what EOL string is being used in the specified string.
  * @param text - The string to analyze
  * @return A string representing the EOL characters being used in `text`.  If no
- * end-of-line is found, and empty string is returned.
+ * end-of-line is found, undefined is returned.
  */
-export function getEol(text: string): string {
+export function getEol(text: string): string | undefined {
     const match = createEolRegex().exec(text);
     if (!match) {
-        return "";
+        return undefined;
     }
     else {
         return match[0];

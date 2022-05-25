@@ -1,7 +1,7 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
     removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight,
-    repeat, splice
+    repeat, splice, getEol
 } from "./stringHelpers";
 
 
@@ -383,6 +383,25 @@ describe("padRight()", () => {
     it("Will insert correct pad when the pad string is multiple characters and does not fit evenly", () => {
         const padded = padRight("123", "xy", 6);
         expect(padded).toEqual("123xyx");
+    });
+
+});
+
+
+describe("getEol()", () => {
+
+    it("returns '\r\n' when used as EOL", () => {
+        expect(getEol("foo\r\nbar")).toEqual("\r\n");
+    });
+
+
+    it("returns '\n' when used as EOL", () => {
+        expect(getEol("foo\nbar")).toEqual("\n");
+    });
+
+
+    it("returns undefined when there is no EOL in the sample string", () => {
+        expect(getEol("foobar")).toEqual(undefined);
     });
 
 });

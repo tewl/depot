@@ -83,7 +83,7 @@ export function comment(
         // use the whole line in order to get the EOL.  If it is not blank, it
         // will be everything following the common indent.
         const blank = isBlank(curLine);
-        const sourceText = blank ? getEol(curLine) :
+        const sourceText = blank ? getEol(curLine) || "" :
                                    curLine.slice(indentStr.length);
 
         // The whitespace that will follow the comment token.
@@ -128,7 +128,7 @@ export function uncomment(linesToUncomment: string): string | undefined {
         // was add with the comment token itself.
         const newPostCommentWs = match.groups!.post_comment_ws.slice(1);
         const text             = match.groups!.text;
-        const eol              = getEol(curLine);
+        const eol              = getEol(curLine) || "";
         const uncommented      = beginWs + newPostCommentWs + text + eol;
         return uncommented;
     })

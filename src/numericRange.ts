@@ -15,3 +15,7 @@ export const sInt32Max =  2_147_483_647;
 
 export const uInt32Min =             0;
 export const uInt32Max = 4_294_967_295;
+
+// Note: JavaScript's 'number' type cannot represent a 64-bit integer value. To
+// handle 64-bit signed/unsigned two's-complement values, use the "long"
+// package.

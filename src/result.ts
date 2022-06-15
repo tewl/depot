@@ -82,3 +82,32 @@ export function succeeded<TSuccess, TError>(result: Result<TSuccess, TError>): r
 export function failed<TSuccess, TError>(result: Result<TSuccess, TError>): result is IFailedResult<TError> {
     return result.state === "failed";
 }
+
+
+// The following Result namespace serves as a place to put functions when we
+// want clients to prefix the function with "Result.".
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace Result {
+
+    /**
+     * When all input Results are successful, returns a successful Result containing
+     * an array of the successful values.  If the input contains one (or more)
+     * failures, a failed Result is returned containing the first error.
+     *
+     * @param resultsCollection - The input collection
+     * @return Description
+     */
+    export function all<TSuccess, TError>(
+        resultsCollection: Array<Result<TSuccess, TError>>
+    ): Result<Array<TSuccess>, TError> {
+        const firstFailure = resultsCollection.find(
+            (curResult): curResult is IFailedResult<TError> => failed(curResult)
+        );
+
+        return firstFailure ?
+            firstFailure :
+            succeededResult(resultsCollection.map((curResult) => curResult.value!));
+    }
+
+}

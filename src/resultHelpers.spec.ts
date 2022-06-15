@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { pipe } from "./pipe";
 import { failed, failedResult, Result, succeeded, succeededResult } from "./result";
-import { bindResult, boolToResult, executeWhileSuccessful, pare, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
+import { bindResult, boolToResult, executeWhileSuccessful, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
 
 
 describe("bindResult()", () => {
@@ -179,40 +179,6 @@ describe("mapWhileSuccessful()", () => {
 });
 
 
-describe("pare()", () => {
-
-    it("when given successful results, returns an array of their values", () => {
-        const results = [
-            succeededResult(10),
-            succeededResult(20),
-            succeededResult(30)
-        ];
-        expect(pare(results)).toEqual(succeededResult([10, 20, 30]));
-    });
-
-
-    it("when given successful results of different types, returns an array of their values", () => {
-        const results = [
-            succeededResult(10),
-            succeededResult(20),
-            succeededResult(undefined)
-        ];
-        expect(pare(results)).toEqual(succeededResult([10, 20, undefined]));
-    });
-
-
-    it("when given a collection containing failures, returns the first failure", () => {
-        const results = [
-            succeededResult(10),
-            succeededResult(20),
-            failedResult("Error msg")
-        ];
-        expect(pare(results)).toEqual(failedResult("Error msg"));
-    });
-
-});
-
-
 describe("executeWhileSuccessful()", () => {
     it("returns a successful result with typed array elements when all functions succeed", () => {
         function boolResultFn(): Result<boolean, string> {
@@ -245,7 +211,8 @@ describe("executeWhileSuccessful()", () => {
 
 
 describe("boolToResult()", () => {
-    it("returns a Result wrapping the truty value when the condition is truthy", () => {
+
+    it("returns a Result wrapping the truthy value when the condition is truthy", () => {
         const result = boolToResult(1, "yes", "no");
         expect(succeeded(result)).toBeTrue();
         expect(result.value).toEqual("yes");

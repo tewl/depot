@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import * as _ from "lodash";
-import { failed, failedResult, IFailedResult, Result, succeeded, succeededResult } from "./result";
+import { failed, failedResult, Result, succeeded, succeededResult } from "./result";
 
 
 /**
@@ -105,26 +105,6 @@ export function mapWhileSuccessful<TInput, TOutput, TError>(
         },
         succeededResult([]) as Result<Array<TOutput>, TError>
     );
-}
-
-
-/**
- * Extracts the values from an array of Results.  If the collection contains any
- * failures, the first one is returned.
- *
- * @param param - Description
- * @return Description
- */
-export function pare<TSuccess, TError>(
-    resultsCollection: Array<Result<TSuccess, TError>>
-): Result<Array<TSuccess>, TError> {
-    const firstFailure = resultsCollection.find((curResult): curResult is IFailedResult<TError> => failed(curResult));
-    if (firstFailure) {
-        return firstFailure;
-    }
-    else {
-        return succeededResult(resultsCollection.map((curResult) => curResult.value!));
-    }
 }
 
 

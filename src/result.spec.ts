@@ -94,3 +94,41 @@ describe("failed()", () => {
     });
 
 });
+
+
+describe("Result namespace", () => {
+
+    describe("all()", () => {
+
+        it("when given successful results, returns an array of their values", () => {
+            const results = [
+                succeededResult(10),
+                succeededResult(20),
+                succeededResult(30)
+            ];
+            expect(Result.all(results)).toEqual(succeededResult([10, 20, 30]));
+        });
+
+
+        it("when given successful results of different types, returns an array of their values", () => {
+            const results = [
+                succeededResult(10),
+                succeededResult(20),
+                succeededResult(undefined)
+            ];
+            expect(Result.all(results)).toEqual(succeededResult([10, 20, undefined]));
+        });
+
+
+        it("when given a collection containing failures, returns the first failure", () => {
+            const results = [
+                succeededResult(10),
+                succeededResult(20),
+                failedResult("Error msg")
+            ];
+            expect(Result.all(results)).toEqual(failedResult("Error msg"));
+        });
+
+    });
+
+});

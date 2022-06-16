@@ -1,4 +1,5 @@
 import * as os from "os";
+import * as crypto from "crypto";
 import * as _ from "lodash";
 import {createEolRegex} from "./regexpHelpers";
 
@@ -323,4 +324,17 @@ export function splice(str: string, index: number, numCharsToDelete: number, ins
     }
 
     return str.slice(0, index) + (insert || "") + str.slice(index + numCharsToDelete);
+}
+
+
+/**
+ * Hashes the specified string
+ * @param str - The string to be hashed
+ * @param algorithm - The hashing algorithm to use (e.g. "md5", "sha1", "sha256", "sha512")
+ * @param encoding - The encoding used in the returned string ("base64" or "hex")
+ * @returns The hashed value of the string
+ */
+export function hash(str: string, algorithm: string = "sha256", encoding: crypto.BinaryToTextEncoding = "hex"): string {
+    const hash = crypto.createHash(algorithm).update(str).digest(encoding);
+    return hash;
 }

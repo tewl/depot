@@ -1,6 +1,6 @@
 import { IHashable } from "./hashable";
 import { hash } from "./stringHelpers";
-import { KevMap } from "./kevMap";
+import { VokMap } from "./vokMap";
 
 class Person implements IHashable {
     public constructor(public readonly first: string, public readonly last: string) {
@@ -23,18 +23,18 @@ const betty2 = new Person("Betty", "Rubble");
 
 
 
-describe("KevMap", () => {
+describe("VokMap", () => {
 
     describe("constructor", () => {
 
         it("creates an empty map when no values are specified", () => {
-            const map = new KevMap<Person, number>();
+            const map = new VokMap<Person, number>();
             expect(map.size).toEqual(0);
         });
 
 
         it("creates a prepopulated map when an iterable is specified", () => {
-            const map = new KevMap<Person, number>([
+            const map = new VokMap<Person, number>([
                 [fred1, 40],
                 [wilma1, 41],
                 [barney1, 42],
@@ -51,7 +51,7 @@ describe("KevMap", () => {
         describe("size property", () => {
 
             it("has expected value while mutating the collection", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 expect(map.size).toEqual(0);
                 map.set(fred1, 40);
                 expect(map.size).toEqual(1);
@@ -78,7 +78,7 @@ describe("KevMap", () => {
         describe("iterator", () => {
 
             it("iterates over the items in the expected order", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -88,7 +88,7 @@ describe("KevMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -111,7 +111,7 @@ describe("KevMap", () => {
 
 
             it("makes the map an Iterable that can be used directly in a for...of loop", () => {
-                const map1 = new KevMap<Person, number>();
+                const map1 = new VokMap<Person, number>();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -150,7 +150,7 @@ describe("KevMap", () => {
         describe("entries()", () => {
 
             it("iterates over the items in the expected order", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -165,7 +165,7 @@ describe("KevMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -188,7 +188,7 @@ describe("KevMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new KevMap<Person, number>();
+                const map1 = new VokMap<Person, number>();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -227,7 +227,7 @@ describe("KevMap", () => {
         describe("keys()", () => {
 
             it("iterates over the keys in the expected order", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -242,7 +242,7 @@ describe("KevMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -265,7 +265,7 @@ describe("KevMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new KevMap<Person, number>();
+                const map1 = new VokMap<Person, number>();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -299,7 +299,7 @@ describe("KevMap", () => {
         describe("values()", () => {
 
             it("iterates over the values in the expected order", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -314,7 +314,7 @@ describe("KevMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -337,7 +337,7 @@ describe("KevMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new KevMap<Person, number>();
+                const map1 = new VokMap<Person, number>();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -372,7 +372,7 @@ describe("KevMap", () => {
         describe("set()", () => {
 
             it("sets the entry when it does not already exist", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 expect(map.size).toEqual(0);
                 map.set(fred1, 40);
                 expect(map.size).toEqual(1);
@@ -381,7 +381,7 @@ describe("KevMap", () => {
 
 
             it("when the same key instance is used to set the value a second time, the first is overwritten", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(fred1, 42);
                 expect(map.get(fred1)).toEqual(42);
@@ -390,7 +390,7 @@ describe("KevMap", () => {
 
 
             it("when a different but equal instance is used to set the value a second time, the first is overwritten", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(fred2, 42);
                 expect(map.get(fred1)).toEqual(42);
@@ -403,14 +403,14 @@ describe("KevMap", () => {
         describe("get()", () => {
 
             it("returns undefined when the key does not exist", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 expect(map.get(barney1)).toBeUndefined();
             });
 
 
             it("returns the expected value when the key is the same instance used when set", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -421,7 +421,7 @@ describe("KevMap", () => {
 
 
             it("returns the expected value when the key is NOT the same instance used when set", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -436,7 +436,7 @@ describe("KevMap", () => {
         describe("has()", () => {
 
             it("returns true when called with the same instance used when set", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -450,7 +450,7 @@ describe("KevMap", () => {
 
 
             it("returns true when called with a different instance as used when set", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -464,7 +464,7 @@ describe("KevMap", () => {
 
 
             it("returns false when no equal key exists in the map", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -480,7 +480,7 @@ describe("KevMap", () => {
         describe("delete()", () => {
 
             it("returns true when an existing item in the map was deleted using the same instance", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -499,7 +499,7 @@ describe("KevMap", () => {
 
 
             it("returns true when an existing item in the map was deleted using a different instance", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -518,7 +518,7 @@ describe("KevMap", () => {
 
 
             it("returns false when the specified key does not exist in the map", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -534,7 +534,7 @@ describe("KevMap", () => {
         describe("clear()", () => {
 
             it("removes all items from the collection", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -551,7 +551,7 @@ describe("KevMap", () => {
         describe("forEach", () => {
 
             it("invokes the function with with the specified arguments in the expected order", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -589,7 +589,7 @@ describe("KevMap", () => {
 
 
             it("invokes the function with the specified this argument", () => {
-                const map = new KevMap<Person, number>();
+                const map = new VokMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);

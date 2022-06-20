@@ -51,7 +51,7 @@ export class VokMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVa
      * with other language features such as for...of, Array.from() and spread
      * operator.
      */
-    *[Symbol.iterator](): Iterator<[TKey, TVal]> {
+    *[Symbol.iterator](): IterableIterator<[TKey, TVal]> {
         // Get an iterator to the backing store's map, and use it in this
         // implementation.
         const iter = this._backingStore[Symbol.iterator]();
@@ -190,7 +190,7 @@ export class VokMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVa
      *     function.
      */
     public forEach(
-        fn: (value: TVal, key: TKey, map: VokMap<TKey, TVal>) => void,
+        fn: (value: TVal, key: TKey, map: ReadonlyMap<TKey, TVal>) => void,
         thisArg?: unknown
     ): void {
         const cbFn = fn.bind(thisArg);

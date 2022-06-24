@@ -17,11 +17,9 @@ export class Lint {
     public static maxValue: Lint = new Lint(Long.MAX_VALUE);
 
 
-    public static fromBuffer(buf: Buffer, offset: number = 0): Lint | undefined
-    {
+    public static fromBuffer(buf: Buffer, offset: number = 0): Lint | undefined {
         const lastIndexToRead = offset + 8 - 1;
-        if (lastIndexToRead > buf.length - 1)
-        {
+        if (lastIndexToRead > buf.length - 1) {
             return undefined;
         }
 
@@ -34,10 +32,8 @@ export class Lint {
     }
 
 
-    public static fromBufReader(reader: BufReader): Lint | undefined
-    {
-        if (reader.numBytesRemaining() < 8)
-        {
+    public static fromBufReader(reader: BufReader): Lint | undefined {
+        if (reader.numBytesRemaining() < 8) {
             return undefined;
         }
 
@@ -50,8 +46,7 @@ export class Lint {
     }
 
 
-    public static fromBytesLE(bytes: Array<number>): Lint | undefined
-    {
+    public static fromBytesLE(bytes: Array<number>): Lint | undefined {
         const val = Long.fromBytesLE(bytes, false);
         return new Lint(val);
     }
@@ -107,8 +102,7 @@ export class Ulint {
     public static maxValue: Ulint = new Ulint(Long.MAX_UNSIGNED_VALUE);
 
 
-    public static fromBuffer(buf: Buffer, offset: number = 0): Ulint | undefined
-    {
+    public static fromBuffer(buf: Buffer, offset: number = 0): Ulint | undefined {
         const lastIndexToRead = offset + 8 - 1;
         if (lastIndexToRead > buf.length - 1) {
             return undefined;
@@ -137,8 +131,7 @@ export class Ulint {
     }
 
 
-    public static fromBytesLE(bytes: Array<number>): Ulint | undefined
-    {
+    public static fromBytesLE(bytes: Array<number>): Ulint | undefined {
         const val = Long.fromBytesLE(bytes, true);
         return new Ulint(val);
     }

@@ -167,7 +167,8 @@ describe("BufReader", () => {
         it("will read to the end of the Buffer when no size is specified", () => {
             const reader: BufReader = new BufReader(Buffer.from([
                 0x01, 0x02, 0x03, 0x04,
-                0x05, 0x06, 0x07, 0x08]));
+                0x05, 0x06, 0x07, 0x08
+            ]));
 
             reader.readUInt32();
             const remainder: Buffer = reader.readBytes();
@@ -183,7 +184,8 @@ describe("BufReader", () => {
         it("should read the appropriate number of bytes", () => {
             const reader: BufReader = new BufReader(Buffer.from([
                 0x01, 0x02, 0x03, 0x04,
-                0x05, 0x06, 0x07, 0x08]));
+                0x05, 0x06, 0x07, 0x08
+            ]));
 
             reader.readUInt32();
             const buf: Buffer = reader.readBytes(2);
@@ -196,7 +198,8 @@ describe("BufReader", () => {
         it("should read 0 bytes if instructed to do so", () => {
             const reader: BufReader = new BufReader(Buffer.from([
                 0x01, 0x02, 0x03, 0x04,
-                0x05, 0x06, 0x07, 0x08]));
+                0x05, 0x06, 0x07, 0x08
+            ]));
 
             reader.readUInt32();
             const buf: Buffer = reader.readBytes(0);
@@ -207,7 +210,8 @@ describe("BufReader", () => {
 
         it("should not read past the end of the source buffer", () => {
             const reader: BufReader = new BufReader(Buffer.from([
-                0x01, 0x02]));
+                0x01, 0x02
+            ]));
 
             const buf: Buffer = reader.readBytes(4);
 
@@ -219,7 +223,8 @@ describe("BufReader", () => {
 
         it("should allow the caller to specify a size that goes to the end of the buffer", () => {
             const reader: BufReader = new BufReader(Buffer.from([
-                0x01, 0x02, 0x03, 0x04]));
+                0x01, 0x02, 0x03, 0x04
+            ]));
 
             reader.readUInt8();
             const buf: Buffer = reader.readBytes(3);
@@ -234,7 +239,8 @@ describe("BufReader", () => {
 
         it("should return an empty buffer once the end has been reached", () => {
             const reader: BufReader = new BufReader(Buffer.from([
-                0x01, 0x02, 0x03, 0x04]));
+                0x01, 0x02, 0x03, 0x04
+            ]));
             reader.readUInt32();
 
             let buf: Buffer = reader.readBytes();
@@ -253,7 +259,8 @@ describe("BufReader", () => {
         it("should return the first byte if the buffer had not been read", () => {
 
             const reader: BufReader = new BufReader(
-                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+            );
 
             expect(reader.inspectNextByte()).toEqual(0x01);
 
@@ -262,7 +269,8 @@ describe("BufReader", () => {
         it("should not impact the BufReader location", () => {
 
             const reader: BufReader = new BufReader(
-                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+            );
 
             const expected = reader.numBytesRemaining();
             reader.inspectNextByte();
@@ -274,7 +282,8 @@ describe("BufReader", () => {
         it("should read the next byte after reading", () => {
 
             const reader: BufReader = new BufReader(
-                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+            );
 
             reader.readBYTE();
             expect(reader.inspectNextByte()).toEqual(0x02);
@@ -292,7 +301,8 @@ describe("BufReader", () => {
         it("should return undefined when the BufReader has reached the end", () => {
 
             const reader: BufReader = new BufReader(
-                Buffer.from([0x01]));
+                Buffer.from([0x01])
+            );
 
             reader.readBYTE();
             expect(reader.numBytesRemaining()).toEqual(0);
@@ -307,7 +317,8 @@ describe("BufReader", () => {
 
         it("description should return the correct number of bytes remaining", () => {
             const reader: BufReader = new BufReader(
-                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+                Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+            );
 
             expect(reader.numBytesRemaining()).toEqual(8);
             reader.readUInt16();

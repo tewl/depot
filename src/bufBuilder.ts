@@ -34,7 +34,9 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendUSINT: (value: number) => void = this.appendUInt8;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendBYTE:  (value: number) => void = this.appendUInt8;
 
     /**
@@ -47,6 +49,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendSINT: (value: number) => void = this.appendInt8;
 
     /**
@@ -59,7 +62,9 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendUINT: (value: number) => void = this.appendUInt16;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendWORD: (value: number) => void = this.appendUInt16;
 
     /**
@@ -72,6 +77,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendINT: (value: number) => void = this.appendInt16;
 
     /**
@@ -84,7 +90,9 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendUDINT: (value: number) => void = this.appendUInt32;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendDWORD: (value: number) => void = this.appendUInt32;
 
     /**
@@ -97,6 +105,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendDINT: (value: number) => void = this.appendInt32;
 
 
@@ -105,6 +114,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendULINT: (value: Ulint) => void = this.appendUInt64;
 
 
@@ -113,6 +123,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendLINT: (value: Lint) => void = this.appendInt64;
 
 
@@ -126,6 +137,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendREAL: (value: number) => void = this.appendFloat;
 
 
@@ -135,6 +147,7 @@ export class BufBuilder {
         this._parts.push(buf);
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public appendLREAL: (value: number) => void = this.appendDouble;
 
 

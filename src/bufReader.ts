@@ -26,13 +26,11 @@ export class BufReader {
      */
     public inspectNextByte(): number | undefined {
         // make sure it's a buffer with data
-        if (this._theBuffer.length > 0)
-        {
+        if (this._theBuffer.length > 0) {
             // if this._curIndex is beyond the length of the Buffer, undefined will be returned
             return this._theBuffer[this._curIndex];
         }
-        else
-        {
+        else {
             return undefined;
         }
     }
@@ -59,7 +57,9 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readUSINT: () => number = this.readUInt8;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readBYTE:  () => number = this.readUInt8;
 
     /**
@@ -72,6 +72,7 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readSINT: () => number = this.readInt8;
 
     /**
@@ -85,7 +86,9 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readUINT: () => number = this.readUInt16;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readWORD: () => number = this.readUInt16;
 
     /**
@@ -110,6 +113,7 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readINT: () => number = this.readInt16;
 
     /**
@@ -123,7 +127,9 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readUDINT: () => number = this.readUInt32;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readDWORD: () => number = this.readUInt32;
 
     /**
@@ -148,6 +154,7 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readDINT: () => number = this.readInt32;
 
     /**
@@ -156,14 +163,14 @@ export class BufReader {
      */
     public readUInt64(): Ulint {
         const value = Ulint.fromBuffer(this._theBuffer, this._curIndex);
-        if (!value)
-        {
+        if (!value) {
             throw new Error("Failed to read UInt64 value from Buffer.");
         }
         this._curIndex += 8;
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readULINT: () => Ulint = this.readUInt64;
 
 
@@ -173,14 +180,14 @@ export class BufReader {
      */
     public readInt64(): Lint {
         const value = Lint.fromBuffer(this._theBuffer, this._curIndex);
-        if (!value)
-        {
+        if (!value) {
             throw new Error("Failed to read Int64 value from Buffer.");
         }
         this._curIndex += 8;
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readLINT: () => Lint = this.readInt64;
 
 
@@ -190,6 +197,7 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readREAL: () => number = this.readFloat;
 
 
@@ -199,6 +207,7 @@ export class BufReader {
         return value;
     }
 
+    // eslint-disable-next-line @typescript-eslint/member-ordering
     public readLREAL: () => number = this.readDouble;
 
 
@@ -279,7 +288,7 @@ export class BufReader {
      *     if there is still data to be read.
      */
     public atEnd(): boolean {
-       return this._curIndex >= this._theBuffer.length;
+        return this._curIndex >= this._theBuffer.length;
     }
 }
 Object.freeze(BufReader.prototype);

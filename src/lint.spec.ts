@@ -125,18 +125,27 @@ describe("Lint", () => {
 
             it("will write 0 to a Buffer", () => {
                 const lint = Lint.fromBuffer(Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
-                expect(_.isEqual(lint!.toBuffer(), Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))).toBeTruthy();
+                expect(_.isEqual(
+                    lint!.toBuffer(),
+                    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+                )).toBeTruthy();
 
             });
 
 
             it("will write the minimum value to a Buffer", () => {
-                expect(_.isEqual(Lint.minValue.toBuffer(), Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80]))).toBeTruthy();
+                expect(_.isEqual(
+                    Lint.minValue.toBuffer(),
+                    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80])
+                )).toBeTruthy();
             });
 
 
             it("will write the maximum value to a Buffer", () => {
-                expect(_.isEqual(Lint.maxValue.toBuffer(), Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]))).toBeTruthy();
+                expect(_.isEqual(
+                    Lint.maxValue.toBuffer(),
+                    Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f])
+                )).toBeTruthy();
             });
 
 
@@ -263,18 +272,27 @@ describe("Ulint", () => {
 
             it("will write 0 to a Buffer", () => {
                 const ulint = Ulint.fromBuffer(Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
-                expect(_.isEqual(ulint!.toBuffer(), Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))).toBeTruthy();
+                expect(_.isEqual(
+                    ulint!.toBuffer(),
+                    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+                )).toBeTruthy();
 
             });
 
 
             it("will write the minimum value to a Buffer", () => {
-                expect(_.isEqual(Ulint.minValue.toBuffer(), Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))).toBeTruthy();
+                expect(_.isEqual(
+                    Ulint.minValue.toBuffer(),
+                    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+                )).toBeTruthy();
             });
 
 
             it("will write the maximum value to a Buffer", () => {
-                expect(_.isEqual(Ulint.maxValue.toBuffer(), Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]))).toBeTruthy();
+                expect(_.isEqual(
+                    Ulint.maxValue.toBuffer(),
+                    Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+                )).toBeTruthy();
             });
 
 

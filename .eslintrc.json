@@ -94,13 +94,13 @@
                     "protected-decorated-field",
                     "protected-instance-field",
                     "protected-abstract-field",
-                    "public-decorated-field",
-                    "public-instance-field",
                     // Constructors
                     "public-constructor",
                     "protected-constructor",
                     "private-constructor",
                     "public-abstract-field",
+                    "public-decorated-field",
+                    "public-instance-field",
                     // Methods
                     "public-decorated-method",
                     "public-instance-method",

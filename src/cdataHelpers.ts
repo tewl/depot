@@ -1,3 +1,5 @@
+import { failedResult, Result, succeededResult } from "./result";
+
 /**
  * Gets a regular expression capable of extracting the character data from CDATA
  * text.
@@ -18,8 +20,10 @@ export function getCdataRegex(): RegExp {
  * @return A string containing the embedded character data.  undefined if the
  *     input text was not valid CDATA text.
  */
-export function getCdata(input: string): string | undefined {
+export function getCdata(input: string): Result<string, string> {
     const cdataRegex = getCdataRegex();
     const matches = cdataRegex.exec(input);
-    return matches ? matches.groups!.charData : undefined;
+    return matches ?
+        succeededResult(matches.groups!.charData) :
+        failedResult("Failed to parse CDATA.");
 }

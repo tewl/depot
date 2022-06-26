@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import { pipe } from "./pipe";
 import { failed, failedResult, Result, succeeded, succeededResult } from "./result";
 import { bindResult, boolToResult, executeWhileSuccessful, mapError, mapSuccess, mapWhileSuccessful } from "./resultHelpers";
@@ -40,8 +39,8 @@ describe("bindResult()", () => {
 
         function parse(text: string): Result<number, string> {
             const parsed = parseInt(text, 10);
-            return _.isNaN(parsed) ? failedResult(`Invalid integer value "${text}".`) :
-                                     succeededResult(parsed);
+            return Number.isNaN(parsed) ? failedResult(`Invalid integer value "${text}".`) :
+                                          succeededResult(parsed);
         }
 
         function sqrt(x: number): Result<number, string> {

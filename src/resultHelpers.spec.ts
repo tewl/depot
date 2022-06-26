@@ -180,6 +180,7 @@ describe("mapWhileSuccessful()", () => {
 
 
 describe("executeWhileSuccessful()", () => {
+
     it("returns a successful result with typed array elements when all functions succeed", () => {
         function boolResultFn(): Result<boolean, string> {
             return succeededResult(true);
@@ -207,6 +208,30 @@ describe("executeWhileSuccessful()", () => {
         expect(strVal).toEqual("xyzzy");
         expect(numVal).toEqual(5);
     });
+
+
+    it("returns the first failure encountered", () => {
+        function boolResultFn(): Result<boolean, string> {
+            return succeededResult(true);
+        }
+
+        function stringResultFn(): Result<string, string> {
+            return failedResult("error msg");
+        }
+
+        function numberResultFn(): Result<number, string> {
+            return succeededResult(5);
+        }
+
+        const result = executeWhileSuccessful(
+            boolResultFn,
+            stringResultFn,
+            numberResultFn
+        );
+
+        expect(result).toEqual(failedResult("error msg"));
+    });
+
 });
 
 

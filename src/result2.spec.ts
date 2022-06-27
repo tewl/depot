@@ -1,4 +1,5 @@
 import { assertNever } from "./never";
+import { pipe } from "./pipe";
 import { FailedResult, Result, SuccessResult } from "./result2";
 
 
@@ -111,12 +112,13 @@ describe("FailedResult", () => {
             });
 
         });
+
     });
 
 });
 
 
-describe("Result", () => {
+describe("Result type", () => {
 
     function doSomething(): Result<number, string> {
         return new SuccessResult(5);
@@ -154,4 +156,288 @@ describe("Result", () => {
                 return assertNever(res);
         }
     });
+});
+
+
+describe("Result namespace", () => {
+
+    describe("all()", () => {
+
+        it("when given successful results, returns an array of their values", () => {
+            const results = [
+                new SuccessResult(10),
+                new SuccessResult(20),
+                new SuccessResult(30)
+            ];
+            expect(Result.all(results)).toEqual(new SuccessResult([10, 20, 30]));
+        });
+
+
+        it("when given successful results of different types, returns an array of their values", () => {
+            const results = [
+                new SuccessResult(10),
+                new SuccessResult(20),
+                new SuccessResult(undefined)
+            ];
+            expect(Result.all(results)).toEqual(new SuccessResult([10, 20, undefined]));
+        });
+
+
+        it("when given a collection containing failures, returns the first failure", () => {
+            const results = [
+                new SuccessResult(10),
+                new SuccessResult(20),
+                new FailedResult("Error msg")
+            ];
+            expect(Result.all(results)).toEqual(new FailedResult("Error msg"));
+        });
+
+    });
+
+
+    describe("bind()", () => {
+
+
+        it("with failed input the error is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            function sqrt(x: number): Result<number, string> {
+                numInvocations += 1;
+                return x < 0 ? new FailedResult("Cannot take the square root of a negative numbwer.") :
+                            new SuccessResult(Math.sqrt(x));
+            }
+
+            const result = Result.bind(sqrt, new FailedResult("Initial error"));
+            expect(result.failed).toBeTruthy();
+            expect(result.error).toEqual("Initial error");
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with successful input the function is invoked and its result returned", () => {
+            let numInvocations = 0;
+            function sqrt(x: number): Result<number, string> {
+                numInvocations += 1;
+                return x < 0 ? new FailedResult("Cannot take the square root of a negative numbwer.") :
+                            new SuccessResult(Math.sqrt(x));
+            }
+
+            const result = Result.bind(sqrt, new SuccessResult(16));
+            expect(result.succeeded).toBeTruthy();
+            expect(result.value).toEqual(4);
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("can be used easily with pipe()", () => {
+
+            function parse(text: string): Result<number, string> {
+                const parsed = parseInt(text, 10);
+                return Number.isNaN(parsed) ? new FailedResult(`Invalid integer value "${text}".`) :
+                                              new SuccessResult(parsed);
+            }
+
+            function sqrt(x: number): Result<number, string> {
+                return x < 0 ? new FailedResult("Cannot take the square root of a negative number.") :
+                               new SuccessResult(Math.sqrt(x));
+            }
+
+            function stringify(x: number): Result<string, string> {
+                return new SuccessResult(`${x}`);
+            }
+
+            const resultA = pipe(
+                "16",
+                parse,
+                (r) => Result.bind(sqrt, r),
+                (r) => Result.bind(stringify, r)
+            );
+
+            expect(resultA.succeeded).toBeTruthy();
+            expect(resultA.value).toEqual("4");
+        });
+
+    });
+
+
+    describe("mapSuccess()", () => {
+        it("with failed input the error is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return x + 1; };
+
+            const result = Result.mapSuccess(fn, new FailedResult("failure"));
+            expect(result.failed).toBeTruthy();
+            expect(result.error).toEqual("failure");
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with successful input the function is invoked and its result is wrapped in a successful Result", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return x + 1; };
+
+            const result = Result.mapSuccess(fn, new SuccessResult(1));
+            expect(result.succeeded).toBeTruthy();
+            expect(result.value).toEqual(2);
+            expect(numInvocations).toEqual(1);
+        });
+    });
+
+
+    describe("mapError()", () => {
+        it("with successful input the value is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
+
+            const result = Result.mapError(fn, new SuccessResult(1));
+            expect(result.succeeded).toBeTruthy();
+            expect(result.value).toEqual(1);
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with failed input the function is invoked and its result is wrapped in a failed Result", () => {
+            let numInvocations = 0;
+            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
+
+            const result = Result.mapError(fn, new FailedResult("fake error message"));
+            expect(result.failed).toBeTruthy();
+            expect(result.error).toEqual("Error: fake error message");
+            expect(numInvocations).toEqual(1);
+        });
+    });
+
+
+    describe("mapWhileSuccessful()", () => {
+
+        it("returns a successful result with the mapped array when all succeed", () => {
+            const arr = [1, 2, 3, 4, 5];
+            const squareWithMaxOfFifty = (n: number) => {
+                const square = n * n;
+                return square < 50 ?
+                    new SuccessResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeTruthy();
+            expect(mapRes.value).toEqual([1, 4, 9, 16, 25]);
+        });
+
+
+        it("returns a failure result with the first failure", () => {
+            const arr = [5, 6, 7, 8, 9];
+            const squareWithMaxOfFifty = (n: number) => {
+                const square = n * n;
+                return square < 50 ?
+                    new SuccessResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeFalsy();
+            expect(mapRes.error).toEqual("The square of 8 exceeds the maximum.");
+        });
+
+
+        it("invokes the mapping function once for each success and once for the first failure", () => {
+            let numFuncInvocations = 0;
+            const arr = [5, 6, 7, 8, 9];
+            const squareWithMaxOfFifty = (n: number) => {
+                numFuncInvocations++;
+                const square = n * n;
+                return square < 50 ?
+                    new SuccessResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeFalsy();
+            expect(numFuncInvocations).toEqual(4);
+        });
+
+
+        it("adds each result value to the returned array even when they are arrays", () => {
+            const inputs = [1, 2, 3];
+            const mapFn = (curInt: number): Result<[number, number], string> => {
+                return new SuccessResult([curInt, curInt + 1]);
+            };
+            const result = Result.mapWhileSuccessful(inputs, mapFn);
+            expect(result.succeeded).toBeTrue();
+            expect(result.value!).toEqual([[1, 2], [2, 3], [3, 4]]);
+        });
+
+    });
+
+
+    describe("executeWhileSuccessful()", () => {
+
+        it("returns a successful result with typed array elements when all functions succeed", () => {
+            function boolResultFn(): Result<boolean, string> {
+                return new SuccessResult(true);
+            }
+
+            function stringResultFn(): Result<string, string> {
+                return new SuccessResult("xyzzy");
+            }
+
+            function numberResultFn(): Result<number, string> {
+                return new SuccessResult(5);
+            }
+
+            const result = Result.executeWhileSuccessful(
+                boolResultFn,
+                stringResultFn,
+                numberResultFn
+            );
+
+            // The TS compiler knows the individual types for each array/tuple
+            // element. You can verify this by hovering over the following variables
+            // and checking their type.
+            const [boolVal, strVal, numVal] = result.value!;
+            expect(boolVal).toEqual(true);
+            expect(strVal).toEqual("xyzzy");
+            expect(numVal).toEqual(5);
+        });
+
+
+        it("returns the first failure encountered", () => {
+            function boolResultFn(): Result<boolean, string> {
+                return new SuccessResult(true);
+            }
+
+            function stringResultFn(): Result<string, string> {
+                return new FailedResult("error msg");
+            }
+
+            function numberResultFn(): Result<number, string> {
+                return new SuccessResult(5);
+            }
+
+            const result = Result.executeWhileSuccessful(
+                boolResultFn,
+                stringResultFn,
+                numberResultFn
+            );
+
+            expect(result).toEqual(new FailedResult("error msg"));
+        });
+    });
+
+
+    describe("fromBool()", () => {
+
+        it("returns a Result wrapping the truthy value when the condition is truthy", () => {
+            const result = Result.fromBool(1, "yes", "no");
+            expect(result.succeeded).toBeTrue();
+            expect(result.value).toEqual("yes");
+        });
+
+
+        it("returns a Result wrapping the falsy value when the condition is falsy", () => {
+            const result = Result.fromBool(0, "yes", "no");
+            expect(result.failed).toBeTrue();
+            expect(result.error).toEqual("no");
+        });
+    });
+
 });

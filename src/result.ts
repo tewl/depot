@@ -33,7 +33,7 @@ export class SucceededResult<TSuccess> implements IResult<TSuccess, undefined> {
     private readonly _value: TSuccess;
 
     /**
-     * Creates a new SuccessResult instance.
+     * Creates a new SucceededResult instance.
      * @param value - The successful result value
      */
     public constructor(value: TSuccess) {

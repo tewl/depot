@@ -3,7 +3,7 @@ import { pipe } from "./pipe";
 import { FailedResult, Result, SucceededResult } from "./result";
 
 
-describe("SuccessResult", () => {
+describe("SucceededResult", () => {
 
     describe("instance", () => {
 

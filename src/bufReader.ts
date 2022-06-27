@@ -21,7 +21,7 @@ export class BufReader {
 
     /**
      * Returns the first byte of data where the BufReader is pointing in the Buffer
-     * for inspection without effecting the BufReader
+     * for inspection without affecting the BufReader
      * @return Byte
      */
     public inspectNextByte(): number | undefined {

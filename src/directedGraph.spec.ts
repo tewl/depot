@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import { DirectedGraph, EdgeClassification, IEdge } from "./directedGraph";
-import { failed, succeeded } from "./result";
 
 
 function getGraph1(): [Set<string>, Array<IEdge<string, string>>] {
@@ -43,7 +42,7 @@ describe("DirectedGraph()", () => {
 
             it("succeeds when given valid data", () => {
                 const createRes = DirectedGraph.create(...getGraph1());
-                expect(succeeded(createRes)).toBeTrue();
+                expect(createRes.succeeded).toBeTrue();
             });
 
 
@@ -51,7 +50,7 @@ describe("DirectedGraph()", () => {
                 const [vertices, edges] = getGraph1();
                 const invalidEdges = edges.concat({fromVertex: "a", toVertex: "s", edgeAttr: "as"});
                 const createRes = DirectedGraph.create(vertices, invalidEdges);
-                expect(failed(createRes)).toBeTrue();
+                expect(createRes.failed).toBeTrue();
                 expect(createRes.error).toEqual('Edge specifies a fromVertex of "a" which is not in the vertex collection.');
             });
         });
@@ -93,7 +92,7 @@ describe("DirectedGraph()", () => {
             it("returns the expected output", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 const searchRes = digraph.breadthFirstSearch("s");
-                expect(succeeded(searchRes)).toBeTrue();
+                expect(searchRes.succeeded).toBeTrue();
                 const {distance, predecessor} = searchRes.value!;
                 expect(distance).toEqual(new Map([
                     ["r", 1],
@@ -121,7 +120,7 @@ describe("DirectedGraph()", () => {
             it("fails when the source node does not exist in the graph", () => {
                 const digraph = DirectedGraph.create(...getGraph1()).value!;
                 const searchRes = digraph.breadthFirstSearch("a");
-                expect(failed(searchRes)).toBeTrue();
+                expect(searchRes.failed).toBeTrue();
             });
         });
 

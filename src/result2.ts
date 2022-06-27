@@ -28,7 +28,7 @@ interface IResult<TSuccess, TError> {
 /**
  * Represents a successful result returned from a function.
  */
-export class SuccessResult<TSuccess> implements IResult<TSuccess, undefined> {
+export class SucceededResult<TSuccess> implements IResult<TSuccess, undefined> {
 
     private readonly _value: TSuccess;
 
@@ -94,7 +94,7 @@ export class FailedResult<TError> implements IResult<undefined, TError> {
 /**
  * Represents the successful or failure result of an operation.
  */
-export type Result<TSuccess, TError> = SuccessResult<TSuccess> | FailedResult<TError>;
+export type Result<TSuccess, TError> = SucceededResult<TSuccess> | FailedResult<TError>;
 
 
 /**
@@ -120,7 +120,7 @@ export namespace Result {
 
         const retVal = firstFailure ?
             firstFailure :
-            new SuccessResult(resultsCollection.map((curResult): TSuccess => curResult.value!));
+            new SucceededResult(resultsCollection.map((curResult): TSuccess => curResult.value!));
         return retVal;
     }
 
@@ -161,7 +161,7 @@ export namespace Result {
     ): Result<TOutputSuccess, TError> {
         if (input.succeeded) {
             const mappedValue = fn(input.value);
-            return new SuccessResult(mappedValue);
+            return new SucceededResult(mappedValue);
         }
         else {
             return input;
@@ -223,7 +223,7 @@ export namespace Result {
                     return res;
                 }
             },
-            new SuccessResult([])
+            new SucceededResult([])
         );
     }
 
@@ -394,7 +394,7 @@ export namespace Result {
                     return res;
                 }
             },
-            new SuccessResult([])
+            new SucceededResult([])
         );
     }
 
@@ -415,7 +415,7 @@ export namespace Result {
         falseErrorVal: TError
     ): Result<TSuccess, TError> {
         return condition ?
-            new SuccessResult(trueSuccessVal) :
+            new SucceededResult(trueSuccessVal) :
             new FailedResult(falseErrorVal);
     }
 

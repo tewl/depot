@@ -1,7 +1,7 @@
 import { Logger, LogLevel } from "./logger";
 import { continuePollingNo, ContinuePollingPredicate, continuePollingYes, poll, pollAsyncResult } from "./poll";
 import { getTimerPromise } from "./promiseHelpers";
-import { failed, failedResult, succeeded, succeededResult } from "./result";
+import { FailedResult, SucceededResult } from "./result2";
 
 
 describe("poll()", () => {
@@ -68,12 +68,12 @@ describe("pollAsyncResult()", () => {
         const asyncResultOp = () => {
             numInvocations++;
             return numInvocations === 4 ?
-                Promise.resolve(succeededResult(4)) :
-                Promise.resolve(failedResult(0));
+                Promise.resolve(new SucceededResult(4)) :
+                Promise.resolve(new FailedResult(0));
         };
 
         const result = await pollAsyncResult(asyncResultOp, undefined, pollingInterval, 1000);
-        expect(succeeded(result)).toBeTruthy();
+        expect(result.succeeded).toBeTruthy();
         expect(Date.now() - startTime).toBeGreaterThan(3 * pollingInterval);
         expect(result.value).toEqual(4);
     });
@@ -81,11 +81,11 @@ describe("pollAsyncResult()", () => {
 
     it("when timing out returns the most recent failure", async () => {
         const asyncResultOp = () => {
-            return Promise.resolve(failedResult(5));
+            return Promise.resolve(new FailedResult(5));
         };
 
         const result = await pollAsyncResult(asyncResultOp, undefined, 100, 1000);
-        expect(failed(result)).toBeTruthy();
+        expect(result.failed).toBeTruthy();
         expect(result.error!.message).toEqual("Polling timed out after 1000 ms.");
         expect(result.error!.lastResult.error).toEqual(5);
     });
@@ -95,7 +95,7 @@ describe("pollAsyncResult()", () => {
         let numInvocations = 0;
         const asyncResultOp = () => {
             numInvocations++;
-            return Promise.resolve(succeededResult(numInvocations));
+            return Promise.resolve(new SucceededResult(numInvocations));
         };
 
         const result = await pollAsyncResult(
@@ -105,14 +105,14 @@ describe("pollAsyncResult()", () => {
             1000
         );
 
-        expect(succeeded(result)).toBeTruthy();
+        expect(result.succeeded).toBeTruthy();
         expect(result.value).toEqual(5);
     });
 
 
     it("when the operation always succeeds but predicate always fails, returns an error with successful lastResult", async () => {
         const asyncResultOp = () => {
-            return Promise.resolve(succeededResult(3));
+            return Promise.resolve(new SucceededResult(3));
         };
 
         const result = await pollAsyncResult(
@@ -122,9 +122,9 @@ describe("pollAsyncResult()", () => {
             500
         );
 
-        expect(failed(result)).toBeTruthy();
+        expect(result.failed).toBeTruthy();
         expect(result.error!.message).toEqual("Polling timed out after 500 ms.");
-        expect(succeeded(result.error!.lastResult)).toBeTruthy();
+        expect(result.error!.lastResult.succeeded).toBeTruthy();
         expect(result.error!.lastResult.value).toEqual(3);
     });
 

@@ -5,8 +5,8 @@ import * as cp from "child_process";
 import * as stream from "stream";
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
-import { failedResult, Result, succeededResult } from "./result";
 import { assertNever } from "./never";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 /**
@@ -161,7 +161,7 @@ export function spawn(
             .pipe(errorStream);
 
             childProcess.once("error", (err: ISystemError) => {
-                resolve(failedResult({ type: "ISpawnSystemError", ...err }));
+                resolve(new FailedResult({ type: "ISpawnSystemError", ...err }));
             });
 
             childProcess.once("exit", (exitCode: number) => {
@@ -173,13 +173,13 @@ export function spawn(
                         if (description) {
                             console.log(`Child process succeeded: ${cmdLineRepresentation}`);
                         }
-                        resolve(succeededResult(_.trim(stdoutCollector.collected)));
+                        resolve(new SucceededResult(_.trim(stdoutCollector.collected)));
                     }
                     else {
                         if (description) {
                             console.log(`Child process failed: ${cmdLineRepresentation}`);
                         }
-                        resolve(failedResult({
+                        resolve(new FailedResult({
                             type:     "ISpawnExitError",
                             exitCode: exitCode,
                             stderr:   _.trim(stderrCollector.collected),

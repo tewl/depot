@@ -1,4 +1,4 @@
-import { failedResult, Result, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 /**
  * Gets a regular expression capable of extracting the character data from CDATA
@@ -24,6 +24,6 @@ export function getCdata(input: string): Result<string, string> {
     const cdataRegex = getCdataRegex();
     const matches = cdataRegex.exec(input);
     return matches ?
-        succeededResult(matches.groups!.charData) :
-        failedResult("Failed to parse CDATA.");
+        new SucceededResult(matches.groups!.charData) :
+        new FailedResult("Failed to parse CDATA.");
 }

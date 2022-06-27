@@ -1,7 +1,5 @@
 import {evaluate, symbolToTraits, IExpressionTokenNumber, IExpressionTokenOperator, tokenize, toPostfix} from "./expression";
 import {Fraction} from "./fraction";
-import {succeeded, failed} from "./result";
-
 
 describe("symbolToTraits", () => {
 
@@ -66,14 +64,14 @@ describe("tokenize()", () => {
 
     it("fails to tokenize a string that makes no sense", () => {
         const tokenizeResult = tokenize("&");
-        expect(failed(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.failed).toBeTruthy();
         expect(tokenizeResult.error).toEqual('Failed to parse expression at index 0 of "&".');
     });
 
 
     it("successfully tokenizes a whole number", () => {
         const tokenizeResult = tokenize("3");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
@@ -83,7 +81,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression with leading whitespace", () => {
         const tokenizeResult = tokenize("   \t  3");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
 
@@ -94,7 +92,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression with trailing whitespace", () => {
         const tokenizeResult = tokenize("3  \t   ");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
 
@@ -105,7 +103,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes a fraction", () => {
         const tokenizeResult = tokenize("1/4");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
         expect(tokens[0].type).toEqual("IExpressionTokenNumber");
@@ -115,7 +113,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes a fraction that contains a whole number and a fractional part", () => {
         const tokenizeResult = tokenize("2 1/4");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(1);
 
@@ -126,7 +124,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains a plus operator", () => {
         const tokenizeResult = tokenize("2 + 3");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
 
@@ -141,7 +139,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains fractions and a plus operator", () => {
         const tokenizeResult = tokenize("2 3/8 + 2 5/8");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
 
@@ -168,7 +166,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains fractions and a minus operator", () => {
         const tokenizeResult = tokenize("2 3/8 - 2 5/8");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
 
@@ -195,7 +193,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains fractions and a multiplication operator", () => {
         const tokenizeResult = tokenize("2 3/8 * 2 5/8");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
 
@@ -222,7 +220,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains fractions and a division operator", () => {
         const tokenizeResult = tokenize("2 3/8 / 2 5/8");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(3);
 
@@ -249,7 +247,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains multiple operators", () => {
         const tokenizeResult = tokenize("3/1 + 1/2 * 4/1");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(5);
 
@@ -289,7 +287,7 @@ describe("tokenize()", () => {
 
     it("successfully tokenizes an expression that contains parenthesis", () => {
         const tokenizeResult = tokenize("(3/1 + 1/2) * 4/1");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const tokens = tokenizeResult.value!;
         expect(tokens.length).toEqual(7);
 
@@ -344,27 +342,27 @@ describe("tokenize()", () => {
 describe("toPostfix()", () => {
     it("fails when there is a mismatched left parenthesis", () => {
         const tokenizeResult = tokenize("2 * ( 3");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const postfixResult = toPostfix(tokenizeResult.value!);
-        expect(failed(postfixResult)).toBeTruthy();
+        expect(postfixResult.failed).toBeTruthy();
         expect(postfixResult.error).toEqual('"(" found while emptying operator stack.  Mismatched parenthesis.');
     });
 
 
     it("fails when there is a mismatched right parenthesis", () => {
         const tokenizeResult = tokenize("2 * ) 3");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const postfixResult = toPostfix(tokenizeResult.value!);
-        expect(failed(postfixResult)).toBeTruthy();
+        expect(postfixResult.failed).toBeTruthy();
         expect(postfixResult.error).toEqual('Operator stack exhaused while finding "(".  Mismatched parenthesis.');
     });
 
 
     it("converts an infix expression to a postfix expression", () => {
         const tokenizeResult = tokenize("(1/4 + 1 3/4) * 4");
-        expect(succeeded(tokenizeResult)).toBeTruthy();
+        expect(tokenizeResult.succeeded).toBeTruthy();
         const postfixResult = toPostfix(tokenizeResult.value!);
-        expect(succeeded(postfixResult)).toBeTruthy();
+        expect(postfixResult.succeeded).toBeTruthy();
         expect(postfixResult.value!.length).toEqual(5);
 
         const postfixTokens = postfixResult.value!;
@@ -392,31 +390,31 @@ describe("evaluate()", () => {
 
     it("fails to evaluate an empty expression", () => {
         const res = evaluate("");
-        expect(failed(res)).toBeTruthy();
+        expect(res.failed).toBeTruthy();
         expect(res.error).toEqual("No expression.");
     });
 
 
     it("fails to evaluate an expression that cannot be tokenized", () => {
-        expect(failed(evaluate("2 3/4 & 6/1"))).toBeTruthy();
+        expect(evaluate("2 3/4 & 6/1").failed).toBeTruthy();
     });
 
 
     it("fails to evaluate an expression that can be tokenized but cannot be converted to postfix", () => {
-        expect(failed(evaluate("1/2 * 2 +"))).toBeTruthy();
+        expect(evaluate("1/2 * 2 +").failed).toBeTruthy();
     });
 
 
     it("successfully evaluates an expression where the order matters", () => {
         const res = evaluate("3 - 2");
-        expect(succeeded(res)).toBeTruthy();
+        expect(res.succeeded).toBeTruthy();
         expect(res.value!.equals(1)).toBeTruthy();
     });
 
 
     it("successfully evaluates an expression containing parenthesis", () => {
         const res = evaluate("(3/1 + 1/2) * 4/1");
-        expect(succeeded(res)).toBeTruthy();
+        expect(res.succeeded).toBeTruthy();
         expect(res.value!.equals(14)).toBeTruthy();
     });
 

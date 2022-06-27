@@ -1,6 +1,6 @@
-import { failed, failedResult, Result } from "./result";
 import { assertNever } from "./never";
 import { NIError } from "./niError";
+import { FailedResult, Result } from "./result2";
 
 
 describe("NIError", () => {
@@ -10,13 +10,13 @@ describe("NIError", () => {
             function buildCastle1():
                 Result<void,
                     NIError<"BurnedDown"> | NIError<"FellOver"> | NIError<"SankIntoSwamp">> {
-                return failedResult( new NIError("SankIntoSwamp"));
+                return new FailedResult( new NIError("SankIntoSwamp"));
             }
 
 
             it("does exhaustiveness checking", () => {
                 const res = buildCastle1();
-                if (failed(res)) {
+                if (res.failed) {
                     if (res.error.code === "BurnedDown") {
                         // eslint-disable-next-line no-empty
                     }
@@ -45,13 +45,13 @@ describe("NIError", () => {
 
             function buildCastle2():
                 Result<void, NIError<BuildCastleError>> {
-                return failedResult(new NIError(BuildCastleError.FellOver, "Optional error details."));
+                return new FailedResult(new NIError(BuildCastleError.FellOver, "Optional error details."));
             }
 
 
             it("does exhaustiveness checking", () => {
                 const res = buildCastle2();
-                if (failed(res)) {
+                if (res.failed) {
                     if (res.error.code === BuildCastleError.BurnedDown) {
                         // eslint-disable-next-line no-empty
                     }

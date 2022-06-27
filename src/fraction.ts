@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { Result, failed, failedResult, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 // Regular expressions used to parse fraction strings.
@@ -11,13 +11,13 @@ const allParts  = /^(?<whole>\d+) (?<num>\d+)\/(?<den>\d+)$/;
 export class Fraction {
     public static from(val: number | Fraction | string): Result<Fraction, string> {
         if (typeof val === "number") {
-            return succeededResult(Fraction.fromNumber(val));
+            return new SucceededResult(Fraction.fromNumber(val));
         }
         else if (typeof val === "string") {
             return Fraction.fromString(val);
         }
         else {
-            return succeededResult(val);
+            return new SucceededResult(val);
         }
     }
 
@@ -53,23 +53,23 @@ export class Fraction {
         // Make sure all values are integers.
         //
         if (!_.isSafeInteger(whole)) {
-            return failedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+            return new FailedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
         }
         if (!_.isSafeInteger(num)) {
-            return failedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+            return new FailedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
         }
         if (!_.isSafeInteger(den)) {
-            return failedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
+            return new FailedResult(`Fractions can only be created using integer values: whole=${whole}, num=${num}, den=${den}`);
         }
 
         //
         // Make sure the denominator is valid.
         //
         if (den === 0) {
-            return failedResult(`The denominator of a Fraction cannot be zero: whole=${whole}, num=${num}, den=${den}`);
+            return new FailedResult(`The denominator of a Fraction cannot be zero: whole=${whole}, num=${num}, den=${den}`);
         }
         if (den < 0) {
-            return failedResult(`The denominator of a Fraction cannot be negative: whole=${whole}, num=${num}, den=${den}`);
+            return new FailedResult(`The denominator of a Fraction cannot be negative: whole=${whole}, num=${num}, den=${den}`);
         }
 
         //
@@ -84,7 +84,7 @@ export class Fraction {
             // When there is a whole component, the numerator can only be
             // positive.
             if (num < 0) {
-                return failedResult(`Fractions with a whole part cannot have a negative numerator: whole=${whole}, num=${num}, den=${den}`);
+                return new FailedResult(`Fractions with a whole part cannot have a negative numerator: whole=${whole}, num=${num}, den=${den}`);
             }
             isPositive = whole >= 0;
         }
@@ -97,7 +97,7 @@ export class Fraction {
         if (!isPositive) {
             num = num * -1;
         }
-        return succeededResult(new Fraction(num, den));
+        return new SucceededResult(new Fraction(num, den));
     }
 
 
@@ -132,7 +132,7 @@ export class Fraction {
             return Fraction.fromParts(whole, num, den);
         }
 
-        return failedResult(`The string '${str}' cannot be converted into a Fraction.`);
+        return new FailedResult(`The string '${str}' cannot be converted into a Fraction.`);
     }
 
 
@@ -175,12 +175,12 @@ export class Fraction {
         }
 
         const fracAResult = Fraction.from(a);
-        if (failed(fracAResult)) {
+        if (fracAResult.failed) {
             throw new Error("Failed to convert number or fraction to a fraction. Should never happen.");
         }
         const fracA = fracAResult.value;
         const fracBResult = Fraction.from(b);
-        if (failed(fracBResult)) {
+        if (fracBResult.failed) {
             throw new Error("Failed to convert number or fraction to a fraction. Should never happen.");
         }
         const fracB = fracBResult.value;

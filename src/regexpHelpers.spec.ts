@@ -1,5 +1,4 @@
 import {matchesAny, setFlags, clearFlags, strToRegExp} from "./regexpHelpers";
-import { failed, succeeded } from "./result";
 
 describe("matchesAny()", () => {
 
@@ -49,20 +48,20 @@ describe("setFlags()", () => {
 describe("strToRegExp()", () => {
     it("succeeds when given a valid regex", () => {
         const result = strToRegExp("foo");
-        expect(succeeded(result)).toBeTrue();
+        expect(result.succeeded).toBeTrue();
     });
 
 
     it("succeeds when given a regex with flags", () => {
         const result = strToRegExp("/foo/i");
-        expect(succeeded(result)).toBeTrue();
+        expect(result.succeeded).toBeTrue();
         expect(result.value?.flags).toEqual("i");
     });
 
 
     it("fails when given in invalid regex", () => {
         const result = strToRegExp("foo\\");
-        expect(failed(result)).toBeTrue();
+        expect(result.failed).toBeTrue();
         expect(result.error?.length).toBeGreaterThan(0);
     });
 });

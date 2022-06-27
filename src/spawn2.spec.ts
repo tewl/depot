@@ -5,7 +5,6 @@ import * as _ from "lodash";
 import {isISpawnExitError, isISpawnSystemError, spawn} from "./spawn2";
 import {tmpDir} from "../test/ut/specHelpers";
 import {getOs, OperatingSystem} from "./os";
-import {failed, succeeded} from "./result";
 import {File} from "./file";
 
 
@@ -26,7 +25,7 @@ describe("spawn", () => {
         }
         const testFilePath = path.join(tmpDir.absPath(), "foo.txt");
         const spawnResult = await spawn(cmd, [">", "foo.txt"], options).closePromise;
-        expect(succeeded(spawnResult)).toBeTruthy();
+        expect(spawnResult.succeeded).toBeTruthy();
         const stats = fs.statSync(testFilePath);
         expect(stats.isFile()).toBeTruthy();
     });
@@ -45,7 +44,7 @@ describe("spawn", () => {
         }
 
         const spawnResult = await spawn(lsCmd, [], options).closePromise;
-        expect(succeeded(spawnResult)).toBeTruthy();
+        expect(spawnResult.succeeded).toBeTruthy();
         expect(spawnResult.value).toContain("existingfile.txt");
     });
 
@@ -69,7 +68,7 @@ describe("spawn", () => {
         const output = spawn(cmd, args, {cwd: tmpDir.absPath()});
         output.childProcess.kill();
         const result = await output.closePromise;
-        expect(failed(result)).toBeTruthy();
+        expect(result.failed).toBeTruthy();
 
         if (!isISpawnExitError(result.error)) {
             throw new Error("Unexpected type.");
@@ -86,7 +85,7 @@ describe("spawn", () => {
         const lsCmd = os === OperatingSystem.Windows ? "dir" : "ls";
         const options = os === OperatingSystem.Windows ? {shell: true} : undefined;
         const result = await spawn(lsCmd, [nonExistantFilePath], options).closePromise;
-        expect(failed(result)).toBeTruthy();
+        expect(result.failed).toBeTruthy();
 
         if (!isISpawnExitError(result.error)) {
             throw new Error("Unexpected type.");
@@ -104,7 +103,7 @@ describe("spawn", () => {
 
     it("provides the expected system error information when the process fails to start", async () => {
         const result = await spawn("notarealcommand.exe", []).closePromise;
-        expect(failed(result)).toBeTruthy();
+        expect(result.failed).toBeTruthy();
 
         if (!isISpawnSystemError(result.error)) {
             throw new Error("Unexpected type.");
@@ -120,7 +119,7 @@ describe("spawn", () => {
             await spawn("node", ["-e", "console.log(process.env.xyzzy);"], {env: env})
             .closePromise;
 
-        expect(succeeded(result)).toBeTruthy();
+        expect(result.succeeded).toBeTruthy();
         expect(result.value).toEqual("xyzzy-xyzzy");
     });
 

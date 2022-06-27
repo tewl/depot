@@ -1,5 +1,5 @@
-import { failedResult, Result, succeededResult } from ".";
 import { IEquatable } from "./equate";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -104,11 +104,11 @@ export class Uuid implements IEquatable<Uuid> {
     public static fromString(uuidStr: string): Result<Uuid, string> {
         const isValid = Uuid.isValid(uuidStr);
         if (!isValid) {
-            return failedResult(`The string "${uuidStr}" is not a valid Uuid string.`);
+            return new FailedResult(`The string "${uuidStr}" is not a valid Uuid string.`);
         }
 
         const instance = new Uuid(uuidStr);
-        return succeededResult(instance);
+        return new SucceededResult(instance);
     }
 
 

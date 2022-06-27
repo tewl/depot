@@ -1,5 +1,5 @@
 import { getTimerPromise } from "./promiseHelpers";
-import { failedResult, Result, succeeded } from "./result";
+import { FailedResult, Result } from "./result2";
 
 
 interface IContinuePollingYes {
@@ -128,7 +128,7 @@ export async function pollAsyncResult<TSuccess, TError>(
             asyncResultPromise
         ): Promise<ContinuePollingResult<Result<TSuccess, PollingTimeoutError<TSuccess, TError>>>> => {
             const result = await asyncResultPromise;
-            if (succeeded(result)) {
+            if (result.succeeded) {
                 let donePolling = true;
                 if (donePollingPredicate) {
                     donePolling = donePollingPredicate(iterationNum, startTime, result.value);
@@ -140,7 +140,7 @@ export async function pollAsyncResult<TSuccess, TError>(
             }
 
             if (Date.now() - startTime > timeoutMs) {
-                return continuePollingNo(failedResult(new PollingTimeoutError(`Polling timed out after ${timeoutMs} ms.`, result)));
+                return continuePollingNo(new FailedResult(new PollingTimeoutError(`Polling timed out after ${timeoutMs} ms.`, result)));
             }
             else {
                 return continuePollingYes(pollIntervalMs);

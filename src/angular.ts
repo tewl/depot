@@ -1,8 +1,9 @@
-import { failedResult, insertIf, nodeBinForOs, succeeded, succeededResult } from ".";
+import { insertIf } from "./arrayHelpers";
+import { nodeBinForOs } from "./nodeUtil";
 import { Directory } from "./directory";
 import { File } from "./file";
-import { Result } from "./result";
 import {isISpawnExitError, spawn, spawnErrorToString} from "./spawn2";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 const angularProjectFilename = "angular.json";
@@ -70,7 +71,7 @@ export async function lintFiles(
 
     if (files.length === 0) {
         // There are no files to lint.  Consider this a successful linting.
-        return succeededResult([]);
+        return new SucceededResult([]);
     }
 
     // Convert the files so they are relative to the project directory.
@@ -93,16 +94,16 @@ export async function lintFiles(
     // Do not fail if the process returned a failure exit code.  That only
     // indicates that lint errors were found.  In that case, we should go ahead
     // and parse the output.
-    if (succeeded(result)) {
+    if (result.succeeded) {
         // Linting returned an exit code of 0.  This means there were no
         // warnings or errors or they were all fixed.
-        return succeededResult([]);
+        return new SucceededResult([]);
     }
     else {
         if (!isISpawnExitError(result.error)) {
             const errMsg = spawnErrorToString(result.error);
             console.error(errMsg);
-            return failedResult(errMsg);
+            return new FailedResult(errMsg);
         }
     }
 
@@ -110,7 +111,7 @@ export async function lintFiles(
     const matches = output.match(ngLintOutputRegex);
     if (!matches) {
         const errMsg = `Output from "ng lint" does not match expected text.  ${output}`;
-        return failedResult(errMsg);
+        return new FailedResult(errMsg);
 
     }
 
@@ -121,8 +122,8 @@ export async function lintFiles(
     }
     catch (error) {
         const errMsg = `Failed to parse "ng lint JSON output.  ${error}`;
-        return failedResult(errMsg);
+        return new FailedResult(errMsg);
     }
 
-    return succeededResult(json);
+    return new SucceededResult(json);
 }

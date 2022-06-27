@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import {Directory} from "./directory";
 import {File} from "./file";
-import { failedResult, Result, succeeded, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 /**
@@ -51,7 +51,7 @@ export async function resolveFileLocation(
     let done = false;
     while (!done) {
         const result = await fileExistsInDir(searchFileName, curDir);
-        if (succeeded(result)) {
+        if (result.succeeded) {
             return result;
         }
 
@@ -64,7 +64,7 @@ export async function resolveFileLocation(
         }
     }
 
-    return failedResult(`${searchFileName} could not be found in ${startingDir.toString()} or any parent directory.`);
+    return new FailedResult(`${searchFileName} could not be found in ${startingDir.toString()} or any parent directory.`);
 
 
 
@@ -73,10 +73,10 @@ export async function resolveFileLocation(
         const files = contents.files;
         const matchingFile = _.find(files, (curExistingFile) => curExistingFile.fileName === searchFileName);
         if (matchingFile === undefined) {
-            return failedResult(`${searchFileName} could not be found in ${dir.toString()}.`);
+            return new FailedResult(`${searchFileName} could not be found in ${dir.toString()}.`);
         }
         else {
-            return succeededResult(matchingFile);
+            return new SucceededResult(matchingFile);
         }
     }
 }

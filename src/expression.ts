@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 import { Fraction } from "./fraction";
-import { Result, failedResult, succeededResult, failed } from "./result";
 import {find} from "./collection";
 import { assertNever } from "./never";
 import { IDuMember } from "./discriminatedUnion";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,12 +233,12 @@ export function tokenize(input: string): Result<Array<ExpressionToken>, string> 
             remainingExpressionStartIndex = token.endIndex;
         }
         else {
-            return failedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of "${originalExpression}".`);
+            return new FailedResult(`Failed to parse expression at index ${remainingExpressionStartIndex} of "${originalExpression}".`);
         }
     }
 
 
-    return succeededResult(tokens);
+    return new SucceededResult(tokens);
 }
 
 
@@ -271,21 +271,21 @@ export function toPostfix(
         }
         else if (curToken.type === "IExpressionTokenOperator" && curToken.symbol === ")") {
             if (_.isEmpty(operatorStack)) {
-                return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+                return new FailedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
             }
             let firstInOperatorStack = _.last(operatorStack)!;
             while (firstInOperatorStack.symbol !== "(") {
                 output.push(operatorStack.pop()!);      // Move the operator from the top of the operator stack to the output queue.
 
                 if (_.isEmpty(operatorStack)) {
-                    return failedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
+                    return new FailedResult(`Operator stack exhaused while finding "(".  Mismatched parenthesis.`);
                 }
                 firstInOperatorStack = _.last(operatorStack)!;
             }
 
             const topOperator = operatorStack.pop();
             if (topOperator === undefined || topOperator.symbol !== "(") {
-                return failedResult(`Operator stack invalid after finding "(".`);
+                return new FailedResult(`Operator stack invalid after finding "(".`);
             }
             // We intentionally do nothing with the popped "(".  Discard it.
         }
@@ -308,23 +308,23 @@ export function toPostfix(
     while (!_.isEmpty(operatorStack)) {
         const curOperator = operatorStack.pop()!;
         if (curOperator.symbol === "(") {
-            return failedResult(`"(" found while emptying operator stack.  Mismatched parenthesis.`);
+            return new FailedResult(`"(" found while emptying operator stack.  Mismatched parenthesis.`);
         }
         output.push(curOperator);
     }
 
-    return succeededResult(output);
+    return new SucceededResult(output);
 }
 
 
 export function evaluate(input: string): Result<Fraction, string> {
     const tokenizeResult = tokenize(input);
-    if (failed(tokenizeResult)) {
+    if (tokenizeResult.failed) {
         return tokenizeResult;
     }
 
     const postfixResult = toPostfix(tokenizeResult.value);
-    if (failed(postfixResult)) {
+    if (postfixResult.failed) {
         return postfixResult;
     }
 
@@ -339,7 +339,7 @@ export function evaluate(input: string): Result<Fraction, string> {
             // The stack should have enough values on it to provide a value for
             // each operator argument.
             if (stack.length < traits.numArguments!) {
-                return failedResult(`Not enough arguments for operator ${curToken.symbol} at index ${curToken.startIndex}.`);
+                return new FailedResult(`Not enough arguments for operator ${curToken.symbol} at index ${curToken.startIndex}.`);
             }
 
             const resultVal = traits.evaluate!(stack);
@@ -353,12 +353,12 @@ export function evaluate(input: string): Result<Fraction, string> {
     // The stack should contain only 1 value.
     const stackLength = stack.length;
     if (stackLength === 1) {
-        return succeededResult(stack[0]);
+        return new SucceededResult(stack[0]);
     }
     else if (stackLength < 1) {
-        return failedResult(`No expression.`);
+        return new FailedResult(`No expression.`);
     }
     else {
-        return failedResult(`Expression finished evaluating with items still on the stack.`);
+        return new FailedResult(`Expression finished evaluating with items still on the stack.`);
     }
 }

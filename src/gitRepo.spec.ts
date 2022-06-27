@@ -7,7 +7,6 @@ import {File} from "./file";
 import {Url} from "./url";
 import {CommitHash} from "./commitHash";
 import {generateUuid, UuidFormat} from "./uuid";
-import {failed, succeeded} from "./result";
 import path from "path";
 
 
@@ -19,14 +18,14 @@ describe("GitRepo", () => {
 
             it("will error when not given a directory that is not a repo directory", async () => {
                 const result = await GitRepo.fromDirectory(new Directory(__dirname));
-                expect(failed(result)).toBeTrue();
+                expect(result.failed).toBeTrue();
                 expect(result.error!.length).toBeGreaterThan(0);
             });
 
 
             it("will create a new instance when given a Git repo directory", async () => {
                 const result = await GitRepo.fromDirectory(new Directory(__dirname, ".."));
-                expect(succeeded(result)).toBeTrue();
+                expect(result.succeeded).toBeTrue();
             });
 
         });
@@ -398,7 +397,7 @@ describe("GitRepo", () => {
                 const stageResult = await repo.stage(modifiedFile);
 
                 // Then, the result will be successful and contain the staged file.
-                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.succeeded).toBeTrue();
                 expect(stageResult.value!.equals(modifiedFile)).toBeTrue();
             });
 
@@ -415,7 +414,7 @@ describe("GitRepo", () => {
                 const stageResult = await repo.stage(repoFile);
 
                 // Then, the result will be successful and contain the staged file.
-                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.succeeded).toBeTrue();
                 expect(stageResult.value!.equals(repoFile)).toBeTrue();
             });
 
@@ -432,7 +431,7 @@ describe("GitRepo", () => {
                 const stageResult = await repo.stage(nonexistentFile);
 
                 // Then, the result will be successful and contain the staged file.
-                expect(failed(stageResult)).toBeTrue();
+                expect(stageResult.failed).toBeTrue();
                 expect(stageResult.error!.length).toBeGreaterThan(0);
             });
         });
@@ -459,7 +458,7 @@ describe("GitRepo", () => {
                 const result = await repo.getStagedFiles("repo");
 
                 // Then the result will be successful and contain an empty array.
-                expect(succeeded(result)).toBeTrue();
+                expect(result.succeeded).toBeTrue();
                 expect(result.value!.length).toEqual(0);
             });
 
@@ -474,13 +473,13 @@ describe("GitRepo", () => {
                 stagedFile.writeSync("modified by unit test.");
 
                 const stageResult = await repo.stage(stagedFile);
-                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.succeeded).toBeTrue();
 
                 // When we get the staged files...
                 const getStagedFilesResult = await repo.getStagedFiles("repo");
 
                 // Then the result will be successful and contain an empty array.
-                expect(succeeded(getStagedFilesResult)).toBeTrue();
+                expect(getStagedFilesResult.succeeded).toBeTrue();
                 const stagedFiles = getStagedFilesResult.value!;
                 expect(stagedFiles.length).toEqual(1);
                 expect(stagedFiles[0].toString()).toEqual("package.json");
@@ -495,13 +494,13 @@ describe("GitRepo", () => {
                 stagedFile.writeSync("modified by unit test.");
 
                 const stageResult = await repo.stage(stagedFile);
-                expect(succeeded(stageResult)).toBeTrue();
+                expect(stageResult.succeeded).toBeTrue();
 
                 // When we get the staged files...
                 const getStagedFilesResult = await repo.getStagedFiles("cwd");
 
                 // Then the result will be successful and contain an empty array.
-                expect(succeeded(getStagedFilesResult)).toBeTrue();
+                expect(getStagedFilesResult.succeeded).toBeTrue();
                 const stagedFiles = getStagedFilesResult.value!;
                 expect(stagedFiles.length).toEqual(1);
                 expect(stagedFiles[0].toString()).toEqual(path.join("tmp", "sampleGitRepo-src", "package.json"));
@@ -603,7 +602,7 @@ describe("GitRepo", () => {
 
                 // Finally, delete the merged local branch.
                 const deleteResult = await workingRepo.deleteBranch(featureBranch);
-                expect(succeeded(deleteResult)).toBeTrue();
+                expect(deleteResult.succeeded).toBeTrue();
             }, 1000 * 10);
 
 
@@ -630,7 +629,7 @@ describe("GitRepo", () => {
 
                 // Try to delete the unmerged local feature branch.
                 const deleteResult = await workingRepo.deleteBranch(featureBranch);
-                expect(failed(deleteResult)).toBeTrue();
+                expect(deleteResult.failed).toBeTrue();
                 expect(deleteResult.error).toContain("not fully merged");
             }, 1000 * 10);
 
@@ -658,7 +657,7 @@ describe("GitRepo", () => {
 
                 // Try to delete the unmerged local feature branch.
                 const deleteResult = await workingRepo.deleteBranch(featureBranch, true);
-                expect(succeeded(deleteResult)).toBeTrue();
+                expect(deleteResult.succeeded).toBeTrue();
             }, 1000 * 10);
 
 
@@ -693,7 +692,7 @@ describe("GitRepo", () => {
                 // Finally, delete the remote branch.
                 const remoteBranch = (await GitBranch.create(workingRepo, branchName, "origin")).value!;
                 const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
-                expect(succeeded(deleteResult)).toBeTrue();
+                expect(deleteResult.succeeded).toBeTrue();
             }, 1000 * 20);
 
 
@@ -732,7 +731,7 @@ describe("GitRepo", () => {
                 // Finally, delete the remote branch.
                 const remoteBranch = (await GitBranch.create(workingRepo, branchName, "origin")).value!;
                 const deleteResult = await workingRepo.deleteBranch(remoteBranch, false);
-                expect(succeeded(deleteResult)).toBeTrue();
+                expect(deleteResult.succeeded).toBeTrue();
             }, 1000 * 10);
 
 
@@ -763,7 +762,7 @@ describe("GitRepo", () => {
 
                 // Finally, delete the merged local branch.
                 const deleteResult = await workingRepo.deleteBranch(featureBranch);
-                expect(succeeded(deleteResult)).toBeTrue();
+                expect(deleteResult.succeeded).toBeTrue();
 
                 // The branch should no longer appear in the list of branches.
                 branches = await workingRepo.getBranches();
@@ -804,7 +803,7 @@ describe("GitRepo", () => {
 
                 // Finally, get the merged local branches.
                 const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, true, false);
-                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                expect(mergedBranchesResult.succeeded).toBeTrue();
                 const foundFeatureBranch = _.find(
                     mergedBranchesResult.value!,
                     (curBranch) => curBranch.name === branchName
@@ -844,7 +843,7 @@ describe("GitRepo", () => {
 
                 // Finally, get the merged remote branches.
                 const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, false, true);
-                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                expect(mergedBranchesResult.succeeded).toBeTrue();
                 const foundFeatureBranch = _.find(
                     mergedBranchesResult.value!,
                     (curBranch) => curBranch.name === branchName
@@ -884,7 +883,7 @@ describe("GitRepo", () => {
 
                 // Finally, get the merged remote branches.
                 const mergedBranchesResult = await workingRepo.getMergedBranches(undefined, true, true);
-                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                expect(mergedBranchesResult.succeeded).toBeTrue();
                 const foundFeatureBranches = _.filter(
                     mergedBranchesResult.value!,
                     (curBranch) => curBranch.name === branchName
@@ -932,7 +931,7 @@ describe("GitRepo", () => {
 
                 // Finally, get the merged remote branches.
                 const mergedBranchesResult = await workingRepo.getMergedBranches(mainBranch, true, true);
-                expect(succeeded(mergedBranchesResult)).toBeTrue();
+                expect(mergedBranchesResult.succeeded).toBeTrue();
                 const foundFeatureBranches = _.filter(
                     mergedBranchesResult.value!,
                     (curBranch) => curBranch.name === branchName

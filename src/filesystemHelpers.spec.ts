@@ -3,7 +3,6 @@ import {tmpDir} from "../test/ut/specHelpers";
 import {getFilesystemItem, resolveFileLocation} from "./filesystemHelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
-import { failed, succeeded } from "./result";
 
 
 describe("getFilesystemItem()", () => {
@@ -58,8 +57,8 @@ describe("resolveFileLocation()", () => {
         searchFile.writeSync("search file");
 
         const result = await resolveFileLocation("foo.txt", tmpDir);
-        expect(succeeded(result)).toBeTruthy();
-        if (succeeded(result)) {
+        expect(result.succeeded).toBeTruthy();
+        if (result.succeeded) {
             expect(result.value.fileName).toEqual("foo.txt");
             expect(result.value.directory.equals(tmpDir)).toBeTruthy();
         }
@@ -78,8 +77,8 @@ describe("resolveFileLocation()", () => {
         dirC.ensureExistsSync();
 
         const result = await resolveFileLocation("foo.txt", dirC);
-        expect(succeeded(result)).toBeTruthy();
-        if (succeeded(result)) {
+        expect(result.succeeded).toBeTruthy();
+        if (result.succeeded) {
             expect(result.value.fileName).toEqual("foo.txt");
             expect(result.value.directory.equals(tmpDir)).toBeTruthy();
         }
@@ -106,8 +105,8 @@ describe("resolveFileLocation()", () => {
 
     it("resolves with a failed result when the file is not found", async () => {
         const result = await resolveFileLocation("aFileThatShouldNeverBeFound.txt", tmpDir);
-        expect(failed(result)).toBeTruthy();
-        if (failed(result)) {
+        expect(result.failed).toBeTruthy();
+        if (result.failed) {
             expect(result.error.length).toBeGreaterThan(0);
         }
     });

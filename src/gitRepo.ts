@@ -11,8 +11,8 @@ import {gitUrlToProjectName, isGitUrl} from "./gitHelpers";
 import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import {toPromise} from "./promiseResult";
-import {Result, failedResult, succeededResult, succeeded, failed} from "./result";
 import {mapAsync} from "./promiseHelpers";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 interface IGitLogEntry {
@@ -81,8 +81,8 @@ export class GitRepo {
     public static async fromDirectory(dir: Directory): Promise<Result<GitRepo, string>> {
         const isGitRepo = await isGitRepoDir(dir);
         return isGitRepo ?
-               succeededResult(new GitRepo(dir)) :
-               failedResult(`${dir.toString()} does not exist or is not a Git repo.`);
+               new SucceededResult(new GitRepo(dir)) :
+               new FailedResult(`${dir.toString()} does not exist or is not a Git repo.`);
     }
 
 
@@ -578,11 +578,11 @@ export class GitRepo {
         const result = await spawn2("git", ["add", repoFile.toString()], {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result)) {
-            return succeededResult(file);
+        if (result.succeeded) {
+            return new SucceededResult(file);
         }
         else {
-            return failedResult(spawnErrorToString(result.error));
+            return new FailedResult(spawnErrorToString(result.error));
         }
     }
 
@@ -675,8 +675,8 @@ export class GitRepo {
         const result = await spawn2("git", ["diff", "--name-only", "--cached"], {cwd: this._dir.toString()})
         .closePromise;
 
-        if (failed(result)) {
-            return failedResult(spawnErrorToString(result.error));
+        if (result.failed) {
+            return new FailedResult(spawnErrorToString(result.error));
         }
 
         // The output will contain one file path per line.  The file paths will
@@ -692,7 +692,7 @@ export class GitRepo {
             );
         }
 
-        return succeededResult(stagedFiles);
+        return new SucceededResult(stagedFiles);
     }
 
     /**
@@ -801,9 +801,9 @@ export class GitRepo {
         )
         .closePromise;
 
-        return succeeded(result) ?
-               succeededResult(this) :
-               failedResult(spawnErrorToString(result.error));
+        return result.succeeded ?
+               new SucceededResult(this) :
+               new FailedResult(spawnErrorToString(result.error));
     }
 
 
@@ -840,13 +840,13 @@ export class GitRepo {
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result)) {
+        if (result.succeeded) {
             this._branches = undefined;
         }
 
-        return succeeded(result) ?
-               succeededResult(this) :
-               failedResult(spawnErrorToString(result.error));
+        return result.succeeded ?
+               new SucceededResult(this) :
+               new FailedResult(spawnErrorToString(result.error));
     }
 
 
@@ -887,7 +887,7 @@ export class GitRepo {
         const result = await spawn2("git", args, {cwd: this._dir.toString()})
         .closePromise;
 
-        if (succeeded(result)) {
+        if (result.succeeded) {
             // Output looks like the following.  Please note how spawn2() trims
             // the output so the first line does not start with whitespace.
             // 1828-column_sorting_in_new_proj_list
@@ -914,7 +914,7 @@ export class GitRepo {
                     const branchName = match.groups!.branchName;
                     const remoteName = match.groups!.remoteName;
                     const branchResult = await GitBranch.create(this, branchName, remoteName);
-                    if (failed(branchResult)) {
+                    if (branchResult.failed) {
                         throw new Error(branchResult.error);
                     }
                     return branchResult.value;
@@ -941,10 +941,10 @@ export class GitRepo {
                 branches = _.filter(branches, (curBranch) => !curBranch.equals(currentBranch));
             }
 
-            return succeededResult(branches);
+            return new SucceededResult(branches);
         }
         else {
-            return failedResult(spawnErrorToString(result.error));
+            return new FailedResult(spawnErrorToString(result.error));
         }
 
 

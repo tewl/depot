@@ -2,7 +2,6 @@ import {GitBranch} from "./gitBranch";
 import {GitRepo} from "./gitRepo";
 import {Directory} from "./directory";
 import {sampleRepoDir, tmpDir} from "../test/ut/specHelpers";
-import {failed, succeeded} from "./result";
 
 
 describe("GitBranch", () => {
@@ -86,14 +85,14 @@ describe("GitBranch", () => {
             it("will error when given an illegal branch name", async () => {
                 const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
                 const result = await GitBranch.create(repo, "illegal:branch_name");
-                expect(failed(result)).toBeTrue();
+                expect(result.failed).toBeTrue();
             });
 
 
             it("will succeed and return a GitBranch instance when given a valid branch name", async () => {
                 const repo = (await GitRepo.fromDirectory(new Directory(__dirname, ".."))).value!;
                 const result = await GitBranch.create(repo, "feature/feature_name");
-                expect(succeeded(result)).toBeTrue();
+                expect(result.succeeded).toBeTrue();
                 expect(result.value! instanceof GitBranch).toBeTrue();
             });
 

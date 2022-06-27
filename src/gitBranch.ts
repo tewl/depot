@@ -4,7 +4,7 @@ import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
 import { splitIntoLines, splitLinesOsIndependent} from "./stringHelpers";
-import { Result, failedResult, succeeded, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 
 // TODO: To get the branches that are pointing at a given commit:
@@ -83,8 +83,8 @@ export class GitBranch {
         const isValid = await validator.isValid(branchName);
 
         return isValid ?
-               succeededResult(new GitBranch(repo, branchName, remoteName)) :
-               failedResult(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
+               new SucceededResult(new GitBranch(repo, branchName, remoteName)) :
+               new FailedResult(`Cannot create GitBranch instance from invalid branch name ${branchName}.`);
     }
 
 
@@ -306,7 +306,7 @@ export class GitBranch {
                 if (matches) {
                     return GitBranch.create(this.repo, matches[2], matches[1])
                     .then((branchResult) => {
-                        if (succeeded(branchResult)) {
+                        if (branchResult.succeeded) {
                             return branchResult.value;
                         }
                         else {

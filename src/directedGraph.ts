@@ -1,4 +1,4 @@
-import { failedResult, Result, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 import { difference } from "./setHelpers";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,11 +113,11 @@ export class DirectedGraph<TVertex, TEdge> {
         for (const curEdge of edges) {
             if (!adjMap.has(curEdge.fromVertex)) {
                 const vertexStr = JSON.stringify(curEdge.fromVertex);
-                return failedResult(`Edge specifies a fromVertex of ${vertexStr} which is not in the vertex collection.`);
+                return new FailedResult(`Edge specifies a fromVertex of ${vertexStr} which is not in the vertex collection.`);
             }
             if (!adjMap.has(curEdge.toVertex)) {
                 const vertexStr = JSON.stringify(curEdge.toVertex);
-                return failedResult(`Edge specifies a toVertex of ${vertexStr} which is not in the vertex collection.`);
+                return new FailedResult(`Edge specifies a toVertex of ${vertexStr} which is not in the vertex collection.`);
             }
 
             const adjList = adjMap.get(curEdge.fromVertex)!;
@@ -128,7 +128,7 @@ export class DirectedGraph<TVertex, TEdge> {
         }
 
         const inst = new DirectedGraph(adjMap);
-        return succeededResult(inst);
+        return new SucceededResult(inst);
     }
 
 
@@ -215,7 +215,7 @@ function bfs<TVertex, TEdge>(
     const allVertices = new Set(adjMap.keys());
     if (!allVertices.has(source)) {
         const sourceText = JSON.stringify(source);
-        return failedResult(`Source vertex ${sourceText} is not a vertex in the graph.`);
+        return new FailedResult(`Source vertex ${sourceText} is not a vertex in the graph.`);
     }
 
     // Initialize data structures.
@@ -253,7 +253,7 @@ function bfs<TVertex, TEdge>(
 
                 // Invoke the stop predicate to see if we should stop searching.
                 if (stopPred(discovered)) {
-                    return succeededResult({distance: dist, predecessor: pred});
+                    return new SucceededResult({distance: dist, predecessor: pred});
                 }
 
                 // Put v in the gray queue so we will eventually discover
@@ -268,7 +268,7 @@ function bfs<TVertex, TEdge>(
         q.shift();
     }
 
-    return succeededResult({distance: dist, predecessor: pred});
+    return new SucceededResult({distance: dist, predecessor: pred});
 }
 
 

@@ -1,6 +1,5 @@
 import * as _ from "lodash";
-import { UuidFormat, reStrUuidFormatD, reStrUuidFormatN, Uuid, failed, succeeded } from ".";
-import {generateUuid} from "./uuid";
+import { UuidFormat, reStrUuidFormatD, reStrUuidFormatN, Uuid, generateUuid } from "./uuid";
 
 
 describe("generateUuid()", () => {
@@ -85,19 +84,19 @@ describe("Uuid", () => {
 
             it("returns a failed result when given an invalid uuid string", () => {
                 const result = Uuid.fromString("zb8d7a702-5f65-491a-9aad-5ce704ddd566");
-                expect(failed(result)).toBeTrue();
+                expect(result.failed).toBeTrue();
             });
 
 
             it("returns a successful result with the new instance when given a valid D format string", () => {
                 const result = Uuid.fromString("b8d7a702-5f65-491a-9aad-5ce704ddd566");
-                expect(succeeded(result)).toBeTrue();
+                expect(result.succeeded).toBeTrue();
             });
 
 
             it("returns a successful result with the new instance when given a valid N format string", () => {
                 const result = Uuid.fromString("a1096b4bdb344926997fb97256373e2f");
-                expect(succeeded(result)).toBeTrue();
+                expect(result.succeeded).toBeTrue();
             });
 
         });

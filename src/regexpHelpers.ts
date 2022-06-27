@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { failedResult, Result, succeededResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 
 /**
  * Creates a new regular expression capable of detecting EOL.  Because regular
@@ -85,14 +85,14 @@ export function strToRegExp(str: string): Result<RegExp, string> {
     try {
         if (matches) {
             const regex = new RegExp(matches.groups!.pattern, matches.groups!.flags);
-            return succeededResult(regex);
+            return new SucceededResult(regex);
         }
         else {
             const regex = new RegExp(str);
-            return succeededResult(regex);
+            return new SucceededResult(regex);
         }
     }
     catch (err) {
-        return failedResult((err as Error).message);
+        return new FailedResult((err as Error).message);
     }
 }

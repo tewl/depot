@@ -1,4 +1,3 @@
-import { failed } from ".";
 import {Fraction, greatestCommonDivisor, leastCommonMultiple} from "./fraction";
 
 
@@ -9,26 +8,26 @@ describe("Fraction", () => {
         describe("fromParts()", () => {
 
             it("fails when any of the values is a non-integer", () => {
-                expect(failed(Fraction.fromParts(1.1, 2,   3  ))).toBeTrue();
-                expect(failed(Fraction.fromParts(1,   2.1, 3  ))).toBeTrue();
-                expect(failed(Fraction.fromParts(1,   2,   3.1))).toBeTrue();
+                expect(Fraction.fromParts(1.1, 2,   3  ).failed).toBeTrue();
+                expect(Fraction.fromParts(1,   2.1, 3  ).failed).toBeTrue();
+                expect(Fraction.fromParts(1,   2,   3.1).failed).toBeTrue();
             });
 
 
             it("fails when the denominator is zero", () => {
-                expect(failed(Fraction.fromParts(1, 2, 0))).toBeTrue();
+                expect(Fraction.fromParts(1, 2, 0).failed).toBeTrue();
             });
 
 
             it("fails when the denominator is negative", () => {
-                expect(failed(Fraction.fromParts(1, 1, -2))).toBeTrue();
-                expect(failed(Fraction.fromParts(1, -2))).toBeTrue();
+                expect(Fraction.fromParts(1, 1, -2).failed).toBeTrue();
+                expect(Fraction.fromParts(1, -2).failed).toBeTrue();
             });
 
 
             it("fails when a whole part is specified and the numerator is negative", () => {
-                expect(failed(Fraction.fromParts(1, -1, 2))).toBeTrue();
-                expect(failed(Fraction.fromParts(-1, -1, 2))).toBeTrue();
+                expect(Fraction.fromParts(1, -1, 2).failed).toBeTrue();
+                expect(Fraction.fromParts(-1, -1, 2).failed).toBeTrue();
             });
 
 
@@ -67,14 +66,14 @@ describe("Fraction", () => {
         describe("fromString()", () => {
 
             it("fails when given an invalid string", () => {
-                expect(failed(Fraction.fromString("abc"))).toBeTrue();
-                expect(failed(Fraction.fromString("1  2"))).toBeTrue();
-                expect(failed(Fraction.fromString("1  2/3"))).toBeTrue();  // too many spaces
+                expect(Fraction.fromString("abc").failed).toBeTrue();
+                expect(Fraction.fromString("1  2").failed).toBeTrue();
+                expect(Fraction.fromString("1  2/3").failed).toBeTrue();  // too many spaces
 
                 // Must use whole numbers
-                expect(failed(Fraction.fromString("1.2 2/3"))).toBeTrue();
-                expect(failed(Fraction.fromString("1 2.1/3"))).toBeTrue();
-                expect(failed(Fraction.fromString("1 2/3.1"))).toBeTrue();
+                expect(Fraction.fromString("1.2 2/3").failed).toBeTrue();
+                expect(Fraction.fromString("1 2.1/3").failed).toBeTrue();
+                expect(Fraction.fromString("1 2/3.1").failed).toBeTrue();
 
             });
 

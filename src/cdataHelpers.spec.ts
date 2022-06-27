@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import { getCdata, getCdataRegex } from "./cdataHelpers";
-import { failed, succeeded } from "./result";
 
 
 describe("getCdataRegex()", () => {
@@ -26,13 +25,13 @@ describe("getCdata()", () => {
 
     it("returns undefined when given bad input text", () => {
         const res = getCdata("<![CDATAX[foo]]>");
-        expect(failed(res)).toBeTrue();
+        expect(res.failed).toBeTrue();
     });
 
 
     it("returns the expected character data as a string", () => {
         const res = getCdata("<![CDATA[foo]]>");
-        expect(succeeded(res)).toBeTrue();
+        expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual("foo");
     });
 
@@ -43,7 +42,7 @@ describe("getCdata()", () => {
         quux
         `;
         const res = getCdata(`<![CDATA[${charData}]]>`);
-        expect(succeeded(res)).toBeTrue();
+        expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual(charData);
     });
 

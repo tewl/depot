@@ -7,10 +7,10 @@ import { toGulpError } from "./src/gulpHelpers";
 import { File } from "./src/file";
 import { getOs, OperatingSystem } from "./src/os";
 import { spawn, SpawnError, spawnErrorToString } from "./src/spawn2";
-import { failed, failedResult, Result, succeeded, succeededResult } from "./src/result";
 import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
 import { mapAsync } from "./src/promiseHelpers";
+import { FailedResult, Result, SucceededResult } from "./src/result2";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,9 +50,9 @@ async function runClean(): Promise<Result<undefined, string>>
     const dirsToDelete = [tmpDir, distDir];
     try {
         dirsToDelete.forEach((curDir) => curDir.deleteSync());
-        return succeededResult(undefined);
+        return new SucceededResult(undefined);
     } catch (error) {
-        return failedResult(`Failed to delete files. ${JSON.stringify(error, undefined, 4)}`);
+        return new FailedResult(`Failed to delete files. ${JSON.stringify(error, undefined, 4)}`);
     }
 }
 
@@ -64,7 +64,7 @@ async function runClean(): Promise<Result<undefined, string>>
 export async function eslint(): Promise<void>
 {
     const result = await runEslint();
-    if (succeeded(result)) {
+    if (result.succeeded) {
         // We still need to print the eslint output, because it may contain
         // warnings (only errors cause failure).
         console.log(result.value);
@@ -100,7 +100,7 @@ async function runEslint(): Promise<Result<string, SpawnError>>
 export async function ut(): Promise<void>
 {
     const result = await runUnitTests(true);
-    if (succeeded(result)) {
+    if (result.succeeded) {
         // Since we allowed output while running the unit test task, we don't
         // have to print it out again.
     }
@@ -152,7 +152,7 @@ export async function compile(): Promise<void>
 {
     const tsconfigFile = new File("tsconfig.json");
     const result = await runCompile(tsconfigFile);
-    if (succeeded(result)) {
+    if (result.succeeded) {
         console.log(result.value);
     }
     else {
@@ -184,7 +184,7 @@ async function runCompile(tsconfigFile: File): Promise<Result<string, SpawnError
 export async function build(): Promise<void>
 {
     const cleanResult = await runClean();
-    if (failed(cleanResult)) {
+    if (cleanResult.failed) {
         throw toGulpError(cleanResult.error);
     }
 
@@ -206,7 +206,7 @@ export async function build(): Promise<void>
 
     const results = await promiseResult.allArray(_.map(tasks, (curTask) => curTask.promiseResult));
 
-    if (failed(results)) {
+    if (results.failed) {
         console.error(failStyle(sep));
         console.error(failStyle(`❌ Task failed: ${tasks[results.error.index]!.name}`));
         console.error(failStyle(sep));
@@ -256,7 +256,7 @@ function makeExecutable(): Promise<void>
 
     //
     // Insert a shebang line into each script and turn on the executable
-    // permission on each script file. 
+    // permission on each script file.
     //
     const makeExecutablePromises = mapAsync(scriptFiles, (curJsScriptFile) => {
         console.log(`Making executable:  ${curJsScriptFile.toString()}`);

@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { Result, succeeded, succeededResult, failedResult } from "./result";
+import { FailedResult, Result, SucceededResult } from "./result2";
 import { IIndexedItem } from "./utilityTypes";
 
 
@@ -12,7 +12,7 @@ export async function toPromise<TSuccess, TError>(
     pr: Promise<Result<TSuccess, TError>>
 ): Promise<TSuccess> {
     const result = await pr;
-    return succeeded(result) ?
+    return result.succeeded ?
         Promise.resolve(result.value) :
         Promise.reject(result.error);
 }
@@ -159,7 +159,7 @@ export function allArray<TSuccess, TFail>(
         _.forEach(promises, (curPromise, index) => {
             curPromise
             .then((curResult) => {
-                if (succeeded(curResult)) {
+                if (curResult.succeeded) {
                     // The current async operation succeeded.
                     successfulResults[index] = curResult.value;
                     numSuccesses++;
@@ -168,7 +168,7 @@ export function allArray<TSuccess, TFail>(
                     // with an array of all the success values.  Otherwise, keep
                     // waiting.
                     if (numSuccesses === numPromises) {
-                        resolve(succeededResult(successfulResults));
+                        resolve(new SucceededResult(successfulResults));
                     }
                 }
                 else {
@@ -178,7 +178,7 @@ export function allArray<TSuccess, TFail>(
                         index: index,
                         item:  curResult.error
                     };
-                    resolve(failedResult(indexed));
+                    resolve(new FailedResult(indexed));
                 }
             })
             .catch((err) => {

@@ -3,7 +3,7 @@ import { Fraction } from "./fraction";
 import {find} from "./collection";
 import { assertNever } from "./never";
 import { IDuMember } from "./discriminatedUnion";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 ////////////////////////////////////////////////////////////////////////////////

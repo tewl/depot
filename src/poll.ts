@@ -1,5 +1,5 @@
 import { getTimerPromise } from "./promiseHelpers";
-import { FailedResult, Result } from "./result2";
+import { FailedResult, Result } from "./result";
 
 
 interface IContinuePollingYes {

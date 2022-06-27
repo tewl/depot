@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import {Directory} from "./directory";
 import {File} from "./file";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 /**

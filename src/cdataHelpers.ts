@@ -1,4 +1,4 @@
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 /**
  * Gets a regular expression capable of extracting the character data from CDATA

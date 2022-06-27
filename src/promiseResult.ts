@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 import { IIndexedItem } from "./utilityTypes";
 
 

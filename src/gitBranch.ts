@@ -4,7 +4,7 @@ import {spawn} from "./spawn";
 import {Validator} from "./validator";
 import {insertIf} from "./arrayHelpers";
 import { splitIntoLines, splitLinesOsIndependent} from "./stringHelpers";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 // TODO: To get the branches that are pointing at a given commit:

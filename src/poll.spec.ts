@@ -1,7 +1,7 @@
 import { Logger, LogLevel } from "./logger";
 import { continuePollingNo, ContinuePollingPredicate, continuePollingYes, poll, pollAsyncResult } from "./poll";
 import { getTimerPromise } from "./promiseHelpers";
-import { FailedResult, SucceededResult } from "./result2";
+import { FailedResult, SucceededResult } from "./result";
 
 
 describe("poll()", () => {

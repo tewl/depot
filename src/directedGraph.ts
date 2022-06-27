@@ -1,4 +1,4 @@
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 import { difference } from "./setHelpers";
 
 ////////////////////////////////////////////////////////////////////////////////

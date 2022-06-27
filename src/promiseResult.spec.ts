@@ -1,6 +1,6 @@
 import * as promiseResult from "./promiseResult";
 import { getTimerPromise } from "./promiseHelpers";
-import { FailedResult, SucceededResult } from "./result2";
+import { FailedResult, SucceededResult } from "./result";
 
 
 describe("toPromise()", () => {

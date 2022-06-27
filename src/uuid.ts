@@ -1,5 +1,5 @@
 import { IEquatable } from "./equate";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

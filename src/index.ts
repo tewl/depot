@@ -39,7 +39,7 @@ export * from "./quickServer";
 export * from "./random";
 export * from "./regexpHelpers";
 export * from "./requestHelpers";
-export * from "./result2";
+export * from "./result";
 export * from "./selfSignedCertificate";
 export * from "./serialization";
 export * from "./serializationRegistry";

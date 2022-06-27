@@ -6,7 +6,7 @@ import * as stream from "stream";
 import {NullStream} from "./nullStream";
 import {eventToPromise} from "./promiseHelpers";
 import { assertNever } from "./never";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 /**

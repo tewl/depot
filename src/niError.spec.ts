@@ -1,6 +1,6 @@
 import { assertNever } from "./never";
 import { NIError } from "./niError";
-import { FailedResult, Result } from "./result2";
+import { FailedResult, Result } from "./result";
 
 
 describe("NIError", () => {

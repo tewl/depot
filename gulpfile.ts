@@ -10,7 +10,7 @@ import { spawn, SpawnError, spawnErrorToString } from "./src/spawn2";
 import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
 import { mapAsync } from "./src/promiseHelpers";
-import { FailedResult, Result, SucceededResult } from "./src/result2";
+import { FailedResult, Result, SucceededResult } from "./src/result";
 
 
 ////////////////////////////////////////////////////////////////////////////////

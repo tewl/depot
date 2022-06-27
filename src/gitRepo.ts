@@ -12,7 +12,7 @@ import {IPackageJson} from "./nodePackage";
 import {CommitHash} from "./commitHash";
 import {toPromise} from "./promiseResult";
 import {mapAsync} from "./promiseHelpers";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 interface IGitLogEntry {

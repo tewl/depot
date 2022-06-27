@@ -3,7 +3,7 @@ import { nodeBinForOs } from "./nodeUtil";
 import { Directory } from "./directory";
 import { File } from "./file";
 import {isISpawnExitError, spawn, spawnErrorToString} from "./spawn2";
-import { FailedResult, Result, SucceededResult } from "./result2";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 const angularProjectFilename = "angular.json";

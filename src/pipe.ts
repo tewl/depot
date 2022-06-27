@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/ban-types */
 
 /**
@@ -20,311 +21,325 @@
  *
  * @return The value returned from the last function.
  */
-export function pipe<TA>(a: TA): TA;
-export function pipe<TA, TB>(a: TA, ab: (a: TA) => TB): TB;
-export function pipe<TA, TB, TC>(a: TA, ab: (a: TA) => TB, bc: (b: TB) => TC): TC;
-export function pipe<TA, TB, TC, TD>(a: TA, ab: (a: TA) => TB, bc: (b: TB) => TC, cd: (c: TC) => TD): TD;
-export function pipe<TA, TB, TC, TD, TE>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE
-): TE;
-export function pipe<TA, TB, TC, TD, TE, TF>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF
-): TF;
-export function pipe<TA, TB, TC, TD, TE, TF, TG>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG
-): TG;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH
-): TH;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI
-): TI;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ
-): TJ;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK
-): TK;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL
-): TL;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM
-): TM;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN
-): TN;
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO
-): TO;
+export function pipe<T001>(
+    v001: T001
+): T001;
+export function pipe<T001, T002>(
+    v001: T001,
+    f001002: (v1: T001) => T002
+): T002;
+export function pipe<T001, T002, T003>(
+    v001: T001,
+    f001002: (a: T001) => T002,
+    f002003: (b: T002) => T003
+): T003;
+export function pipe<T001, T002, T003, T004>(
+    v001: T001,
+    f001002: (a: T001) => T002,
+    f002003: (b: T002) => T003,
+    f003004: (c: T003) => T004
+): T004;
+export function pipe<T001, T002, T003, T004, T005>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005
+): T005;
+export function pipe<T001, T002, T003, T004, T005, T006>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006
+): T006;
+export function pipe<T001, T002, T003, T004, T005, T006, T007>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007
+): T007;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008
+): T008;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009
+): T009;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010
+): T010;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011
+): T011;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012
+): T012;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013
+): T013;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014
+): T014;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015
+): T015;
 
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO,
-    op: (o: TO) => TP
-): TP;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015,
+    f015016: (v015: T015) => T016
+): T016;
 
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO,
-    op: (o: TO) => TP,
-    pq: (p: TP) => TQ
-): TQ;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015,
+    f015016: (v015: T015) => T016,
+    f016017: (v016: T016) => T017
+): T017;
 
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO,
-    op: (o: TO) => TP,
-    pq: (p: TP) => TQ,
-    qr: (q: TQ) => TR
-): TR;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015,
+    f015016: (v015: T015) => T016,
+    f016017: (v016: T016) => T017,
+    f017018: (v017: T017) => T018
+): T018;
 
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR, TS>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO,
-    op: (o: TO) => TP,
-    pq: (p: TP) => TQ,
-    qr: (q: TQ) => TR,
-    rs: (r: TR) => TS
-): TS;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015,
+    f015016: (v015: T015) => T016,
+    f016017: (v016: T016) => T017,
+    f017018: (v017: T017) => T018,
+    f018019: (v018: T018) => T019
+): T019;
 
-export function pipe<TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR, TS, TT>(
-    a: TA,
-    ab: (a: TA) => TB,
-    bc: (b: TB) => TC,
-    cd: (c: TC) => TD,
-    de: (d: TD) => TE,
-    ef: (e: TE) => TF,
-    fg: (f: TF) => TG,
-    gh: (g: TG) => TH,
-    hi: (h: TH) => TI,
-    ij: (i: TI) => TJ,
-    jk: (j: TJ) => TK,
-    kl: (k: TK) => TL,
-    lm: (l: TL) => TM,
-    mn: (m: TM) => TN,
-    no: (n: TN) => TO,
-    op: (o: TO) => TP,
-    pq: (p: TP) => TQ,
-    qr: (q: TQ) => TR,
-    rs: (r: TR) => TS,
-    st: (s: TS) => TT
-): TT;
+export function pipe<T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020>(
+    v001: T001,
+    f001002: (v001: T001) => T002,
+    f002003: (v002: T002) => T003,
+    f003004: (v003: T003) => T004,
+    f004005: (v004: T004) => T005,
+    f005006: (v005: T005) => T006,
+    f006007: (v006: T006) => T007,
+    f007008: (v007: T007) => T008,
+    f008009: (v008: T008) => T009,
+    f009010: (v009: T009) => T010,
+    f010011: (v010: T010) => T011,
+    f011012: (v011: T011) => T012,
+    f012013: (v012: T012) => T013,
+    f013014: (v013: T013) => T014,
+    f014015: (v014: T014) => T015,
+    f015016: (v015: T015) => T016,
+    f016017: (v016: T016) => T017,
+    f017018: (v017: T017) => T018,
+    f018019: (v018: T018) => T019,
+    f019020: (v019: T019) => T020
+): T020;
 
 export function pipe(
     a: unknown,
-    ab?: Function,
-    bc?: Function,
-    cd?: Function,
-    de?: Function,
-    ef?: Function,
-    fg?: Function,
-    gh?: Function,
-    hi?: Function,
-    ij?: Function,
-    jk?: Function,
-    kl?: Function,
-    lm?: Function,
-    mn?: Function,
-    no?: Function,
-    op?: Function,
-    pq?: Function,
-    qr?: Function,
-    rs?: Function,
-    st?: Function
+    f001002?: Function,
+    f002003?: Function,
+    f003004?: Function,
+    f004005?: Function,
+    f005006?: Function,
+    f006007?: Function,
+    f007008?: Function,
+    f008009?: Function,
+    f009010?: Function,
+    f010011?: Function,
+    f011012?: Function,
+    f012013?: Function,
+    f013014?: Function,
+    f014015?: Function,
+    f015016?: Function,
+    f016017?: Function,
+    f017018?: Function,
+    f018019?: Function,
+    f019020?: Function
 ): unknown {
     switch (arguments.length) {
         case 1:
             return a;
         case 2:
-            return ab!(a);
+            return f001002!(a);
         case 3:
-            return bc!(ab!(a));
+            return f002003!(f001002!(a));
         case 4:
-            return cd!(bc!(ab!(a)));
+            return f003004!(f002003!(f001002!(a)));
         case 5:
-            return de!(cd!(bc!(ab!(a))));
+            return f004005!(f003004!(f002003!(f001002!(a))));
         case 6:
-            return ef!(de!(cd!(bc!(ab!(a)))));
+            return f005006!(f004005!(f003004!(f002003!(f001002!(a)))));
         case 7:
-            return fg!(ef!(de!(cd!(bc!(ab!(a))))));
+            return f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))));
         case 8:
-            return gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))));
+            return f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))));
         case 9:
-            return hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))));
+            return f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))));
         case 10:
-            return ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))));
+            return f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))));
         case 11:
-            return jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))));
+            return f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))))));
         case 12:
-            return kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))))));
+            return f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))))));
         case 13:
-            return lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))))));
+            return f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))))))));
         case 14:
-            return mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))))))));
+            return f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))))))));
         case 15:
-            return no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))))))));
+            return f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))))))))));
         case 16:
-            return op!(no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))))))))));
+            return f015016!(f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))))))))));
         case 17:
-            return pq!(op!(no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))))))))));
+            return f016017!(f015016!(f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))))))))))));
         case 18:
-            return qr!(pq!(op!(no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))))))))))));
+            return f017018!(f016017!(f015016!(f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))))))))))));
         case 19:
-            return rs!(qr!(pq!(op!(no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a))))))))))))))))));
+            return f018019!(f017018!(f016017!(f015016!(f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a))))))))))))))))));
         case 20:
-            return st!(rs!(qr!(pq!(op!(no!(mn!(lm!(kl!(jk!(ij!(hi!(gh!(fg!(ef!(de!(cd!(bc!(ab!(a)))))))))))))))))));
+            return f019020!(f018019!(f017018!(f016017!(f015016!(f014015!(f013014!(f012013!(f011012!(f010011!(f009010!(f008009!(f007008!(f006007!(f005006!(f004005!(f003004!(f002003!(f001002!(a)))))))))))))))))));
         default:
             return;
     }

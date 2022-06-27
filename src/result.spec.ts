@@ -159,7 +159,7 @@ describe("Result type", () => {
 });
 
 
-fdescribe("Result namespace", () => {
+describe("Result namespace", () => {
 
     describe("all()", () => {
 

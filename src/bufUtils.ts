@@ -150,7 +150,7 @@ export function hexDump(theBuffer: Buffer): string {
 
         // Get a "sub-buffer" of the bytes that will be printed on the current line.
         const subBuf: Buffer = theBuffer.slice(outputBytes, outputBytes + HEX_DUMP_BYTES_PER_LINE);
-        // Get the string ofr the current line.
+        // Get the string for the current line.
         const line: string = hexDumpLine(subBuf);
 
         // If we are appending on to a previous line, append EOL.
@@ -164,4 +164,13 @@ export function hexDump(theBuffer: Buffer): string {
     }
 
     return outputStr;
+}
+
+
+export function bytesToString(theBuffer: Buffer): string {
+    const str =
+        Array.from(theBuffer)
+        .map((curByte) => sprintf("%02x", curByte))
+        .join(" ");
+    return str;
 }

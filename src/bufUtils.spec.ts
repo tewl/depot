@@ -1,6 +1,6 @@
 import { EOL } from "os";
 import * as _ from "lodash";
-import { alignBuffer, boolify, hexDump, padBuffer } from "./bufUtils";
+import { alignBuffer, boolify, bytesToString, hexDump, padBuffer } from "./bufUtils";
 
 
 describe("padBuffer()", () => {
@@ -148,18 +148,12 @@ describe("hexDump()", () => {
 });
 
 
-describe("bufferHelpers", () => {
+describe("bytesToString()", () => {
 
-    it("foo", () => {
-        const n = -92;
-
-        const buf = Buffer.alloc(8);
-
-
-
-
-
-
-
+    it("returns the expected string", () => {
+        const buf = Buffer.from(_.range(0, 0x18));
+        const actual = bytesToString(buf);
+        expect(actual).toEqual("00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17");
     });
+
 });

@@ -419,4 +419,53 @@ export namespace Result {
             new FailedResult(falseErrorVal);
     }
 
+
+    /**
+     * Performs side-effects for the given Result
+     * @param fn - The function to invoke, passing the Result
+     * @param input - The input Result
+     * @returns The original input Result
+     */
+    export function tap<TSuccess, TError>(
+        fn: (res: Result<TSuccess, TError>) => void,
+        input: Result<TSuccess, TError>
+    ): Result<TSuccess, TError> {
+        fn(input);
+        return input;
+    }
+
+
+    /**
+     * Performs side-effects when the specified Result is successful
+     * @param fn - The function to invoke, passing the successful Result's value
+     * @param input - The input Result
+     * @returns The original input Result
+     */
+    export function tapSuccess<TSuccess, TError>(
+        fn: (val: TSuccess) => void,
+        input: Result<TSuccess, TError>
+    ): Result<TSuccess, TError> {
+        if (input.succeeded) {
+            fn(input.value);
+        }
+        return input;
+    }
+
+
+    /**
+     * Performs side-effects when the specified Result is a failure
+     * @param fn - The function to invoke, passing the failed Result's error
+     * @param input - The Input Result
+     * @returns The original input Result
+     */
+    export function tapError<TSuccess, TError>(
+        fn: (val: TError) => void,
+        input: Result<TSuccess, TError>
+    ): Result<TSuccess, TError> {
+        if (input.failed) {
+            fn(input.error);
+        }
+        return input;
+    }
+
 }

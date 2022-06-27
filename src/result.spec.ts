@@ -159,7 +159,7 @@ describe("Result type", () => {
 });
 
 
-describe("Result namespace", () => {
+fdescribe("Result namespace", () => {
 
     describe("all()", () => {
 
@@ -196,7 +196,6 @@ describe("Result namespace", () => {
 
 
     describe("bind()", () => {
-
 
         it("with failed input the error is passed along and the function is not invoked", () => {
             let numInvocations = 0;
@@ -260,6 +259,7 @@ describe("Result namespace", () => {
 
 
     describe("mapSuccess()", () => {
+
         it("with failed input the error is passed along and the function is not invoked", () => {
             let numInvocations = 0;
             const fn = (x: number) => { numInvocations++; return x + 1; };
@@ -284,6 +284,7 @@ describe("Result namespace", () => {
 
 
     describe("mapError()", () => {
+
         it("with successful input the value is passed along and the function is not invoked", () => {
             let numInvocations = 0;
             const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
@@ -437,6 +438,158 @@ describe("Result namespace", () => {
             const result = Result.fromBool(0, "yes", "no");
             expect(result.failed).toBeTrue();
             expect(result.error).toEqual("no");
+        });
+    });
+
+
+    describe("tap()", () => {
+
+        it("calls the function when the input Result is a failure", () => {
+            let numInvocations = 0;
+            function tapFn(res: Result<number, string>) {
+                numInvocations++;
+                return new SucceededResult(12);
+            }
+
+            pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tap(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("calls the function when the input Result is successful", () => {
+            let numInvocations = 0;
+            function tapFn(res: Result<number, string>) {
+                numInvocations++;
+                return new SucceededResult(12);
+            }
+
+            pipe(
+                new SucceededResult(1) as Result<number, string>,
+                (res) => Result.tap(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("returns the original Result", () => {
+            let numInvocations = 0;
+            function tapFn(res: Result<number, string>) {
+                numInvocations++;
+                return new SucceededResult(12);
+            }
+
+            const actual = pipe(
+                new SucceededResult(1) as Result<number, string>,
+                (res) => Result.tap(tapFn, res)
+            );
+
+            expect(actual).toEqual(new SucceededResult(1));
+        });
+    });
+
+
+    describe("tapSuccess()", () => {
+
+        it("does not call the function when the input Result is a failure", () => {
+            let numInvocations = 0;
+            function tapFn(num: number) {
+                numInvocations++;
+            }
+
+            pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tapSuccess(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("calls the function when the input Result is successful", () => {
+            let numInvocations = 0;
+            function tapFn(num: number) {
+                numInvocations++;
+            }
+
+            pipe(
+                new SucceededResult(3) as Result<number, string>,
+                (res) => Result.tapSuccess(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("returns the original Result", () => {
+            let numInvocations = 0;
+            function tapFn(num: number) {
+                numInvocations++;
+                return num++;   // Should have no effect
+            }
+
+            const actual = pipe(
+                new SucceededResult(3) as Result<number, string>,
+                (res) => Result.tapSuccess(tapFn, res)
+            );
+
+            expect(actual).toEqual(new SucceededResult(3));
+        });
+
+    });
+
+
+    describe("tapError()", () => {
+
+        it("calls the function when the input Result is a failure", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("does not call the function when the input Result is successful", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            pipe(
+                new SucceededResult(1) as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("returns the original Result", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            const actual = pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(actual).toEqual(new FailedResult("error message"));
         });
     });
 

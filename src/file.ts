@@ -675,6 +675,10 @@ export class File {
      */
     public async readLines(callbackFn: ReadLinesCallback): Promise<void> {
         return new Promise((resolve, reject) => {
+            if (!this.existsSync()) {
+                reject(new Error(`The file "${this._filePath}" does not exist.`));
+            }
+
             try {
                 let lineNum = 1;
 

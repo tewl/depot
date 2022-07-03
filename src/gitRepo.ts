@@ -560,7 +560,7 @@ export class GitRepo {
 
 
     /**
-     *
+     * Stages the specified file.
      * @param file - The file to be staged.  The File does not have to be
      * relative to the repo's root directory.
      * @returns A Promise that always resolves with a Result.  The result will

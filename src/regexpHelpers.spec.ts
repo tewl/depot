@@ -29,18 +29,18 @@ describe("matchesAny()", () => {
 
 describe("clearFlags", () => {
     it("clears the specified flags", () => {
-        const srcRegex = /bar/dig;
+        const srcRegex = /bar/sig;
         const newRegex = clearFlags(srcRegex, ["i", "g", "y"]);
-        expect(newRegex.flags).toEqual("d");
+        expect(newRegex.flags).toEqual("s");
     });
 });
 
 
 describe("setFlags()", () => {
     it("sets the specified flags", () => {
-        const srcRegex = /bar/d;
+        const srcRegex = /bar/s;
         const newRegex = setFlags(srcRegex, ["i", "g"]);
-        expect(newRegex.flags).toEqual("dgi");
+        expect(newRegex.flags).toEqual("gis");
     });
 });
 

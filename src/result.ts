@@ -127,7 +127,7 @@ export namespace Result {
 
     /**
      * If _input_ is successful, unwraps the value and passes it into _fn_,
-     * returning the result.  If _input_ is not successful, returns it.
+     * returning its returned Result.  If _input_ is not successful, returns it.
      * @param fn - The function to invoke on _input.value_ when _input_ is
      * successful.
      * @param input - The input Result.

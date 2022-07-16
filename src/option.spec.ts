@@ -1,17 +1,17 @@
 import { assertNever } from "./never";
-import {bindOption, boolToOption, isNone, isSome, mapSome, noneOption, Option, someOption} from "./option";
+import { Option, SomeOption, NoneOption } from "./option2";
 import { pipe } from "./pipe";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test Infrastructure
 
 function someOperation(): Option<number> {
-    return someOption(5);
+    return new SomeOption(5);
 }
 
 
 function noneOperation(): Option<number> {
-    return noneOption();
+    return NoneOption.get();
 }
 
 
@@ -19,15 +19,16 @@ function noneOperation(): Option<number> {
 
 
 describe("example", () => {
+
     it("of exhaustiveness checking", () => {
         const opt = someOperation();
-        switch (opt.state) {
+        switch (opt.isSome) {
             // If this switch is made non-exhaustive, this code will no longer
             // compile.
-            case "some":
+            case true:
                 break;
 
-            case "none":
+            case false:
                 break;
 
             default:
@@ -39,138 +40,159 @@ describe("example", () => {
 });
 
 
-describe("someOption()", () => {
+describe("SomeOption()", () => {
+
     it("returns an object describing an option with a value", () => {
-        const opt = someOption(5);
-        expect(opt.state).toEqual("some");
+        const opt = new SomeOption(5);
+        expect(opt.isSome).toBeTrue();
+        expect(opt.isNone).toBeFalse();
         expect(opt.value).toEqual(5);
     });
 });
 
 
-describe("noneOption()", () => {
+describe("NoneOption.get()", () => {
+
     it("returns an object describing an option with no value", () => {
-        const opt = noneOption();
-        expect(opt.state).toEqual("none");
+        const opt = NoneOption.get();
+        expect(opt.isNone).toBeTrue();
+        expect(opt.isSome).toBeFalse();
         expect(opt.value).toEqual(undefined);
     });
 });
 
 
-describe("isSome()", () => {
-    it("returns true when given an option with a value", () => {
-        expect(isSome(someOperation())).toBeTruthy();
+describe("Option namespace", () => {
+
+    describe("bind", () => {
+
+        it("with none input the option is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return new SomeOption(x + 1); };
+
+            const opt = Option.bind(fn, NoneOption.get());
+            expect(opt.isNone).toBeTruthy();
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with some input the function is invoked and the returned option is returned", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return new SomeOption(x + 1); };
+
+            const opt = Option.bind(fn, new SomeOption(3));
+            expect(opt.isSome).toBeTruthy();
+            expect(opt.value).toEqual(4);
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("can be used easily with pipe()", () => {
+            const subtract1 = (x: number) => x <= 0 ? NoneOption.get() : new SomeOption(x - 1);
+
+            const opt1 = pipe(
+                2,
+                subtract1,                              // 1
+                (o) => Option.bind(subtract1, o),        // 0
+                (o) => Option.bind(subtract1, o)         // none
+            );
+            expect(opt1.isNone).toBeTruthy();
+
+            const opt2 = pipe(
+                2,
+                subtract1,                              // 1
+                (o) => Option.bind(subtract1, o)         // 0
+            );
+            expect(opt2.isSome).toBeTruthy();
+            expect(opt2.value).toEqual(0);
+
+        });
     });
 
 
-    it("returns false when given an option with no value", () => {
-        expect(isSome(noneOperation())).toBeFalsy();
-    });
-});
+    describe("mapSome()", () => {
+
+        it("with none input the option is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const add1 = (x: number) => { numInvocations++; return x + 1; };
+
+            const opt = Option.mapSome(add1, NoneOption.get());
+            expect(opt.isNone).toBeTruthy();
+            expect(numInvocations).toEqual(0);
+        });
 
 
-describe("isNone()", () => {
-    it("returns true when given an option with no value", () => {
-        expect(isNone(noneOperation())).toBeTruthy();
-    });
+        it("with some input the function is invoked and its return values is wrapped in a some option", () => {
+            let numInvocations = 0;
+            const add1 = (x: number) => { numInvocations++; return x + 1; };
+
+            const opt = Option.mapSome(add1, new SomeOption(3));
+            expect(opt.isSome).toBeTruthy();
+            expect(opt.value).toEqual(4);
+            expect(numInvocations).toEqual(1);
+        });
 
 
-    it("returns false when given an option with a value", () => {
-        expect(isNone(someOperation())).toBeFalsy();
-    });
-});
+        it("can be used easily with pipe()", () => {
+            const add1 = (x: number) => x + 1;
 
+            const opt = pipe(
+                new SomeOption(3),
+                (o) => Option.mapSome(add1, o),        // 4
+                (o) => Option.mapSome(add1, o),        // 5
+                (o) => Option.mapSome(add1, o)         // 6
+            );
 
-describe("bindOption", () => {
-    it("with none input the option is passed along and the function is not invoked", () => {
-        let numInvocations = 0;
-        const fn = (x: number) => { numInvocations++; return someOption(x + 1); };
-
-        const opt = bindOption(fn, noneOption());
-        expect(isNone(opt)).toBeTruthy();
-        expect(numInvocations).toEqual(0);
-    });
-
-
-    it("with some input the function is invoked and the returned option is returned", () => {
-        let numInvocations = 0;
-        const fn = (x: number) => { numInvocations++; return someOption(x + 1); };
-
-        const opt = bindOption(fn, someOption(3));
-        expect(isSome(opt)).toBeTruthy();
-        expect(opt.value).toEqual(4);
-        expect(numInvocations).toEqual(1);
-    });
-
-
-    it("can be used easily with pipe()", () => {
-        const subtract1 = (x: number) => x <= 0 ? noneOption() : someOption(x - 1);
-
-        const opt1 = pipe(
-            2,
-            subtract1,                              // 1
-            (o) => bindOption(subtract1, o),        // 0
-            (o) => bindOption(subtract1, o)         // none
-        );
-        expect(isNone(opt1)).toBeTruthy();
-
-        const opt2 = pipe(
-            2,
-            subtract1,                              // 1
-            (o) => bindOption(subtract1, o)         // 0
-        );
-        expect(isSome(opt2)).toBeTruthy();
-        expect(opt2.value).toEqual(0);
-
-    });
-});
-
-
-describe("mapSome()", () => {
-    it("with none input the option is passed along and the function is not invoked", () => {
-        let numInvocations = 0;
-        const add1 = (x: number) => { numInvocations++; return x + 1; };
-
-        const opt = mapSome(add1, noneOption());
-        expect(isNone(opt)).toBeTruthy();
-        expect(numInvocations).toEqual(0);
+            expect(opt.isSome).toBeTruthy();
+            expect(opt.value).toEqual(6);
+        });
     });
 
 
-    it("with some input the function is invoked and its return values is wrapped in a some option", () => {
-        let numInvocations = 0;
-        const add1 = (x: number) => { numInvocations++; return x + 1; };
+    describe("fromBool()", () => {
 
-        const opt = mapSome(add1, someOption(3));
-        expect(isSome(opt)).toBeTruthy();
-        expect(opt.value).toEqual(4);
-        expect(numInvocations).toEqual(1);
+        it("returns some value when condition is true", () => {
+            expect(Option.fromBool(true, 5)).toEqual(new SomeOption(5));
+        });
+
+
+        it("returns none value when condition is false", () => {
+            expect(Option.fromBool(false, 5)).toEqual(NoneOption.get());
+        });
     });
 
 
-    it("can be used easily with pipe()", () => {
-        const add1 = (x: number) => x + 1;
+    describe("all()", () => {
 
-        const opt = pipe(
-            someOption(3),
-            (o) => mapSome(add1, o),        // 4
-            (o) => mapSome(add1, o),        // 5
-            (o) => mapSome(add1, o)         // 6
-        );
+        it("when given all 'some' options, returns an array of their values", () => {
+            const options = [
+                new SomeOption(1),
+                new SomeOption(2),
+                new SomeOption(3)
+            ];
+            expect(Option.all(options)).toEqual(new SomeOption([1, 2, 3]));
+        });
 
-        expect(isSome(opt)).toBeTruthy();
-        expect(opt.value).toEqual(6);
+
+        it("when given all 'some' options with different types, returns an array of their values", () => {
+            const options: Array<Option<number | string>> = [
+                new SomeOption(1),
+                new SomeOption("foo"),
+                new SomeOption(3)
+            ];
+            expect(Option.all(options)).toEqual(new SomeOption([1, "foo", 3]));
+        });
+
+
+        it("when given an array with 'none' values, returns a 'none' value", () => {
+            const options = [
+                new SomeOption(1),
+                new SomeOption(2),
+                NoneOption.get()
+            ];
+            expect(Option.all(options)).toEqual(NoneOption.get());
+        });
+
     });
-});
 
-
-describe("boolToOption()", () => {
-    it("returns some value when condition is true", () => {
-        expect(boolToOption(true, 5)).toEqual(someOption(5));
-    });
-
-
-    it("returns none value when condition is false", () => {
-        expect(boolToOption(false, 5)).toEqual(noneOption());
-    });
 });

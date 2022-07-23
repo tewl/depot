@@ -258,118 +258,6 @@ describe("Result namespace", () => {
     });
 
 
-    describe("mapSuccess()", () => {
-
-        it("with failed input the error is passed along and the function is not invoked", () => {
-            let numInvocations = 0;
-            const fn = (x: number) => { numInvocations++; return x + 1; };
-
-            const result = Result.mapSuccess(fn, new FailedResult("failure"));
-            expect(result.failed).toBeTruthy();
-            expect(result.error).toEqual("failure");
-            expect(numInvocations).toEqual(0);
-        });
-
-
-        it("with successful input the function is invoked and its result is wrapped in a successful Result", () => {
-            let numInvocations = 0;
-            const fn = (x: number) => { numInvocations++; return x + 1; };
-
-            const result = Result.mapSuccess(fn, new SucceededResult(1));
-            expect(result.succeeded).toBeTruthy();
-            expect(result.value).toEqual(2);
-            expect(numInvocations).toEqual(1);
-        });
-    });
-
-
-    describe("mapError()", () => {
-
-        it("with successful input the value is passed along and the function is not invoked", () => {
-            let numInvocations = 0;
-            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
-
-            const result = Result.mapError(fn, new SucceededResult(1));
-            expect(result.succeeded).toBeTruthy();
-            expect(result.value).toEqual(1);
-            expect(numInvocations).toEqual(0);
-        });
-
-
-        it("with failed input the function is invoked and its result is wrapped in a failed Result", () => {
-            let numInvocations = 0;
-            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
-
-            const result = Result.mapError(fn, new FailedResult("fake error message"));
-            expect(result.failed).toBeTruthy();
-            expect(result.error).toEqual("Error: fake error message");
-            expect(numInvocations).toEqual(1);
-        });
-    });
-
-
-    describe("mapWhileSuccessful()", () => {
-
-        it("returns a successful result with the mapped array when all succeed", () => {
-            const arr = [1, 2, 3, 4, 5];
-            const squareWithMaxOfFifty = (n: number) => {
-                const square = n * n;
-                return square < 50 ?
-                    new SucceededResult(square) :
-                    new FailedResult(`The square of ${n} exceeds the maximum.`);
-            };
-
-            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
-            expect(mapRes.succeeded).toBeTruthy();
-            expect(mapRes.value).toEqual([1, 4, 9, 16, 25]);
-        });
-
-
-        it("returns a failure result with the first failure", () => {
-            const arr = [5, 6, 7, 8, 9];
-            const squareWithMaxOfFifty = (n: number) => {
-                const square = n * n;
-                return square < 50 ?
-                    new SucceededResult(square) :
-                    new FailedResult(`The square of ${n} exceeds the maximum.`);
-            };
-
-            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
-            expect(mapRes.succeeded).toBeFalsy();
-            expect(mapRes.error).toEqual("The square of 8 exceeds the maximum.");
-        });
-
-
-        it("invokes the mapping function once for each success and once for the first failure", () => {
-            let numFuncInvocations = 0;
-            const arr = [5, 6, 7, 8, 9];
-            const squareWithMaxOfFifty = (n: number) => {
-                numFuncInvocations++;
-                const square = n * n;
-                return square < 50 ?
-                    new SucceededResult(square) :
-                    new FailedResult(`The square of ${n} exceeds the maximum.`);
-            };
-
-            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
-            expect(mapRes.succeeded).toBeFalsy();
-            expect(numFuncInvocations).toEqual(4);
-        });
-
-
-        it("adds each result value to the returned array even when they are arrays", () => {
-            const inputs = [1, 2, 3];
-            const mapFn = (curInt: number): Result<[number, number], string> => {
-                return new SucceededResult([curInt, curInt + 1]);
-            };
-            const result = Result.mapWhileSuccessful(inputs, mapFn);
-            expect(result.succeeded).toBeTrue();
-            expect(result.value!).toEqual([[1, 2], [2, 3], [3, 4]]);
-        });
-
-    });
-
-
     describe("executeWhileSuccessful()", () => {
 
         it("returns a successful result with typed array elements when all functions succeed", () => {
@@ -442,6 +330,121 @@ describe("Result namespace", () => {
     });
 
 
+    describe("mapError()", () => {
+
+        it("with successful input the value is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
+
+            const result = Result.mapError(fn, new SucceededResult(1));
+            expect(result.succeeded).toBeTruthy();
+            expect(result.value).toEqual(1);
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with failed input the function is invoked and its result is wrapped in a failed Result", () => {
+            let numInvocations = 0;
+            const fn = (errMsg: string) => { numInvocations++; return `Error: ${errMsg}`; };
+
+            const result = Result.mapError(fn, new FailedResult("fake error message"));
+            expect(result.failed).toBeTruthy();
+            expect(result.error).toEqual("Error: fake error message");
+            expect(numInvocations).toEqual(1);
+        });
+    });
+
+
+    describe("mapSuccess()", () => {
+
+        it("with failed input the error is passed along and the function is not invoked", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return x + 1; };
+
+            const result = Result.mapSuccess(fn, new FailedResult("failure"));
+            expect(result.failed).toBeTruthy();
+            expect(result.error).toEqual("failure");
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("with successful input the function is invoked and its result is wrapped in a successful Result", () => {
+            let numInvocations = 0;
+            const fn = (x: number) => { numInvocations++; return x + 1; };
+
+            const result = Result.mapSuccess(fn, new SucceededResult(1));
+            expect(result.succeeded).toBeTruthy();
+            expect(result.value).toEqual(2);
+            expect(numInvocations).toEqual(1);
+        });
+    });
+
+
+    describe("mapWhileSuccessful()", () => {
+
+        it("returns a successful result with the mapped array when all succeed", () => {
+            const arr = [1, 2, 3, 4, 5];
+            const squareWithMaxOfFifty = (n: number) => {
+                const square = n * n;
+                return square < 50 ?
+                    new SucceededResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeTruthy();
+            expect(mapRes.value).toEqual([1, 4, 9, 16, 25]);
+        });
+
+
+        it("returns a failure result with the first failure", () => {
+            const arr = [5, 6, 7, 8, 9];
+            const squareWithMaxOfFifty = (n: number) => {
+                const square = n * n;
+                return square < 50 ?
+                    new SucceededResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeFalsy();
+            expect(mapRes.error).toEqual("The square of 8 exceeds the maximum.");
+        });
+
+
+        it("invokes the mapping function once for each success and once for the first failure", () => {
+            let numFuncInvocations = 0;
+            const arr = [5, 6, 7, 8, 9];
+            const squareWithMaxOfFifty = (n: number) => {
+                numFuncInvocations++;
+                const square = n * n;
+                return square < 50 ?
+                    new SucceededResult(square) :
+                    new FailedResult(`The square of ${n} exceeds the maximum.`);
+            };
+
+            const mapRes = Result.mapWhileSuccessful(arr, squareWithMaxOfFifty);
+            expect(mapRes.succeeded).toBeFalsy();
+            expect(numFuncInvocations).toEqual(4);
+        });
+
+
+        it("adds each result value to the returned array even when they are arrays", () => {
+            const inputs = [1, 2, 3];
+            const mapFn = (curInt: number): Result<[number, number], string> => {
+                return new SucceededResult([curInt, curInt + 1]);
+            };
+            const result = Result.mapWhileSuccessful(inputs, mapFn);
+            expect(result.succeeded).toBeTrue();
+            expect(result.value!).toEqual([[1, 2], [2, 3], [3, 4]]);
+        });
+
+    });
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+
     describe("tap()", () => {
 
         it("calls the function when the input Result is a failure", () => {
@@ -489,6 +492,57 @@ describe("Result namespace", () => {
             );
 
             expect(actual).toEqual(new SucceededResult(1));
+        });
+    });
+
+
+    describe("tapError()", () => {
+
+        it("calls the function when the input Result is a failure", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(1);
+        });
+
+
+        it("does not call the function when the input Result is successful", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            pipe(
+                new SucceededResult(1) as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("returns the original Result", () => {
+            let numInvocations = 0;
+            function tapFn(err: string) {
+                numInvocations++;
+                return "tapFn() return value";
+            }
+
+            const actual = pipe(
+                new FailedResult("error message") as Result<number, string>,
+                (res) => Result.tapError(tapFn, res)
+            );
+
+            expect(actual).toEqual(new FailedResult("error message"));
         });
     });
 
@@ -542,55 +596,5 @@ describe("Result namespace", () => {
 
     });
 
-
-    describe("tapError()", () => {
-
-        it("calls the function when the input Result is a failure", () => {
-            let numInvocations = 0;
-            function tapFn(err: string) {
-                numInvocations++;
-                return "tapFn() return value";
-            }
-
-            pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
-
-            expect(numInvocations).toEqual(1);
-        });
-
-
-        it("does not call the function when the input Result is successful", () => {
-            let numInvocations = 0;
-            function tapFn(err: string) {
-                numInvocations++;
-                return "tapFn() return value";
-            }
-
-            pipe(
-                new SucceededResult(1) as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
-
-            expect(numInvocations).toEqual(0);
-        });
-
-
-        it("returns the original Result", () => {
-            let numInvocations = 0;
-            function tapFn(err: string) {
-                numInvocations++;
-                return "tapFn() return value";
-            }
-
-            const actual = pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
-
-            expect(actual).toEqual(new FailedResult("error message"));
-        });
-    });
 
 });

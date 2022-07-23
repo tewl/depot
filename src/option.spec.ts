@@ -1,6 +1,7 @@
 import { assertNever } from "./never";
-import { Option, SomeOption, NoneOption } from "./option2";
+import { Option, SomeOption, NoneOption } from "./option";
 import { pipe } from "./pipe";
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test Infrastructure
@@ -16,6 +17,7 @@ function noneOperation(): Option<number> {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Tests
 
 
 describe("example", () => {
@@ -48,6 +50,7 @@ describe("SomeOption()", () => {
         expect(opt.isNone).toBeFalse();
         expect(opt.value).toEqual(5);
     });
+
 });
 
 
@@ -59,10 +62,46 @@ describe("NoneOption.get()", () => {
         expect(opt.isSome).toBeFalse();
         expect(opt.value).toEqual(undefined);
     });
+
 });
 
 
 describe("Option namespace", () => {
+
+
+    describe("all()", () => {
+
+        it("when given all 'some' options, returns an array of their values", () => {
+            const options = [
+                new SomeOption(1),
+                new SomeOption(2),
+                new SomeOption(3)
+            ];
+            expect(Option.all(options)).toEqual(new SomeOption([1, 2, 3]));
+        });
+
+
+        it("when given all 'some' options with different types, returns an array of their values", () => {
+            const options: Array<Option<number | string>> = [
+                new SomeOption(1),
+                new SomeOption("foo"),
+                new SomeOption(3)
+            ];
+            expect(Option.all(options)).toEqual(new SomeOption([1, "foo", 3]));
+        });
+
+
+        it("when given an array with 'none' values, returns a 'none' value", () => {
+            const options = [
+                new SomeOption(1),
+                new SomeOption(2),
+                NoneOption.get()
+            ];
+            expect(Option.all(options)).toEqual(NoneOption.get());
+        });
+
+    });
+
 
     describe("bind", () => {
 
@@ -110,6 +149,19 @@ describe("Option namespace", () => {
     });
 
 
+    describe("fromBool()", () => {
+
+        it("returns some value when condition is true", () => {
+            expect(Option.fromBool(true, 5)).toEqual(new SomeOption(5));
+        });
+
+
+        it("returns none value when condition is false", () => {
+            expect(Option.fromBool(false, 5)).toEqual(NoneOption.get());
+        });
+    });
+
+
     describe("mapSome()", () => {
 
         it("with none input the option is passed along and the function is not invoked", () => {
@@ -148,51 +200,5 @@ describe("Option namespace", () => {
         });
     });
 
-
-    describe("fromBool()", () => {
-
-        it("returns some value when condition is true", () => {
-            expect(Option.fromBool(true, 5)).toEqual(new SomeOption(5));
-        });
-
-
-        it("returns none value when condition is false", () => {
-            expect(Option.fromBool(false, 5)).toEqual(NoneOption.get());
-        });
-    });
-
-
-    describe("all()", () => {
-
-        it("when given all 'some' options, returns an array of their values", () => {
-            const options = [
-                new SomeOption(1),
-                new SomeOption(2),
-                new SomeOption(3)
-            ];
-            expect(Option.all(options)).toEqual(new SomeOption([1, 2, 3]));
-        });
-
-
-        it("when given all 'some' options with different types, returns an array of their values", () => {
-            const options: Array<Option<number | string>> = [
-                new SomeOption(1),
-                new SomeOption("foo"),
-                new SomeOption(3)
-            ];
-            expect(Option.all(options)).toEqual(new SomeOption([1, "foo", 3]));
-        });
-
-
-        it("when given an array with 'none' values, returns a 'none' value", () => {
-            const options = [
-                new SomeOption(1),
-                new SomeOption(2),
-                NoneOption.get()
-            ];
-            expect(Option.all(options)).toEqual(NoneOption.get());
-        });
-
-    });
 
 });

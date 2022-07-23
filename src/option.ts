@@ -96,6 +96,22 @@ export type Option<T> = SomeOption<T> | NoneOption;
  */
 export namespace Option {
 
+    /**
+     * When all input Options are "some", returns a "some" Option containing an
+     * array of the values.  If the input contains one (or more) "none" options,
+     * the first "none" Option is returned.
+     * @param collection - The input collection
+     * @returns
+     */
+    export function all<T>(
+        collection: Array<Option<T>>
+    ): Option<Array<T>> {
+        const firstNone = collection.find((curOpt): curOpt is NoneOption => curOpt instanceof NoneOption);
+        return firstNone ?
+            firstNone :
+            new SomeOption(collection.map((curOpt) => curOpt.value!));
+    }
+
 
     /**
      * If _input_ is "some", unwraps the value and passes it into _fn_,
@@ -112,23 +128,6 @@ export namespace Option {
     ): Option<TOut> {
         return input.isSome ?
             fn(input.value) :
-            input;
-    }
-
-
-    /**
-     * When _input_ is "some", maps the wrapped value using _fn_.
-     * @param fn - The function that maps the wrapped value to another value.
-     * @param input - The input Option
-     * @returns Either the mapped "some" option or the passed-through "none"
-     * Option.
-     */
-    export function mapSome<TIn, TOut>(
-        fn: (x: TIn) => TOut,
-        input: Option<TIn>
-    ): Option<TOut> {
-        return input.isSome ?
-            new SomeOption(fn(input.value)) :
             input;
     }
 
@@ -151,19 +150,19 @@ export namespace Option {
 
 
     /**
-     * When all input Options are "some", returns a "some" Option containing an
-     * array of the values.  If the input contains one (or more) "none" options,
-     * the first "none" Option is returned.
-     * @param collection - The input collection
-     * @returns
+     * When _input_ is "some", maps the wrapped value using _fn_.
+     * @param fn - The function that maps the wrapped value to another value.
+     * @param input - The input Option
+     * @returns Either the mapped "some" option or the passed-through "none"
+     * Option.
      */
-    export function all<T>(
-        collection: Array<Option<T>>
-    ): Option<Array<T>> {
-        const firstNone = collection.find((curOpt): curOpt is NoneOption => curOpt instanceof NoneOption);
-        return firstNone ?
-            firstNone :
-            new SomeOption(collection.map((curOpt) => curOpt.value!));
+    export function mapSome<TIn, TOut>(
+        fn: (x: TIn) => TOut,
+        input: Option<TIn>
+    ): Option<TOut> {
+        return input.isSome ?
+            new SomeOption(fn(input.value)) :
+            input;
     }
 
 }

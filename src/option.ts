@@ -133,18 +133,35 @@ export namespace Option {
 
 
     /**
-     * If the input is Some value, returns the wrapped value, else returns the
+     * If the input is Some value, returns the contained value, else returns the
      * default value.
      *
      * @param defaultValue - The default value to use if input is a None Option
      * Otherwise, returns the specified default value.
      * @param input - The input Option
-     * @returns The wrapped value if input is Some, else the default value.
+     * @returns The contained value if input is Some, else the default value.
      */
     export function defaultValue<T>(defaultValue: T, input: Option<T>): T {
         return input.isSome ?
             input.value :
             defaultValue;
+    }
+
+
+    /**
+     * If the input is a Some value, returns the contained value, else
+     * returns _fn()_.  This function is useful when getting the default value
+     * is expensive.
+     * @param fn - A function that can be invoked to get the default value.  Not
+     * executed unless input is None.
+     * @param input - The input Result
+     * @returns The contained value if input is Some, else the value
+     * returned by _fn_.
+     */
+    export function defaultWith<T>(fn: () => T, input: Option<T>): T {
+        return input.isSome ?
+            input.value :
+            fn();
     }
 
 

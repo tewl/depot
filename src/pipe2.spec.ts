@@ -5,7 +5,7 @@ import { Pipe } from "./pipe2";
 describe("Pipe", () => {
 
 
-    it("example", () => {
+    it("pipes a value through the specified functions", () => {
         const result =
             Pipe.begin("5")
             .pipe((str) => parseInt(str, 10))

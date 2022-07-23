@@ -262,13 +262,43 @@ describe("Result namespace", () => {
     describe("defaultValue()", () => {
 
 
-        it("when given a success value returns the wrapped value", () => {
+        it("when given a success value returns the contained value", () => {
             expect(Result.defaultValue(0, new SucceededResult(5))).toEqual(5);
         });
 
 
-        it("when given a None value returns the specified default value", () => {
+        it("when given an error value returns the specified default value", () => {
             expect(Result.defaultValue(0, new FailedResult("Error msg"))).toEqual(0);
+        });
+
+
+    });
+
+
+    describe("defaultWith()", () => {
+
+
+        it("when given a success value returns the contained value", () => {
+            let numInvocations = 0;
+            function getDefault() {
+                numInvocations++;
+                return 5;
+            }
+
+            expect(Result.defaultWith(getDefault, new SucceededResult(3))).toEqual(3);
+            expect(numInvocations).toEqual(0);
+        });
+
+
+        it("when given an error value invokes the function and returns the result", () => {
+            let numInvocations = 0;
+            function getDefault() {
+                numInvocations++;
+                return 5;
+            }
+
+            expect(Result.defaultWith(getDefault, new FailedResult("Error msg"))).toEqual(5);
+            expect(numInvocations).toEqual(1);
         });
 
 

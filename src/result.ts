@@ -149,19 +149,35 @@ export namespace Result {
 
 
     /**
-     * If the input is a successful value, returns the wrapped value, else
+     * If the input is a successful value, returns the contained value, else
      * returns the default value.
      *
      * @param defaultValue - The default value to use if input is an error
      * Result
      * @param input - The input Result
-     * @returns The wrapped value if input is successful, else the default
+     * @returns The contained value if input is successful, else the default
      * value.
      */
     export function defaultValue<TSuccess, TError>(defaultValue: TSuccess, input: Result<TSuccess, TError>): TSuccess {
         return input.succeeded ?
             input.value :
             defaultValue;
+    }
+
+    /**
+     * If the input is a successful value, returns the contained value, else
+     * returns _fn()_.  This function is useful when getting the default value
+     * is expensive.
+     * @param fn - A function that can be invoked to get the default value.  Not
+     * executed unless input is an error.
+     * @param input - The input Result
+     * @returns The contained value if input is successful, else the value
+     * returned by _fn_.
+     */
+    export function defaultWith<TSuccess, TError>(fn: () => TSuccess, input: Result<TSuccess, TError>): TSuccess {
+        return input.succeeded ?
+            input.value :
+            fn();
     }
 
 

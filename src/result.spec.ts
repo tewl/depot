@@ -161,6 +161,7 @@ describe("Result type", () => {
 
 describe("Result namespace", () => {
 
+
     describe("all()", () => {
 
         it("when given successful results, returns an array of their values", () => {
@@ -254,6 +255,22 @@ describe("Result namespace", () => {
             expect(resultA.succeeded).toBeTruthy();
             expect(resultA.value).toEqual("4");
         });
+
+    });
+
+
+    describe("defaultValue()", () => {
+
+
+        it("when given a success value returns the wrapped value", () => {
+            expect(Result.defaultValue(0, new SucceededResult(5))).toEqual(5);
+        });
+
+
+        it("when given a None value returns the specified default value", () => {
+            expect(Result.defaultValue(0, new FailedResult("Error msg"))).toEqual(0);
+        });
+
 
     });
 

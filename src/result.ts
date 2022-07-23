@@ -148,6 +148,23 @@ export namespace Result {
     }
 
 
+    /**
+     * If the input is a successful value, returns the wrapped value, else
+     * returns the default value.
+     *
+     * @param defaultValue - The default value to use if input is an error
+     * Result
+     * @param input - The input Result
+     * @returns The wrapped value if input is successful, else the default
+     * value.
+     */
+    export function defaultValue<TSuccess, TError>(defaultValue: TSuccess, input: Result<TSuccess, TError>): TSuccess {
+        return input.succeeded ?
+            input.value :
+            defaultValue;
+    }
+
+
     // #region executeWhileSuccessful()
 
 

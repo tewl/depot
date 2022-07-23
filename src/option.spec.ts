@@ -149,6 +149,22 @@ describe("Option namespace", () => {
     });
 
 
+    describe("defaultValue()", () => {
+
+
+        it("when given a Some value returns the wrapped value", () => {
+            expect(Option.defaultValue(3, new SomeOption(5))).toEqual(5);
+        });
+
+
+        it("when given a None value returns the specified default value", () => {
+            expect(Option.defaultValue(3, NoneOption.get())).toEqual(3);
+        });
+
+
+    });
+
+
     describe("fromBool()", () => {
 
         it("returns some value when condition is true", () => {

@@ -133,6 +133,22 @@ export namespace Option {
 
 
     /**
+     * If the input is Some value, returns the wrapped value, else returns the
+     * default value.
+     *
+     * @param defaultValue - The default value to use if input is a None Option
+     * Otherwise, returns the specified default value.
+     * @param input - The input Option
+     * @returns The wrapped value if input is Some, else the default value.
+     */
+    export function defaultValue<T>(defaultValue: T, input: Option<T>): T {
+        return input.isSome ?
+            input.value :
+            defaultValue;
+    }
+
+
+    /**
      * Converts a boolean value into an Option wrapping the specified value.
      * @param condition - The condition
      * @param trueVal - Value to be wrapped in a "some" Option when _condition_

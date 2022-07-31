@@ -149,6 +149,25 @@ describe("Option namespace", () => {
     });
 
 
+    describe("choose()", () => {
+
+
+        it("returns an array where only Some mappings are included", () => {
+
+            const result =
+                pipe(
+                    [1, 2, 3, 4, 5, 6],
+                    (input) => Option.choose((n) => n % 2 === 0 ? new SomeOption(n + 1) : NoneOption.get(), input)
+                );
+
+            expect(result).toEqual([3, 5, 7]);
+
+        });
+
+
+    });
+
+
     describe("defaultValue()", () => {
 
 

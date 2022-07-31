@@ -128,6 +128,7 @@ export namespace Result {
     /**
      * If _input_ is successful, unwraps the value and passes it into _fn_,
      * returning its returned Result.  If _input_ is not successful, returns it.
+     *
      * @param fn - The function to invoke on _input.value_ when _input_ is
      * successful.
      * @param input - The input Result.
@@ -149,6 +150,33 @@ export namespace Result {
 
 
     /**
+     * Maps each input value through the specified mapping function.  If the
+     * mapping function returns a successful result, its value is added to the
+     * output array; otherwise nothing is added to the output array.
+     *
+     * @param fn - The function that will map each input value to either a
+     * successful value that will be included in the output array or a failure
+     * if no value will be contributed to the output array.
+     * @param input - The input sequence
+     * @returns  The output array
+     */
+    export function choose<TIn, TOut, TError>(fn: (v: TIn,) => Result<TOut, TError>, input: Iterable<TIn>): Array<TOut> {
+        const inputArr = Array.from(input);
+        const output =
+            inputArr.reduce<Array<TOut>>(
+                (acc, cur) => {
+                    const res = fn(cur);
+                    if (res.succeeded) {
+                        acc.push(res.value);
+                    }
+                    return acc;
+                },
+                []
+            );
+        return output;
+    }
+
+    /**
      * If the input is a successful value, returns the contained value, else
      * returns the default value.
      *
@@ -168,6 +196,7 @@ export namespace Result {
      * If the input is a successful value, returns the contained value, else
      * returns _fn()_.  This function is useful when getting the default value
      * is expensive.
+     *
      * @param fn - A function that can be invoked to get the default value.  Not
      * executed unless input is an error.
      * @param input - The input Result
@@ -355,6 +384,7 @@ export namespace Result {
 
     /**
      * Converts a boolean value into a successful or failure Result.
+     *
      * @param condition - The condition.
      * @param trueSuccessVal - Value to be wrapped in a successful Result when
      * _condition_ is truthy.
@@ -376,6 +406,7 @@ export namespace Result {
 
     /**
      * When _input_ is a failure, maps the wrapped error using _fn_.
+     *
      * @param fn - Function that maps the wrapped error value to another value.
      * @param input - The input Result.
      * @return Either the passed-through successful Result or the mapped error
@@ -397,6 +428,7 @@ export namespace Result {
 
     /**
      * When _input_ is successful, maps the wrapped value using _fn_.
+     *
      * @param fn - Function that maps the wrapped success value to another value.
      * @param input - The input Result.
      * @return Either the mapped successful Result or the passed-through failure
@@ -419,6 +451,7 @@ export namespace Result {
     /**
      * Maps values from a source collection until a failed mapping occurs.  If a
      * failure occurs, the mapping stops immediately.
+     *
      * @param srcCollection - The source collection
      * @param mappingFunc - The mapping function. Each element from _srcCollection_
      * is run through this function and it must return a successful result wrapping
@@ -456,6 +489,7 @@ export namespace Result {
 
     /**
      * Performs side-effects for the given Result
+     *
      * @param fn - The function to invoke, passing the Result
      * @param input - The input Result
      * @returns The original input Result
@@ -471,6 +505,7 @@ export namespace Result {
 
     /**
      * Performs side-effects when the specified Result is a failure
+     *
      * @param fn - The function to invoke, passing the failed Result's error
      * @param input - The Input Result
      * @returns The original input Result
@@ -488,6 +523,7 @@ export namespace Result {
 
     /**
      * Performs side-effects when the specified Result is successful
+     *
      * @param fn - The function to invoke, passing the successful Result's value
      * @param input - The input Result
      * @returns The original input Result

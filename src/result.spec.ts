@@ -259,6 +259,25 @@ describe("Result namespace", () => {
     });
 
 
+    describe("choose()", () => {
+
+
+        it("returns an array where only successful mappings are included", () => {
+
+            const result =
+                pipe(
+                    [1, 2, 3, 4, 5, 6],
+                    (input) => Result.choose((n) => n % 2 === 0 ? new SucceededResult(n + 1) : new FailedResult(""), input)
+                );
+
+            expect(result).toEqual([3, 5, 7]);
+
+        });
+
+
+    });
+
+
     describe("defaultValue()", () => {
 
 

@@ -100,6 +100,7 @@ export namespace Option {
      * When all input Options are "some", returns a "some" Option containing an
      * array of the values.  If the input contains one (or more) "none" options,
      * the first "none" Option is returned.
+     *
      * @param collection - The input collection
      * @returns
      */
@@ -116,6 +117,7 @@ export namespace Option {
     /**
      * If _input_ is "some", unwraps the value and passes it into _fn_,
      * returning its returned Option.  If _input_ is not "some" returns it.
+     *
      * @param fn - The function to invoke on _input.value_ when _input_ is
      * "some"
      * @param - The input Option
@@ -129,6 +131,33 @@ export namespace Option {
         return input.isSome ?
             fn(input.value) :
             input;
+    }
+
+
+    /**
+     * Maps each input value through the specified mapping function.  If the
+     * mapping function returns a Some result, its value is added to the
+     * output array; otherwise nothing is added to the output array.
+     *
+     * @param fn - The function that will map each input value to either a
+     * Some value that will be included in the output array or a None value.
+     * @param input - The input sequence
+     * @returns  The output array
+     */
+    export function choose<TIn, TOut>(fn: (v: TIn,) => Option<TOut>, input: Iterable<TIn>): Array<TOut> {
+        const inputArr = Array.from(input);
+        const output =
+            inputArr.reduce<Array<TOut>>(
+                (acc, cur) => {
+                    const res = fn(cur);
+                    if (res.isSome) {
+                        acc.push(res.value);
+                    }
+                    return acc;
+                },
+                []
+            );
+        return output;
     }
 
 
@@ -152,6 +181,7 @@ export namespace Option {
      * If the input is a Some value, returns the contained value, else
      * returns _fn()_.  This function is useful when getting the default value
      * is expensive.
+     *
      * @param fn - A function that can be invoked to get the default value.  Not
      * executed unless input is None.
      * @param input - The input Result
@@ -167,6 +197,7 @@ export namespace Option {
 
     /**
      * Converts a boolean value into an Option wrapping the specified value.
+     *
      * @param condition - The condition
      * @param trueVal - Value to be wrapped in a "some" Option when _condition_
      * is truthy
@@ -184,6 +215,7 @@ export namespace Option {
 
     /**
      * When _input_ is "some", maps the wrapped value using _fn_.
+     *
      * @param fn - The function that maps the wrapped value to another value.
      * @param input - The input Option
      * @returns Either the mapped "some" option or the passed-through "none"

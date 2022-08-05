@@ -196,6 +196,111 @@ describe("Result namespace", () => {
     });
 
 
+    describe("augment()", () => {
+
+        it("if the input is an error, returns it without invoking the function", () => {
+            function step1() {
+                return new FailedResult("Step 1 error.");
+            }
+
+            let numStep2Invocations = 0;
+            function step2() {
+                numStep2Invocations++;
+                return new SucceededResult({c: 3, d: 4});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Result.augment(step2, res)
+                );
+            expect(res).toEqual(new FailedResult("Step 1 error."));
+            expect(numStep2Invocations).toEqual(0);
+        });
+
+
+        it("if the input is successful, invokes fn", () => {
+            function step1() {
+                return new SucceededResult({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SucceededResult({c: props.b + 1, d: props.b + 2});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Result.augment(step2, res)
+                );
+            expect(numStep2Invocations).toEqual(1);
+        });
+
+
+        it("if the input is successful and fn errors, returns fn's error", () => {
+            function step1() {
+                return new SucceededResult({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new FailedResult("Step 2 error.");
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Result.augment(step2, res)
+                );
+            expect(res).toEqual(new FailedResult("Step 2 error."));
+        });
+
+
+        it("if the input and fn are successful, returns a successful result containing all properties", () => {
+            function step1() {
+                return new SucceededResult({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SucceededResult({c: props.b + 1, d: props.b + 2});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Result.augment(step2, res)
+                );
+            expect(res).toEqual(new SucceededResult({a: 1, b: 2, c: 3, d: 4}));
+        });
+
+
+        it("properties in the original input can be reassigned", () => {
+            function step1() {
+                return new SucceededResult({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SucceededResult({b: 0});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Result.augment(step2, res)
+                );
+            expect(res).toEqual(new SucceededResult({a: 1, b: 0}));
+        });
+
+    });
+
+
     describe("bind()", () => {
 
         it("with failed input the error is passed along and the function is not invoked", () => {

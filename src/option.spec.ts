@@ -103,6 +103,111 @@ describe("Option namespace", () => {
     });
 
 
+    describe("augment()", () => {
+
+        it("if the input is None, returns None without invoking the function", () => {
+            function step1() {
+                return NoneOption.get();
+            }
+
+            let numStep2Invocations = 0;
+            function step2() {
+                numStep2Invocations++;
+                return new SomeOption({c: 3, d: 4});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Option.augment(step2, res)
+                );
+            expect(res).toEqual(NoneOption.get());
+            expect(numStep2Invocations).toEqual(0);
+        });
+
+
+        it("if the input is Some, invokes fn", () => {
+            function step1() {
+                return new SomeOption({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SomeOption({c: props.b + 1, d: props.b + 2});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Option.augment(step2, res)
+                );
+            expect(numStep2Invocations).toEqual(1);
+        });
+
+
+        it("if the input is Some and fn returns None, returns None", () => {
+            function step1() {
+                return new SomeOption({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return NoneOption.get();
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Option.augment(step2, res)
+                );
+            expect(res).toEqual(NoneOption.get());
+        });
+
+
+        it("if the input and fn return Some, returns a Some Option containing all properties", () => {
+            function step1() {
+                return new SomeOption({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SomeOption({c: props.b + 1, d: props.b + 2});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Option.augment(step2, res)
+                );
+            expect(res).toEqual(new SomeOption({a: 1, b: 2, c: 3, d: 4}));
+        });
+
+
+        it("properties in the original input can be reassigned", () => {
+            function step1() {
+                return new SomeOption({a: 1, b: 2});
+            }
+
+            let numStep2Invocations = 0;
+            function step2(props: {b: number}) {
+                numStep2Invocations++;
+                return new SomeOption({b: 0});
+            }
+
+            const res =
+                pipe(
+                    step1(),
+                    (res) => Option.augment(step2, res)
+                );
+            expect(res).toEqual(new SomeOption({a: 1, b: 0}));
+        });
+
+    });
+
+
     describe("bind", () => {
 
         it("with none input the option is passed along and the function is not invoked", () => {

@@ -115,6 +115,41 @@ export namespace Option {
 
 
     /**
+     * If the input Option is Some, invokes _fn_ with the value.  If a Some
+     * Option is returned, the original input value is augmented with the value.
+     *
+     * @param fn - Function that will be invoked if the input is a Some Option.
+     * Returns an Option.  If Some, the  properties will be added to _input_ and
+     * returned as a Some Option.
+     * @param input - The input Option
+     * @returns An None Option if the input is None or _fn_ returns None.
+     * Otherwise, a successful Option containing all properties of the original
+     * input and the value returned by _fn_.
+     */
+    export function augment<TInput, TFn>(
+        fn: (input: TInput) => Option<TFn>,
+        input: Option<TInput>
+    ): Option<TInput & TFn> {
+
+        if (input.isNone) {
+            return input;
+        }
+
+        // The input is a some Result.
+        const fnOpt = fn(input.value);
+        if (fnOpt.isNone) {
+            // _fn_ has returned None.  Return None.
+            return fnOpt;
+        }
+
+        // _fn_ has returned Some.  Return an object containing all properties of
+        // the original input and the value returned by _fn_.
+        const augmented = { ...input.value, ...fnOpt.value};
+        return new SomeOption(augmented);
+    }
+
+
+    /**
      * If _input_ is "some", unwraps the value and passes it into _fn_,
      * returning its returned Option.  If _input_ is not "some" returns it.
      *

@@ -126,6 +126,42 @@ export namespace Result {
 
 
     /**
+     * If the input Result is successful, invokes _fn_ with the value.  If a
+     * successful Result is returned, the original input value is augmented with
+     * the value.
+     *
+     * @param fn - Function that will be invoked if the input Result is
+     * successful.  Returns a Result.  If successful, the properties will
+     * be added to _input_ and returned as a successful Result.
+     * @param input - The input Result
+     * @returns An error if the input is an error or _fn_ returns an error.
+     * Otherwise, a successful Result containing all properties of the original
+     * input and the value returned by _fn_.
+     */
+    export function augment<TInputSuccess, TInputError, TFnSuccess, TFnError>(
+        fn: (input: TInputSuccess) => Result<TFnSuccess, TFnError>,
+        input: Result<TInputSuccess, TInputError>
+    ): Result<TInputSuccess & TFnSuccess, TInputError | TFnError> {
+
+        if (input.failed) {
+            return input;
+        }
+
+        // The input is a successful Result.
+        const fnRes = fn(input.value);
+        if (fnRes.failed) {
+            // _fn_ has errored.  Return that error.
+            return fnRes;
+        }
+
+        // _fn_ has succeeded.  Return an object containing all properties of
+        // the original input and the value returned by _fn_.
+        const augmented = { ...input.value, ...fnRes.value};
+        return new SucceededResult(augmented);
+    }
+
+
+    /**
      * If _input_ is successful, unwraps the value and passes it into _fn_,
      * returning its returned Result.  If _input_ is not successful, returns it.
      *

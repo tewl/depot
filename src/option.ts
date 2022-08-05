@@ -117,6 +117,9 @@ export namespace Option {
     /**
      * If the input Option is Some, invokes _fn_ with the value.  If a Some
      * Option is returned, the original input value is augmented with the value.
+     * Augment is a lot like bind(), except it automatically includes all of the
+     * input's properties.  It can also serve as a reality check or gate when
+     * augmenting no additional properties.
      *
      * @param fn - Function that will be invoked if the input is a Some Option.
      * Returns an Option.  If Some, the  properties will be added to _input_ and

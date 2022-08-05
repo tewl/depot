@@ -128,11 +128,13 @@ export namespace Result {
     /**
      * If the input Result is successful, invokes _fn_ with the value.  If a
      * successful Result is returned, the original input value is augmented with
-     * the value.
+     * the value.  Augment is a lot like bind(), except it automatically
+     * includes all of the input's properties.  It can also serve as a reality
+     * check or gate when augmenting no additional properties.
      *
      * @param fn - Function that will be invoked if the input Result is
-     * successful.  Returns a Result.  If successful, the properties will
-     * be added to _input_ and returned as a successful Result.
+     * successful.  Returns a Result.  If successful, the properties will be
+     * added to _input_ and returned as a successful Result.
      * @param input - The input Result
      * @returns An error if the input is an error or _fn_ returns an error.
      * Otherwise, a successful Result containing all properties of the original

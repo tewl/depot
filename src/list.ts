@@ -424,14 +424,6 @@ export class List<TValue> implements Iterable<TValue> {
 
 
 /**
- * Describes the return type from an iterator's next() method.
- * See:
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#iterator
- */
-// export type MoveIteratorRetType<T> = {done: false, value: T} | {done: true};
-
-
-/**
  * Implements the iterator protocol for List.
  */
 export class Iterator<TValue> implements Iterator<TValue> {

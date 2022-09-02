@@ -1,7 +1,7 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
     removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight,
-    repeat, splice, getEol, hash
+    repeat, splice, getEol, hash, parseDecInt
 } from "./stringHelpers";
 
 
@@ -505,4 +505,25 @@ describe("hash()", () => {
         const hash1 = hash("foo", "sha256", "base64");
         expect(hash1).toEqual("LCa0a2j/xo/5m0U8HTBBNBNCLXBkg7+g+YpeiGJm564=");
     });
+});
+
+
+describe("parseDecInt()", () => {
+
+    const jsUnrepresentable = "18446744073709551615";
+    const jsRepresentable = "9007199254740991";
+
+
+    it("returns successful result with expected value when given a representable string", () => {
+        const res = parseDecInt(jsRepresentable);
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(9007199254740991);
+    });
+
+
+    it("returns error result when given an unrepresentable string", () => {
+        const res = parseDecInt(jsUnrepresentable);
+        expect(res.failed).toBeTrue();
+    });
+
 });

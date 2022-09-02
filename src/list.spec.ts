@@ -1,4 +1,4 @@
-import {List, Iterator, MoveIteratorRetType} from "./list";
+import {List, Iterator} from "./list";
 import {randomizedArray} from "./random_data.spec";
 
 
@@ -196,13 +196,11 @@ describe("List", () => {
     });
 
 
-    it("toArray() should return an array with the same contents", () => {
+    it("iterator protocol allows Array.from to work", () => {
         const list = List.fromArray([1, 2, 3]);
-        const arr = list.toArray();
+        const arr = Array.from(list);
 
-        expect(arr[0]).toEqual(1);
-        expect(arr[1]).toEqual(2);
-        expect(arr[2]).toEqual(3);
+        expect(arr).toEqual([1, 2, 3]);
     });
 
 
@@ -356,7 +354,7 @@ describe("List", () => {
 
             const it = list.begin();
 
-            let res: MoveIteratorRetType<number> = it.next();
+            let res = it.next();
             expect(res.done).toEqual(false);
             if (!res.done) {
                 expect(res.value).toEqual(1);
@@ -376,7 +374,7 @@ describe("List", () => {
 
             const it: Iterator<number> = list.begin();
 
-            let res: MoveIteratorRetType<number> = it.next();
+            let res = it.next();
             expect(res.done).toEqual(false);
             if (!res.done) {
                 expect(res.value).toEqual(1);

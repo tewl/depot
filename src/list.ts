@@ -1,6 +1,6 @@
 import {advance, partition} from "./algorithm";
 
-function link<TValue>(prev: DLNodeAny<TValue>, next: DLNodeAny<TValue>): void {
+function link<TValue>(prev: DLNode<TValue>, next: DLNode<TValue>): void {
     prev.next = next;
     next.prev = prev;
 }
@@ -8,8 +8,8 @@ function link<TValue>(prev: DLNodeAny<TValue>, next: DLNodeAny<TValue>): void {
 
 class DLNodeEnd<TValue> {
     // region Data Members
-    private _prev: DLNodeAny<TValue>;
-    private _next: DLNodeAny<TValue>;
+    private _prev: DLNode<TValue>;
+    private _next: DLNode<TValue>;
     // endregion
 
 
@@ -19,31 +19,32 @@ class DLNodeEnd<TValue> {
     }
 
 
+    // Discriminant.
     public get nodeType(): "DLNodeEnd" {
         return "DLNodeEnd";
     }
 
 
-    public get prev(): DLNodeAny<TValue> {
+    public get prev(): DLNode<TValue> {
         if (this._prev === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a previous node.");
         }
         return this._prev;
     }
 
-    public set prev(prev: DLNodeAny<TValue>) {
+    public set prev(prev: DLNode<TValue>) {
         this._prev = prev;
     }
 
 
-    public get next(): DLNodeAny<TValue> {
+    public get next(): DLNode<TValue> {
         if (this._next === undefined) {
             throw new Error("DLNodeEnd instance has not been linked to a next node.");
         }
         return this._next;
     }
 
-    public set next(next: DLNodeAny<TValue>) {
+    public set next(next: DLNode<TValue>) {
         this._next = next;
     }
 }
@@ -55,8 +56,8 @@ class DLNodeEnd<TValue> {
  */
 class DLNodeValue<TValue> {
     // region Data Members
-    private _prev: DLNodeAny<TValue> | undefined;
-    private _next: DLNodeAny<TValue> | undefined;
+    private _prev: DLNode<TValue> | undefined;
+    private _next: DLNode<TValue> | undefined;
     private _value: TValue;
     // endregion
 
@@ -70,31 +71,32 @@ class DLNodeValue<TValue> {
     }
 
 
+    // Discriminant.
     public get nodeType(): "DLNodeValue" {
         return "DLNodeValue";
     }
 
 
-    public get prev(): DLNodeAny<TValue> {
+    public get prev(): DLNode<TValue> {
         if (this._prev === undefined) {
             throw new Error("DLNodeValue instance has not been linked to a previous node.");
         }
         return this._prev;
     }
 
-    public set prev(prev: DLNodeAny<TValue>) {
+    public set prev(prev: DLNode<TValue>) {
         this._prev = prev;
     }
 
 
-    public get next(): DLNodeAny<TValue> {
+    public get next(): DLNode<TValue> {
         if (this._next === undefined) {
             throw new Error("DLNodeValue instance has not been linked to a next node.");
         }
         return this._next;
     }
 
-    public set next(next: DLNodeAny<TValue>) {
+    public set next(next: DLNode<TValue>) {
         this._next = next;
     }
 
@@ -114,7 +116,7 @@ class DLNodeValue<TValue> {
 
 // A union type of all possible node types.
 // The discriminant is the `nodeType` property.
-type DLNodeAny<TValue> = DLNodeEnd<TValue> | DLNodeValue<TValue>;
+type DLNode<TValue> = DLNodeEnd<TValue> | DLNodeValue<TValue>;
 
 
 /**
@@ -123,7 +125,7 @@ type DLNodeAny<TValue> = DLNodeEnd<TValue> | DLNodeValue<TValue>;
  * This linked list is implemented as a circular linked list with one node being
  * the "end" node.
  */
-export class List<TValue> {
+export class List<TValue> implements Iterable<TValue> {
     public static fromArray<TValue>(arr: Array<TValue>): List<TValue> {
         const newList = new List<TValue>();
         arr.forEach((curVal) => newList.push(curVal));
@@ -161,6 +163,16 @@ export class List<TValue> {
      */
     public get isEmpty(): boolean {
         return this._length === 0;
+    }
+
+
+    /**
+     * Makes this collection an Iterable, which enables instances to be used
+     * with other language features such as for...of, Array.from() and spread
+     * operator.
+     */
+    [Symbol.iterator](): Iterator<TValue> {
+        return this.begin();
     }
 
 
@@ -236,7 +248,7 @@ export class List<TValue> {
         }
 
         const nodeToRemove: DLNodeValue<TValue> = it._getDLNode() as DLNodeValue<TValue>;
-        const nextNode: DLNodeAny<TValue> = this.removeNode(nodeToRemove);
+        const nextNode: DLNode<TValue> = this.removeNode(nodeToRemove);
         return new Iterator<TValue>(nextNode, this._end);
     }
 
@@ -276,25 +288,8 @@ export class List<TValue> {
      */
     public insert(insertInFrontOf: Iterator<TValue>, ...values: Array<TValue>): Iterator<TValue> {
 
-        const firstInsertedNode: DLNodeAny<TValue> = this.insertNode(insertInFrontOf._getDLNode(), ...values);
+        const firstInsertedNode: DLNode<TValue> = this.insertNode(insertInFrontOf._getDLNode(), ...values);
         return new Iterator(firstInsertedNode, this._end);
-    }
-
-
-    /**
-     * Converts this List to an array with the same values.
-     * @returns The converted array
-     */
-    public toArray(): Array<TValue> {
-        const arr: Array<TValue> = [];
-        const itEnd: Iterator<TValue> = this.end();
-        for (const it = this.begin(); !it.equals(itEnd); it.next()) {
-            // This for loop ensures that it will only point to value nodes (not
-            // the end node), so reading the value here will never throw an
-            // Error.
-            arr.push(it.value!);
-        }
-        return arr;
     }
 
 
@@ -309,9 +304,9 @@ export class List<TValue> {
      * DLNodeValue<ValueType> because the end node cannot be removed.
      * @returns The node after the removed node
      */
-    private removeNode(removeNode: DLNodeValue<TValue>): DLNodeAny<TValue> {
-        const prevNode: DLNodeAny<TValue> = removeNode.prev;
-        const nextNode: DLNodeAny<TValue> = removeNode.next;
+    private removeNode(removeNode: DLNodeValue<TValue>): DLNode<TValue> {
+        const prevNode: DLNode<TValue> = removeNode.prev;
+        const nextNode: DLNode<TValue> = removeNode.next;
 
         // Remove the element from the list.
         link(prevNode, nextNode);
@@ -329,17 +324,17 @@ export class List<TValue> {
      * @returns The first inserted DLNode, or `insertInFrontOf` if no values
      * were specified.
      */
-    private insertNode(insertInFrontOf: DLNodeAny<TValue>, ...values: Array<TValue>): DLNodeAny<TValue> {
+    private insertNode(insertInFrontOf: DLNode<TValue>, ...values: Array<TValue>): DLNode<TValue> {
 
         if (values.length === 0) {
             return insertInFrontOf;
         }
 
-        let nodeRet: DLNodeAny<TValue> | undefined;
+        let nodeRet: DLNode<TValue> | undefined;
 
         for (const curVal of values) {
-            const prevNode: DLNodeAny<TValue> = insertInFrontOf.prev;
-            const nextNode: DLNodeAny<TValue> = insertInFrontOf;
+            const prevNode: DLNode<TValue> = insertInFrontOf.prev;
+            const nextNode: DLNode<TValue> = insertInFrontOf;
 
             const newNode = new DLNodeValue(curVal);
 
@@ -433,14 +428,14 @@ export class List<TValue> {
  * See:
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#iterator
  */
-export type MoveIteratorRetType<T> = {done: false, value: T} | {done: true};
+// export type MoveIteratorRetType<T> = {done: false, value: T} | {done: true};
 
 
 /**
  * Implements the iterator protocol for List.
  */
-export class Iterator<TValue> {
-    private          _curNode: DLNodeAny<TValue>;
+export class Iterator<TValue> implements Iterator<TValue> {
+    private          _curNode: DLNode<TValue>;
     private readonly _endNode: DLNodeEnd<TValue>;
 
 
@@ -449,13 +444,13 @@ export class Iterator<TValue> {
      * @param curNode - The node the Iterator should be pointing to
      * @param endNode - The end node of the linked list
      */
-    constructor(curNode: DLNodeAny<TValue>, endNode: DLNodeEnd<TValue>) {
+    constructor(curNode: DLNode<TValue>, endNode: DLNodeEnd<TValue>) {
         this._curNode = curNode;
         this._endNode = endNode;
     }
 
 
-    public _getDLNode(): DLNodeAny<TValue> {
+    public _getDLNode(): DLNode<TValue> {
         return this._curNode;
     }
 
@@ -474,9 +469,9 @@ export class Iterator<TValue> {
     }
 
 
-    public next(): MoveIteratorRetType<TValue> {
+    public next(): IteratorResult<TValue, undefined> {
         if (this._curNode.nodeType === "DLNodeEnd") {
-            return {done: true};
+            return {done: true, value: undefined};
         }
         else {
             // Get the value to be returned.

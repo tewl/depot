@@ -12,9 +12,17 @@ export class IntRange implements Iterable<number> {
     private readonly _first: number;
     private readonly _last: number;
 
-    constructor(first: number, last: number) {
-        this._first = first;
-        this._last = last;
+
+    /**
+     * Creates a new IntRange containing the integers from begin (inclusive) to
+     * end (exclusive).
+     *
+     * @param begin - The first integer (inclusive)
+     * @param end - The end integer (exclusive)
+     */
+    constructor(begin: number, end: number) {
+        this._first = begin;
+        this._last = end;
     }
 
     *[Symbol.iterator](): Iterator<number> {

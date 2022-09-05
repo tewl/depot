@@ -97,38 +97,6 @@ describe("List", () => {
     });
 
 
-    describe("remove()", () => {
-
-        it("should be able to remove the specified element", () => {
-            const list = new List<number>();
-            list.push(1).push(2).push(3);
-
-            const itRemove = list.begin().offset(1);
-            list.remove(itRemove);
-
-            expect(list.length).toEqual(2);
-            expect(list.getAt(0)).toEqual(1);
-            expect(list.getAt(1)).toEqual(3);
-        });
-
-
-        it("should be able to remove the last element", () => {
-            const list = List.fromArray([1, 2, 3]);
-            let it = list.begin().offset(2);
-            list.remove(it);
-
-            it = list.begin();
-            expect(it.value).toEqual(1);
-            it.next();
-            expect(it.value).toEqual(2);
-            it.next();
-            expect(it.equals(list.end())).toBeTruthy();
-        });
-
-
-    });
-
-
     it("getAt() should return the value at the specified index", () => {
         const list: List<number> = new List<number>();
         list.push(1).push(2).push(3);
@@ -163,44 +131,103 @@ describe("List", () => {
     });
 
 
-    it("insert() should insert the specified value in front of the specified element", () => {
-        const list = new List<number>();
-        list.push(2).push(4).push(6);
-        const it = list.begin();
-        it.next();
-        const itResult = list.insert(it, 3);
-
-        expect(list.length).toEqual(4);
-        expect(list.getAt(0)).toEqual(2);
-        expect(list.getAt(1)).toEqual(3);
-        expect(list.getAt(2)).toEqual(4);
-        expect(list.getAt(3)).toEqual(6);
-        expect(itResult.value).toEqual(3);
-    });
-
-
-    it("insert() can insert multiple elements", () => {
-        const list = List.fromArray([5, 10, 15]);
-        const it = list.begin();
-        it.next();
-        const itResult = list.insert(it, 6, 7);
-
-        expect(list.length).toEqual(5);
-
-        expect(list.getAt(0)).toEqual(5);
-        expect(list.getAt(1)).toEqual(6);
-        expect(list.getAt(2)).toEqual(7);
-        expect(list.getAt(3)).toEqual(10);
-        expect(list.getAt(4)).toEqual(15);
-        expect(itResult.value).toEqual(6);
-    });
-
-
     it("iterator protocol allows Array.from to work", () => {
         const list = List.fromArray([1, 2, 3]);
         const arr = Array.from(list);
 
         expect(arr).toEqual([1, 2, 3]);
+    });
+
+
+    describe("splice()", () => {
+
+        it("will do nothing when the delete count is zero and no items to insert are specified", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin().offset(1), 0);
+            expect(Array.from(list)).toEqual([1, 2, 3, 4, 5]);
+            expect(deleted.length).toEqual(0);
+        });
+
+
+        it("can remove the specified number of items from the beginning of the list", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin(), 2);
+            expect(Array.from(list)).toEqual([3, 4, 5]);
+            expect(deleted).toEqual([1, 2]);
+        });
+
+
+        it("can remove the specified number of items in the middle of the list", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin().offset(1), 3);
+            expect(Array.from(list)).toEqual([1, 5]);
+            expect(deleted).toEqual([2, 3, 4]);
+        });
+
+
+        it("will only remove items to the end when the delete count is too high", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin().offset(3), 3);
+            expect(Array.from(list)).toEqual([1, 2, 3]);
+            expect(deleted).toEqual([4, 5]);
+        });
+
+
+        it("will not delete any items when the end node is specified", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.end(), 3);
+            expect(Array.from(list)).toEqual([1, 2, 3, 4, 5]);
+            expect(deleted.length).toEqual(0);
+        });
+
+
+        it("can insert the specified items at the beginning of the list", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin(), 0, 0.1, 0.2, 0.3);
+            expect(Array.from(list)).toEqual([0.1, 0.2, 0.3, 1, 2, 3, 4, 5]);
+            expect(deleted.length).toEqual(0);
+        });
+
+
+        it("can insert the specified items in the middle of the list", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.begin().offset(2), 0, 2.1, 2.2, 2.3);
+            expect(Array.from(list)).toEqual([1, 2, 2.1, 2.2, 2.3, 3, 4, 5]);
+            expect(deleted.length).toEqual(0);
+        });
+
+
+        it("can insert the specified items at the end of the list", () => {
+            const list = List.fromArray([1, 2, 3, 4, 5]);
+            const deleted = list.splice(list.end(), 0, 5.1, 5.2, 5.3);
+            expect(Array.from(list)).toEqual([1, 2, 3, 4, 5, 5.1, 5.2, 5.3]);
+            expect(deleted.length).toEqual(0);
+        });
+
+
+        it("can remove and insert items at the beginning of the list", () => {
+            const list = List.fromArray(["xxx", "xxx", "xxx", "3", "4", "5"]);
+            const deleted = list.splice(list.begin(), 3, "1", "2");
+            expect(Array.from(list)).toEqual(["1", "2", "3", "4", "5"]);
+            expect(deleted).toEqual(["xxx", "xxx", "xxx"]);
+        });
+
+
+        it("can remove and insert items in the middle of the list", () => {
+            const list = List.fromArray(["1", "xxx", "xxx", "xxx", "5"]);
+            const deleted = list.splice(list.begin().offset(1), 3, "2", "3", "4");
+            expect(Array.from(list)).toEqual(["1", "2", "3", "4", "5"]);
+            expect(deleted).toEqual(["xxx", "xxx", "xxx"]);
+        });
+
+
+        it("can remove and insert items at the end of the list", () => {
+            const list = List.fromArray(["1", "2", "xxx", "xxx", "xxx"]);
+            const deleted = list.splice(list.begin().offset(2), 3, "3", "4", "5");
+            expect(Array.from(list)).toEqual(["1", "2", "3", "4", "5"]);
+            expect(deleted).toEqual(["xxx", "xxx", "xxx"]);
+        });
+
     });
 
 
@@ -301,7 +328,7 @@ describe("List", () => {
             expect(itA.equals(itB)).toBeTruthy();
             expect(itA.value).toEqual(itB.value);
 
-            // The clone is independent.
+            // Advancing the clone will not advance the original, proving they are independent.
             itB.next();
             expect(itA.equals(itB)).toBeFalsy();
             expect(itA.value).not.toEqual(itB.value);

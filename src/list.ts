@@ -235,25 +235,6 @@ export class List<TValue> implements Iterable<TValue> {
 
 
     /**
-     * Removes the specified element from this List.
-     * @param it - Iterator pointing to the element to be removed.  If the
-     * iterator passed is end(), an Error will be thrown.
-     * @returns An iterator pointing to the element following the removed
-     * element, which may be end().
-     */
-    public remove(it: Iterator<TValue>): Iterator<TValue> {
-        const itEnd = this.end();
-        if (it.equals(itEnd)) {
-            throw new Error("Attempted to remove List elment at end().");
-        }
-
-        const nodeToRemove: DLNodeValue<TValue> = it._getDLNode() as DLNodeValue<TValue>;
-        const nextNode: DLNode<TValue> = this.removeNode(nodeToRemove);
-        return new Iterator<TValue>(nextNode, this._end);
-    }
-
-
-    /**
      * Gets the value at the specified index.
      * @param index - The index of the value to retrieve
      * @returns The value at the specified index
@@ -280,16 +261,34 @@ export class List<TValue> implements Iterable<TValue> {
 
 
     /**
-     * Inserts new elements into this list.
-     * @param insertInFrontOf - The new elements will be inserted in front of this element
-     * @param values - The values to insert
-     * @returns An Iterator pointing to the first inserted element, or `insertInFrontOf` if
-     * no values were specified.
+     * Splices items into this list, deleting some existing items and inserting
+     * other in their place.
+     * @param location - Iterator pointing at the first item to be deleted or
+     * the item new items will be inserted in front of.
+     * @param deleteCount - The number of items to be deleted
+     * @param newItems - The new values to be inserted
+     * @returns An array of the deleted items
      */
-    public insert(insertInFrontOf: Iterator<TValue>, ...values: Array<TValue>): Iterator<TValue> {
+    public splice(location: Iterator<TValue>, deleteCount: number, ...newItems: Array<TValue>): Array<TValue> {
 
-        const firstInsertedNode: DLNode<TValue> = this.insertNode(insertInFrontOf._getDLNode(), ...values);
-        return new Iterator(firstInsertedNode, this._end);
+        // Delete.
+        const deletedItems: Array<TValue> = [];
+        let curNode = location._getDLNode();
+        for (let i = 0; i < deleteCount; i++) {
+
+            if (curNode.nodeType === "DLNodeEnd") {
+                break;
+            }
+
+            deletedItems.push(curNode.value);
+            curNode = this.removeNode(curNode);
+
+        }
+
+        // Insert.
+        this.insertNode(curNode, ...newItems);
+
+        return deletedItems;
     }
 
 
@@ -326,6 +325,7 @@ export class List<TValue> implements Iterable<TValue> {
      */
     private insertNode(insertInFrontOf: DLNode<TValue>, ...values: Array<TValue>): DLNode<TValue> {
 
+        // If the array of items to insert is empty, we have nothing to do.
         if (values.length === 0) {
             return insertInFrontOf;
         }
@@ -498,6 +498,13 @@ export class Iterator<TValue> implements Iterator<TValue> {
     }
 
 
+    /**
+    * Clones the specified iterator and then advances it the specified number of
+    * times.
+    *
+    * @param offset - The number of times to advance the new iterator.
+    * @return The new iterator
+    */
     public offset(offset: number): Iterator<TValue> {
         // Make a copy of this iterator and then advance it.
         const it: Iterator<TValue> = new Iterator<TValue>(this._curNode, this._endNode);

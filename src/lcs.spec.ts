@@ -42,7 +42,7 @@ describe("createLcsTable()", () => {
                 {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
                 {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
                 {optSubproblem: OptimalSubproblem.Common, lcsLength: 2}
-            ],
+            ]
         ];
         expect(actual).toEqual(expected);
     });

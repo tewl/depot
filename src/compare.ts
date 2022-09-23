@@ -17,6 +17,26 @@ export interface IComparable<T> {
 // Reusable compare functions
 
 /**
+ * Compares two items using the less than operator.
+ *
+ * @param x - The first item
+ * @param y - The second item
+ * @return The result of the comparison
+ */
+export function compareIntrinsic<T>(x: T, y: T): CompareResult {
+    if (x < y) {
+        return CompareResult.LESS;
+    }
+    else if (y < x) {
+        return CompareResult.GREATER;
+    }
+    else {
+        return CompareResult.EQUAL;
+    }
+}
+
+
+/**
  * Compares two strings.
  *
  * @param x - The first string
@@ -24,15 +44,7 @@ export interface IComparable<T> {
  * @return The result of the comparison
  */
 export function compareStr(x: string, y: string): CompareResult {
-    if (x < y) {
-        return CompareResult.LESS;
-    }
-    else if (x > y) {
-        return CompareResult.GREATER;
-    }
-    else {
-        return CompareResult.EQUAL;
-    }
+    return compareIntrinsic(x, y);
 }
 
 
@@ -44,7 +56,6 @@ export function compareStr(x: string, y: string): CompareResult {
  * @return The result of the comparison
  */
 export function compareStrI(x: string, y: string): CompareResult {
-
     const res = x.localeCompare(y, "en", {sensitivity: "base"});
     if (res === 0) {
         return CompareResult.EQUAL;

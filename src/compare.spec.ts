@@ -1,4 +1,23 @@
-import {CompareResult, compareStr, compareStrI} from "./compare";
+import {compareIntrinsic, CompareResult, compareStr, compareStrI} from "./compare";
+
+
+describe("compareIntrinsic()", () => {
+
+    it("when first is less returns LESS", () => {
+        expect(compareIntrinsic(3, 5)).toEqual(CompareResult.LESS);
+    });
+
+
+    it("when first is greater returns GREATER", () => {
+        expect(compareIntrinsic(10, 2)).toEqual(CompareResult.GREATER);
+    });
+
+
+    it("when the two are equal returns EQUAL", () => {
+        expect(compareIntrinsic(6, 6)).toEqual(CompareResult.EQUAL);
+    });
+
+});
 
 
 describe("compareStr()", () => {

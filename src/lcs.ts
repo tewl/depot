@@ -111,6 +111,15 @@ export interface IDiffItemEqual<T> {
 
 export type DiffItem<T> = IDiffItemUniqueToX<T> | IDiffItemUniqueToY<T> | IDiffItemEqual<T>;
 
+
+/**
+ * Compares two sequences and returns the minimal differences.
+ *
+ * @param x - The first sequence
+ * @param y - The second sequence
+ * @param compareFn - A function used to compare items in the sequences
+ * @return An array of items describing the minimal differences between the two
+ */
 export function getDiff<T>(x: Array<T>, y: Array<T>, compareFn: CompareFunc<T>): Array<DiffItem<T>> {
     const table = createLcsTable(x, y, compareFn);
     let row = table.length - 1;

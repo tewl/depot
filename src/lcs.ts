@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import {assertNever} from "./never";
 import { CompareFunc, CompareResult } from "./compare";
 
 
@@ -89,4 +90,69 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
     }
 
     return table;
+}
+
+
+export interface IDiffItemUniqueToX<T> {
+    change: OptimalSubproblem.UniqueToX;
+    value: T;
+}
+
+export interface IDiffItemUniqueToY<T> {
+    change: OptimalSubproblem.UniqueToY;
+    value: T;
+}
+
+export interface IDiffItemEqual<T> {
+    change: OptimalSubproblem.Equal;
+    xValue: T;
+    yValue: T;
+}
+
+export type DiffItem<T> = IDiffItemUniqueToX<T> | IDiffItemUniqueToY<T> | IDiffItemEqual<T>;
+
+export function getDiff<T>(x: Array<T>, y: Array<T>, compareFn: CompareFunc<T>): Array<DiffItem<T>> {
+    const table = createLcsTable(x, y, compareFn);
+    let row = table.length - 1;
+    let col = table[0].length - 1;
+    const diffItems: Array<DiffItem<T>> = [];
+
+    while (row !== 0 || col !== 0) {
+
+        const change = table[row][col]!.optSubproblem;
+
+        switch (change) {
+            case OptimalSubproblem.UniqueToX:
+                diffItems.push({change: OptimalSubproblem.UniqueToX, value: x[row - 1]});
+                row--;
+                break;
+
+            case OptimalSubproblem.UniqueToY:
+                diffItems.push({change: OptimalSubproblem.UniqueToY, value: y[col - 1]});
+                col--;
+                break;
+
+            case OptimalSubproblem.Equal:
+                diffItems.push({change: OptimalSubproblem.Equal, xValue: x[row - 1], yValue: y[col - 1]});
+                row--;
+                col--;
+                break;
+
+            case undefined:
+                if (row === 0) {
+                    diffItems.push({change: OptimalSubproblem.UniqueToY, value: y[col - 1]});
+                    col--;
+                }
+                else if (col === 0) {
+                    diffItems.push({change: OptimalSubproblem.UniqueToX, value: x[row - 1]});
+                    row--;
+                }
+                break;
+
+            default:
+                assertNever(change);
+        }
+    }
+
+    return diffItems.reverse();
 }

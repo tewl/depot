@@ -1,4 +1,4 @@
-import { CompareResult, compareStr, compareStrI } from "./compare";
+import {compareStr, compareStrI} from "./compare";
 import {createLcsTable, OptimalSubproblem, Table} from "./lcs";
 
 

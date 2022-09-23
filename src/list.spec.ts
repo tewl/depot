@@ -272,7 +272,7 @@ describe("List", () => {
         list.pop();
         expect(list.length).toEqual(0);
 
-        list.insert(list.end(), 1, 2, 3);
+        list.splice(list.end(), 0, 1, 2, 3);
         expect(list.length).toEqual(3);
 
         const it = list.begin();

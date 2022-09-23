@@ -388,7 +388,7 @@ export class List<TValue> implements Iterable<TValue> {
         itFirst = itPivot.offset(1);
 
         // Remove the pivot element.
-        this.remove(itPivot);
+        this.splice(itPivot, 1);
 
         // partition() from itFirst (inclusive) to itLast (exclusive) based on
         // curVal < pivot.  Once the range is partitioned, we will be able to
@@ -398,7 +398,9 @@ export class List<TValue> implements Iterable<TValue> {
         const insertedAtEnd = itPartition.equals(itLast);
 
         // Insert the pivot element at the beginning of the second range (returned from partition()).
-        itPartition = this.insert(itPartition, pivotValue);
+        this.splice(itPartition, 0, pivotValue);
+        // Move the iterator back the pivot value that was just inserted.
+        itPartition = itPartition.offset(-1);
 
         if (insertedAtBeginning) {
             // We just inserted the pivot at the beginning of the sequence.  We

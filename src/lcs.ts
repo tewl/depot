@@ -3,9 +3,9 @@ import { CompareFunc, CompareResult } from "./compare";
 
 
 export enum OptimalSubproblem {
-    XInserted,   // Up
-    YInserted,   // Left
-    Common       // Diagonal
+    UniqueToX,   // Up
+    UniqueToY,   // Left
+    Equal        // Diagonal
 }
 
 
@@ -63,7 +63,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // subproblem to the upper left and increment the LCS length.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.Common,
+                        optSubproblem: OptimalSubproblem.Equal,
                         lcsLength:     table[tableRow - 1][tableCol - 1]!.lcsLength + 1
                     };
             }
@@ -72,7 +72,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // it, and keep the LCS length the same.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.XInserted,
+                        optSubproblem: OptimalSubproblem.UniqueToX,
                         lcsLength:     table[tableRow - 1][tableCol]!.lcsLength
                     };
             }
@@ -81,7 +81,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // and keep the LCS length the same.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.YInserted,
+                        optSubproblem: OptimalSubproblem.UniqueToY,
                         lcsLength:     table[tableRow][tableCol - 1]!.lcsLength
                     };
             }

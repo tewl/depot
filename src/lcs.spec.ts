@@ -17,31 +17,31 @@ describe("createLcsTable()", () => {
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.Common, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 1}
+                {optSubproblem: OptimalSubproblem.Equal, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 1}
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1}
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1}
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1}
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1}
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.Common, lcsLength: 2}
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.Equal, lcsLength: 2}
             ]
         ];
         expect(actual).toEqual(expected);
@@ -60,21 +60,21 @@ describe("createLcsTable()", () => {
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.Common, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.Equal, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 1},
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.Common, lcsLength: 2},
-                {optSubproblem: OptimalSubproblem.YInserted, lcsLength: 2},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.Equal, lcsLength: 2},
+                {optSubproblem: OptimalSubproblem.UniqueToY, lcsLength: 2},
             ],
             [
                 {optSubproblem: undefined, lcsLength: 0},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 1},
-                {optSubproblem: OptimalSubproblem.XInserted, lcsLength: 2},
-                {optSubproblem: OptimalSubproblem.Common, lcsLength: 3},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 1},
+                {optSubproblem: OptimalSubproblem.UniqueToX, lcsLength: 2},
+                {optSubproblem: OptimalSubproblem.Equal, lcsLength: 3},
             ]
         ];
         expect(actual).toEqual(expected);

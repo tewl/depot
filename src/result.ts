@@ -526,6 +526,30 @@ export namespace Result {
 
 
     /**
+     * Converts a truthy value to a successful Result
+     * @param falseErrMsg - Error message used if the input is falsy
+     * @param val - The input value
+     * @returns A successful Result if the input is truthy; a failure Result
+     * otherwise.
+     */
+    export function requireTruthy(falseErrMsg: string, val: unknown): Result<boolean, string> {
+        return val ? new SucceededResult(true) : new FailedResult(falseErrMsg);
+    }
+
+
+    /**
+     * Converts a falsy value to a successful Result
+     * @param trueErrMsg - Error messaged use if the input is truthy
+     * @param val - The input value
+     * @returns A successful Result if the input is falsy; a failure Result
+     * otherwise.
+     */
+    export function requireFalsy(trueErrMsg: string, val: unknown): Result<boolean, string> {
+        return val ? new FailedResult(trueErrMsg) : new SucceededResult(false);
+    }
+
+
+    /**
      * Performs side-effects for the given Result
      *
      * @param fn - The function to invoke, passing the Result

@@ -7,7 +7,7 @@ export type RemoveListenerFunc = () => void;
 
 
 /**
- * Levels controlling what log messages are written to stdout.
+ * Levels controlling what messages are logged.
  */
 export enum LogLevel {
     Off0     = 0,

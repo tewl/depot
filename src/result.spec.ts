@@ -613,9 +613,6 @@ describe("Result namespace", () => {
     });
 
 
-    ////////////////////////////////////////////////////////////////////////////////
-
-
     describe("tap()", () => {
 
         it("calls the function when the input Result is a failure", () => {

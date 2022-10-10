@@ -1,4 +1,4 @@
-import { Uuid } from ".";
+import { Uuid } from "./uuid";
 import { Brand } from "./brand";
 
 

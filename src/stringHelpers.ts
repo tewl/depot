@@ -6,10 +6,10 @@ import { FailedResult, Result, SucceededResult } from "./result";
 
 
 /**
- * Counts the number of times padStr occurs at the beginning of str.
+ * Counts the number of times _padStr_ occurs at the beginning of str.
  * @param str - The string to inspect
  * @param padStr - The substring to count occurrences of
- * @return The number of times padStr occurs at the beginning of str
+ * @return The number of times _padStr_ occurs at the beginning of _str_
  */
 export function numInitial(str: string, padStr: string): number {
     if (padStr === "") {
@@ -29,7 +29,7 @@ export function numInitial(str: string, padStr: string): number {
 
 
 /**
- * Creates a string where each line of src is indented.
+ * Creates a string where each line of _src_ is indented.
  * @param src - The string to be indented
  * @param numSpacesOrPad - The number of spaces to indent each line
  * @param skipFirstLine - If truthy, the first line will not be indented
@@ -160,6 +160,19 @@ export function removeBlankLines(str: string): string {
  */
 export function isBlank(text: string): boolean {
     return blankLineRegex.test(text);
+}
+
+
+/**
+ * Determines whether the specified value is a string containing one or more
+ * non-whitespace characters.  Suitable for dto or input validation.
+ *
+ * @param val - The value to test
+ * @return Whether the value is a string containing one or more non-whitespace
+ * characters.
+ */
+export function isNonBlankString(val: unknown): val is string {
+    return typeof val === "string" && !isBlank(val);
 }
 
 

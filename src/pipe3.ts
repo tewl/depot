@@ -1,4 +1,11 @@
-
+/**
+ * Provides an initial value with which to start a pipeline containing
+ * synchronous functions.
+ *
+ * @param startVal - The value to start the pipeline with.
+ * @returns An object wrapping the pipelined value.  Use its end() method to get
+ * the value.
+ */
 export function pipe<T>(startVal: T): PipeValue<T> {
     return new PipeValue(startVal);
 }
@@ -7,7 +14,7 @@ export function pipe<T>(startVal: T): PipeValue<T> {
  * Class that provides the ability to start with a single value and pass it
  * through a collection of functions, each function receiving its input from the
  * previous function's output.  Instances of this class can be thought of as a
- * piped value.  All methods are strongly typed.
+ * piped value.
  */
 class PipeValue<T> {
 
@@ -39,7 +46,7 @@ class PipeValue<T> {
     /**
      * Used at the end of a pipe() chain to retrieve the resulting value.
      */
-    public get end(): T {
+    public end(): T {
         return this._val;
     }
 }

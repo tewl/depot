@@ -13,7 +13,7 @@ describe("Pipe", () => {
             .pipe((n) => n + 1)
             .pipe((n) => n.toString())
             .pipe((str) => str + "!")
-            .end;
+            .end();
         expect(result).toEqual("16!");
     });
 

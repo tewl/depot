@@ -145,8 +145,10 @@ export function all(
  * This has the advantage that higher order functions can be used to create the
  * array (i.e. _.map()), but has the disadvantage that there can only be one
  * Result success type and one Result failure type.
- * @param param - Description
- * @return Description
+ * @param promises - The input array of Promises for Results.
+ * @return If all input Promises resolve with successful Results, a Result
+ * containing an array of those successful Results is returned.  Otherwise, an
+ * array of the failed Results is returned.
  */
 export function allArray<TSuccess, TFail>(
     promises: Array<Promise<Result<TSuccess, TFail>>>

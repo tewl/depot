@@ -30,12 +30,11 @@ class PipeValue<T> {
 
 
     /**
-     * Pipes this instance's value into the specified function to obtain the
-     * output.
+     * Pipes this instance's value into the specified function.
      *
      * @param fn - The function this value will be passed into to obtain the
      * output that may eventually be passed into the next piped function.
-     * @returns A new piped value.
+     * @returns An object wrapping the function's returned value (to allow further piping)
      */
     public pipe<TOutput>(fn: (input: T) => TOutput): PipeValue<TOutput> {
         const outVal = fn(this._val);
@@ -45,6 +44,8 @@ class PipeValue<T> {
 
     /**
      * Used at the end of a pipe() chain to retrieve the resulting value.
+     *
+     * @returns The inner value.
      */
     public end(): T {
         return this._val;

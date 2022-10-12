@@ -27,19 +27,32 @@ class PipeAsyncValue<T> {
     }
 
 
+    /**
+     * Passes this instance's (resolved) value into the specified function.
+     *
+     * @param fn - The next function in the pipeline, which will receive the
+     * current (resolved) value as input.  This function may be synchronous or
+     * asynchronous.  If a synchronous value is returned, it will automatically
+     * be wrapped in a Promise.
+     * @returns An object wrapping the new function's asynchronous return value
+     * (to allow further piping)
+     */
     public pipe<TOutput>(fn: (input: T) => TOutput | Promise<TOutput>): PipeAsyncValue<TOutput> {
 
-        const nextPromise = this._val
-        .then((thisVal: T) => {
-            return Promise.resolve(fn(thisVal));
-        });
+        const nextPromise =
+            this._val
+            .then((thisVal: T) => {
+                return Promise.resolve(fn(thisVal));
+            });
 
         return new PipeAsyncValue(nextPromise);
     }
 
 
     /**
-     * Unwraps this async value.
+     * Used at the end of a pipeAsync() chain to retrieve the chain's resolved
+     * value.
+     *
      * @returns The inner value.
      */
     public async end(): Promise<T> {

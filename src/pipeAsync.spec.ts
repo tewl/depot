@@ -1,4 +1,4 @@
-import {pipeAsync} from "./asyncPipe";
+import {pipeAsync} from "./pipeAsync";
 import { getTimerPromise } from "./promiseHelpers";
 
 

@@ -210,10 +210,10 @@ describe("Result namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Result.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Result.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new FailedResult("Step 1 error."));
             expect(numStep2Invocations).toEqual(0);
         });
@@ -231,10 +231,10 @@ describe("Result namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Result.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Result.augment(step2, res))
+                .end();
+
             expect(numStep2Invocations).toEqual(1);
         });
 
@@ -251,10 +251,10 @@ describe("Result namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Result.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Result.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new FailedResult("Step 2 error."));
         });
 
@@ -271,10 +271,10 @@ describe("Result namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Result.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Result.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new SucceededResult({a: 1, b: 2, c: 3, d: 4}));
         });
 
@@ -291,10 +291,10 @@ describe("Result namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Result.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Result.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new SucceededResult({a: 1, b: 0}));
         });
 
@@ -350,12 +350,12 @@ describe("Result namespace", () => {
                 return new SucceededResult(`${x}`);
             }
 
-            const resultA = pipe(
-                "16",
-                parse,
-                (r) => Result.bind(sqrt, r),
-                (r) => Result.bind(stringify, r)
-            );
+            const resultA =
+                pipe("16")
+                .pipe(parse)
+                .pipe((r) => Result.bind(sqrt, r))
+                .pipe((r) => Result.bind(stringify, r))
+                .end();
 
             expect(resultA.succeeded).toBeTruthy();
             expect(resultA.value).toEqual("4");
@@ -370,10 +370,9 @@ describe("Result namespace", () => {
         it("returns an array where only successful mappings are included", () => {
 
             const result =
-                pipe(
-                    [1, 2, 3, 4, 5, 6],
-                    (input) => Result.choose((n) => n % 2 === 0 ? new SucceededResult(n + 1) : new FailedResult(""), input)
-                );
+                pipe([1, 2, 3, 4, 5, 6])
+                .pipe((input) => Result.choose((n) => n % 2 === 0 ? new SucceededResult(n + 1) : new FailedResult(""), input))
+                .end();
 
             expect(result).toEqual([3, 5, 7]);
 
@@ -622,10 +621,9 @@ describe("Result namespace", () => {
                 return new SucceededResult(12);
             }
 
-            pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tap(tapFn, res)
-            );
+            pipe(new FailedResult("error message") as Result<number, string>)
+            .pipe((res) => Result.tap(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(1);
         });
@@ -638,10 +636,9 @@ describe("Result namespace", () => {
                 return new SucceededResult(12);
             }
 
-            pipe(
-                new SucceededResult(1) as Result<number, string>,
-                (res) => Result.tap(tapFn, res)
-            );
+            pipe(new SucceededResult(1) as Result<number, string>)
+            .pipe((res) => Result.tap(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(1);
         });
@@ -654,10 +651,10 @@ describe("Result namespace", () => {
                 return new SucceededResult(12);
             }
 
-            const actual = pipe(
-                new SucceededResult(1) as Result<number, string>,
-                (res) => Result.tap(tapFn, res)
-            );
+            const actual =
+                pipe(new SucceededResult(1) as Result<number, string>)
+                .pipe((res) => Result.tap(tapFn, res))
+                .end();
 
             expect(actual).toEqual(new SucceededResult(1));
         });
@@ -673,10 +670,9 @@ describe("Result namespace", () => {
                 return "tapFn() return value";
             }
 
-            pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
+            pipe(new FailedResult("error message") as Result<number, string>)
+            .pipe((res) => Result.tapError(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(1);
         });
@@ -689,10 +685,9 @@ describe("Result namespace", () => {
                 return "tapFn() return value";
             }
 
-            pipe(
-                new SucceededResult(1) as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
+            pipe(new SucceededResult(1) as Result<number, string>)
+            .pipe((res) => Result.tapError(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(0);
         });
@@ -705,10 +700,10 @@ describe("Result namespace", () => {
                 return "tapFn() return value";
             }
 
-            const actual = pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tapError(tapFn, res)
-            );
+            const actual =
+                pipe(new FailedResult("error message") as Result<number, string>)
+                .pipe((res) => Result.tapError(tapFn, res))
+                .end();
 
             expect(actual).toEqual(new FailedResult("error message"));
         });
@@ -723,10 +718,9 @@ describe("Result namespace", () => {
                 numInvocations++;
             }
 
-            pipe(
-                new FailedResult("error message") as Result<number, string>,
-                (res) => Result.tapSuccess(tapFn, res)
-            );
+            pipe(new FailedResult("error message") as Result<number, string>)
+            .pipe((res) => Result.tapSuccess(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(0);
         });
@@ -738,10 +732,9 @@ describe("Result namespace", () => {
                 numInvocations++;
             }
 
-            pipe(
-                new SucceededResult(3) as Result<number, string>,
-                (res) => Result.tapSuccess(tapFn, res)
-            );
+            pipe(new SucceededResult(3) as Result<number, string>)
+            .pipe((res) => Result.tapSuccess(tapFn, res))
+            .end();
 
             expect(numInvocations).toEqual(1);
         });
@@ -754,10 +747,10 @@ describe("Result namespace", () => {
                 return num++;   // Should have no effect
             }
 
-            const actual = pipe(
-                new SucceededResult(3) as Result<number, string>,
-                (res) => Result.tapSuccess(tapFn, res)
-            );
+            const actual =
+                pipe(new SucceededResult(3) as Result<number, string>)
+                .pipe((res) => Result.tapSuccess(tapFn, res))
+                .end();
 
             expect(actual).toEqual(new SucceededResult(3));
         });

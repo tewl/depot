@@ -117,10 +117,10 @@ describe("Option namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Option.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Option.augment(step2, res))
+                .end();
+
             expect(res).toEqual(NoneOption.get());
             expect(numStep2Invocations).toEqual(0);
         });
@@ -138,10 +138,10 @@ describe("Option namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Option.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Option.augment(step2, res))
+                .end();
+
             expect(numStep2Invocations).toEqual(1);
         });
 
@@ -158,10 +158,10 @@ describe("Option namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Option.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Option.augment(step2, res))
+                .end();
+
             expect(res).toEqual(NoneOption.get());
         });
 
@@ -178,10 +178,10 @@ describe("Option namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Option.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Option.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new SomeOption({a: 1, b: 2, c: 3, d: 4}));
         });
 
@@ -198,10 +198,10 @@ describe("Option namespace", () => {
             }
 
             const res =
-                pipe(
-                    step1(),
-                    (res) => Option.augment(step2, res)
-                );
+                pipe(step1())
+                .pipe((res) => Option.augment(step2, res))
+                .end();
+
             expect(res).toEqual(new SomeOption({a: 1, b: 0}));
         });
 
@@ -234,19 +234,20 @@ describe("Option namespace", () => {
         it("can be used easily with pipe()", () => {
             const subtract1 = (x: number) => x <= 0 ? NoneOption.get() : new SomeOption(x - 1);
 
-            const opt1 = pipe(
-                2,
-                subtract1,                              // 1
-                (o) => Option.bind(subtract1, o),        // 0
-                (o) => Option.bind(subtract1, o)         // none
-            );
+            const opt1 =
+                pipe(2)
+                .pipe(subtract1)
+                .pipe((o) => Option.bind(subtract1, o))
+                .pipe((o) => Option.bind(subtract1, o))
+                .end();
             expect(opt1.isNone).toBeTruthy();
 
-            const opt2 = pipe(
-                2,
-                subtract1,                              // 1
-                (o) => Option.bind(subtract1, o)         // 0
-            );
+            const opt2 =
+                pipe(2)
+                .pipe(subtract1)
+                .pipe((o) => Option.bind(subtract1, o))
+                .end();
+
             expect(opt2.isSome).toBeTruthy();
             expect(opt2.value).toEqual(0);
 
@@ -260,10 +261,9 @@ describe("Option namespace", () => {
         it("returns an array where only Some mappings are included", () => {
 
             const result =
-                pipe(
-                    [1, 2, 3, 4, 5, 6],
-                    (input) => Option.choose((n) => n % 2 === 0 ? new SomeOption(n + 1) : NoneOption.get(), input)
-                );
+                pipe([1, 2, 3, 4, 5, 6])
+                .pipe((input) => Option.choose((n) => n % 2 === 0 ? new SomeOption(n + 1) : NoneOption.get(), input))
+                .end();
 
             expect(result).toEqual([3, 5, 7]);
 
@@ -358,12 +358,12 @@ describe("Option namespace", () => {
         it("can be used easily with pipe()", () => {
             const add1 = (x: number) => x + 1;
 
-            const opt = pipe(
-                new SomeOption(3),
-                (o) => Option.mapSome(add1, o),        // 4
-                (o) => Option.mapSome(add1, o),        // 5
-                (o) => Option.mapSome(add1, o)         // 6
-            );
+            const opt =
+                pipe(new SomeOption(3))
+                .pipe((o) => Option.mapSome(add1, o))
+                .pipe((o) => Option.mapSome(add1, o))
+                .pipe((o) => Option.mapSome(add1, o))
+                .end();
 
             expect(opt.isSome).toBeTruthy();
             expect(opt.value).toEqual(6);

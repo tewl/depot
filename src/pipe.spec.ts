@@ -1,18 +1,19 @@
 import { pipe } from "./pipe";
 
-describe("pipe()", () => {
+
+
+describe("Pipe", () => {
 
 
     it("pipes a value through the specified functions", () => {
         const result =
-            pipe(
-                "5",
-                (str) => parseInt(str, 10),
-                (n) => n * 3,
-                (n) => n + 1,
-                (n) => n.toString(),
-                (str) => str + "!"
-            );
+            pipe("5")
+            .pipe((str) => parseInt(str, 10))
+            .pipe((n) => n * 3)
+            .pipe((n) => n + 1)
+            .pipe((n) => n.toString())
+            .pipe((str) => str + "!")
+            .end();
         expect(result).toEqual("16!");
     });
 

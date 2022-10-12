@@ -168,11 +168,15 @@ export function isBlank(text: string): boolean {
  * non-whitespace characters.  Suitable for dto or input validation.
  *
  * @param val - The value to test
+ * @param errMsg - The error message that will be returned if _val_ is not a
+ * string or is blank.
  * @return Whether the value is a string containing one or more non-whitespace
  * characters.
  */
-export function isNonBlankString(val: unknown): val is string {
-    return typeof val === "string" && !isBlank(val);
+export function isNonBlankString(val: unknown, errMsg: string): Result<string, string> {
+    return typeof val === "string" && !isBlank(val) ?
+        new SucceededResult(val) :
+        new FailedResult(errMsg);
 }
 
 

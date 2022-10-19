@@ -104,30 +104,62 @@ describe("Uuid", () => {
 
 
     describe("instnace", () => {
-        describe("equals()", () => {
-            it("returns false when two instances are different", () => {
-                const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
-                const uuid2 = Uuid.fromString("b1096b4bdb344926997fb97256373e2f").value!;
-                expect(uuid1.equals(uuid2)).toBeFalse();
+
+        describe("equals() when called with a Uuid", () => {
+
+            describe("when called with a Uuid", () => {
+
+                it("returns false when two instances are different", () => {
+                    const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    const uuid2 = Uuid.fromString("b1096b4bdb344926997fb97256373e2f").value!;
+                    expect(uuid1.equals(uuid2)).toBeFalse();
+                });
+
+
+                it("returns true when two instances are equal", () => {
+                    const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    const uuid2 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    expect(uuid1.equals(uuid2)).toBeTrue();
+                });
+
+
+                it("returns true when two instances are equal but and are using different formats", () => {
+                    const uuid1 = Uuid.fromString("a1096b4b-db34-4926-997f-b97256373e2f").value!;
+                    const uuid2 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    expect(uuid1.equals(uuid2)).toBeTrue();
+                });
             });
 
 
-            it("returns true when two instances are equal", () => {
-                const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
-                const uuid2 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
-                expect(uuid1.equals(uuid2)).toBeTrue();
-            });
+            describe("when called with a string", () => {
+
+                it("returns false when they are different", () => {
+                    const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    const uuid2 = "b1096b4bdb344926997fb97256373e2f";
+                    expect(uuid1.equals(uuid2)).toBeFalse();
+                });
 
 
-            it("returns true when two instances are equal but and are using different formats", () => {
-                const uuid1 = Uuid.fromString("a1096b4b-db34-4926-997f-b97256373e2f").value!;
-                const uuid2 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
-                expect(uuid1.equals(uuid2)).toBeTrue();
+                it("returns true when they are equal", () => {
+                    const uuid1 = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
+                    const uuid2 = "a1096b4bdb344926997fb97256373e2f";
+                    expect(uuid1.equals(uuid2)).toBeTrue();
+                });
+
+
+                it("returns true when equal but using different formats", () => {
+                    const uuid1 = Uuid.fromString("a1096b4b-db34-4926-997f-b97256373e2f").value!;
+                    const uuid2 = "a1096b4bdb344926997fb97256373e2f";
+                    expect(uuid1.equals(uuid2)).toBeTrue();
+                });
+
             });
+
         });
 
 
         describe("toString()", () => {
+
             it("always returns the uuid in the format specified during creation", () => {
                 const dUuid = Uuid.fromString("b8d7a702-5f65-491a-9aad-5ce704ddd566").value!;
                 expect(dUuid.toString()).toEqual("b8d7a702-5f65-491a-9aad-5ce704ddd566");
@@ -135,6 +167,7 @@ describe("Uuid", () => {
                 const nUuid = Uuid.fromString("a1096b4bdb344926997fb97256373e2f").value!;
                 expect(nUuid.toString()).toEqual("a1096b4bdb344926997fb97256373e2f");
             });
+
         });
     });
 });

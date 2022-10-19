@@ -54,7 +54,7 @@ export function generateUuid(format: UuidFormat = UuidFormat.D): string {
 }
 
 
-export class Uuid implements IEquatable<Uuid> {
+export class Uuid implements IEquatable<Uuid>, IEquatable<string> {
     /**
      * Creates a standardized representation of the specified UUID string to make
      * validation and comparison simpler.
@@ -133,7 +133,16 @@ export class Uuid implements IEquatable<Uuid> {
      * @param other - The Uuid instance to compare this instance to
      * @return Whether this instance equals `other`.
      */
-    public equals(other: Uuid): boolean {
+    public equals(other: Uuid | string): boolean {
+        if (typeof other === "string") {
+            const otherUuidRes = Uuid.fromString(other);
+            if (otherUuidRes.failed) {
+                // other is not a Uuid, so it cannot be equal.
+                return false;
+            }
+            // Call this method again.  This time, with a Uuid.
+            return this.equals(otherUuidRes.value);
+        }
         const thisNormalized = Uuid.toNormalizedString(this._uuidStr);
         const otherNormalized = Uuid.toNormalizedString(other._uuidStr);
         return thisNormalized === otherNormalized;

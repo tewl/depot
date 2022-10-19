@@ -758,4 +758,41 @@ describe("Result namespace", () => {
     });
 
 
+    describe("throwIfFailed()", () => {
+
+        it("unwraps the value when given a successful result", () => {
+            const res = new SucceededResult(5);
+            const val = Result.throwIfFailed("error message", res);
+            expect(val).toEqual(5);
+        });
+
+
+        it("throws when given a failed Result", () => {
+            const res = new FailedResult("error 12");
+            expect(() => {
+                const val = Result.throwIfFailed("operation failed", res);
+            }).toThrowError("operation failed");
+
+        });
+    });
+
+
+    describe("throwIfSucceeded()", () => {
+
+        it("unwraps the error when given a failed result", () => {
+            const res = new FailedResult("error 9");
+            const err = Result.throwIfSucceeded("error message", res);
+            expect(err).toEqual("error 9");
+        });
+
+
+        it("throws when given a successful Result", () => {
+            const res = new SucceededResult(6);
+            expect(() => {
+                const val = Result.throwIfSucceeded("operation should have failed", res);
+            }).toThrowError("operation should have failed");
+
+        });
+    });
+
 });

@@ -526,7 +526,10 @@ export namespace Result {
 
 
     /**
-     * Converts a truthy value to a successful Result
+     * Converts a boolean value to a Result where truthy values become a successful
+     * Result containing true and falsy values become a failed Result containing
+     * the specified error message.
+     *
      * @param falseErrMsg - Error message used if the input is falsy
      * @param val - The input value
      * @returns A successful Result if the input is truthy; a failure Result
@@ -538,7 +541,10 @@ export namespace Result {
 
 
     /**
-     * Converts a falsy value to a successful Result
+     * Converts a boolean value to a Result where falsy values become a
+     * successful Result containing false and truthy values become a failed
+     * Result containing the specified error message.
+     *
      * @param trueErrMsg - Error messaged use if the input is truthy
      * @param val - The input value
      * @returns A successful Result if the input is falsy; a failure Result
@@ -598,6 +604,38 @@ export namespace Result {
             fn(input.value);
         }
         return input;
+    }
+
+
+    /**
+     * Unwraps a successful Result, throwing if it is a failure.
+     *
+     * @param errorMsg - The error message to use when throwing in the event the
+     * Result is a failure
+     * @param result - The input Result
+     * @returns The unwrapped successful Result value
+     */
+    export function throwIfFailed<TSuccess, TError>(errorMsg: string, result: Result<TSuccess, TError>): TSuccess {
+        if (result.failed) {
+            throw new Error(errorMsg);
+        }
+        return result.value;
+    }
+
+
+    /**
+     * Unwraps a failed Result, throwing if it is a success.
+     *
+     * @param errorMsg - The error message to use when throwing in the event the
+     * Result is a success.
+     * @param result - The input Result
+     * @returns The unwrapped failed Result error.
+     */
+    export function throwIfSucceeded<TSuccess, TError>(errorMsg: string, result: Result<TSuccess, TError>): TError {
+        if (result.succeeded) {
+            throw new Error(errorMsg);
+        }
+        return result.error;
     }
 
 }

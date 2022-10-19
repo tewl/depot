@@ -126,7 +126,7 @@ describe("Result type", () => {
     }
 
 
-    it("status can be easily deciphered", () => {
+    it("status can be easily determined", () => {
 
         const res = doSomething();
         if (res.succeeded) {
@@ -607,6 +607,68 @@ describe("Result namespace", () => {
             const result = Result.mapWhileSuccessful(inputs, mapFn);
             expect(result.succeeded).toBeTrue();
             expect(result.value!).toEqual([[1, 2], [2, 3], [3, 4]]);
+        });
+
+    });
+
+
+    describe("requireFalsy()", () => {
+
+        it("converts a falsy value to a successful Result containing the value", () => {
+            const res = Result.requireFalsy("error", "");
+            expect(res.succeeded).toBeTrue();
+            expect(res.value).toEqual("");
+        });
+
+
+        it("converts a truthy value to a failed Result", () => {
+            const res = Result.requireFalsy("Value not falsy", "truthy string");
+            expect(res.failed).toBeTrue();
+            expect(res.error).toEqual("Value not falsy");
+        });
+
+    });
+
+
+    describe("requireOk()", () => {
+
+        it("converts an ok value to a successful Result containing the value", () => {
+            const val = {
+                ok:   true,
+                name: "Fred"
+            };
+            const res = Result.requireOk("Not ok", val);
+            expect(res.succeeded).toBeTrue();
+            expect(res.value).toEqual({ok: true, name: "Fred"});
+        });
+
+
+        it("converts a not-ok value to a failed Result", () => {
+            const val = {
+                ok:   false,
+                name: "Fred"
+            };
+            const res = Result.requireOk("Not ok", val);
+            expect(res.failed).toBeTrue();
+            expect(res.error).toEqual("Not ok");
+        });
+
+    });
+
+
+    describe("requireTruthy()", () => {
+
+        it("converts a truthy value to a successful Result containing the value", () => {
+            const res = Result.requireTruthy("not truthy", "truthy value");
+            expect(res.succeeded).toBeTrue();
+            expect(res.value).toEqual("truthy value");
+        });
+
+
+        it("converts a falsy value to a failed Result", () => {
+            const res = Result.requireTruthy("not truthy", undefined);
+            expect(res.failed).toBeTrue();
+            expect(res.error).toEqual("not truthy");
         });
 
     });

@@ -526,6 +526,38 @@ export namespace Result {
 
 
     /**
+     * Converts a boolean value to a Result where falsy values become a
+     * successful Result containing _val_ and truthy values become a failed
+     * Result containing the specified error message.
+     *
+     * @param trueErrMsg - Error messaged use if the input is truthy
+     * @param val - The input value
+     * @returns A successful Result if the input is falsy; a failure Result
+     * otherwise.
+     */
+    export function requireFalsy<TVal>(trueErrMsg: string, val: TVal): Result<TVal, string> {
+        return val ? new FailedResult(trueErrMsg) : new SucceededResult(val);
+    }
+
+
+    /**
+     * Converts an object containing an _ok_ property (such as a fetch response)
+     * to a Result.
+     *
+     * @param errMsg - Error message to use if the ok property is false
+     * @param val - The input object that has an ok property
+     * @returns If _ok_ is truthy, a successful Result wrapping _val_.
+     * Otherwise, a failed Result containing the error message.
+     */
+    export function requireOk<TVal extends {ok: boolean}>(
+        errMsg: string,
+        val: TVal
+    ): Result<TVal, string> {
+        return val.ok ? new SucceededResult(val) : new FailedResult(errMsg);
+    }
+
+
+    /**
      * Converts a boolean value to a Result where truthy values become a successful
      * Result containing true and falsy values become a failed Result containing
      * the specified error message.
@@ -535,23 +567,8 @@ export namespace Result {
      * @returns A successful Result if the input is truthy; a failure Result
      * otherwise.
      */
-    export function requireTruthy(falseErrMsg: string, val: unknown): Result<boolean, string> {
-        return val ? new SucceededResult(true) : new FailedResult(falseErrMsg);
-    }
-
-
-    /**
-     * Converts a boolean value to a Result where falsy values become a
-     * successful Result containing false and truthy values become a failed
-     * Result containing the specified error message.
-     *
-     * @param trueErrMsg - Error messaged use if the input is truthy
-     * @param val - The input value
-     * @returns A successful Result if the input is falsy; a failure Result
-     * otherwise.
-     */
-    export function requireFalsy(trueErrMsg: string, val: unknown): Result<boolean, string> {
-        return val ? new FailedResult(trueErrMsg) : new SucceededResult(false);
+    export function requireTruthy<TVal>(falseErrMsg: string, val: TVal): Result<TVal, string> {
+        return val ? new SucceededResult(val) : new FailedResult(falseErrMsg);
     }
 
 

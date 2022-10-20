@@ -41,6 +41,15 @@ describe("all()", () => {
     });
 
 
+    it("works with an input array of one element", async () => {
+        const result = await promiseResult.all(
+            getTimerPromise(25, new SucceededResult(25))
+        );
+        expect(result.succeeded).toBeTruthy();
+        expect(result.value).toEqual([25]);
+    });
+
+
     it("when one result fails, the returned promise resolves with a Result containing the index of the item that failed and its error", async () => {
         const op1 = () => getTimerPromise(25, new SucceededResult(25));
         const op2 = () => getTimerPromise(50, new FailedResult("Error 1"));

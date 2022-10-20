@@ -21,6 +21,12 @@ export async function toPromise<TSuccess, TError>(
 ////////////////////////////////////////////////////////////////////////////////
 // all()
 ////////////////////////////////////////////////////////////////////////////////
+export async function all<TSA, TFA>(
+    a: Promise<Result<TSA, TFA>>
+): Promise<Result<
+    [TSA], IIndexedItem<TFA>
+>>;
+
 export async function all<TSA, TFA, TSB, TFB>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>

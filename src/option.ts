@@ -54,6 +54,13 @@ export class NoneOption implements IOption<undefined> {
 
     private static readonly _instance: NoneOption = new NoneOption();
 
+    /**
+     * Gets the one-and-only instance.  Implemented as a single (1) to reduce
+     * memory consumption and (2) to allow JS's === operator (which uses
+     * reference equality) to work as expected.
+     *
+     * @returns The singleton instance
+     */
     public static get(): NoneOption {
         return NoneOption._instance;
     }

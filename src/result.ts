@@ -490,7 +490,7 @@ export namespace Result {
      * Maps values from a source collection until a failed mapping occurs.  If a
      * failure occurs, the mapping stops immediately.
      *
-     * @param srcCollection - The source collection
+     * @param collection - The source collection
      * @param mappingFunc - The mapping function. Each element from _srcCollection_
      * is run through this function and it must return a successful result wrapping
      * the mapped value or a failure result wrapping the error.
@@ -498,10 +498,10 @@ export namespace Result {
      * failure result wrapping the first failure encountered.
      */
     export function mapWhileSuccessful<TInput, TOutput, TError>(
-        srcCollection: Array<TInput>,
+        collection: Array<TInput>,
         mappingFunc: (curItem: TInput) => Result<TOutput, TError>
     ): Result<Array<TOutput>, TError> {
-        return srcCollection.reduce<Result<Array<TOutput>, TError>>(
+        return collection.reduce<Result<Array<TOutput>, TError>>(
             (acc, curItem) => {
                 // If we have already failed, just return the error.
                 if (acc.failed) {

@@ -15,7 +15,7 @@ export class StringI implements IEquatable<StringI>, IEquatable<string> {
     }
 
 
-    public get value(): string {
+    public toString(): string {
         return this._strVal;
     }
 

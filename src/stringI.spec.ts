@@ -1,14 +1,14 @@
 import { StringI } from "./stringI";
 
-fdescribe("StringI", () => {
+describe("StringI", () => {
 
     describe("instance", () => {
 
-        describe("value property", () => {
+        describe("toString()", () => {
 
-            it("has same case as the value used during construction", () => {
+            it("returns the same case as the value used during construction", () => {
                 const si = new StringI("FooBar");
-                expect(si.value).toEqual("FooBar");
+                expect(si.toString()).toEqual("FooBar");
             });
 
         });

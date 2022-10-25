@@ -1,4 +1,4 @@
-import {anyMatchRegex, insertIf, permutations, toArray} from "./arrayHelpers";
+import {anyMatchRegex, insertIf, permutations, split, toArray} from "./arrayHelpers";
 
 describe("anyMatchRegex()", () => {
 
@@ -119,4 +119,38 @@ describe("toArray()", () => {
     it("wraps a single value in an array", () => {
         expect(toArray("one")).toEqual(["one"]);
     });
+});
+
+
+describe("split()", () => {
+
+    it("returns expected two arrays", () => {
+        const nums = [1, 2, 3, 4, 5];
+        expect(split(nums, 3)).toEqual([[1, 2, 3], [4, 5]]);
+    });
+
+
+    it("returns the expected arrays when the source array has exactly enough for the first", () => {
+        const nums = [1, 2, 3, 4, 5];
+        expect(split(nums, 5)).toEqual([[1, 2, 3, 4, 5], []]);
+    });
+
+
+    it("returns the expected arrays when the source array does not have enough elements for the first one", () => {
+        const nums = [1, 2, 3, 4, 5];
+        expect(split(nums, 6)).toEqual([[1, 2, 3, 4, 5], []]);
+    });
+
+
+    it("returns the expected arrays when numToTake is 0", () => {
+        const nums = [1, 2, 3, 4, 5];
+        expect(split(nums, 0)).toEqual([[], [1, 2, 3, 4, 5]]);
+    });
+
+
+    it("forces numToTake to be at least 0", () => {
+        const nums = [1, 2, 3, 4, 5];
+        expect(split(nums, -2)).toEqual([[], [1, 2, 3, 4, 5]]);
+    });
+
 });

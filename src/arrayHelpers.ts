@@ -89,3 +89,18 @@ export function toArray<T>(val: undefined | null | T | Array<T>): Array<T> {
 
     return Array.isArray(val) ? val : [val];
 }
+
+
+
+/**
+ * Splits an array into two smaller arrays.
+ *
+ * @param arr - The source array
+ * @param numToTake - Maximum number of elements that will be in the first returned array
+ * @returns A tuple containing the two parts of the split array.
+ */
+export function split<T>(arr: Array<T>, numToTake: number): [Array<T>, Array<T>] {
+    const first = _.take(arr, numToTake);
+    const second = arr.slice(first.length);
+    return [first, second];
+}

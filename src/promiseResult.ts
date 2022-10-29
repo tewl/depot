@@ -198,3 +198,57 @@ export function allArray<TSuccess, TFail>(
         });
     });
 }
+
+
+/**
+ * Awaits the input Result.  If successful, unwraps the value and passes it into
+ * _fn_, returning its Result or Promise<Result>.  If the input was not
+ * successful, returns it.
+ *
+ * @param fn - The function to invoke when the input is successful.
+ * @param input - The input Result or Promise<Result>
+ * @returns Either the passed through failure Result or the Result returned from
+ * _fn_.
+ */
+export async function bind<TInSuccess, TOutSuccess, TError>(
+    fn: (x: TInSuccess) => Result<TOutSuccess, TError> | Promise<Result<TOutSuccess, TError>>,
+    input: Result<TInSuccess, TError> | Promise<Result<TInSuccess, TError>>
+): Promise<Result<TOutSuccess, TError>> {
+
+    const awaitedInputRes = await Promise.resolve(input);
+    if (awaitedInputRes.succeeded) {
+
+        // Execute the specified fn.
+        const output = fn(awaitedInputRes.value);
+        return output;
+    }
+    else {
+        return awaitedInputRes;
+    }
+}
+
+
+/**
+ * Awaits the input Result.  If successful, maps its value using _fn_ (the
+ * mapping may also be async).  When the input is a failed Result, it is
+ * returned.
+ *
+ * @param fn - The function to invoke when the input is successful
+ * @param input - The input Result or Promise<Result>
+ * @returns Either the mapped successful Promise<Result> or the passed-through
+ * failure Result or Promise<Result>.
+ */
+export async function map<TInSuccess, TOutSuccess, TError>(
+    fn: (x: TInSuccess) => TOutSuccess | Promise<TOutSuccess>,
+    input: Result<TInSuccess, TError> | Promise<Result<TInSuccess, TError>>
+): Promise<Result<TOutSuccess, TError>> {
+
+    const awaitedInputRes = await Promise.resolve(input);
+    if (awaitedInputRes.succeeded) {
+        const outVal = await Promise.resolve(fn(awaitedInputRes.value));
+        return new SucceededResult(outVal);
+    }
+    else {
+        return awaitedInputRes;
+    }
+}

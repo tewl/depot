@@ -1,7 +1,9 @@
-import {Response, RequestInfo, RequestInit, Headers} from "node-fetch";
+import { Response, RequestInfo, RequestInit, Headers } from "node-fetch";
 import { compareStrI } from "./compare";
 import { ContentType, HeaderName } from "./httpConstants";
+import { HttpError } from "./httpError";
 import { retry } from "./promiseHelpers";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 /**
@@ -85,4 +87,106 @@ export function getFetchWithHeader(
         return innerFetch(url, newInit);
     };
     return fetchWithHeader;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+export class NetworkError extends Error {
+
+    public constructor(err: unknown) {
+        const errMsg = err instanceof Error ? err.message : JSON.stringify(err);
+        super(errMsg);
+
+        // Show the specific error type in stack traces.
+        this.name = this.constructor.name;
+    }
+}
+
+export class ResponseBodyError extends Error {
+    public constructor(errMsg: string) {
+        super(errMsg);
+
+        // Show the specific error type in stack traces.
+        this.name = this.constructor.name;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+type FetchResultResponse = Response;
+type FetchResultErrors = NetworkError | HttpError;
+
+/**
+ * Performs a fetch and parses the response as JSON, communicating all errors
+ * via the returned Result object.
+ *
+ * @param fetch - The fetch() function to use
+ * @param url - The URL
+ * @param init - The fetch options
+ * @returns A Promise that always resolves with a Result.  The Result is
+ * successful if the response returns a status code in the 200 range and the
+ * body could be parsed as JSON.
+ */
+export async function fetchResult(
+    fetch: FetchFn,
+    url: RequestInfo,
+    init?: RequestInit
+): Promise<Result<FetchResultResponse, FetchResultErrors>> {
+
+    let resp: Response;
+    try {
+        resp = await fetch(url, init);
+    }
+    catch (err) {
+        return new FailedResult(new NetworkError(err));
+    }
+
+    if (!resp.ok) {
+        return new FailedResult(new HttpError(resp));
+    }
+
+    return new SucceededResult(resp);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+type FetchJsonResponse<TDto> = Response & {parsedBody: Partial<TDto>};
+type FetchJsonErrors = NetworkError | HttpError | ResponseBodyError;
+
+/**
+ * Performs a fetch and parses the response as JSON, communicating all errors
+ * via the returned Result object.
+ *
+ * @param fetch - The fetch() function to use
+ * @param url - The URL
+ * @param init - The fetch options
+ * @returns A Promise that always resolves with a Result.  The Result is
+ * successful if the response returns a status code in the 200 range and the
+ * body could be parsed as JSON.
+ */
+export async function fetchJson<TDto>(
+    fetch: FetchFn,
+    url: RequestInfo,
+    init?: RequestInit
+): Promise<Result<FetchJsonResponse<TDto>, FetchJsonErrors>> {
+    const fetchRes = await fetchResult(fetch, url, init);
+    if (fetchRes.failed) {
+        return fetchRes;
+    }
+    const resp = fetchRes.value;
+
+    let parsedBody: Partial<TDto>;
+    try {
+        parsedBody = await resp.json();
+    }
+    catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : JSON.stringify(err);
+        return new FailedResult(new ResponseBodyError(errMsg));
+    }
+
+    const retResp = Object.assign(resp, {parsedBody});
+    return new SucceededResult(retResp);
 }

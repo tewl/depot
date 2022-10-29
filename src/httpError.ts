@@ -3,36 +3,26 @@ import { Response } from "node-fetch";
 import { ContentType, HeaderName } from "./httpConstants";
 
 
-export class HttpError {
-
-    public static fromResponse(response: Response, description?: string): HttpError {
-        if (response.ok) {
-            throw new Error("Attempted to create HttpError instance with a successful response.");
-        }
-
-        return new HttpError(response, description);
-    }
+export class HttpError extends Error {
 
     private readonly _response: Response;
-    private readonly _description: undefined | string;
-    private _toString: undefined | string;
 
-    private constructor(response: Response, description?: string) {
-        this._response = response;
-        this._description = description;
-    }
 
-    public get type(): "HttpError" {
-        return "HttpError";
-    }
+    public constructor(response: Response) {
 
-    public async toString(): Promise<string> {
-        if (this._toString === undefined) {
-            this._toString = await responseErrorMessage(this._description || "", this._response);
+        if (response.ok) {
+            throw new Error("Attempted to create a HttpError from a successful response.");
         }
 
-        return this._toString;
+        const errMsg = `${response.status} - ${response.statusText}`;
+        super(errMsg);
+
+        // Show the specific error type in stack traces.
+        this.name = this.constructor.name;
+
+        this._response = response;
     }
+
 
     public get response(): Response {
         return this._response;

@@ -6,7 +6,8 @@ export enum HeaderName {
     Authorization = "Authorization",
     ContentType = "Content-Type",
     Accept = "Accept",
-    Location = "Location"
+    Location = "Location",
+    UserAgent = "User-Agent"
 }
 
 

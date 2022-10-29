@@ -530,13 +530,13 @@ export namespace Result {
      * successful Result containing _val_ and truthy values become a failed
      * Result containing the specified error message.
      *
-     * @param trueErrMsg - Error messaged use if the input is truthy
+     * @param trueErrVal - Error value use if the input is truthy
      * @param val - The input value
      * @returns A successful Result if the input is falsy; a failure Result
      * otherwise.
      */
-    export function requireFalsy<TVal>(trueErrMsg: string, val: TVal): Result<TVal, string> {
-        return val ? new FailedResult(trueErrMsg) : new SucceededResult(val);
+    export function requireFalsy<TError, TVal>(trueErrVal: TError, val: TVal): Result<TVal, TError> {
+        return val ? new FailedResult(trueErrVal) : new SucceededResult(val);
     }
 
 
@@ -544,16 +544,16 @@ export namespace Result {
      * Converts an object containing an _ok_ property (such as a fetch response)
      * to a Result.
      *
-     * @param errMsg - Error message to use if the ok property is false
+     * @param errVal - Error value to use if the ok property is false
      * @param val - The input object that has an ok property
      * @returns If _ok_ is truthy, a successful Result wrapping _val_.
      * Otherwise, a failed Result containing the error message.
      */
-    export function requireOk<TVal extends {ok: boolean}>(
-        errMsg: string,
+    export function requireOk<TError, TVal extends {ok: boolean}>(
+        errVal: TError,
         val: TVal
-    ): Result<TVal, string> {
-        return val.ok ? new SucceededResult(val) : new FailedResult(errMsg);
+    ): Result<TVal, TError> {
+        return val.ok ? new SucceededResult(val) : new FailedResult(errVal);
     }
 
 
@@ -562,13 +562,13 @@ export namespace Result {
      * Result containing true and falsy values become a failed Result containing
      * the specified error message.
      *
-     * @param falseErrMsg - Error message used if the input is falsy
+     * @param errVal - Error value used if the input is falsy
      * @param val - The input value
      * @returns A successful Result if the input is truthy; a failure Result
      * otherwise.
      */
-    export function requireTruthy<TVal>(falseErrMsg: string, val: TVal): Result<TVal, string> {
-        return val ? new SucceededResult(val) : new FailedResult(falseErrMsg);
+    export function requireTruthy<TError, TVal>(errVal: TError, val: TVal | undefined | null): Result<TVal, TError> {
+        return val ? new SucceededResult(val) : new FailedResult(errVal);
     }
 
 

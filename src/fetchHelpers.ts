@@ -1,6 +1,4 @@
 import { Response, RequestInfo, RequestInit, Headers } from "node-fetch";
-import { compareStrI } from "./compare";
-import { ContentType, HeaderName } from "./httpConstants";
 import { HttpError } from "./httpError";
 import { retry } from "./promiseHelpers";
 import { FailedResult, Result, SucceededResult } from "./result";
@@ -21,17 +19,8 @@ export async function failedResponseToString(response: Response): Promise<string
     let errMsg = `${response.status} ${response.statusText}`;
 
     // Append any response body data.
-    const contentType = response.headers.get(HeaderName.ContentType);
-    if (contentType) {
-        if (compareStrI(contentType, ContentType.Json)) {
-            const obj = await response.json();
-            errMsg += " " + JSON.stringify(obj);
-        }
-        else if (compareStrI(contentType, ContentType.TextPlain)) {
-            const text = await response.text();
-            errMsg += " " + text;
-        }
-    }
+    const text = await response.text();
+    errMsg += " " + text;
     return errMsg;
 }
 
@@ -165,7 +154,8 @@ type FetchJsonErrors = NetworkError | HttpError | ResponseBodyError;
  * @param init - The fetch options
  * @returns A Promise that always resolves with a Result.  The Result is
  * successful if the response returns a status code in the 200 range and the
- * body could be parsed as JSON.
+ * body could be parsed as JSON.  The parsed body is assigned to the
+ * _parsedBody_ property of the returned Response.
  */
 export async function fetchJson<TDto>(
     fetch: FetchFn,

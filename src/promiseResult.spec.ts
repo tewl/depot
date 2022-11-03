@@ -74,3 +74,51 @@ describe("all()", () => {
         expect(resolveTime - startTime).toBeLessThanOrEqual(70);
     });
 });
+
+
+describe("bind()", () => {
+
+    it("allows the input to be a Result<>", async () => {
+        const fn = (x: number) => new SucceededResult(x + 1);
+        const res = await promiseResult.bind(fn, new SucceededResult(5));
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(6);
+    });
+
+
+    it("allows the input to be a Promise<Result<>>", async () => {
+        const fn = (x: number) => Promise.resolve(new SucceededResult(x + 1));
+        const res = await promiseResult.bind(fn, Promise.resolve(new SucceededResult(5)));
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(6);
+    });
+
+
+    it("does not invoke the function if the input is a failure", async () => {
+        let numInvocations = 0;
+        const fn = (x: number) => {
+            numInvocations++;
+            return Promise.resolve(new SucceededResult(x + 1));
+        };
+
+        const res = await promiseResult.bind(fn, new FailedResult("error"));
+        expect(res.failed).toBeTrue();
+        expect(numInvocations).toEqual(0);
+    });
+
+
+    it("works well in a pipeAsync()", async () => {
+        const fn = (x: number) => Promise.resolve(new SucceededResult(x + 1));
+        const res =
+            await pipeAsync(Promise.resolve(new SucceededResult(5)))
+            .pipe((res) => promiseResult.bind(fn, res))
+            .pipe((res) => promiseResult.bind(fn, res))
+            .pipe((res) => promiseResult.bind(fn, res))
+            .end();
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(8);
+    });
+
+
+});
+

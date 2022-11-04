@@ -3,6 +3,10 @@ import { errorToString } from "./errorHelpers";
 
 describe("errorToString()", () => {
 
+    it("returns the string when given a string", () => {
+        expect(errorToString("baz")).toEqual("baz");
+    });
+
     it("returns the message property when given an Error instance", () => {
         expect(errorToString(new Error("quux"))).toEqual("quux");
     });

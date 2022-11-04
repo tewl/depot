@@ -10,8 +10,10 @@ export function errorToString(err: unknown): string {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errAny = err as any;
-
-    if (errAny.message && typeof errAny.message === "string") {
+    if (typeof err === "string") {
+        return err;
+    }
+    else if (errAny.message && typeof errAny.message === "string") {
         return errAny.message;
     }
     else {

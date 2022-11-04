@@ -18,6 +18,55 @@ export async function toPromise<TSuccess, TError>(
 }
 
 
+/**
+ * Converts a Promise into a Promise<Result<>> that will always resolve with a
+ * Result.
+ *
+ * @param promise - The input Promise
+ * @returns A Promise that will always resolve with a Result.  Resolved promises
+ * yield a successful Result and rejections yield a failure Result containing a
+ * string error message.
+ */
+export function fromPromise<TSuccess>(
+    promise: Promise<TSuccess>
+): Promise<Result<TSuccess, string>> {
+    return promise.then(
+        (val) => {
+            return new SucceededResult(val);
+        },
+        (err) => {
+            return new FailedResult(errorToString(err));
+        }
+    );
+}
+
+
+/**
+ * Converts a Promise into a Promise<Result<>> that will always resolve with a
+ * Result and rejections will be mapped through the specified function.
+ *
+ * @param promise - The input Promise
+ * @param errMapFn - A function that will convert a rejection error to the
+ * Result's failure type.
+ * @returns A Promise that will always resolve with a Result.  Resolved promises
+ * yield a successful Result and rejections yield a failure Result.
+ */
+export function fromPromiseWith<TSuccess, TError>(
+    promise: Promise<TSuccess>,
+    errMapFn: (err: unknown) => TError
+): Promise<Result<TSuccess, TError>> {
+    return promise.then(
+        (val) => {
+            return new SucceededResult(val);
+        },
+        (err: unknown) => {
+            const mappedErr = errMapFn(err);
+            return new FailedResult(mappedErr);
+        }
+    );
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // all()
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,3 +301,20 @@ export async function map<TInSuccess, TOutSuccess, TError>(
         return awaitedInputRes;
     }
 }
+
+/**
+ * Forces a Promise<Result<>> to always resolve (and never reject) with a
+ * Result<>.
+ *
+ * @param pr - The input Promise<Result<>> that may reject
+ * @returns A Promise that will always resolve with a Result.
+ */
+export async function forceResult<TSuccess, TError>(
+    pr: Promise<Result<TSuccess, TError>>
+): Promise<Result<TSuccess, TError | string>> {
+    return pr
+    .catch((err) => {
+        return new FailedResult(errorToString(err));
+    });
+}
+

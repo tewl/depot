@@ -30,6 +30,49 @@ describe("toPromise()", () => {
 });
 
 
+describe("fromPromise()", () => {
+
+    it("when the Promise resolves a successful Result is returned", async () => {
+        const res = await promiseResult.fromPromise(Promise.resolve(5));
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(5);
+    });
+
+
+    it("when the Promise rejects a failure Result with a string is returned", async () => {
+        const res = await promiseResult.fromPromise(Promise.reject(new Error("error message")));
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual("error message");
+    });
+
+});
+
+
+describe("fromPromiseWith()", () => {
+
+    const errorMapper = (err: unknown) => {
+        return typeof err === "string" ? new Error(`Error: ${err}`) : new Error("unknown error");
+    };
+
+
+    it("when the Promise resolves a successful Result is returned", async () => {
+        const res = await promiseResult.fromPromiseWith(Promise.resolve(19), errorMapper);
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(19);
+    });
+
+
+    it("when the Promise rejects a failure Result with a mapped value is returned", async () => {
+        const res = await promiseResult.fromPromiseWith(Promise.reject("error 37"), errorMapper);
+        expect(res.failed).toBeTrue();
+        expect(res.error).toBeInstanceOf(Error);
+        expect(res.error!.message).toEqual("Error: error 37");
+    });
+
+});
+
+
+
 describe("all()", () => {
     it("when all are successful, the returned promise resolves with a Result containing an array of all the successful values", async () => {
         const op1 = () => getTimerPromise(25, new SucceededResult(25));
@@ -166,5 +209,34 @@ describe("map()", () => {
         expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual(8);
     });
+
+});
+
+
+describe("forceResult()", () => {
+
+    it("When the Promise resolves with a successful Result it is returned", async () => {
+        const pr = Promise.resolve(new SucceededResult(21));
+        const res = await promiseResult.forceResult(pr);
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(21);
+    });
+
+
+    it("when the Promise resolves with a failure Result it is returned", async () => {
+        const pr = Promise.resolve(new FailedResult("Error message 37"));
+        const res = await promiseResult.forceResult(pr);
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual("Error message 37");
+    });
+
+
+    it("when the Promise rejects a failure Result containing a string is returned", async () => {
+        const pr = Promise.reject("error 34");
+        const res = await promiseResult.forceResult(pr);
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual("error 34");
+    });
+
 
 });

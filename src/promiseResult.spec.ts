@@ -1,6 +1,7 @@
 import * as promiseResult from "./promiseResult";
 import { getTimerPromise } from "./promiseHelpers";
 import { FailedResult, SucceededResult } from "./result";
+import { pipeAsync } from "./pipeAsync";
 
 
 describe("toPromise()", () => {
@@ -122,3 +123,48 @@ describe("bind()", () => {
 
 });
 
+
+describe("map()", () => {
+
+    it("allows the input to be a Result<>", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res = await promiseResult.map(fn, new SucceededResult(6));
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(7);
+    });
+
+
+    it("allows the input to be a Promise<Result<>>", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res = await promiseResult.map(fn, Promise.resolve(new SucceededResult(6)));
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(7);
+    });
+
+
+    it("does not invoke the function if the input is a failure", async () => {
+        let numInvocations = 0;
+        const fn = (x: number) => {
+            numInvocations++;
+            return Promise.resolve(x + 1);
+        };
+
+        const res = await promiseResult.map(fn, new FailedResult("error"));
+        expect(res.failed).toBeTrue();
+        expect(numInvocations).toEqual(0);
+    });
+
+
+    it("works well with pipeAsync()", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res =
+            await pipeAsync(Promise.resolve(new SucceededResult(5)))
+            .pipe((res) => promiseResult.map(fn, res))
+            .pipe((res) => promiseResult.map(fn, res))
+            .pipe((res) => promiseResult.map(fn, res))
+            .end();
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual(8);
+    });
+
+});

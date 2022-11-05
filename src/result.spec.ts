@@ -196,7 +196,36 @@ describe("Result namespace", () => {
     });
 
 
-    describe("allArray()", () => {
+    describe("allArrayA", () => {
+
+        it("when some Results are failures, returns a failure Result wrapping all errors", () => {
+            const res = Result.allArrayA([
+                new SucceededResult(5),
+                new FailedResult("error 37"),
+                new SucceededResult(6),
+                new FailedResult("error 47")
+            ]);
+            expect(res.failed).toBeTrue();
+            expect(res.error).toEqual(["error 37", "error 47"]);
+
+        });
+
+
+        it("when all Results are successful, returns a successful Result wrapping all values", () => {
+            const res = Result.allArrayA([
+                new SucceededResult(5),
+                new SucceededResult(6),
+                new SucceededResult(7),
+                new SucceededResult(8)
+            ]);
+            expect(res.succeeded).toBeTrue();
+            expect(res.value).toEqual([5, 6, 7, 8]);
+        });
+
+    });
+
+
+    describe("allArrayM()", () => {
 
         it("when given successful results, returns an array of their values", () => {
             const results = [
@@ -204,7 +233,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new SucceededResult(30)
             ];
-            expect(Result.allArray(results)).toEqual(new SucceededResult([10, 20, 30]));
+            expect(Result.allArrayM(results)).toEqual(new SucceededResult([10, 20, 30]));
         });
 
 
@@ -214,7 +243,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new SucceededResult(undefined)
             ];
-            expect(Result.allArray(results)).toEqual(new SucceededResult([10, 20, undefined]));
+            expect(Result.allArrayM(results)).toEqual(new SucceededResult([10, 20, undefined]));
         });
 
 
@@ -224,7 +253,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new FailedResult("Error msg")
             ];
-            expect(Result.allArray(results)).toEqual(new FailedResult("Error msg"));
+            expect(Result.allArrayM(results)).toEqual(new FailedResult("Error msg"));
         });
 
     });

@@ -354,14 +354,36 @@ export namespace Result {
 
 
     /**
-     * When all input Results are successful, returns a successful Result containing
-     * an array of the successful values.  If the input contains one (or more)
-     * failures, a failed Result is returned containing the first error.
+     * Tests if all Results are successful.  If not, all errors are returned.
      *
      * @param resultsCollection - The input collection
-     * @return Description
+     * @returns If all inputs are successful, a successful Result containing
+     * their values.  If the input contains some failures, a failure Result
+     * containing an array of the errors.
      */
-    export function allArray<TSuccess, TError>(
+    export function allArrayA<TSuccess, TError>(
+        resultsCollection: Array<Result<TSuccess, TError>>
+    ): Result<Array<TSuccess>, Array<TError>> {
+        const failureResults = resultsCollection.filter((res) => res.failed);
+        if (failureResults.length > 0) {
+            return new FailedResult(failureResults.map((res) => res.error!));
+        }
+        else {
+            return new SucceededResult(resultsCollection.map((res) => res.value!));
+        }
+    }
+
+
+    /**
+     * Tests if all Results are successful.  If not, the first error is
+     * returned.
+     *
+     * @param resultsCollection - The input collection
+     * @returns If all inputs are successful, a successful Result containing
+     * their values.  If the input contains some failures, a failure Result
+     * containing the first error.
+     */
+    export function allArrayM<TSuccess, TError>(
         resultsCollection: Array<Result<TSuccess, TError>>
     ): Result<Array<TSuccess>, TError> {
         const firstFailure = resultsCollection.find(

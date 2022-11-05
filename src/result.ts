@@ -163,6 +163,181 @@ export namespace Result {
         d: Result<TSD, TFD>
     ): Result<[TSA, TSB, TSC, TSD], TFA | TFB | TFC | TFD>;
 
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>
+    ): Result<[TSA, TSB, TSC, TSD, TSE], TFA | TFB | TFC | TFD | TFE>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF], TFA | TFB | TFC | TFD | TFE | TFF>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @param g - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>,
+        g: Result<TSG, TFG>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF, TSG], TFA | TFB | TFC | TFD | TFE | TFF | TFG>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @param g - Result
+     * @param h - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>,
+        g: Result<TSG, TFG>,
+        h: Result<TSH, TFH>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH], TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @param g - Result
+     * @param h - Result
+     * @param i - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>,
+        g: Result<TSG, TFG>,
+        h: Result<TSH, TFH>,
+        i: Result<TSI, TFI>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH, TSI], TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @param g - Result
+     * @param h - Result
+     * @param i - Result
+     * @param j - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI, TSJ, TFJ>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>,
+        g: Result<TSG, TFG>,
+        h: Result<TSH, TFH>,
+        i: Result<TSI, TFI>,
+        j: Result<TSJ, TFJ>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH, TSI, TSJ], TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI | TFJ>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @param e - Result
+     * @param f - Result
+     * @param g - Result
+     * @param h - Result
+     * @param i - Result
+     * @param j - Result
+     * @param k - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI, TSJ, TFJ, TSK, TFK>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>,
+        e: Result<TSE, TFE>,
+        f: Result<TSF, TFF>,
+        g: Result<TSG, TFG>,
+        h: Result<TSH, TFH>,
+        i: Result<TSI, TFI>,
+        j: Result<TSJ, TFJ>,
+        k: Result<TSK, TFK>
+    ): Result<[TSA, TSB, TSC, TSD, TSE, TSF, TSG, TSH, TSI, TSJ, TSK], TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI | TFJ | TFK>;
+
     export function allM(
         ...results: Array<Result<unknown, unknown>>
     ): Result<Array<unknown>, unknown> {

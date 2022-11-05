@@ -162,7 +162,7 @@ describe("Result type", () => {
 describe("Result namespace", () => {
 
 
-    describe("all()", () => {
+    describe("allArray()", () => {
 
         it("when given successful results, returns an array of their values", () => {
             const results = [
@@ -170,7 +170,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new SucceededResult(30)
             ];
-            expect(Result.all(results)).toEqual(new SucceededResult([10, 20, 30]));
+            expect(Result.allArray(results)).toEqual(new SucceededResult([10, 20, 30]));
         });
 
 
@@ -180,7 +180,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new SucceededResult(undefined)
             ];
-            expect(Result.all(results)).toEqual(new SucceededResult([10, 20, undefined]));
+            expect(Result.allArray(results)).toEqual(new SucceededResult([10, 20, undefined]));
         });
 
 
@@ -190,7 +190,7 @@ describe("Result namespace", () => {
                 new SucceededResult(20),
                 new FailedResult("Error msg")
             ];
-            expect(Result.all(results)).toEqual(new FailedResult("Error msg"));
+            expect(Result.allArray(results)).toEqual(new FailedResult("Error msg"));
         });
 
     });

@@ -103,6 +103,8 @@ export type Result<TSuccess, TError> = SucceededResult<TSuccess> | FailedResult<
  */
 export namespace Result {
 
+    // TODO: Change this to allArray() and create an all() with type-specific overloads.
+
     /**
      * When all input Results are successful, returns a successful Result containing
      * an array of the successful values.  If the input contains one (or more)
@@ -111,7 +113,7 @@ export namespace Result {
      * @param resultsCollection - The input collection
      * @return Description
      */
-    export function all<TSuccess, TError>(
+    export function allArray<TSuccess, TError>(
         resultsCollection: Array<Result<TSuccess, TError>>
     ): Result<Array<TSuccess>, TError> {
         const firstFailure = resultsCollection.find(

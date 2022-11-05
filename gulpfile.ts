@@ -204,7 +204,7 @@ export async function build(): Promise<void>
         }
     ];
 
-    const results = await promiseResult.allArray(_.map(tasks, (curTask) => curTask.promiseResult));
+    const results = await promiseResult.allArrayM(_.map(tasks, (curTask) => curTask.promiseResult));
 
     if (results.failed) {
         console.error(failStyle(sep));

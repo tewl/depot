@@ -120,6 +120,47 @@ describe("all()", () => {
 });
 
 
+describe("allArrayM()", () => {
+
+    it("resolves as soon as possible with the first failure", async () => {
+
+        const start = Date.now();
+
+        const res = await promiseResult.allArrayM([
+            getTimerPromise(5, new SucceededResult(1)),
+            getTimerPromise(15, new FailedResult("error 1")),
+            getTimerPromise(40, new SucceededResult(2)),
+            getTimerPromise(50, new SucceededResult(3)),
+            getTimerPromise(60, new FailedResult("error 2"))
+        ]);
+
+        const end = Date.now();
+        const delta = end - start;
+        expect(delta).toBeGreaterThanOrEqual(10);
+        expect(delta).toBeLessThanOrEqual(35);  // Saw this get as high as 27
+        expect(res.failed).toBeTrue();
+        expect(res.error!.index).toEqual(1);
+        expect(res.error!.item).toEqual("error 1");
+    });
+
+
+    it("when all are successful, returns successful Result wrapping all values", async () => {
+        const start = Date.now();
+        const res = await promiseResult.allArrayM([
+            getTimerPromise(5, new SucceededResult(1)),
+            getTimerPromise(10, new SucceededResult(2)),
+            getTimerPromise(15, new SucceededResult(3))
+        ]);
+
+        const end = Date.now();
+        expect(end - start).toBeGreaterThanOrEqual(15);
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual([1, 2, 3]);
+    });
+
+});
+
+
 describe("bind()", () => {
 
     it("allows the input to be a Result<>", async () => {

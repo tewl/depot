@@ -191,23 +191,31 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
 export function all(
     ...promises: Array<Promise<Result<unknown, unknown>>>
 ): Promise<Result<Array<unknown>, IIndexedItem<unknown>>> {
-    return allArray<unknown, unknown>(promises);
+    return allArrayM<unknown, unknown>(promises);
 }
 
 
+// TODO: Create a allArrayA() (monadic) that returns all errors.
+
 /**
- * A version of all() that accepts the input Promise-Result objects as an array.
- * This has the advantage that higher order functions can be used to create the
- * array (i.e. _.map()), but has the disadvantage that there can only be one
- * Result success type and one Result failure type.
+ * Checks to see if all input Promise<Result<>> objects resolve successfully.
+ * Returns the first failure as soon as possible upon any failure (the "M"
+ * stands for monadic).
+ *
+ * This function accepts the inputs as an array.  This has the advantage that
+ * higher order functions can be used to create the array (i.e. _.map()), but
+ * has the disadvantage that there can only be one Result success type and one
+ * Result failure type.
+ *
  * @param promises - The input array of Promises for Results.
- * @return If all input Promises resolve with successful Results, a Result
- * containing an array of those successful Results is returned.  Otherwise, a
- * Result containing information about the first Failure is returned.
+ * @return If all input Promises resolve with successful Results, a successful
+ * Result containing an array of those successful values.  Otherwise, a failure
+ * Result is returned as soon as possible containing information about the first
+ * error.
  */
-export function allArray<TSuccess, TFail>(
-    promises: Array<Promise<Result<TSuccess, TFail>>>
-): Promise<Result<Array<TSuccess>, IIndexedItem<TFail>>> {
+export function allArrayM<TSuccess, TError>(
+    promises: Array<Promise<Result<TSuccess, TError>>>
+): Promise<Result<Array<TSuccess>, IIndexedItem<TError>>> {
     return new Promise((resolve, reject) => {
 
         const numPromises = promises.length;
@@ -230,8 +238,7 @@ export function allArray<TSuccess, TFail>(
                 }
                 else {
                     // It failed.  Return the failed result immediately.
-                    // resolve(curResult);
-                    const indexed: IIndexedItem<TFail> = {
+                    const indexed: IIndexedItem<TError> = {
                         index: index,
                         item:  curResult.error
                     };
@@ -241,7 +248,8 @@ export function allArray<TSuccess, TFail>(
             .catch((err) => {
                 // This should never happen, because failure is supposed to be
                 // communicated with a Promise that resolves (not rejects) with
-                // a failed Result object.
+                // a failed Result object. See promiseResult.forceResult() for a
+                // way to wrap a Promise<Result<>> so that it never rejects.
                 reject(`Promise for Result unexpectedly rejected. ${JSON.stringify(err)}`);
             });
         });

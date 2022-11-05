@@ -162,6 +162,40 @@ describe("Result type", () => {
 describe("Result namespace", () => {
 
 
+    describe("allM()", () => {
+
+        it("return the first failed Result among the parameters", () => {
+            const res = Result.allM(
+                new SucceededResult(13),
+                new FailedResult("error 37"),
+                new SucceededResult(false)
+            );
+
+            expect(res.failed).toBeTrue();
+            expect(res.error).toEqual("error 37");
+        });
+
+
+        it("when all Results are successful, returns a successful Result wrapping a typed tuple of all values", () => {
+            const res = Result.allM(
+                new SucceededResult(13),
+                new SucceededResult("foo"),
+                new SucceededResult(false)
+            );
+            expect(res.succeeded).toBeTrue();
+            if (res.succeeded) {
+                const [n, s, b] = res.value;
+                expect(n).toEqual(13);
+                expect(s).toEqual("foo");
+                expect(b).toEqual(false);
+            }
+            else {
+                expect(false).toBeTrue();
+            }
+        });
+    });
+
+
     describe("allArray()", () => {
 
         it("when given successful results, returns an array of their values", () => {

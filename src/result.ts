@@ -103,7 +103,80 @@ export type Result<TSuccess, TError> = SucceededResult<TSuccess> | FailedResult<
  */
 export namespace Result {
 
-    // TODO: Change this to allArray() and create an all() with type-specific overloads.
+    ////////////////////////////////////////////////////////////////////////////////
+    // allM()
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA>(
+        a: Result<TSA, TFA>
+    ): Result<[TSA], TFA>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>
+    ): Result<[TSA, TSB], TFA | TFB>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>
+    ): Result<[TSA, TSB, TSC], TFA | TFB | TFC>;
+
+    /**
+     * Tests if all Results are successful.  If not, returns the first failure.
+     *
+     * @param a - Result
+     * @param b - Result
+     * @param c - Result
+     * @param d - Result
+     * @returns If all Results are successful, a successful Result wrapping a
+     * tuple of the values.  Otherwise, the first failure Result is returned.
+     */
+    export function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD>(
+        a: Result<TSA, TFA>,
+        b: Result<TSB, TFB>,
+        c: Result<TSC, TFC>,
+        d: Result<TSD, TFD>
+    ): Result<[TSA, TSB, TSC, TSD], TFA | TFB | TFC | TFD>;
+
+    export function allM(
+        ...results: Array<Result<unknown, unknown>>
+    ): Result<Array<unknown>, unknown> {
+        const firstFailureIdx = results.findIndex((res) => res.failed);
+        if (firstFailureIdx === -1) {
+            const successVals = results.map((res) => res.value!);
+            return new SucceededResult(successVals);
+        }
+        else {
+            const failedResult = results[firstFailureIdx] as FailedResult<unknown>;
+            return failedResult;
+        }
+    }
+
 
     /**
      * When all input Results are successful, returns a successful Result containing

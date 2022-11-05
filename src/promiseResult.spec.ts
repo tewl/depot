@@ -120,6 +120,51 @@ describe("all()", () => {
 });
 
 
+describe("allArrayA()", () => {
+
+    it("when there are failures, returns IIndexedItems referencing each failure", async () => {
+        const start = Date.now();
+
+        const res = await promiseResult.allArrayA([
+            getTimerPromise(5, new SucceededResult(0)),
+            getTimerPromise(10, new FailedResult("error 1")),
+            getTimerPromise(15, new SucceededResult(2)),
+            getTimerPromise(20, new FailedResult("error 3")),
+            getTimerPromise(25, new SucceededResult(4)),
+            getTimerPromise(30, new FailedResult("error 5")),
+            getTimerPromise(35, new SucceededResult(6))
+        ]);
+
+        const end = Date.now();
+
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual([
+            { index: 1, item: "error 1"},
+            { index: 3, item: "error 3"},
+            { index: 5, item: "error 5"}
+        ]);
+        expect(end - start).toBeGreaterThanOrEqual(35);
+    });
+
+
+    it("when all are successful, returns successful Result wrapping all values", async () => {
+        const res = await promiseResult.allArrayA([
+            getTimerPromise(5, new SucceededResult(0)),
+            getTimerPromise(10, new SucceededResult(1)),
+            getTimerPromise(15, new SucceededResult(2)),
+            getTimerPromise(20, new SucceededResult(3)),
+            getTimerPromise(25, new SucceededResult(4)),
+            getTimerPromise(30, new SucceededResult(5)),
+            getTimerPromise(35, new SucceededResult(6))
+        ]);
+
+        expect(res.succeeded).toBeTrue();
+        expect(res.value).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    });
+
+});
+
+
 describe("allArrayM()", () => {
 
     it("resolves as soon as possible with the first failure", async () => {

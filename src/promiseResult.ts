@@ -195,19 +195,69 @@ export function all(
 }
 
 
-// TODO: Create a allArrayA() (monadic) that returns all errors.
+
+/**
+ * Checks to see if all input Promise<Result<>> objects resolve successfully.
+ * Returns all failures (the "A" stands for "applicative").
+ *
+ * @param promises - The input array of Promise<Result<>>s
+ * @returns  If all input Promises resolve with successful Results, a successful
+ * Result containing an array of those successful values.  Otherwise, a failure
+ * Result is returned containing information about each failure.
+ */
+
+export async function allArrayA<TSuccess, TError>(
+    promises: Array<Promise<Result<TSuccess, TError>>>
+): Promise<Result<Array<TSuccess>, Array<IIndexedItem<TError>>>> {
+
+    let results: Array<Result<TSuccess, TError>>;
+    try {
+        results = await Promise.all(promises);
+    }
+    catch (err) {
+        // This should never happen, because failure is supposed to be
+        // communicated with a Promise that *resolves* (not rejects) with a
+        // failed Result object.  See promiseResult.forceResult() for a way to
+        // wrap a Promise<Result<>> so that it never rejects.
+        const errMsg = `Promise for Result unexpectedly rejected. ${errorToString(err)}`;
+        throw new Error(errMsg);
+    }
+
+    if (results.every((res) => res.succeeded)) {
+        // Return a successful Result wrapping all of the successful values.
+        return new SucceededResult(results.map((res) => res.value!));
+    }
+    else {
+        // Returns a failure Result wrapping an array of IIndexedItems
+        // referencing each error.
+        const failures = results.reduce<Array<IIndexedItem<TError>>>(
+            (acc, res, idx) => {
+                if (res.failed) {
+                    acc.push({
+                        index: idx,
+                        item:  res.error
+                    });
+                }
+                return acc;
+            },
+            []
+        );
+        return new FailedResult(failures);
+    }
+}
+
 
 /**
  * Checks to see if all input Promise<Result<>> objects resolve successfully.
  * Returns the first failure as soon as possible upon any failure (the "M"
- * stands for monadic).
+ * stands for "monadic").
  *
  * This function accepts the inputs as an array.  This has the advantage that
  * higher order functions can be used to create the array (i.e. _.map()), but
  * has the disadvantage that there can only be one Result success type and one
  * Result failure type.
  *
- * @param promises - The input array of Promises for Results.
+ * @param promises - The input array of Promise<Result<>>s.
  * @return If all input Promises resolve with successful Results, a successful
  * Result containing an array of those successful values.  Otherwise, a failure
  * Result is returned as soon as possible containing information about the first
@@ -247,10 +297,11 @@ export function allArrayM<TSuccess, TError>(
             })
             .catch((err) => {
                 // This should never happen, because failure is supposed to be
-                // communicated with a Promise that resolves (not rejects) with
+                // communicated with a Promise that *resolves* (not rejects) with
                 // a failed Result object. See promiseResult.forceResult() for a
                 // way to wrap a Promise<Result<>> so that it never rejects.
-                reject(`Promise for Result unexpectedly rejected. ${JSON.stringify(err)}`);
+                const errMsg = `Promise for Result unexpectedly rejected. ${errorToString(err)}`;
+                reject(new Error(errMsg));
             });
         });
     });

@@ -73,20 +73,20 @@ describe("fromPromiseWith()", () => {
 
 
 
-describe("all()", () => {
+describe("allM()", () => {
     it("when all are successful, the returned promise resolves with a Result containing an array of all the successful values", async () => {
         const op1 = () => getTimerPromise(25, new SucceededResult(25));
         const op2 = () => getTimerPromise(50, new SucceededResult(50));
         const op3 = () => getTimerPromise(75, new SucceededResult(75));
 
-        const result = await promiseResult.all(op1(), op2(), op3());
+        const result = await promiseResult.allM(op1(), op2(), op3());
         expect(result.succeeded).toBeTruthy();
         expect(result.value).toEqual([25, 50, 75]);
     });
 
 
     it("works with an input array of one element", async () => {
-        const result = await promiseResult.all(
+        const result = await promiseResult.allM(
             getTimerPromise(25, new SucceededResult(25))
         );
         expect(result.succeeded).toBeTruthy();
@@ -99,7 +99,7 @@ describe("all()", () => {
         const op2 = () => getTimerPromise(50, new FailedResult("Error 1"));
         const op3 = () => getTimerPromise(75, new SucceededResult(75));
 
-        const result = await promiseResult.all(op1(), op2(), op3());
+        const result = await promiseResult.allM(op1(), op2(), op3());
         expect(result.failed).toBeTruthy();
         expect(result.error!.index).toEqual(1);
         expect(result.error!.item).toEqual("Error 1");
@@ -112,7 +112,7 @@ describe("all()", () => {
         const op3 = () => getTimerPromise(75, new SucceededResult(75));
 
         const startTime = Date.now();
-        const result = await promiseResult.all(op1(), op2(), op3());
+        const result = await promiseResult.allM(op1(), op2(), op3());
         const resolveTime = Date.now();
         expect(resolveTime - startTime).toBeGreaterThanOrEqual(50);
         expect(resolveTime - startTime).toBeLessThanOrEqual(70);

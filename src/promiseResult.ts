@@ -5,6 +5,7 @@ import { IIndexedItem } from "./utilityTypes";
 
 /**
  * Converts a Promise<Result<>> to a Promise.
+ *
  * @param pr - The Promise<Result<>> to be converted.
  * @return Either a resolved promise or a rejected promise based on the input
  */
@@ -68,15 +69,15 @@ export function fromPromiseWith<TSuccess, TError>(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// all()
+// allM()
 ////////////////////////////////////////////////////////////////////////////////
-export async function all<TSA, TFA>(
+export async function allM<TSA, TFA>(
     a: Promise<Result<TSA, TFA>>
 ): Promise<Result<
     [TSA], IIndexedItem<TFA>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB>(
+export async function allM<TSA, TFA, TSB, TFB>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>
 ): Promise<Result<
@@ -84,7 +85,7 @@ export async function all<TSA, TFA, TSB, TFB>(
     IIndexedItem<TFA | TFB>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>
@@ -93,7 +94,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC>(
     IIndexedItem<TFA | TFB | TFC>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -103,7 +104,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD>(
     IIndexedItem<TFA | TFB | TFC | TFD>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -114,7 +115,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE>(
     IIndexedItem<TFA | TFB | TFC | TFD | TFE>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -126,7 +127,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
     IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -139,7 +140,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
     IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -153,7 +154,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
     IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI>(
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
     c: Promise<Result<TSC, TFC>>,
@@ -168,7 +169,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
     IIndexedItem<TFA | TFB | TFC | TFD | TFE | TFF | TFG | TFH | TFI>
 >>;
 
-export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI,
+export async function allM<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF, TFF, TSG, TFG, TSH, TFH, TSI, TFI,
                           TSJ, TFJ>(
     a: Promise<Result<TSA, TFA>>,
     b: Promise<Result<TSB, TFB>>,
@@ -188,7 +189,7 @@ export async function all<TSA, TFA, TSB, TFB, TSC, TFC, TSD, TFD, TSE, TFE, TSF,
 //
 // Implementation
 //
-export function all(
+export function allM(
     ...promises: Array<Promise<Result<unknown, unknown>>>
 ): Promise<Result<Array<unknown>, IIndexedItem<unknown>>> {
     return allArrayM<unknown, unknown>(promises);

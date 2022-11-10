@@ -1302,6 +1302,79 @@ describe("Directory", () => {
         });
 
 
+        describe("getSize()", () => {
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+
+                const dirA = new Directory(tmpDir, "dirA").ensureExistsSync();
+                const dirAA = new Directory(dirA, "dirAA").ensureExistsSync();
+
+                const a1 = new File(dirA, "a1.txt");
+                const a2 = new File(dirA, "a2.txt");
+                const aa1 = new File(dirAA, "aa1.txt");
+                const aa2 = new File(dirAA, "aa2.txt");
+
+                a1.writeSync("This if file a1.txt");
+                a2.writeSync("File a2.txt.");
+                aa1.writeSync("aa1.txt in subdirctory.");
+                aa2.writeSync("aa2.txt in folder dirAA");
+
+            });
+
+
+            it("returns the correct size of a directory", async () => {
+
+                const dirA = new Directory(tmpDir, "dirA");
+                const dirAA = new Directory(dirA, "dirAA");
+
+                const sizeA = await dirA.getSize();
+                expect(sizeA.bytes).toEqual(77);
+
+                const sizeAA = await dirAA.getSize();
+                expect(sizeAA.bytes).toEqual(46);
+            });
+
+
+        });
+
+
+        describe("getSizeSync()", () => {
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+
+                const dirA = new Directory(tmpDir, "dirA").ensureExistsSync();
+                const dirAA = new Directory(dirA, "dirAA").ensureExistsSync();
+
+                const a1 = new File(dirA, "a1.txt");
+                const a2 = new File(dirA, "a2.txt");
+                const aa1 = new File(dirAA, "aa1.txt");
+                const aa2 = new File(dirAA, "aa2.txt");
+
+                a1.writeSync("This if file a1.txt");
+                a2.writeSync("File a2.txt.");
+                aa1.writeSync("aa1.txt in subdirctory.");
+                aa2.writeSync("aa2.txt in folder dirAA");
+
+            });
+
+
+            it("returns the correct size of a directory", () => {
+
+                const dirA = new Directory(tmpDir, "dirA");
+                const dirAA = new Directory(dirA, "dirAA");
+
+                const sizeA = dirA.getSizeSync();
+                expect(sizeA.bytes).toEqual(77);
+
+                const sizeAA = dirAA.getSizeSync();
+                expect(sizeAA.bytes).toEqual(46);
+            });
+
+
+        });
+
     });
 
 

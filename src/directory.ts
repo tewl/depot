@@ -5,6 +5,7 @@ import {File} from "./file";
 import {promisify1} from "./promisify";
 import {sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
+import { StorageSize } from "./storageSize";
 
 
 const unlinkAsync = promisify1<void, string>(fs.unlink);
@@ -719,5 +720,38 @@ export class Directory {
                 await curSubDir.walk(cb);
             }
         }
+    }
+
+
+    /**
+     * Calculates the size of this Directory.
+     *
+     * @returns The size of all files (recursively) in this Directory.
+     */
+    public async getSize(): Promise<StorageSize> {
+        // Note: Calling fs.stat() on a directory returns 0.
+
+        const {files} = await this.contents(true);
+        const totalBytes =
+            (await Promise.all(files.map((curFile) => curFile.exists())))
+            .filter((stat): stat is fs.Stats => stat !== undefined)
+            .reduce((acc, stat) => acc + stat.size, 0);
+        return StorageSize.fromBytes(totalBytes);
+    }
+
+
+    /**
+     * Calculates the size of this Directory.
+     *
+     * @returns The size of all files (recursively) in this Directory.
+     */
+    public getSizeSync(): StorageSize {
+        const {files} = this.contentsSync(true);
+        const totalBytes =
+            files
+            .map((curFile) => curFile.existsSync())
+            .filter((stat): stat is fs.Stats => stat !== undefined)
+            .reduce((acc, stat) => acc + stat.size, 0);
+        return StorageSize.fromBytes(totalBytes);
     }
 }

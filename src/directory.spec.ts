@@ -1096,6 +1096,51 @@ describe("Directory", () => {
         });
 
 
+        describe("copyFiltered()", () => {
+
+            const srcDir = new Directory(tmpDir, "src");
+
+            const dirA = new Directory(srcDir, "dirA");
+            const fileA = new File(dirA, "a-include.txt");
+
+            const dirB = new Directory(srcDir, "dirB");
+            const fileB = new File(dirB, "b-excluded.txt");
+
+            const dirC = new Directory(srcDir, "dirC");
+
+            const dstDir = new Directory(tmpDir, "dst");
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+                srcDir.ensureExistsSync();
+                dirA.ensureExistsSync();
+                dirB.ensureExistsSync();
+                dirC.ensureExistsSync();
+
+                fileA.writeSync("included");
+                fileB.writeSync("excluded");
+
+                dstDir.ensureExistsSync();
+            });
+
+
+            it("excludes files that match exclude patterns", async () => {
+
+                await srcDir.copyFiltered(dstDir, false, [/.*/], [/exclude/i]);
+
+                expect(new File(dstDir, "dirA", "a-include.txt").existsSync()).toBeTruthy();
+                expect(new File(dstDir, "dirB", "b-excluded.txt").existsSync()).toBeFalsy();
+            });
+
+
+            it("creates included directories, even emty ones", async () => {
+                await srcDir.copyFiltered(dstDir, false, [/.*/], [/exclude/i]);
+                expect(new Directory(dstDir, "dirC").existsSync()).toBeTruthy();
+            });
+
+        });
+
+
         describe("move()", () => {
 
             beforeEach(() => {

@@ -6,6 +6,7 @@ import {promisify1} from "./promisify";
 import {sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
 import { StorageSize } from "./storageSize";
+import { matchesAny } from "./regexpHelpers";
 
 
 const unlinkAsync = promisify1<void, string>(fs.unlink);
@@ -663,6 +664,51 @@ export class Directory {
 
         contents.subdirs.forEach((curSubdir) => {
             curSubdir.copySync(destDir, true);
+        });
+
+        return destDir;
+    }
+
+
+    /**
+     * Copies the selected files and directories to `destDir`.
+     * @param destDir
+     * @param copyRoot
+     */
+    public async copyFiltered(
+        destDir: Directory,
+        copyRoot: boolean,
+        includeRegexes: Array<RegExp>,
+        excludeRegexes: Array<RegExp>
+    ): Promise<Directory> {
+        if (copyRoot) {
+            const thisDest: Directory = new Directory(destDir, this.dirName);
+            await thisDest.ensureExists();
+            this.copyFiltered(thisDest, false, includeRegexes, excludeRegexes);
+            return thisDest;
+        }
+
+        await this.walk(async (fsItem) => {
+
+            const curItemRelative = fsItem instanceof Directory ?
+                Directory.relative(this, fsItem) :
+                File.relative(this, fsItem);
+
+            const relativeStr = curItemRelative.toString();
+
+            if (matchesAny(relativeStr, includeRegexes) &&
+                !matchesAny(relativeStr, excludeRegexes)) {
+                if (curItemRelative instanceof Directory) {
+                    const dstDir = new Directory(destDir, relativeStr);
+                    await dstDir.ensureExists();
+                }
+                else {
+                    const dstFile = new File(destDir, relativeStr);
+                    await (fsItem as File).copy(dstFile);
+                }
+            }
+
+            return true;
         });
 
         return destDir;

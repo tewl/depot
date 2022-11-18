@@ -695,12 +695,14 @@ export class Directory {
                 File.relative(this, fsItem);
 
             const relativeStr = curItemRelative.toString();
+            let shouldRecurse = false;
 
             if (matchesAny(relativeStr, includeRegexes) &&
                 !matchesAny(relativeStr, excludeRegexes)) {
                 if (curItemRelative instanceof Directory) {
                     const dstDir = new Directory(destDir, relativeStr);
                     await dstDir.ensureExists();
+                    shouldRecurse = true;
                 }
                 else {
                     const dstFile = new File(destDir, relativeStr);
@@ -708,7 +710,7 @@ export class Directory {
                 }
             }
 
-            return true;
+            return shouldRecurse;
         });
 
         return destDir;

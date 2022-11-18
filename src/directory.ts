@@ -684,7 +684,7 @@ export class Directory {
         if (copyRoot) {
             const thisDest: Directory = new Directory(destDir, this.dirName);
             await thisDest.ensureExists();
-            this.copyFiltered(thisDest, false, includeRegexes, excludeRegexes);
+            await this.copyFiltered(thisDest, false, includeRegexes, excludeRegexes);
             return thisDest;
         }
 

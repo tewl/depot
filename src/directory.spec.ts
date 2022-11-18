@@ -1148,6 +1148,13 @@ describe("Directory", () => {
                 expect(new Directory(dstDir, "dirA").existsSync()).toBeFalsy();
             });
 
+
+            it("copies into root directory", async () => {
+                await srcDir.copyFiltered(dstDir, true, [/.*/], []);
+                expect(new Directory(dstDir, "src").existsSync()).toBeTruthy();
+                expect(new Directory(dstDir, "src", "dirA").existsSync()).toBeTruthy();
+            });
+
         });
 
 

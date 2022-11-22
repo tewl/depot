@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { FailedResult, Result, SucceededResult } from "./result";
 import { IIndexedItem } from "./utilityTypes";
-
+import { errorToString } from "./errorHelpers";
 
 /**
  * Converts a Promise<Result<>> to a Promise.
@@ -377,4 +377,3 @@ export async function forceResult<TSuccess, TError>(
         return new FailedResult(errorToString(err));
     });
 }
-

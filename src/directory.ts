@@ -719,6 +719,49 @@ export class Directory {
 
 
     /**
+     * Copies the selected files and directories to `destDir`.
+     */
+    public async copyFilteredWith(
+        destDir: Directory,
+        copyRoot: boolean,
+        shouldCopyFn: (relFileOrDir: File | Directory) => boolean | Promise<boolean>
+    ): Promise<Directory> {
+        if (copyRoot) {
+            const thisDest: Directory = new Directory(destDir, this.dirName);
+            await thisDest.ensureExists();
+            await this.copyFilteredWith(thisDest, false, shouldCopyFn);
+            return thisDest;
+        }
+
+        await this.walk(async (fsItem) => {
+
+            const curItemRelative = fsItem instanceof Directory ?
+                Directory.relative(this, fsItem) :
+                File.relative(this, fsItem);
+
+            let shouldRecurse = false;
+
+            const shouldCopy = await Promise.resolve(shouldCopyFn(curItemRelative));
+            if (shouldCopy) {
+                if (curItemRelative instanceof Directory) {
+                    const dstDir = new Directory(destDir, curItemRelative.toString());
+                    await dstDir.ensureExists();
+                    shouldRecurse = true;
+                }
+                else {
+                    const dstFile = new File(destDir, curItemRelative.toString());
+                    await (fsItem as File).copy(dstFile);
+                }
+            }
+
+            return shouldRecurse;
+        });
+
+        return destDir;
+    }
+
+
+    /**
      * Moves this Directory or the contents of this Directory to `destDir`.
      * @param destDir - The destination directory
      * @param moveRoot - If true, this directory name will be a subdirectory of

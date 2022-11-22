@@ -1133,7 +1133,7 @@ describe("Directory", () => {
             });
 
 
-            it("creates included directories, even emty ones", async () => {
+            it("creates included directories, even empty ones", async () => {
                 await srcDir.copyFiltered(dstDir, false, [/.*/], [/exclude/i]);
                 expect(new Directory(dstDir, "dirC").existsSync()).toBeTruthy();
             });
@@ -1143,7 +1143,7 @@ describe("Directory", () => {
 
                 // "$" used in the following regex to make sure the file in this
                 // directory is not a match.  The file should not be included because its parent directory
-                // is not included, non because the file also matched the exclude reges.
+                // is not included, non because the file also matched the exclude regexes.
                 await srcDir.copyFiltered(dstDir, false, [/.*/], [/dirA$/]);
                 expect(new Directory(dstDir, "dirA").existsSync()).toBeFalsy();
             });
@@ -1151,6 +1151,71 @@ describe("Directory", () => {
 
             it("copies into root directory", async () => {
                 await srcDir.copyFiltered(dstDir, true, [/.*/], []);
+                expect(new Directory(dstDir, "src").existsSync()).toBeTruthy();
+                expect(new Directory(dstDir, "src", "dirA").existsSync()).toBeTruthy();
+            });
+
+        });
+
+
+        describe("copyFilteredWith()", () => {
+
+            const srcDir = new Directory(tmpDir, "src");
+
+            const dirA = new Directory(srcDir, "dirA");
+            const fileA = new File(dirA, "a-include.txt");
+
+            const dirB = new Directory(srcDir, "dirB");
+            const fileB = new File(dirB, "b-excluded.txt");
+
+            const dirC = new Directory(srcDir, "dirC");
+
+            const dstDir = new Directory(tmpDir, "dst");
+
+            beforeEach(() => {
+                tmpDir.emptySync();
+                srcDir.ensureExistsSync();
+                dirA.ensureExistsSync();
+                dirB.ensureExistsSync();
+                dirC.ensureExistsSync();
+
+                fileA.writeSync("included");
+                fileB.writeSync("excluded");
+
+                dstDir.ensureExistsSync();
+            });
+
+
+            it("excludes files when predicate returns false", async () => {
+                await srcDir.copyFilteredWith(dstDir, false, (item) => {
+                    return !/exclude/i.test(item.toString());
+                });
+
+                expect(new File(dstDir, "dirA", "a-include.txt").existsSync()).toBeTruthy();
+                expect(new File(dstDir, "dirB", "b-excluded.txt").existsSync()).toBeFalsy();
+            });
+
+
+            it("creates included directories, even empty ones", async () => {
+                await srcDir.copyFilteredWith(dstDir, false, (item) => true);
+                expect(new Directory(dstDir, "dirC").existsSync()).toBeTruthy();
+            });
+
+
+            it("if a parent directory is excluded no subdirectories or files should be copied", async () => {
+                await srcDir.copyFilteredWith(dstDir, false, (item) => {
+                    // "$" used in the following regex to make sure the file in
+                    // this directory is not a match.  The file should not be
+                    // included because its parent directory is not included,
+                    // non because the file also matched the exclude regexes.
+                    return !/dirA$/;
+                });
+                expect(new Directory(dstDir, "dirA").existsSync()).toBeFalsy();
+            });
+
+
+            it("copies into root directory", async () => {
+                await srcDir.copyFilteredWith(dstDir, true, () => true);
                 expect(new Directory(dstDir, "src").existsSync()).toBeTruthy();
                 expect(new Directory(dstDir, "src", "dirA").existsSync()).toBeTruthy();
             });

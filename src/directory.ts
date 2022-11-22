@@ -57,6 +57,7 @@ export class Directory {
 
     // region Data Members
     private readonly _dirPath: string;
+    private _cachedSize: StorageSize | undefined;
     // endregion
 
 
@@ -776,16 +777,20 @@ export class Directory {
      *
      * @returns The size of all files (recursively) in this Directory.
      */
-    public async getSize(): Promise<StorageSize> {
+    public async getSize(refresh = true): Promise<StorageSize> {
         // Note: Calling fs.stat() on a directory returns a size of 0.
         // Therefore, we must sum the size of files.
 
-        const {files} = await this.contents(true);
-        const totalBytes =
-            (await Promise.all(files.map((curFile) => curFile.exists())))
-            .filter((stat): stat is fs.Stats => stat !== undefined)
-            .reduce((acc, stat) => acc + stat.size, 0);
-        return StorageSize.fromBytes(totalBytes);
+        if (refresh || this._cachedSize === undefined) {
+            const {files} = await this.contents(true);
+            const totalBytes =
+                (await Promise.all(files.map((curFile) => curFile.exists())))
+                .filter((stat): stat is fs.Stats => stat !== undefined)
+                .reduce((acc, stat) => acc + stat.size, 0);
+            this._cachedSize = StorageSize.fromBytes(totalBytes);
+        }
+
+        return this._cachedSize!;
     }
 
 

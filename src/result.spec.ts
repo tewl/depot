@@ -897,6 +897,20 @@ describe("Result namespace", () => {
             expect(() => {
                 const val = Result.throwIfFailed("operation failed", res);
             }).toThrowError("operation failed");
+        });
+
+
+        it("Uses the provided function to convert a failure into an error message", () => {
+            let numInvocations = 0;
+            const res = new FailedResult(5);
+            const errorCodeToMessage = (errorCode: number) => {
+                numInvocations++;
+                return `Error: ${errorCode}`;
+            };
+            expect(() => {
+                const val = Result.throwIfFailed(errorCodeToMessage, res);
+            }).toThrowError("Error: 5");
+            expect(numInvocations).toBeGreaterThan(0);
 
         });
     });

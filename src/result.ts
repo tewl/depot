@@ -904,11 +904,39 @@ export namespace Result {
      * @param result - The input Result
      * @returns The unwrapped successful Result value
      */
-    export function throwIfFailed<TSuccess, TError>(errorMsg: string, result: Result<TSuccess, TError>): TSuccess {
-        if (result.failed) {
-            throw new Error(errorMsg);
+    export function throwIfFailed<TSuccess, TError>(
+        errorMsg: string,
+        result: Result<TSuccess, TError>
+    ): TSuccess;
+
+    /**
+     * Unwraps a successful Result, throwing if it is a failure.
+     *
+     * @param errorMapFn - A function that converts the error to an error
+     * message.  The returned string will be the thrown Error object's message.
+     * @param result - The input Result
+     * @returns The unwrapped successful Result value
+     */
+    export function throwIfFailed<TSuccess, TError>(
+        errorMapFn: (err: TError) => string,
+        result: Result<TSuccess, TError>
+    ): TSuccess;
+
+    export function throwIfFailed<TSuccess, TError>(
+        errorMsgOrFn: string | ((err: TError) => string),
+        result: Result<TSuccess, TError>
+    ): TSuccess {
+
+        if (result.succeeded) {
+            return result.value;
         }
-        return result.value;
+
+        const errorMsg =
+            typeof errorMsgOrFn === "function" ?
+            errorMsgOrFn(result.error) :
+            errorMsgOrFn;
+
+        throw new Error(errorMsg);
     }
 
 

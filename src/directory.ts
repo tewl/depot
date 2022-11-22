@@ -777,7 +777,8 @@ export class Directory {
      * @returns The size of all files (recursively) in this Directory.
      */
     public async getSize(): Promise<StorageSize> {
-        // Note: Calling fs.stat() on a directory returns 0.
+        // Note: Calling fs.stat() on a directory returns a size of 0.
+        // Therefore, we must sum the size of files.
 
         const {files} = await this.contents(true);
         const totalBytes =

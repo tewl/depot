@@ -931,6 +931,8 @@ export namespace Result {
             return result.value;
         }
 
+        // The Result is a failure.  We must throw.
+
         const errorMsg =
             typeof errorMsgOrFn === "function" ?
             errorMsgOrFn(result.error) :
@@ -948,11 +950,40 @@ export namespace Result {
      * @param result - The input Result
      * @returns The unwrapped failed Result error.
      */
-    export function throwIfSucceeded<TSuccess, TError>(errorMsg: string, result: Result<TSuccess, TError>): TError {
-        if (result.succeeded) {
-            throw new Error(errorMsg);
+    export function throwIfSucceeded<TSuccess, TError>(
+        errorMsg: string,
+        result: Result<TSuccess, TError>
+    ): TError;
+
+    /**
+     * Unwraps a failed Result, throwing if it is a success.
+     *
+     * @param errorMapFn - A function that converts a successful Result to an
+     * error message.  The returned string will be the throw Error object's
+     * message.
+     * @param result - The input Result
+     * @returns The unwrapped failed Result error.
+     */
+    export function throwIfSucceeded<TSuccess, TError>(
+        errorMapFn: (val: TSuccess) => string,
+        result: Result<TSuccess, TError>
+    ): TError;
+
+    export function throwIfSucceeded<TSuccess, TError>(
+        errorMsgOrFn: string | ((val: TSuccess) => string),
+        result: Result<TSuccess, TError>
+    ): TError {
+        if (result.failed) {
+            return result.error;
         }
-        return result.error;
+
+        // The Result is a success.  We must throw.
+        const errorMsg =
+            typeof errorMsgOrFn === "function" ?
+            errorMsgOrFn(result.value) :
+            errorMsgOrFn;
+
+        throw new Error(errorMsg);
     }
 
 }

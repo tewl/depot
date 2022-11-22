@@ -910,8 +910,7 @@ describe("Result namespace", () => {
             expect(() => {
                 const val = Result.throwIfFailed(errorCodeToMessage, res);
             }).toThrowError("Error: 5");
-            expect(numInvocations).toBeGreaterThan(0);
-
+            expect(numInvocations).toEqual(1);
         });
     });
 
@@ -931,6 +930,20 @@ describe("Result namespace", () => {
                 const val = Result.throwIfSucceeded("operation should have failed", res);
             }).toThrowError("operation should have failed");
 
+        });
+
+
+        it("Uses the provided function to convert a success into an error message", () => {
+            let numInvocations = 0;
+            const res = new SucceededResult(6);
+            const successToMessage = (val: number) => {
+                numInvocations++;
+                return `Got success "${val}" when error expected.`;
+            };
+            expect(() => {
+                const val = Result.throwIfSucceeded(successToMessage, res);
+            }).toThrowError(`Got success "6" when error expected.`);
+            expect(numInvocations).toEqual(1);
         });
     });
 

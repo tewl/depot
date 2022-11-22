@@ -1,7 +1,10 @@
 export enum CompareResult {
-    LESS    = -1,  // First item is less, or this instance is less
-    EQUAL   = 0,   // The instances are equal
-    GREATER = 1    // Second item is less, or this instance is greater
+    /// First item is less, or this instance is less
+    LESS    = -1,
+    /// The instances are equal
+    EQUAL   = 0,
+    /// Second item is less, or this instance is greater
+    GREATER = 1
 }
 
 

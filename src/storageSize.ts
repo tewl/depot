@@ -173,7 +173,7 @@ export class StorageSize {
     public toString(): string {
 
         const [val, units] = this.normalized();
-        return `${val} ${units} (${this._bytes} bytes)`;
+        return `${val} ${units} (${this._bytes.toLocaleString()} bytes)`;
     }
 
 

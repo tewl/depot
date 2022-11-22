@@ -29,7 +29,7 @@ describe("StorageSize", () => {
         it("Provides the normalized value followed by the number of bytes in parenthesis", () => {
             const numBytes = (62 * 1024 * 1024) + (51 * 1024) + 441;
             const s = StorageSize.fromBytes(numBytes);
-            expect(s.toString()).toEqual(`62.05 MB (${numBytes} bytes)`);
+            expect(s.toString()).toEqual(`62.05 MB (${numBytes.toLocaleString()} bytes)`);
         });
     });
 

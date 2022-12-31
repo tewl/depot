@@ -7,6 +7,7 @@ import {ListenerTracker} from "./listenerTracker";
 import {promisify1} from "./promisify";
 import {Directory} from "./directory";
 import {PathPart, reducePathParts} from "./pathHelpers";
+import { FailedResult, Result, SucceededResult } from "./result";
 
 
 const unlinkAsync = promisify1<void, string>(fs.unlink);
@@ -540,6 +541,40 @@ export class File {
     public writeSync(text: string): void {
         this.directory.ensureExistsSync();
         fs.writeFileSync(this._filePath, text);
+    }
+
+
+    /**
+     * Appends the specified text to this file.
+     *
+     * @param text - The text to be appended
+     * @param createIfNonexistent - Whether to create the file if it does not
+     * exist
+     * @return A successful Result if the file was appended to.  A failure
+     * Result with a descriptive error message if the file could not be appended
+     * to.
+     */
+    public async append(text: string, createIfNonexistent: boolean): Promise<Result<File, string>> {
+
+        const alreadyExists = !!(await this.exists());
+        if (!alreadyExists) {
+            if (createIfNonexistent) {
+                await this.write("");
+            }
+            else {
+                return new FailedResult(`File ${this._filePath} does not exist.`);
+            }
+        }
+
+        const stream = fs.createWriteStream(this._filePath, {flags: "a"});
+        stream.write(text);
+        return new Promise((resolve, reject) => {
+
+            stream.once("close", () => {
+                resolve(new SucceededResult(this));
+            });
+            stream.close();
+        });
     }
 
 

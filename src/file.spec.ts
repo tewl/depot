@@ -1128,6 +1128,36 @@ describe("File", () => {
         });
 
 
+        describe("append()", () => {
+
+            it("fails when the file does not exist and told not to create it", async () => {
+                const file1 = new File(tmpDir, "does-not-exist.txt");
+                const res = await file1.append("foo", false);
+                expect(res.failed).toBeTrue();
+                expect(file1.existsSync()).toBeFalsy();
+            });
+
+
+            it("succeeds when told to create the file if nonexistent", async () => {
+                const file1 = new File(tmpDir, "will-be-created.txt");
+                const res = await file1.append("foo", true);
+                expect(res.succeeded).toBeTrue();
+                expect(file1.existsSync()).toBeTruthy();
+                expect(file1.readSync()).toEqual("foo");
+            });
+
+
+            it("appends the text after the existing text", async () => {
+                const file1 = new File(tmpDir, "file1.txt");
+                file1.writeSync("one");
+                const res = await file1.append("two", false);
+                expect(res.succeeded).toBeTrue();
+                expect(file1.readSync()).toEqual("onetwo");
+            });
+
+        });
+
+
         describe("writeJson()", () => {
 
             it("creates the necessary directories", (done) => {

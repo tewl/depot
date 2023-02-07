@@ -3,6 +3,87 @@ import * as crypto from "crypto";
 import * as _ from "lodash";
 import {createEolRegex} from "./regexpHelpers";
 import { FailedResult, Result, SucceededResult } from "./result";
+import {sprintf} from "sprintf-js";
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Binary Values
+
+
+export function hexStr(val: number): string {
+    "use strict";
+    return "0x" + val.toString(16);
+}
+
+
+export function decAndHex(val: number): string {
+    "use strict";
+    return val + " (" + hexStr(val) + ")";
+}
+
+
+export function hexStr8(val: number): string {
+    "use strict";
+    return sprintf("0x%02x", val);
+}
+
+
+export function hexStr16(val: number): string {
+    "use strict";
+    return sprintf("0x%04x", val);
+}
+
+
+export function hexStr16Array(arr: Array<number>): string {
+    "use strict";
+    if (arr.length === 0) {
+        return "none";
+    }
+
+    const stringVals = _.map(arr, (curVal) => hexStr16(curVal));
+    return _.join(stringVals, " ");
+}
+
+
+export function hexStr32(val: number): string {
+    "use strict";
+    return sprintf("0x%08x", val);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Numeric
+
+
+/**
+ * Converts the specified number into exponential notation as displayed in
+ * Studio 5000.
+ * @param val - The value
+ * @return A string containing the exponential notation form of val
+ */
+export function toExponential(val: number): string {
+    let powerOfTen = 0;
+
+    if (val !== 0) {
+        while (Math.abs(val) < 1) {
+            val = val * 10;
+            --powerOfTen;
+        }
+
+        while (Math.abs(val) > 10) {
+            val = val / 10;
+            ++powerOfTen;
+        }
+    }
+
+    const powerOfTenSign = powerOfTen < 0 ? "-" : "+";
+    const powerOfTenAbs = Math.abs(powerOfTen).toString();
+
+    return `${val.toFixed(8)}e${powerOfTenSign}${_.padStart(powerOfTenAbs, 3, "0")}`;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 
 /**
@@ -26,6 +107,10 @@ export function numInitial(str: string, padStr: string): number {
 
     return numOccurrences;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Indentation
 
 
 /**
@@ -97,6 +182,9 @@ export function outdent(str: string, padStr = " ", greedy = true): string {
     return resultLines.join("");
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Whitespace
 
 const blankLineRegex = /^\s*$/;
 
@@ -375,4 +463,152 @@ export function parseDecInt(intStr: string): Result<number, string> {
         new SucceededResult(num) :
         new FailedResult(`The string '${intStr}' has a lossy parsing of '${backToStr}'.`);
 
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// IP Address validation
+
+
+/**
+ * Regular expression for validating an IP address.
+ * Hint:  You might find this string useful when setting the "ng-pattern"
+ * attribute on an input element.
+ */
+export const ipAddrRegexString: string =
+                 "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+const ipAddrRegex: RegExp = new RegExp("^" + ipAddrRegexString + "$");
+
+/**
+ * Returns whether the specific string represents a valid IP address.
+ * @param str - The string to be tested
+ * @returns true if the specified string is a valid IP address
+ */
+export function isValidIpAddress(str: string): boolean {
+    "use strict";
+    return ipAddrRegex.test(str);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Buffer
+
+
+/**
+ * Returns a string representation of a Buffer
+ * @param buf - The Buffer to create a string for
+ * @returns A string representation of buf
+ */
+export function getBufferString(buf: Buffer): string {
+    "use strict";
+
+    if (buf.length === 0) {
+        return "";
+    }
+
+    const result: string = _.reduce(
+        buf,
+        (acc: string, curByte: number) => {
+            return acc + sprintf("%02x ", curByte);
+        },
+        ""
+    );
+
+    // Remove the last space character.
+    return result.slice(0, -1);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Bracket Pairing
+
+
+/**
+ * An interface that describes (string) tokens that should be paired with one
+ * another.  For example:
+ *   - "[" and "]"
+ *   - "{" and "}"
+ *   - "<h1>" and "</h1>".
+ */
+export interface IPairing {
+    begin: string;
+    end: string;
+}
+
+
+/**
+ * Determines whether the specified tokens are properly nested (i.e. do not
+ * overlap) and all begin tokens are paired with the corresponding end token.
+ * @param pairings - An array of associated begin and end tokens to check
+ * @param str - The string to check
+ * @return true if all tokens are properly nested and paired; false otherwise.
+ */
+export function containsNestedPairs(pairings: Array<IPairing>, str: string): boolean {
+    // All begin and end tokens combined in a single array.
+    const allTokens: Array<string> = _.reduce(
+        pairings,
+        (acc: Array<string>, curPairing: IPairing) => {
+            acc.push(curPairing.begin);
+            acc.push(curPairing.end);
+            return acc;
+        },
+        []
+    );
+
+    // A stack to track the current pairing state.  As each begin token is
+    // encountered, the associated pairing is pushed onto this stack.
+    // As we step through str, the only valid ending token is the one currently
+    // on the top of this stack.
+    const curState: Array<IPairing> = [];
+
+    // Step through str until we have reached the end.
+    for (let curIndex = 0; curIndex < str.length; ) {
+        // Search starting at curIndex for the next token.
+        let foundToken: string = "";
+        const nextTokenIndex = _.findIndex(
+            str,
+            (curChar: string, index: number) => {
+                return _.some(allTokens, (curToken) => {
+                    const isMatch = str.substr(index, curToken.length) === curToken;
+                    if (isMatch) {
+                        foundToken = curToken;
+                    }
+                    return isMatch;
+                });
+            },
+            curIndex
+        );
+
+        if (nextTokenIndex < 0) {
+            // We did not find any more tokens.  We are done stepping through str.
+            curIndex = str.length;
+        }
+        else {
+            // If we found the ending to the current token pair, pop it off the stack.
+            if (curState.length > 0 &&
+                foundToken === _.last(curState)!.end) {
+                curState.pop();
+            }
+            else {
+                // If we have found the beginning of a new pairing, push it onto the stack.
+                const newPairing = _.find(pairings, (curPairing) => curPairing.begin === foundToken);
+                if (newPairing) {
+                    curState.push(newPairing);
+                }
+                else {
+                    // We must have found an (illegal) ending token.  The
+                    // pairings are not properly nested.
+                    return false;
+                }
+            }
+
+            curIndex = nextTokenIndex + foundToken.length;
+        }
+
+    }
+
+    // If all begin tokens have been properly paired with their corresponding
+    // end token, the curState stack should be empty.
+    return curState.length === 0;
 }

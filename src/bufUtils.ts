@@ -10,8 +10,6 @@ import { sprintf } from "sprintf-js";
  * Otherwise, a copy of theBuffer that has been padded.
  */
 export function padBuffer(theBuffer: Buffer, desiredNumBytes: number): Buffer {
-    "use strict";
-
     const bytesNeeded: number = desiredNumBytes - theBuffer.length;
 
     if (bytesNeeded <= 0) {
@@ -35,8 +33,6 @@ export function padBuffer(theBuffer: Buffer, desiredNumBytes: number): Buffer {
  * returned.  Otherwise, a copy is made.
  */
 export function alignBuffer(theBuffer: Buffer, numBytes: number): Buffer {
-    "use strict";
-
     // If the user did not specify an expected number of bytes, just return the
     // original buffer.
     if ((numBytes !== 2) && (numBytes !== 4) && (numBytes !== 8) ) {
@@ -63,8 +59,6 @@ export function alignBuffer(theBuffer: Buffer, numBytes: number): Buffer {
  * @return An array representing the bits (in boolean form) of num
  */
 export function boolify(num: number, numBytes: number): Array<boolean> {
-    "use strict";
-
     const result: Array<boolean> = [];
 
     for (let i: number = 0; i < 8 * numBytes; i++) {

@@ -1,6 +1,5 @@
 import {EventEmitter} from "events";
 import {Task, getTimerPromise} from "./promiseHelpers";
-import {allSettled} from "./promiseHelpersLegacy";
 import {TaskQueue} from "./taskQueue";
 import {Deferred} from "./deferred";
 
@@ -318,7 +317,7 @@ describe("TaskQueue", () => {
         // Only task1 should have had a chance to start.
         queue.cancelAllPending(new Error("queue is cancelled"));
 
-        allSettled([t1Prom, t2Prom])
+        Promise.allSettled([t1Prom, t2Prom])
         .then(() => {
             // In-progress tasks should complete normally and return their
             // normal value.
@@ -362,7 +361,7 @@ describe("TaskQueue", () => {
         // Only task1 should have had a chance to start.
         queue.cancelAllPending();
 
-        allSettled([t1Prom, t2Prom])
+        Promise.allSettled([t1Prom, t2Prom])
         .then(() => {
             // In-progress tasks should complete normally and return their
             // normal value.

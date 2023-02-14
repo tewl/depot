@@ -3,7 +3,6 @@ import {getIllegalChars, PersistentCache} from "./persistentCache";
 import {generateUuid} from "./uuid";
 import {tmpDir} from "../test/ut/specHelpers";
 import {Directory} from "./directory";
-import {allSettled} from "./promiseHelpersLegacy";
 
 
 describe("PersistentCache", () => {
@@ -25,9 +24,9 @@ describe("PersistentCache", () => {
                     return PersistentCache.create<string>(name, {dir: tmpDir.toString()});
                 });
 
-                allSettled(promises)
+                Promise.allSettled(promises)
                 .then((inspections) => {
-                    const numRejections = _.sumBy(inspections, (curInspection) => curInspection.isRejected() ? 1 : 0);
+                    const numRejections = _.sumBy(inspections, (curInspection) => curInspection.status === "rejected" ? 1 : 0);
                     expect(numRejections).toEqual(illegalChars.length);
                 });
             });
@@ -123,10 +122,10 @@ describe("PersistentCache", () => {
                         return cache.put("foo" + curIllegalChar + "bar", "quux");
                     });
 
-                    allSettled(promises)
+                    Promise.allSettled(promises)
                     .then((inspections) => {
                         const numRejections = _.sumBy(inspections,
-                                                      (curInspection) => curInspection.isRejected() ? 1 : 0);
+                                                      (curInspection) => curInspection.status === "rejected" ? 1 : 0);
                         expect(numRejections).toEqual(illegalChars.length);
                         done();
                     });

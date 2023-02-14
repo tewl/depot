@@ -1,5 +1,3 @@
-// tslint:disable:member-ordering
-
 /**
  * Facilitates the reading of data from a Buffer.
  */

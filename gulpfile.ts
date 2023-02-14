@@ -214,7 +214,6 @@ export async function build(): Promise<void>
         throw toGulpError("❌ " + failStyle("Build failed."));
     }
     else {
-
         const indexedResults = _.map(
             results.value,
             (curResult, index) => { return {index, result: curResult}; }

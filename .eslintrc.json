@@ -120,20 +120,32 @@
             "error",
             {
                 "selector": "default",
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow",
                 "format": [
                     "camelCase"
-                ],
-                "leadingUnderscore": "allow",
-                "trailingUnderscore": "allow"
+                ]
             },
             {
                 "selector": "variable",
+                "modifiers": [
+                    "const",
+                    "global"
+                ],
+                "leadingUnderscore": "allowSingleOrDouble",
+                "trailingUnderscore": "allow",
                 "format": [
                     "camelCase",
                     "UPPER_CASE"
-                ],
+                ]
+            },
+            {
+                "selector": "variable",
                 "leadingUnderscore": "allowSingleOrDouble",
-                "trailingUnderscore": "allow"
+                "trailingUnderscore": "allow",
+                "format": [
+                    "camelCase"
+                ]
             },
             {
                 "selector": "typeLike",
@@ -143,8 +155,21 @@
             },
             {
                 "selector": "enumMember",
+                // Allow leading underscores for situations where the member
+                // would otherwise start with a numeric digit.
+                "leadingUnderscore": "allow",
                 "format": [
-                    "PascalCase"
+                    "PascalCase",
+                    "UPPER_CASE"
+                ]
+            },
+            {
+                "selector": "objectLiteralProperty",
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow",
+                "format": [
+                    "camelCase",
+                    "UPPER_CASE"
                 ]
             },
             {
@@ -152,41 +177,53 @@
                 "selector": [
                     "variable"
                 ],
-                "format": [
-                    "PascalCase"
-                ],
                 "filter": {
                     "regex": "^.*Module$",
                     "match": true
-                }
+                },
+                "format": [
+                    "PascalCase"
+                ]
             },
             {
                 "selector": "interface",
-                "format": [
-                    "PascalCase"
-                ],
                 "prefix": [
                     "I"
+                ],
+                "format": [
+                    "PascalCase"
                 ]
             },
             {
                 "selector": "typeParameter",
-                "format": [
-                    "PascalCase"
-                ],
                 "prefix": [
                     "T"
+                ],
+                "format": [
+                    "PascalCase"
                 ]
             },
             {
-                "selector": "classProperty",
-                "format": [
-                    "camelCase"
+                "selector": [
+                    "classProperty"
                 ],
+                "modifiers": [
+                    "static",
+                    "readonly"
+                ],
+                "format": [
+                    "UPPER_CASE"
+                ]
+            },
+            {
+                "selector": ["classProperty"],
                 "modifiers": [
                     "private"
                 ],
-                "leadingUnderscore": "require"
+                "leadingUnderscore": "require",
+                "format": [
+                    "camelCase"
+                ]
             }
         ],
         "@typescript-eslint/no-explicit-any": "warn",

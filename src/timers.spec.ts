@@ -49,7 +49,7 @@ describe("Timeout", () => {
             const t1 = new Timeout(100);
 
             let numExpiredEvents = 0;
-            t1.on(Timeout.eventNameExpired, () => {
+            t1.on(Timeout.EVENT_NAME_EXPIRED, () => {
                 numExpiredEvents++;
             });
 
@@ -83,7 +83,7 @@ describe("Timeout", () => {
             const t1 = new Timeout(100);
             let numExpiredEvents = 0;
 
-            t1.on(Timeout.eventNameExpired, () => {
+            t1.on(Timeout.EVENT_NAME_EXPIRED, () => {
                 numExpiredEvents++;
             });
 

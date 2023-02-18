@@ -1,7 +1,9 @@
 import {
     numInitial, outdent, trimBlankLines, indent, removeWhitespace,
     removeBlankLines, splitIntoLines, splitLinesOsIndependent, padLeft, padRight,
-    repeat, splice, getEol, hash, parseDecInt, hexStr, decAndHex, hexStr8, hexStr16, hexStr16Array, hexStr32, toExponential, isValidIpAddress, containsNestedPairs, getBufferString
+    repeat, splice, getEol, hash, parseDecInt, hexStr, decAndHex, hexStr8, hexStr16,
+    hexStr16Array, hexStr32, toExponential, isValidIpAddress, containsNestedPairs,
+    getBufferString
 } from "./stringHelpers";
 
 describe("string helpers module", () => {

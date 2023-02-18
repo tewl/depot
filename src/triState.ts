@@ -7,9 +7,9 @@
  */
 export class TriState {
     // All possible TriState values.
-    public static readonly false         = new TriState(false);
-    public static readonly true          = new TriState(true);
-    public static readonly indeterminate = new TriState(undefined);
+    public static readonly FALSE         = new TriState(false);
+    public static readonly TRUE          = new TriState(true);
+    public static readonly INDETERMINATE = new TriState(undefined);
 
     // Instance Members
     private readonly _value: undefined | boolean;

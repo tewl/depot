@@ -11,31 +11,26 @@ import {sprintf} from "sprintf-js";
 
 
 export function hexStr(val: number): string {
-    "use strict";
     return "0x" + val.toString(16);
 }
 
 
 export function decAndHex(val: number): string {
-    "use strict";
     return val + " (" + hexStr(val) + ")";
 }
 
 
 export function hexStr8(val: number): string {
-    "use strict";
     return sprintf("0x%02x", val);
 }
 
 
 export function hexStr16(val: number): string {
-    "use strict";
     return sprintf("0x%04x", val);
 }
 
 
 export function hexStr16Array(arr: Array<number>): string {
-    "use strict";
     if (arr.length === 0) {
         return "none";
     }
@@ -46,7 +41,6 @@ export function hexStr16Array(arr: Array<number>): string {
 
 
 export function hexStr32(val: number): string {
-    "use strict";
     return sprintf("0x%08x", val);
 }
 
@@ -486,7 +480,6 @@ const ipAddrRegex: RegExp = new RegExp("^" + ipAddrRegexString + "$");
  * @returns true if the specified string is a valid IP address
  */
 export function isValidIpAddress(str: string): boolean {
-    "use strict";
     return ipAddrRegex.test(str);
 }
 
@@ -501,8 +494,6 @@ export function isValidIpAddress(str: string): boolean {
  * @returns A string representation of buf
  */
 export function getBufferString(buf: Buffer): string {
-    "use strict";
-
     if (buf.length === 0) {
         return "";
     }

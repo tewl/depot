@@ -1,5 +1,3 @@
-// tslint:disable:max-classes-per-file
-
 import Long from "long";
 import * as _ from "lodash";
 import {BufReader} from "./bufReader";

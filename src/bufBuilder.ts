@@ -1,5 +1,3 @@
-// tslint:disable:member-ordering
-
 import * as _ from "lodash";
 import {Lint, Ulint} from "./lint";
 

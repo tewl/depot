@@ -80,3 +80,64 @@ export async function resolveFileLocation(
         }
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// getMostRecentlyModified()
+//
+////////////////////////////////////////////////////////////////////////////////
+
+export interface IFsItemWithModifiedMs<TFsItem> {
+    fsItem: TFsItem;
+    mtimeMs: number;
+}
+
+
+interface IStatable {
+    exists(): Promise<fs.Stats | undefined>;
+}
+
+
+/**
+ * Get the most recently modified filesystem item in the specified array.
+ *
+ * @param fsItems - The filesystem items to consider.  This array may contain
+ * Directory instances, File instances or a mixture of the two.
+ * @return A Promise for a Result containing the most recently modified item.
+ * An failed Result is returned when the input array is empty.
+ */
+export async function getMostRecentlyModified<TFsItem extends IStatable>(
+    fsItems: Array<TFsItem>
+): Promise<Result<IFsItemWithModifiedMs<TFsItem>, string>> {
+
+    if (fsItems.length === 0) {
+        return new FailedResult(`No filesystem elements were specified, so their modified timestamps cannot be compared.`);
+    }
+
+    // Get the stats for all the filesystem items.  We will get back an object
+    // containing the filesystem item and its modified timestamp.
+    const promises =
+        fsItems
+        .map((fsItem) => {
+            return fsItem.exists()
+            .then((stats) => {
+                return stats ?
+                    {
+                        fsItem:  fsItem,
+                        mtimeMs: stats.mtimeMs
+                    } as IFsItemWithModifiedMs<TFsItem> :
+                    undefined;
+            });
+        });
+
+    const mostRecent =
+        (await Promise.all(promises))
+        // Remove any items that could not be stated.
+        .filter((fsItem): fsItem is IFsItemWithModifiedMs<TFsItem> => fsItem !== undefined)
+        // Reduce the array to the one item with the largest modified timestamp.
+        .reduce(
+            (acc, fsItem) => fsItem.mtimeMs > acc.mtimeMs ? fsItem : acc
+        );
+    return new SucceededResult(mostRecent);
+}

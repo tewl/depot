@@ -1,8 +1,9 @@
 import * as path from "path";
 import {tmpDir} from "../test/ut/specHelpers";
-import {getFilesystemItem, resolveFileLocation} from "./filesystemHelpers";
+import {getFilesystemItem, getMostRecentlyModified, resolveFileLocation} from "./filesystemHelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
+import { getTimerPromise } from "./promiseHelpers";
 
 
 describe("getFilesystemItem()", () => {
@@ -108,6 +109,91 @@ describe("resolveFileLocation()", () => {
         expect(result.failed).toBeTruthy();
         if (result.failed) {
             expect(result.error.length).toBeGreaterThan(0);
+        }
+    });
+
+});
+
+
+describe("getMostRecentlyModified()", () => {
+
+    beforeEach(() => {
+        tmpDir.ensureExistsSync();
+        tmpDir.emptySync();
+    });
+
+
+    it("returns a failed result when the input array is emtpy", async () => {
+        const res = await getMostRecentlyModified([]);
+        expect(res.failed).toBeTrue();
+    });
+
+
+    it("returns the most recently modified Directory", async () => {
+        const dirA = new Directory(tmpDir, "dirA");
+        const dirB = new Directory(tmpDir, "dirB");
+        const dirC = new Directory(tmpDir, "dirC");
+
+        await Promise.all([dirA.ensureExists(), dirB.ensureExists(), dirC.ensureExists()]);
+
+        const fileA = new File(dirA, "fileA.txt");
+        const fileB = new File(dirB, "fileB.txt");
+        const fileC = new File(dirC, "fileC.txt");
+
+        // By writing _fileB_ last, _dirB_ should be the most recently modified.
+        fileC.writeSync("file C");
+        await getTimerPromise(20, undefined);
+        fileA.writeSync("file A");
+        await getTimerPromise(20, undefined);
+        fileB.writeSync("file B");
+
+        const res = await getMostRecentlyModified([dirA, dirB, dirC]);
+        expect(res.succeeded).toBeTrue();
+        if (res.succeeded) {
+            expect(res.value.fsItem.dirName).toEqual("dirB");
+        }
+    });
+
+
+    it("returns the most recently modified File", async () => {
+        const fileA = new File(tmpDir, "fileA.txt");
+        const fileB = new File(tmpDir, "fileB.txt");
+        const fileC = new File(tmpDir, "fileC.txt");
+
+        fileC.writeSync("file C");
+        await getTimerPromise(20, undefined);
+        fileA.writeSync("file A");
+        await getTimerPromise(20, undefined);
+        fileB.writeSync("file B");
+
+        const res = await getMostRecentlyModified([fileA, fileB, fileC]);
+        expect(res.succeeded).toBeTrue();
+        if (res.succeeded) {
+            expect(res.value.fsItem.fileName).toEqual("fileB.txt");
+        }
+    });
+
+
+    it("returns the most recently modified Directory or File", async () => {
+        const dirA = new Directory(tmpDir, "dirA");
+        const dirB = new Directory(tmpDir, "dirB");
+        const dirC = new Directory(tmpDir, "dirC");
+        await Promise.all([dirA.ensureExists(), dirB.ensureExists(), dirC.ensureExists()]);
+
+        const fileB = new File(dirB, "fileB.txt");
+        const fileD = new File(tmpDir, "fileD.txt");
+
+        fileD.writeSync("file D");
+        await getTimerPromise(20, undefined);
+        fileB.writeSync("file B");
+
+        const res = await getMostRecentlyModified([dirA, dirB, dirC, fileD]);
+        expect(res.succeeded).toBeTrue();
+        if (res.succeeded) {
+            expect(res.value.fsItem instanceof Directory).toBeTrue();
+            if (res.value.fsItem instanceof Directory) {
+                expect(res.value.fsItem.dirName).toEqual("dirB");
+            }
         }
     });
 

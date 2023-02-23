@@ -5,7 +5,7 @@ import * as _ from "lodash";
  * Defines a function type that can take two arguments and decide whether they
  * are similar.
  */
-export type SimilarityPredicate<T> = (a: T, b: T) => boolean;
+export type BinaryPredicate<T> = (a: T, b: T) => boolean;
 
 
 /**
@@ -21,7 +21,7 @@ export type SimilarityPredicate<T> = (a: T, b: T) => boolean;
  */
 export function groupAdjacentBy<T>(
     items: readonly T[],
-    isSimilarFn: SimilarityPredicate<T>
+    isSimilarFn: BinaryPredicate<T>
 ): Array<Array<T>> {
 
     const groups: Array<Array<T>> = [];

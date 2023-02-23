@@ -1,11 +1,12 @@
 import * as _ from "lodash";
 import {assertNever} from "./never";
 import { CompareFunc, CompareResult } from "./compare";
+import { groupAdjacentBy } from "./algorithm2";
 
 
-export enum OptimalSubproblem {
-    UniqueToX,   // Up
-    UniqueToY,   // Left
+export enum DiffChangeType {
+    UniqueToX,   // Up (when each item in X is a row in the table)
+    UniqueToY,   // Left (when each item in Y is a column in the table)
     Equal        // Diagonal
 }
 
@@ -14,7 +15,7 @@ export interface ISubproblemInfo {
     // The direction to travel to find the subproblem with the greatest LCS.
     // undefined if none exists (i.e. you have reached row 0 or column 0, or
     // both).
-    optSubproblem: OptimalSubproblem | undefined;
+    optSubproblem: DiffChangeType | undefined;
     // Length of the LCS for the given subproblem.
     lcsLength: number;
 }
@@ -64,7 +65,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // subproblem to the upper left and increment the LCS length.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.Equal,
+                        optSubproblem: DiffChangeType.Equal,
                         lcsLength:     table[tableRow - 1][tableCol - 1]!.lcsLength + 1
                     };
             }
@@ -73,7 +74,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // it, and keep the LCS length the same.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.UniqueToX,
+                        optSubproblem: DiffChangeType.UniqueToX,
                         lcsLength:     table[tableRow - 1][tableCol]!.lcsLength
                     };
             }
@@ -82,7 +83,7 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
                 // and keep the LCS length the same.
                 table[tableRow][tableCol] =
                     {
-                        optSubproblem: OptimalSubproblem.UniqueToY,
+                        optSubproblem: DiffChangeType.UniqueToY,
                         lcsLength:     table[tableRow][tableCol - 1]!.lcsLength
                     };
             }
@@ -94,17 +95,20 @@ export function createLcsTable<T>(x: Array<T>, y: Array<T>, compareFn: CompareFu
 
 
 export interface IDiffItemUniqueToX<T> {
-    change: OptimalSubproblem.UniqueToX;
+    change: DiffChangeType.UniqueToX;
     value: T;
 }
 
 export interface IDiffItemUniqueToY<T> {
-    change: OptimalSubproblem.UniqueToY;
+    change: DiffChangeType.UniqueToY;
     value: T;
 }
 
 export interface IDiffItemEqual<T> {
-    change: OptimalSubproblem.Equal;
+    change: DiffChangeType.Equal;
+    // Note:  Even though the x and y values are equal, we keep track of them
+    // independently, because they may differ in ways that are ignored by the
+    // compare function used (for example, case insensitivity).
     xValue: T;
     yValue: T;
 }
@@ -131,29 +135,29 @@ export function getDiff<T>(x: Array<T>, y: Array<T>, compareFn: CompareFunc<T>):
         const change = table[row][col]!.optSubproblem;
 
         switch (change) {
-            case OptimalSubproblem.UniqueToX:
-                diffItems.push({change: OptimalSubproblem.UniqueToX, value: x[row - 1]});
+            case DiffChangeType.UniqueToX:
+                diffItems.push({change: DiffChangeType.UniqueToX, value: x[row - 1]});
                 row--;
                 break;
 
-            case OptimalSubproblem.UniqueToY:
-                diffItems.push({change: OptimalSubproblem.UniqueToY, value: y[col - 1]});
+            case DiffChangeType.UniqueToY:
+                diffItems.push({change: DiffChangeType.UniqueToY, value: y[col - 1]});
                 col--;
                 break;
 
-            case OptimalSubproblem.Equal:
-                diffItems.push({change: OptimalSubproblem.Equal, xValue: x[row - 1], yValue: y[col - 1]});
+            case DiffChangeType.Equal:
+                diffItems.push({change: DiffChangeType.Equal, xValue: x[row - 1], yValue: y[col - 1]});
                 row--;
                 col--;
                 break;
 
             case undefined:
                 if (row === 0) {
-                    diffItems.push({change: OptimalSubproblem.UniqueToY, value: y[col - 1]});
+                    diffItems.push({change: DiffChangeType.UniqueToY, value: y[col - 1]});
                     col--;
                 }
                 else if (col === 0) {
-                    diffItems.push({change: OptimalSubproblem.UniqueToX, value: x[row - 1]});
+                    diffItems.push({change: DiffChangeType.UniqueToX, value: x[row - 1]});
                     row--;
                 }
                 break;

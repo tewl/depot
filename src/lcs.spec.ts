@@ -1,5 +1,5 @@
 import {compareStr, compareStrI} from "./compare";
-import {createLcsTable, DiffChangeType, Table, DiffItem, getDiff, groupSimilarAdjacentDiffs} from "./lcs";
+import {createLcsTable, DiffChangeType, Table, DiffItem, getDiff} from "./lcs";
 
 
 describe("createLcsTable()", () => {

@@ -19,7 +19,7 @@ export type BinaryPredicate<T> = (a: T, b: T) => boolean;
  * items from the source array that are considered similar.  The order of the
  * items is unchanged from the input.
  */
-export function groupAdjacentBy<T>(
+export function groupConsecutiveBy<T>(
     items: readonly T[],
     isSimilarFn: BinaryPredicate<T>
 ): Array<Array<T>> {

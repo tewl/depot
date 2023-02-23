@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 import {assertNever} from "./never";
 import { CompareFunc, CompareResult } from "./compare";
-import { groupAdjacentBy } from "./algorithm2";
 
 
 export enum DiffChangeType {

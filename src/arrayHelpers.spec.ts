@@ -160,6 +160,14 @@ describe("groupAdjacentBy()", () => {
 
     const isSimilarEvenOdd = (a: number, b: number) => (a % 2) === (b % 2);
 
+    it("returns single empty grouping when given an empty array", () => {
+        expect(groupConsecutiveBy([], isSimilarEvenOdd)).toEqual(
+            [
+                []
+            ]
+        );
+    });
+
 
     it("returns the original array when no consecutive items are similar", () => {
         expect(groupConsecutiveBy([0, 1, 2, 3, 4, 5], isSimilarEvenOdd)).toEqual(

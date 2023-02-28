@@ -22,6 +22,7 @@ export type ReadLinesCallback = (lineText: string, lineNum: number) => void;
 
 
 export class File {
+
     public static relative(from: Directory, to: File): File {
         const relPath = path.relative(from.toString(), to.toString());
         return new File(relPath);

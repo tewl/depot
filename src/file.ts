@@ -48,6 +48,10 @@ export class File {
 
 
     public constructor(pathPart: PathPart, ...pathParts: Array<PathPart>) {
+        if (typeof pathPart === "string" && pathPart === "") {
+            throw new Error("File instance created with illegal first pathPart.");
+        }
+
         const allParts: Array<PathPart> = [pathPart].concat(pathParts);
         this._filePath = reducePathParts(allParts);
     }

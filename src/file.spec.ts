@@ -32,8 +32,6 @@ describe("File", () => {
             });
         });
 
-
-
     });
 
 
@@ -41,6 +39,15 @@ describe("File", () => {
 
         beforeEach(() => {
             tmpDir.emptySync();
+        });
+
+
+        describe("constructor", () => {
+
+            it("throws when given an invalid path to a file", () => {
+                expect(() => new File("")).toThrow();
+            });
+
         });
 
 

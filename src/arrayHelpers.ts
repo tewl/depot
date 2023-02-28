@@ -137,7 +137,8 @@ export function groupConsecutiveBy<T>(items: T[], isSimilarFn: (a: T, b: T) => b
 
         prevItem = currentItem;
     }
-    if (groups.length === 0 || currentGroup.length > 0) {
+
+    if (currentGroup.length > 0) {
         groups.push(currentGroup);
     }
     return groups;

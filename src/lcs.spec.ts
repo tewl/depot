@@ -1,5 +1,5 @@
 import {compareStr, compareStrI} from "./compare";
-import {createLcsTable, DiffChangeType, Table, DiffItem, getDiff} from "./lcs";
+import {createLcsTable, DiffChangeType, Table, DiffItem, getDiff, elideEqual} from "./lcs";
 
 
 describe("createLcsTable()", () => {
@@ -125,4 +125,33 @@ describe("getDiff()", () => {
         expect(diff).toEqual(expected);
     });
 
+});
+
+
+describe("elideEqual()", () => {
+
+    it("when given an empty array of diff items, returns empty arrays", () => {
+        const diffItems: Array<DiffItem<string>> = [];
+
+        expect(elideEqual(diffItems, "...")).toEqual([
+            [],
+            []
+        ]);
+    });
+
+
+    it("replaces sequences of equal items with a single elided value", () => {
+        const diffItems: Array<DiffItem<string>> = [
+            { change: DiffChangeType.UniqueToX, value: "a" },
+            { change: DiffChangeType.Equal,     xValue: "b", yValue: "b" },
+            { change: DiffChangeType.Equal,     xValue: "c", yValue: "c" },
+            { change: DiffChangeType.Equal,     xValue: "d", yValue: "d" },
+            { change: DiffChangeType.UniqueToY, value: "e" }
+        ];
+
+        expect(elideEqual(diffItems, "...")).toEqual([
+            ["a", "..."],
+            ["...", "e"]
+        ]);
+    });
 });

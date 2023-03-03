@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import {assertNever} from "./never";
 import { CompareFunc, CompareResult } from "./compare";
+import { groupConsecutiveBy } from "./arrayHelpers";
 
 
 export enum DiffChangeType {
@@ -167,4 +168,59 @@ export function getDiff<T>(x: Array<T>, y: Array<T>, compareFn: CompareFunc<T>):
     }
 
     return diffItems.reverse();
+}
+
+
+interface IAccumulatedParts<T> {
+    xParts: Array<T>;
+    yParts: Array<T>;
+}
+
+
+/**
+ * Accepts the result of a comparison, and returns the values that are unique to
+ * the x and y collections while replacing sequences of equal values with the
+ * specified value.
+ *
+ * @param diffItems - The results of comparing the two items
+ * @param elidedVal - The value that will replace sequences of equal values
+ * @return A tuple containing two arrays. The first array contains the values
+ * from the x side of the comparison and the second array contains the values
+ * from the y side of the comparison.  In the arrays, sequences of equal values
+ * have been replaced with the specified _elidedVal_.
+ */
+export function elideEqual<T>(
+    diffItems: Array<DiffItem<T>>,
+    elidedVal: T
+): [Array<T>, Array<T>] {
+
+    const groupedDiffItems = groupConsecutiveBy(diffItems, (x, y) => x.change === y.change);
+
+    const resultParts =
+        groupedDiffItems.reduce<IAccumulatedParts<T>>(
+            (acc, similarDiffItems) => {
+
+                const change = similarDiffItems[0]!.change;
+
+                if (change === DiffChangeType.UniqueToX) {
+                    const vals = (similarDiffItems as IDiffItemUniqueToX<T>[]).map((cur) => cur.value);
+                    acc.xParts.push(...vals);
+                }
+                else if (change === DiffChangeType.UniqueToY) {
+                    const vals = (similarDiffItems as IDiffItemUniqueToY<T>[]).map((cur) => cur.value);
+                    acc.yParts.push(...vals);
+                }
+                else if (change === DiffChangeType.Equal) {
+                    acc.xParts.push(elidedVal);
+                    acc.yParts.push(elidedVal);
+                }
+                else {
+                    assertNever(change);
+                }
+                return acc;
+            },
+            { xParts: [], yParts: [] }
+        );
+
+    return [resultParts.xParts, resultParts.yParts];
 }

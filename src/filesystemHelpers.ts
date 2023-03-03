@@ -1,13 +1,8 @@
 import * as fs from "fs";
-import * as path from "path";
 import * as _ from "lodash";
-import { groupConsecutiveBy } from "./arrayHelpers";
 import {Directory} from "./directory";
 import {File} from "./file";
-import { DiffChangeType, IDiffItemEqual, getDiff, IDiffItemUniqueToX, IDiffItemUniqueToY } from "./lcs";
 import { FailedResult, Result, SucceededResult } from "./result";
-import { CompareResult, compareStr } from "./compare";
-import { assertNever } from "./never";
 
 
 /**
@@ -145,69 +140,4 @@ export async function getMostRecentlyModified<TFsItem extends IStatable>(
             (acc, fsItem) => fsItem.mtimeMs > acc.mtimeMs ? fsItem : acc
         );
     return new SucceededResult(mostRecent);
-}
-
-
-/**
- * Converts two input files to strings in which unique parts of their path are
- * retained and common parts are replaced with ellipsis.
- *
- * @param fileX - The first file
- * @param fileY - The second file
- * @return A tuple containing string representations of fileX and fileY, where
- * common parts are replaced with ellipsis
- */
-export function disambiguateFiles(fileX: File, fileY: File): [string, string] {
-
-    let forcedXResult: string | undefined = undefined;
-    let forcedYResult: string | undefined = undefined;
-
-    const fileXParts = fileX.toString().split(path.sep);
-    const fileXPartsToDiff = fileXParts.slice(1, -1);
-    if (fileXParts.length <= 2) {
-        forcedXResult = fileX.toString();
-    }
-
-    const fileYParts = fileY.toString().split(path.sep);
-    const fileYPartsToDiff = fileYParts.slice(1, -1);
-    if (fileYParts.length <= 2) {
-        forcedYResult = fileY.toString();
-    }
-
-    const diffItems = getDiff(
-        fileXPartsToDiff,
-        fileYPartsToDiff,
-        (a, b) => compareStr(a, b)
-    );
-    const groupedDiffItems =
-        groupConsecutiveBy(diffItems, (itemA, itemB) => itemA.change === itemB.change);
-
-    const resX: string[] = [];
-    const resY: string[] = [];
-
-    for (const curGroup of groupedDiffItems) {
-
-        if (curGroup[0]!.change === DiffChangeType.UniqueToX) {
-            const strs =
-                (curGroup as IDiffItemUniqueToX<string>[]).map((cur) => cur.value);
-            resX.push(...strs);
-        }
-        else if (curGroup[0]!.change === DiffChangeType.UniqueToY) {
-            const strs =
-                (curGroup as IDiffItemUniqueToY<string>[]).map((cur) => cur.value);
-            resY.push(...strs);
-        }
-        else if (curGroup[0]!.change === DiffChangeType.Equal) {
-            resX.push("...");
-            resY.push("...");
-        }
-        else {
-            assertNever(curGroup[0]);
-        }
-    }
-
-    return [
-        forcedXResult || [fileXParts[0], ...resX, _.last(fileXParts)].join(path.sep),
-        forcedYResult || [fileYParts[0], ...resY, _.last(fileYParts)].join(path.sep)
-    ];
 }

@@ -1,6 +1,6 @@
 import * as path from "path";
 import {tmpDir} from "../test/ut/specHelpers";
-import {disambiguateFiles, getFilesystemItem, getMostRecentlyModified, resolveFileLocation} from "./filesystemHelpers";
+import {getFilesystemItem, getMostRecentlyModified, resolveFileLocation} from "./filesystemHelpers";
 import {File} from "./file";
 import {Directory} from "./directory";
 import { getTimerPromise } from "./promiseHelpers";
@@ -195,90 +195,6 @@ describe("getMostRecentlyModified()", () => {
                 expect(res.value.fsItem.dirName).toEqual("dirB");
             }
         }
-    });
-
-});
-
-
-describe("disambiguateFiles()", () => {
-
-    it("always includes the first item even when it is the same in both", () => {
-        const fileA = new File("c:\\one\\fileA.txt");
-        const fileB = new File("c:\\two\\fileB.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\one\\fileA.txt");
-        expect(resB).toEqual("c:\\two\\fileB.txt");
-    });
-
-
-    it("always includes the last item even when it is the same in both", () => {
-        const fileA = new File("c:\\one\\file.txt");
-        const fileB = new File("d:\\two\\file.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\one\\file.txt");
-        expect(resB).toEqual("d:\\two\\file.txt");
-    });
-
-
-    it("correctly disambiguates to files deeply nested under different folders", () => {
-
-        const fileA = new File("c:\\one\\two\\a\\three\\four\\five\\six\\file.txt");
-        const fileB = new File("c:\\one\\two\\b\\three\\four\\five\\six\\file.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\...\\a\\...\\file.txt");
-        expect(resB).toEqual("c:\\...\\b\\...\\file.txt");
-    });
-
-
-    it("returns the expected results", () => {
-        const fileA = new File("c:\\one\\two\\three\\four\\five.txt");
-        const fileB = new File("c:\\two\\two_b\\four\\five.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\one\\...\\three\\...\\five.txt");
-        expect(resB).toEqual("c:\\...\\two_b\\...\\five.txt");
-    });
-
-    it("returns full paths when both File instances consist of only a file name", () => {
-        const fileA = new File("file1.txt");
-        const fileB = new File("file2.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("file1.txt");
-        expect(resB).toEqual("file2.txt");
-    });
-
-
-    it("returns full paths when both File instances consist of only two parts", () => {
-        const fileA = new File("c:\\file1.txt");
-        const fileB = new File("d:\\file2.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\file1.txt");
-        expect(resB).toEqual("d:\\file2.txt");
-    });
-
-
-    it("does the right thing when one of the File instances contains only a file name", () => {
-        const fileA = new File("c:\\one\\two\\three\\four\\file.txt");
-        const fileB = new File("file.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\one\\two\\three\\four\\file.txt");
-        expect(resB).toEqual("file.txt");
-    });
-
-
-    it("does the right thing when one of the File instances contains only two parts", () => {
-        const fileA = new File("c:\\one\\two\\three\\four\\file.txt");
-        const fileB = new File("four\\file.txt");
-
-        const [resA, resB] = disambiguateFiles(fileA, fileB);
-        expect(resA).toEqual("c:\\one\\two\\three\\four\\file.txt");
-        expect(resB).toEqual("four\\file.txt");
     });
 
 });

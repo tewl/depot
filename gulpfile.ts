@@ -196,7 +196,7 @@ export async function build(): Promise<void> {
         }
     ];
 
-    const results = await promiseResult.allArrayM(_.map(tasks, (curTask) => curTask.promiseResult));
+    const results = await promiseResult.allArrayM(tasks.map((curTask) => curTask.promiseResult));
 
     if (results.failed) {
         console.error(failStyle(sep));
@@ -206,8 +206,7 @@ export async function build(): Promise<void> {
         throw toGulpError("❌ " + failStyle("Build failed."));
     }
     else {
-        const indexedResults = _.map(
-            results.value,
+        const indexedResults = results.value.map(
             (curResult, index) => { return {index, result: curResult}; }
         );
 

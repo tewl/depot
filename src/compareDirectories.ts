@@ -173,6 +173,8 @@ export async function compareDirectories(
         else {
             const pairing = new FilePairingXY(xFilePairingItem, yDirComparisonFile);
             pairings.push(pairing);
+            // Delete item in yMap so when we are done yMap will hold items that
+            // are unique to Y.
             yMap.delete(xRelFilePath);
         }
     }

@@ -270,7 +270,7 @@
             "error"
         ],
         "@typescript-eslint/prefer-reduce-type-parameter": [
-            "error"
+            "off"
         ],
         "@typescript-eslint/prefer-return-this-type": [
             "error"

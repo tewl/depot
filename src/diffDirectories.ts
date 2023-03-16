@@ -2,6 +2,7 @@ import * as path from "path";
 import * as _ from "lodash";
 import { Directory } from "./directory";
 import {File} from "./file";
+import { Stats } from "fs";
 
 export enum ActionPriority {
     PRESERVE   = "preserve",
@@ -139,31 +140,19 @@ export class FileComparer implements IFilesToCompare {
 
 
     public async bothExistAndIdentical(): Promise<boolean> {
-        const [leftExists, rightExists] = await Promise.all([
-            this._leftFile.exists(),
-            this._rightFile.exists()
-        ]);
-
-        if (!leftExists || !rightExists) {
-            // One or both of the files do not exist.
-            return false;
-        }
-
-        // Both files exist.  Return a value indicating whether they are
-        // identical.
-        const [leftHash, rightHash] = await Promise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
-        return leftHash === rightHash;
+        return filesAreIdentical(this._leftFile, undefined, this._rightFile, undefined);
     }
 
     public async actions(actionPriority: ActionPriority): Promise<Array<FileCompareAction>> {
-        const [leftExists, rightExists] = await Promise.all([
+
+        const [leftStats, rightStats] = await Promise.all([
             this._leftFile.exists(),
             this._rightFile.exists()
         ]);
 
-        const isLeftOnly = !!(leftExists && !rightExists);
-        const isRightOnly = !!(!leftExists && rightExists);
-        const isInBoth = !!(leftExists && rightExists);
+        const isLeftOnly = !!(leftStats && !rightStats);
+        const isRightOnly = !!(!leftStats && rightStats);
+        const isInBoth = !!(leftStats && rightStats);
 
         const actions: Array<FileCompareAction> = [];
 
@@ -206,10 +195,10 @@ export class FileComparer implements IFilesToCompare {
             }
         }
         else if (isInBoth) {
-            const [leftHash, rightHash] = await Promise.all([this._leftFile.getHash(), this._rightFile.getHash()]);
-            const filesAreIdentical = leftHash === rightHash;
 
-            if (filesAreIdentical) {
+            const filesIdentical = await filesAreIdentical(this._leftFile, leftStats, this._rightFile, rightStats);
+
+            if (filesIdentical) {
                 // When the files are identical, there should be no actions.
             }
             else if (actionPriority === ActionPriority.SyncLeftToRight) {
@@ -237,6 +226,39 @@ export class FileComparer implements IFilesToCompare {
         return actions;
     }
 
+}
+
+
+async function filesAreIdentical(
+    leftFile: File,
+    leftStats: Stats | undefined,
+    rightFile: File,
+    rightStats: Stats | undefined
+): Promise<boolean> {
+
+    if (leftStats === undefined || rightStats === undefined) {
+        [leftStats, rightStats] = await Promise.all([leftFile.exists(), rightFile.exists()]);
+    }
+
+    if (leftStats === undefined || rightStats === undefined) {
+        return false;
+    }
+
+    if (leftStats.size !== rightStats.size) {
+        return false;
+    }
+
+    if (leftStats.mtimeMs !== rightStats.mtimeMs) {
+        return false;
+    }
+
+    const [leftHash, rightHash] = await Promise.all([leftFile.getHash(), rightFile.getHash()]);
+    if (leftHash !== rightHash) {
+        return false;
+    }
+
+    // If we made it this far, they must be equal.
+    return true;
 }
 
 

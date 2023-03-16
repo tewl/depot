@@ -1,4 +1,5 @@
 import * as path from "path";
+import * as fs from "fs/promises";
 import * as _ from "lodash";
 import { tmpDir } from "../test/ut/specHelpers";
 import { File } from "./file";
@@ -98,7 +99,7 @@ describe("diffDirectories()", () => {
         let leftDir: Directory;
         let rightDir: Directory;
 
-        beforeEach(() => {
+        beforeEach(async () => {
             tmpDir.emptySync();
 
             leftDir = new Directory(tmpDir, "left");
@@ -110,6 +111,11 @@ describe("diffDirectories()", () => {
 
             // The (identical) right version of the file.
             const rightFile = leftFile.copySync(rightDir);
+
+            // Make sure the two files have the same timestamps.
+            const leftStats = leftFile.existsSync()!;
+            await fs.utimes(leftFile.toString(), leftStats.atime, leftStats.mtime);
+            await fs.utimes(rightFile.toString(), leftStats.atime, leftStats.mtime);
         });
 
 

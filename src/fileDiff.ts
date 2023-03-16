@@ -16,8 +16,6 @@ export async function showVsCodeDiff(fileA: File, fileB: File, useExisting = fal
         fileB.toString()
     ];
 
-    console.log(args);
-
     const spawnOut = spawn(cmd, args);
     await spawnOut.closePromise;
     return undefined;

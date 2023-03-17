@@ -11,6 +11,7 @@ import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
 import { mapAsync } from "./src/promiseHelpers";
 import { FailedResult, Result, SucceededResult } from "./src/result";
+import { pipeAsync } from "./src/pipeAsync";
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,13 +70,13 @@ export async function eslint(): Promise<void> {
         return;
     }
     else {
-        console.log(spawnErrorToString(result.error));
+        console.error(spawnErrorToString(result.error));
         throw toGulpError("ESLint errors found.");
     }
 }
 
 
-async function runEslint(): Promise<Result<string, SpawnError>> {
+async function runEslint(): Promise<Result<string, string>> {
     const eslintArgs = [
         ".",
         "--ext", ".js",
@@ -85,8 +86,9 @@ async function runEslint(): Promise<Result<string, SpawnError>> {
     let cmd = path.join(".", "node_modules", ".bin", "eslint");
     cmd = nodeBinForOs(cmd).toString();
 
-    return spawn(cmd, eslintArgs, { cwd: __dirname })
-    .closePromise;
+    return pipeAsync(spawn(cmd, eslintArgs, { cwd: __dirname }).closePromise)
+    .pipe((res) => Result.mapError((spawnErr) => spawnErrorToString(spawnErr), res))
+    .end();
 }
 
 
@@ -110,7 +112,7 @@ export async function ut(): Promise<void> {
 
 async function runUnitTests(
     allowOutput: boolean
-): Promise<Result<string, SpawnError>> {
+): Promise<Result<string, string>> {
     const jasmineConfigFile = new File(".", "jasmine.json");
 
     // A typical command line looks something like:
@@ -127,7 +129,7 @@ async function runUnitTests(
         `--config=${jasmineConfigFile.toString()}`
     ];
 
-    return spawn(
+    const spawnPromise = spawn(
         cmd,
         args,
         { cwd: __dirname },
@@ -136,6 +138,10 @@ async function runUnitTests(
         allowOutput ? process.stderr : undefined
     )
     .closePromise;
+
+    return pipeAsync(spawnPromise)
+    .pipe((res) => Result.mapError((spawnErr) => spawnErrorToString(spawnErr), res))
+    .end();
 }
 
 
@@ -150,13 +156,13 @@ export async function compile(): Promise<void> {
         console.log(result.value);
     }
     else {
-        console.log(spawnErrorToString(result.error));
+        console.error(result.error);
         throw toGulpError("TypeScript compilation failed.");
     }
 }
 
 
-async function runCompile(tsconfigFile: File): Promise<Result<string, SpawnError>> {
+async function runCompile(tsconfigFile: File): Promise<Result<string, string>> {
     // A typical command line looks something like:
     // _ ./node_modules/.bin/tsc --project ./tsconfig.json _
     const cmd = nodeBinForOs(path.join(".", "node_modules", ".bin", "tsc")).toString();
@@ -165,8 +171,9 @@ async function runCompile(tsconfigFile: File): Promise<Result<string, SpawnError
         "--pretty"
     ];
 
-    return spawn(cmd, args, { cwd: __dirname })
-    .closePromise;
+    return pipeAsync(spawn(cmd, args, { cwd: __dirname }).closePromise)
+    .pipe((res) => Result.mapError((spawnErr) => spawnErrorToString(spawnErr), res))
+    .end();
 }
 
 
@@ -202,7 +209,7 @@ export async function build(): Promise<void> {
         console.error(failStyle(sep));
         console.error(failStyle(`❌ Task failed: ${tasks[results.error.index]!.name}`));
         console.error(failStyle(sep));
-        console.error(spawnErrorToString(results.error.item));
+        console.error(results.error.item);
         throw toGulpError("❌ " + failStyle("Build failed."));
     }
     else {

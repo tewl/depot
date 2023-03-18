@@ -253,11 +253,57 @@ describe("bind()", () => {
 });
 
 
-describe("map()", () => {
+describe("mapError()", () => {
 
     it("allows the input to be a Result<>", async () => {
         const fn = (x: number) => Promise.resolve(x + 1);
-        const res = await promiseResult.map(fn, new SucceededResult(6));
+        const res = await promiseResult.mapError(fn, new FailedResult(6));
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual(7);
+    });
+
+
+    it("allows the input to be a Promise<Result<>>", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res = await promiseResult.mapError(fn, Promise.resolve(new FailedResult(6)));
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual(7);
+    });
+
+
+    it("does not invoke the function if the input is successful", async () => {
+        let numInvocations = 0;
+        const fn = (x: number) => {
+            numInvocations++;
+            return Promise.resolve(x + 1);
+        };
+
+        const res = await promiseResult.mapError(fn, new SucceededResult(3));
+        expect(res.succeeded).toBeTrue();
+        expect(numInvocations).toEqual(0);
+    });
+
+
+    it("works well with pipeAsync()", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res =
+            await pipeAsync(Promise.resolve(new FailedResult(5)))
+            .pipe((res) => promiseResult.mapError(fn, res))
+            .pipe((res) => promiseResult.mapError(fn, res))
+            .pipe((res) => promiseResult.mapError(fn, res))
+            .end();
+        expect(res.failed).toBeTrue();
+        expect(res.error).toEqual(8);
+    });
+
+});
+
+
+describe("mapSuccess()", () => {
+
+    it("allows the input to be a Result<>", async () => {
+        const fn = (x: number) => Promise.resolve(x + 1);
+        const res = await promiseResult.mapSuccess(fn, new SucceededResult(6));
         expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual(7);
     });
@@ -265,7 +311,7 @@ describe("map()", () => {
 
     it("allows the input to be a Promise<Result<>>", async () => {
         const fn = (x: number) => Promise.resolve(x + 1);
-        const res = await promiseResult.map(fn, Promise.resolve(new SucceededResult(6)));
+        const res = await promiseResult.mapSuccess(fn, Promise.resolve(new SucceededResult(6)));
         expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual(7);
     });
@@ -278,7 +324,7 @@ describe("map()", () => {
             return Promise.resolve(x + 1);
         };
 
-        const res = await promiseResult.map(fn, new FailedResult("error"));
+        const res = await promiseResult.mapSuccess(fn, new FailedResult("error"));
         expect(res.failed).toBeTrue();
         expect(numInvocations).toEqual(0);
     });
@@ -288,9 +334,9 @@ describe("map()", () => {
         const fn = (x: number) => Promise.resolve(x + 1);
         const res =
             await pipeAsync(Promise.resolve(new SucceededResult(5)))
-            .pipe((res) => promiseResult.map(fn, res))
-            .pipe((res) => promiseResult.map(fn, res))
-            .pipe((res) => promiseResult.map(fn, res))
+            .pipe((res) => promiseResult.mapSuccess(fn, res))
+            .pipe((res) => promiseResult.mapSuccess(fn, res))
+            .pipe((res) => promiseResult.mapSuccess(fn, res))
             .end();
         expect(res.succeeded).toBeTrue();
         expect(res.value).toEqual(8);

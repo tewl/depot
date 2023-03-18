@@ -338,16 +338,43 @@ export async function bind<TInSuccess, TOutSuccess, TError>(
 
 
 /**
+ * Awaits the input Result.  If failure, maps the error using _fn_ (the mapping
+ * may also be async).  When the input is a successful Result, it is returned.
+ * Note:  If using pipeAsync(), you can use Result.mapError() instead.
+ *
+ * @param fn - Error mapping function that is invoked when the input is an error
+ * @param input - The input Result or Promise<Result>
+ * @returns Either the successful Result or the mapped error Result.
+ */
+export async function mapError<TInSuccess, TInError, TOutError>(
+    fn: (x: TInError) => TOutError | Promise<TOutError>,
+    input: Result<TInSuccess, TInError> | Promise<Result<TInSuccess, TInError>>
+): Promise<Result<TInSuccess, TOutError>> {
+
+    const awaitedInputRes = await Promise.resolve(input);
+    if (awaitedInputRes.failed) {
+        const outErr = await Promise.resolve(fn(awaitedInputRes.error));
+        return new FailedResult(outErr);
+    }
+    else {
+        return awaitedInputRes;
+    }
+}
+
+
+/**
  * Awaits the input Result.  If successful, maps its value using _fn_ (the
  * mapping may also be async).  When the input is a failed Result, it is
- * returned.
+ * returned.  Note:  If using pipeAsync(), you can use Result.mapSuccess()
+ * instead.
  *
- * @param fn - The function to invoke when the input is successful
+ * @param fn - Success mapping function that is invoked when the input is
+ * successful
  * @param input - The input Result or Promise<Result>
  * @returns Either the mapped successful Promise<Result> or the passed-through
  * failure Result or Promise<Result>.
  */
-export async function map<TInSuccess, TOutSuccess, TError>(
+export async function mapSuccess<TInSuccess, TOutSuccess, TError>(
     fn: (x: TInSuccess) => TOutSuccess | Promise<TOutSuccess>,
     input: Result<TInSuccess, TError> | Promise<Result<TInSuccess, TError>>
 ): Promise<Result<TOutSuccess, TError>> {

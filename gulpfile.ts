@@ -70,7 +70,7 @@ export async function eslint(): Promise<void> {
         return;
     }
     else {
-        console.error(spawnErrorToString(result.error));
+        console.error(result.error);
         throw toGulpError("ESLint errors found.");
     }
 }

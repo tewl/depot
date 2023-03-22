@@ -36,8 +36,7 @@ export function dayOfWeek(date: Date): string {
             break;
 
         default:
-            dayName = "Unknown day";
-            break;
+            throw new Error("Invalid day number");
     }
 
     return dayName;

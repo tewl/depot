@@ -1,12 +1,12 @@
 import * as path from "path";
 import * as _ from "lodash";
-import chalk = require("chalk");
+import chalk  from "chalk";
 import { nodeBinForOs, createCmdLaunchScript, makeNodeScriptExecutable } from "./src/nodeUtil";
 import { Directory } from "./src/directory";
 import { toGulpError } from "./src/gulpHelpers";
 import { File } from "./src/file";
 import { getOs, OperatingSystem } from "./src/os";
-import { spawn, SpawnError, spawnErrorToString } from "./src/spawn2";
+import { spawn, spawnErrorToString } from "./src/spawn2";
 import { hr } from "./src/ttyHelpers";
 import * as promiseResult from "./src/promiseResult";
 import { mapAsync } from "./src/promiseHelpers";

@@ -14,12 +14,12 @@ interface IMapData<TKey extends IHashable, TVal> {
  *   - Keys must not mutate after they have been set.  This collection does not
  *     enforce immutability itself.
  */
-export class VokMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal]>, ReadonlyMap<TKey, TVal> {
+export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal]>, Map<TKey, TVal> {
 
     private readonly _backingStore: Map<string, IMapData<TKey, TVal>>;
 
 
-    [Symbol.toStringTag] = "VokMap";
+    [Symbol.toStringTag] = "VoMap";
 
     /**
      * Constructor
@@ -190,7 +190,7 @@ export class VokMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVa
      *     function.
      */
     public forEach(
-        fn: (value: TVal, key: TKey, map: ReadonlyMap<TKey, TVal>) => void,
+        fn: (value: TVal, key: TKey, map: Map<TKey, TVal>) => void,
         thisArg?: unknown
     ): void {
         const cbFn = fn.bind(thisArg);

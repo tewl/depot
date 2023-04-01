@@ -1,6 +1,6 @@
 import { VoSet } from "./voSet";
 import { IHashable } from "./hashable";
-import { hash } from "./stringHelpers";
+import { hash } from "./hash";
 
 
 class Person implements IHashable {

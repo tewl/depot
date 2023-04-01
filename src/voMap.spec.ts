@@ -1,5 +1,5 @@
 import { IHashable } from "./hashable";
-import { hash } from "./stringHelpers";
+import { hash } from "./hash";
 import { VoMap } from "./voMap";
 
 class Person implements IHashable {

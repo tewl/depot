@@ -15,13 +15,15 @@ class Person {
  * @param iterable - The values to initialize the map with.
  * @returns The new Person map.
  */
-
 function createPersonMap(iterable?: Iterable<[Person, number]>): VoMap<Person, number> {
     return new VoMap<Person, number>(personNameHash, iterable);
 
     function personNameHash(p: Person) {
-        const intrinsics = { first: p.first, last: p.last };
-        return hash(JSON.stringify(intrinsics), false, "sha256", "base64");
+        const intrinsics = {
+            first: p.first.toLocaleLowerCase(),
+            last:  p.last.toLocaleLowerCase()
+        };
+        return hash(JSON.stringify(intrinsics), "sha256", "base64");
     }
 }
 
@@ -34,7 +36,6 @@ const barney1 = new Person("Barney", "Rubble");
 const barney2 = new Person("Barney", "Rubble");
 const betty1 = new Person("Betty", "Rubble");
 const betty2 = new Person("Betty", "Rubble");
-
 
 
 describe("VoMap", () => {

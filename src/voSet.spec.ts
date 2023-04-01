@@ -20,13 +20,15 @@ class Person {
  * @param iterable - The values to initialize the set with.
  * @returns The new Person set.
  */
-
 function createPersonSet(iterable?: Iterable<Person>): VoSet<Person> {
     return new VoSet<Person>(personNameHash, iterable);
 
     function personNameHash(p: Person) {
-        const intrinsics = { first: p.first, last: p.last };
-        return hash(JSON.stringify(intrinsics), false, "sha256", "base64");
+        const intrinsics = {
+            first: p.first.toLocaleLowerCase(),
+            last:  p.last.toLocaleLowerCase()
+        };
+        return hash(JSON.stringify(intrinsics), "sha256", "base64");
     }
 }
 

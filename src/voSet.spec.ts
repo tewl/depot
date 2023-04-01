@@ -3,19 +3,12 @@ import { IHashable } from "./hashable";
 import { hash } from "./hash";
 
 
-class Person implements IHashable {
+class Person {
     public constructor(
         public readonly first: string,
         public readonly last: string,
         public readonly age: number
     ) {
-    }
-
-    public getHash(): string {
-        // Two Person instances are equal if their first and last names are
-        // equal.
-        const intrinsics = { first: this.first, last: this.last };
-        return hash(JSON.stringify(intrinsics), "sha256", "base64");
     }
 }
 

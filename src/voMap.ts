@@ -1,14 +1,6 @@
-import { IHashable } from "./hashable";
+import { HashFn } from "./hash";
 
-// TODO: Change both containers to:
-// - items don't have to implement IHashable
-// - constructor takes a hashing function.  This should be the first argument
-// - add unit tests where the collection contains heterogeneous types and
-//   instances of different types can hash to the same value
-
-
-
-interface IMapData<TKey extends IHashable, TVal> {
+interface IMapData<TKey, TVal> {
     clientKey: TKey;
     clientValue: TVal;
 }
@@ -24,12 +16,14 @@ interface IMapData<TKey extends IHashable, TVal> {
  *   - Keys must not mutate after they have been set.  This collection does not
  *     enforce immutability itself.
  */
-export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal]>, Map<TKey, TVal> {
+export class VoMap<TKey, TVal> implements Iterable<[TKey, TVal]>, Map<TKey, TVal> {
 
+    private readonly _hashFn: HashFn<TKey>;
     private readonly _backingStore: Map<string, IMapData<TKey, TVal>>;
 
 
     [Symbol.toStringTag] = "VoMap";
+
 
     /**
      * Constructor
@@ -37,7 +31,8 @@ export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal
      * @param iterable - An array or other iterable containing key-value pairs
      * that will be added to the new map.
      */
-    public constructor(iterable?: Iterable<[TKey, TVal]>) {
+    public constructor(hashFn: HashFn<TKey>, iterable?: Iterable<[TKey, TVal]>) {
+        this._hashFn = hashFn;
         this._backingStore = new Map<string, IMapData<TKey, TVal>>();
 
         if (iterable) {
@@ -141,7 +136,7 @@ export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal
      * @returns This map instance (for chaining)
      */
     public set(key: TKey, val: TVal): this {
-        const hash = key.getHash();
+        const hash = this._hashFn(key);
         this._backingStore.set(hash, {clientKey: key, clientValue: val});
         return this;
     }
@@ -155,7 +150,7 @@ export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal
      * is returned if the specified key does not exist in this map.
      */
     public get(key: TKey): TVal | undefined {
-        const hash = key.getHash();
+        const hash = this._hashFn(key);
         const clientData = this._backingStore.get(hash);
         return clientData?.clientValue;
     }
@@ -167,7 +162,7 @@ export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal
      * @returns true if the key was found; false otherwise.
      */
     public has(key: TKey): boolean {
-        const hash = key.getHash();
+        const hash = this._hashFn(key);
         return this._backingStore.has(hash);
     }
 
@@ -179,7 +174,7 @@ export class VoMap<TKey extends IHashable, TVal> implements Iterable<[TKey, TVal
      * could not be found.
      */
     public delete(key: TKey): boolean {
-        const hash = key.getHash();
+        const hash = this._hashFn(key);
         const wasDeleted = this._backingStore.delete(hash);
         return wasDeleted;
     }

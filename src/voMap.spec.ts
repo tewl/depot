@@ -2,15 +2,29 @@ import { IHashable } from "./hashable";
 import { hash } from "./hash";
 import { VoMap } from "./voMap";
 
-class Person implements IHashable {
+class Person {
     public constructor(public readonly first: string, public readonly last: string) {
     }
+}
 
-    public getHash(): string {
-        const intrinsics = {first: this.first, last:  this.last};
+
+/**
+ * Creates a VoMap<Person, number> where Person keys are considered equal if they
+ * have the same first and last names.
+ *
+ * @param iterable - The values to initialize the map with.
+ * @returns The new Person map.
+ */
+
+function createPersonMap(iterable?: Iterable<[Person, number]>): VoMap<Person, number> {
+    return new VoMap<Person, number>(personNameHash, iterable);
+
+    function personNameHash(p: Person) {
+        const intrinsics = { first: p.first, last: p.last };
         return hash(JSON.stringify(intrinsics), "sha256", "base64");
     }
 }
+
 
 const fred1 = new Person("Fred", "Flintstone");
 const fred2 = new Person("Fred", "Flintstone");
@@ -28,13 +42,13 @@ describe("VoMap", () => {
     describe("constructor", () => {
 
         it("creates an empty map when no values are specified", () => {
-            const map = new VoMap<Person, number>();
+            const map = createPersonMap();
             expect(map.size).toEqual(0);
         });
 
 
         it("creates a prepopulated map when an iterable is specified", () => {
-            const map = new VoMap<Person, number>([
+            const map = createPersonMap([
                 [fred1, 40],
                 [wilma1, 41],
                 [barney1, 42],
@@ -51,7 +65,7 @@ describe("VoMap", () => {
         describe("size property", () => {
 
             it("has expected value while mutating the collection", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 expect(map.size).toEqual(0);
                 map.set(fred1, 40);
                 expect(map.size).toEqual(1);
@@ -78,7 +92,7 @@ describe("VoMap", () => {
         describe("iterator", () => {
 
             it("iterates over the items in the expected order", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -88,7 +102,7 @@ describe("VoMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -111,7 +125,7 @@ describe("VoMap", () => {
 
 
             it("makes the map an Iterable that can be used directly in a for...of loop", () => {
-                const map1 = new VoMap<Person, number>();
+                const map1 = createPersonMap();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -152,7 +166,7 @@ describe("VoMap", () => {
         describe("entries()", () => {
 
             it("iterates over the items in the expected order", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -167,7 +181,7 @@ describe("VoMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -190,7 +204,7 @@ describe("VoMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new VoMap<Person, number>();
+                const map1 = createPersonMap();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -230,7 +244,7 @@ describe("VoMap", () => {
         describe("keys()", () => {
 
             it("iterates over the keys in the expected order", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -245,7 +259,7 @@ describe("VoMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -268,7 +282,7 @@ describe("VoMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new VoMap<Person, number>();
+                const map1 = createPersonMap();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -303,7 +317,7 @@ describe("VoMap", () => {
         describe("values()", () => {
 
             it("iterates over the values in the expected order", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -318,7 +332,7 @@ describe("VoMap", () => {
 
 
             it("supports concurrent iteration", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -341,7 +355,7 @@ describe("VoMap", () => {
 
 
             it("is an Iterable and can be used directly in a for...of loop", () => {
-                const map1 = new VoMap<Person, number>();
+                const map1 = createPersonMap();
                 map1.set(fred1, 40);
                 map1.set(wilma1, 41);
                 map1.set(barney1, 42);
@@ -376,7 +390,7 @@ describe("VoMap", () => {
         describe("set()", () => {
 
             it("sets the entry when it does not already exist", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 expect(map.size).toEqual(0);
                 map.set(fred1, 40);
                 expect(map.size).toEqual(1);
@@ -385,7 +399,7 @@ describe("VoMap", () => {
 
 
             it("when the same key instance is used to set the value a second time, the first is overwritten", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(fred1, 42);
                 expect(map.get(fred1)).toEqual(42);
@@ -394,7 +408,7 @@ describe("VoMap", () => {
 
 
             it("when a different but equal instance is used to set the value a second time, the first is overwritten", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(fred2, 42);
                 expect(map.get(fred1)).toEqual(42);
@@ -407,14 +421,14 @@ describe("VoMap", () => {
         describe("get()", () => {
 
             it("returns undefined when the key does not exist", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 expect(map.get(barney1)).toBeUndefined();
             });
 
 
             it("returns the expected value when the key is the same instance used when set", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -425,7 +439,7 @@ describe("VoMap", () => {
 
 
             it("returns the expected value when the key is NOT the same instance used when set", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -440,7 +454,7 @@ describe("VoMap", () => {
         describe("has()", () => {
 
             it("returns true when called with the same instance used when set", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -454,7 +468,7 @@ describe("VoMap", () => {
 
 
             it("returns true when called with a different instance as used when set", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -468,7 +482,7 @@ describe("VoMap", () => {
 
 
             it("returns false when no equal key exists in the map", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -484,7 +498,7 @@ describe("VoMap", () => {
         describe("delete()", () => {
 
             it("returns true when an existing item in the map was deleted using the same instance", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -503,7 +517,7 @@ describe("VoMap", () => {
 
 
             it("returns true when an existing item in the map was deleted using a different instance", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -522,7 +536,7 @@ describe("VoMap", () => {
 
 
             it("returns false when the specified key does not exist in the map", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -539,7 +553,7 @@ describe("VoMap", () => {
 
 
             it("does nothing when the collection is empty", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 expect(map.size).toEqual(0);
                 map.clear();
                 expect(map.size).toEqual(0);
@@ -547,7 +561,7 @@ describe("VoMap", () => {
 
 
             it("removes all items from the collection when not empty", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -564,7 +578,7 @@ describe("VoMap", () => {
         describe("forEach", () => {
 
             it("invokes the function with the specified arguments in the expected order", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);
@@ -602,7 +616,7 @@ describe("VoMap", () => {
 
 
             it("invokes the function with the specified this argument", () => {
-                const map = new VoMap<Person, number>();
+                const map = createPersonMap();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
                 map.set(barney1, 42);

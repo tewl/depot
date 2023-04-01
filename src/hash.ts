@@ -2,7 +2,16 @@ import * as crypto from "crypto";
 import { Brand } from "./brand";
 
 
+/**
+ * A hash value in string form.
+ */
 export type HashString = Brand<string, "HashString">;
+
+
+/**
+ * A function that takes a value and returns its hash.
+ */
+export type HashFn<T> = (val: T) => HashString;
 
 
 /**

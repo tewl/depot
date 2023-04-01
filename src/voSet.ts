@@ -1,4 +1,4 @@
-import { IHashable } from "./hashable";
+import { HashFn } from "./hash";
 import { FailedResult, Result, SucceededResult } from "./result";
 
 
@@ -10,14 +10,17 @@ import { FailedResult, Result, SucceededResult } from "./result";
  *   - The value type must implement IHashable.  Values considered equal must
  *     hash to the same value.
  */
-export class VoSet<TVal extends IHashable> implements Iterable<TVal>, ReadonlySet<TVal> {
+export class VoSet<TVal> implements Iterable<TVal>, ReadonlySet<TVal> {
 
     private readonly _backingStore: Map<string, TVal>;
+    private readonly _hashFn: HashFn<TVal>;
+
 
     [Symbol.toStringTag] = "VoSet";
 
 
-    public constructor(iterable?: Iterable<TVal>) {
+    public constructor(hashFn: HashFn<TVal>, iterable?: Iterable<TVal>) {
+        this._hashFn = hashFn;
         this._backingStore = new Map<string, TVal>();
 
         if (iterable) {
@@ -33,7 +36,7 @@ export class VoSet<TVal extends IHashable> implements Iterable<TVal>, ReadonlySe
      */
     public add(value: TVal): this {
 
-        const hash = value.getHash();
+        const hash = this._hashFn(value);
         this._backingStore.set(hash, value);
         return this;
     }
@@ -52,7 +55,7 @@ export class VoSet<TVal extends IHashable> implements Iterable<TVal>, ReadonlySe
      * removed, or false if the element does not exist.
      */
     public delete(value: TVal): boolean {
-        const hash = value.getHash();
+        const hash = this._hashFn(value);
         const wasPresent = this._backingStore.delete(hash);
         return wasPresent;
     }
@@ -63,7 +66,7 @@ export class VoSet<TVal extends IHashable> implements Iterable<TVal>, ReadonlySe
      * or not.
      */
     public has(value: TVal): boolean {
-        const hash = value.getHash();
+        const hash = this._hashFn(value);
         const isPresent = this._backingStore.has(hash);
         return isPresent;
     }
@@ -78,7 +81,7 @@ export class VoSet<TVal extends IHashable> implements Iterable<TVal>, ReadonlySe
      * value.  Otherwise, a failed Result.
      */
     public get(value: TVal): Result<TVal, void> {
-        const hash = value.getHash();
+        const hash = this._hashFn(value);
 
         // Use has() to first determine whether there is an entry with the key
         // we are looking for.  We are doing this extra step so that we can

@@ -20,6 +20,24 @@ class Person implements IHashable {
 }
 
 
+/**
+ * Creates a VoSet<Person> where Person instances are considered equal if they
+ * have the same first and last names.
+ *
+ * @param iterable - The values to initialize the set with.
+ * @returns The new Person set.
+ */
+
+function createPersonSet(iterable?: Iterable<Person>): VoSet<Person> {
+    return new VoSet<Person>(personNameHash, iterable);
+
+    function personNameHash(p: Person) {
+        const intrinsics = { first: p.first, last: p.last };
+        return hash(JSON.stringify(intrinsics), "sha256", "base64");
+    }
+}
+
+
 const fred1 = new Person("Fred", "Flintstone", 40);
 const fred2 = new Person("Fred", "Flintstone", 50);
 const wilma1 = new Person("Wilma", "Flintstone", 40);
@@ -35,13 +53,13 @@ describe("VoSet", () => {
     describe("constructor", () => {
 
         it("creates an empty set when no values are specified", () => {
-            const set = new VoSet();
+            const set = createPersonSet();
             expect(set.size).toEqual(0);
         });
 
 
         it("creates a populated set when an iterable is specified", () => {
-            const set = new VoSet([fred1, wilma1, barney1, betty1]);
+            const set = createPersonSet([fred1, wilma1, barney1, betty1]);
             expect(set.size).toEqual(4);
         });
 
@@ -54,7 +72,7 @@ describe("VoSet", () => {
         describe("add()", () => {
 
             it("adds the item when an equal item does not exist in the set", () => {
-                const set = new VoSet<Person>();
+                const set = createPersonSet();
                 expect(set.size).toEqual(0);
                 set.add(fred1);
                 expect(set.size).toEqual(1);
@@ -62,7 +80,7 @@ describe("VoSet", () => {
 
 
             it("overwrites when an equal item exists in the set", () => {
-                const set = new VoSet();
+                const set = createPersonSet();
                 expect(set.size).toEqual(0);
 
                 set.add(fred1);
@@ -79,7 +97,7 @@ describe("VoSet", () => {
         describe("clear()", () => {
 
             it("does nothing when the collection is empty", () => {
-                const set = new VoSet();
+                const set = createPersonSet();
                 expect(set.size).toEqual(0);
 
                 set.clear();
@@ -91,7 +109,7 @@ describe("VoSet", () => {
 
 
             it("removes all items from the collection", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 set.clear();
@@ -104,7 +122,7 @@ describe("VoSet", () => {
         describe("delete()", () => {
 
             it("returns true when an existing item in the set was deleted using the same instance", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 expect(set.delete(fred1)).toBeTrue();
@@ -113,7 +131,7 @@ describe("VoSet", () => {
 
 
             it("returns true when an existing item in the set was deleted using a different instance", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 expect(set.delete(fred2)).toBeTrue();
@@ -122,7 +140,7 @@ describe("VoSet", () => {
 
 
             it("returns false when the specified item does not exist in the set", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 const slate = new Person("Mr.", "Slate", 70);
@@ -136,7 +154,7 @@ describe("VoSet", () => {
         describe("has()", () => {
 
             it("returns true when called with the same instance used when adding", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 expect(set.has(fred1)).toBeTrue();
@@ -144,7 +162,7 @@ describe("VoSet", () => {
 
 
             it("returns true when called with a different instance as used when adding", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 expect(set.has(fred2)).toBeTrue();
@@ -152,7 +170,7 @@ describe("VoSet", () => {
 
 
             it("returns false when no equal item exists in the set", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(set.size).toEqual(4);
 
                 const slate = new Person("Mr.", "Slate", 70);
@@ -165,13 +183,13 @@ describe("VoSet", () => {
         describe("get()", () => {
 
             it("returns a failed result when an equal item is not in the set", () => {
-                const set = new VoSet([fred1, wilma1]);
+                const set = createPersonSet([fred1, wilma1]);
                 expect(set.get(betty1).failed).toBeTrue();
             });
 
 
             it("returns the expected item when getting using the same instance used when added", () => {
-                const set = new VoSet([fred1, wilma1]);
+                const set = createPersonSet([fred1, wilma1]);
                 const retrievedRes = set.get(fred1);
                 expect(retrievedRes.succeeded).toBeTrue();
                 expect(retrievedRes.value!.first).toEqual("Fred");
@@ -181,7 +199,7 @@ describe("VoSet", () => {
 
 
             it("returns the expected item when getting using an equal instance", () => {
-                const set = new VoSet([fred1, wilma1]);
+                const set = createPersonSet([fred1, wilma1]);
                 const retrievedRes = set.get(fred2);
                 expect(retrievedRes.succeeded).toBeTrue();
                 expect(retrievedRes.value!.first).toEqual("Fred");
@@ -195,7 +213,7 @@ describe("VoSet", () => {
         describe("size", () => {
 
             it("has expected value while mutating the collection", () => {
-                const set = new VoSet();
+                const set = createPersonSet();
                 expect(set.size).toEqual(0);
                 set.add(fred1);
                 expect(set.size).toEqual(1);
@@ -222,13 +240,13 @@ describe("VoSet", () => {
         describe("iterator", () => {
 
             it("iterates over the items in the expected order", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(Array.from(set)).toEqual([fred1, wilma1, barney1, betty1]);
             });
 
 
             it("supports concurrent iteration", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 const iter1 = set[Symbol.iterator]();
 
@@ -247,7 +265,7 @@ describe("VoSet", () => {
 
 
             it("makes the set an Iterable that can be used in a for...of loop", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 let loopInvocations = 0;
                 for (const val of set) {
@@ -279,7 +297,7 @@ describe("VoSet", () => {
         describe("entries()", () => {
 
             it("iterates over the items in the expected order", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(Array.from(set.entries())).toEqual([
                     [fred1, fred1], [wilma1, wilma1], [barney1, barney1], [betty1, betty1]
                 ]);
@@ -287,7 +305,7 @@ describe("VoSet", () => {
 
 
             it("supports concurrent iteration", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 const iter1 = set.entries();
 
@@ -306,7 +324,7 @@ describe("VoSet", () => {
 
 
             it("is an Iterable and can be used in a for...of loop", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 let loopInvocations = 0;
                 for (const val of set.entries()) {
@@ -337,7 +355,7 @@ describe("VoSet", () => {
         describe("keys()", () => {
 
             it("iterates over the keys in the expected order", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(Array.from(set.keys())).toEqual([
                     fred1, wilma1, barney1, betty1
                 ]);
@@ -345,7 +363,7 @@ describe("VoSet", () => {
 
 
             it("supports concurrent iteration", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 const iter1 = set.keys();
 
@@ -364,7 +382,7 @@ describe("VoSet", () => {
 
 
             it("is an Iterable and can be used in a for...of loop", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 let loopInvocations = 0;
                 for (const val of set.keys()) {
@@ -395,7 +413,7 @@ describe("VoSet", () => {
         describe("values()", () => {
 
             it("iterates over the values in the expected order", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
                 expect(Array.from(set.values())).toEqual([
                     fred1, wilma1, barney1, betty1
                 ]);
@@ -403,7 +421,7 @@ describe("VoSet", () => {
 
 
             it("supports concurrent iteration", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 const iter1 = set.values();
 
@@ -422,7 +440,7 @@ describe("VoSet", () => {
 
 
             it("is an Iterable and can be used in a for...of loop", () => {
-                const set = new VoSet([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 let loopInvocations = 0;
                 for (const val of set.values()) {
@@ -453,7 +471,7 @@ describe("VoSet", () => {
         describe("forEach()", () => {
 
             it("invokes the function with the specified arguments in the expected order", () => {
-                const theSet = new VoSet<Person>([fred1, wilma1, barney1, betty1]);
+                const theSet = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 let cbInvocations = 0;
 
@@ -487,7 +505,7 @@ describe("VoSet", () => {
 
 
             it("invokes the function with the specified _this_ argument", () => {
-                const set = new VoSet<Person>([fred1, wilma1, barney1, betty1]);
+                const set = createPersonSet([fred1, wilma1, barney1, betty1]);
 
                 set.forEach(
                     function (this: Person, val, key, theSet) {

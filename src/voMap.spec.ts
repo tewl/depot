@@ -21,7 +21,7 @@ function createPersonMap(iterable?: Iterable<[Person, number]>): VoMap<Person, n
 
     function personNameHash(p: Person) {
         const intrinsics = { first: p.first, last: p.last };
-        return hash(JSON.stringify(intrinsics), "sha256", "base64");
+        return hash(JSON.stringify(intrinsics), false, "sha256", "base64");
     }
 }
 

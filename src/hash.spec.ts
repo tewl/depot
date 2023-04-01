@@ -22,14 +22,35 @@ describe("hash()", () => {
     });
 
 
+    it("returns different hashes for different strings", () => {
+        const hash1 = hash("foo");
+        const hash2 = hash("bar");
+        expect(hash1).not.toEqual(hash2);
+    });
+
+
     it("returns hexadecimal output when requested", () => {
-        const hash1 = hash("foo", "sha256", "hex");
+        const hash1 = hash("foo", true, "sha256", "hex");
         expect(hash1).toEqual("2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae");
     });
 
 
     it("returns base64 output when requested", () => {
-        const hash1 = hash("foo", "sha256", "base64");
+        const hash1 = hash("foo", true, "sha256", "base64");
         expect(hash1).toEqual("LCa0a2j/xo/5m0U8HTBBNBNCLXBkg7+g+YpeiGJm564=");
+    });
+
+
+    it("returns different hashes when input differs by case and case sensitivity is enabled", () => {
+        const hash1 = hash("foo");
+        const hash2 = hash("Foo");
+        expect(hash1).not.toEqual(hash2);
+    });
+
+
+    it("returns the same hash when input differs by case and case sensitivity is disabled", () => {
+        const hash1 = hash("foo", false);
+        const hash2 = hash("Foo", false);
+        expect(hash1).toEqual(hash2);
     });
 });

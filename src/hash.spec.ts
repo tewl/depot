@@ -1,4 +1,4 @@
-import { HashString, hash } from "./hash";
+import { hash } from "./hash";
 
 
 describe("hash()", () => {

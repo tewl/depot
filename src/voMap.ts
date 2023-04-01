@@ -1,5 +1,12 @@
 import { IHashable } from "./hashable";
 
+// TODO: Change both containers to:
+// - items don't have to implement IHashable
+// - constructor takes a hashing function.  This should be the first argument
+// - add unit tests where the collection contains heterogeneous types and
+//   instances of different types can hash to the same value
+
+
 
 interface IMapData<TKey extends IHashable, TVal> {
     clientKey: TKey;
@@ -8,9 +15,12 @@ interface IMapData<TKey extends IHashable, TVal> {
 
 
 /**
+ * A map collection in which keys are value objects that are compared by
+ * comparing their hashes.
+ *
  * To use this map
- *   - The key type must implement IHashable.  Values considered equal must
- *     hash to the same value.
+ *   - The key type must implement IHashable.  Values considered equal must hash
+ *     to the same value.
  *   - Keys must not mutate after they have been set.  This collection does not
  *     enforce immutability itself.
  */

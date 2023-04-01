@@ -142,6 +142,8 @@ describe("VoMap", () => {
 
                     loopInvocations++;
                 }
+
+                expect(loopInvocations).toEqual(4);
             });
 
         });
@@ -219,6 +221,7 @@ describe("VoMap", () => {
 
                     loopInvocations++;
                 }
+                expect(loopInvocations).toEqual(4);
             });
 
         });
@@ -292,6 +295,7 @@ describe("VoMap", () => {
 
                     loopInvocations++;
                 }
+                expect(loopInvocations).toEqual(4);
             });
         });
 
@@ -533,7 +537,16 @@ describe("VoMap", () => {
 
         describe("clear()", () => {
 
-            it("removes all items from the collection", () => {
+
+            it("does nothing when the collection is empty", () => {
+                const map = new VoMap<Person, number>();
+                expect(map.size).toEqual(0);
+                map.clear();
+                expect(map.size).toEqual(0);
+            });
+
+
+            it("removes all items from the collection when not empty", () => {
                 const map = new VoMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);
@@ -550,7 +563,7 @@ describe("VoMap", () => {
 
         describe("forEach", () => {
 
-            it("invokes the function with with the specified arguments in the expected order", () => {
+            it("invokes the function with the specified arguments in the expected order", () => {
                 const map = new VoMap<Person, number>();
                 map.set(fred1, 40);
                 map.set(wilma1, 41);

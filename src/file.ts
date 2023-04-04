@@ -1,17 +1,13 @@
 import * as fs from "fs";
+import * as fsp from "fs/promises";
 import * as path from "path";
 import * as crypto from "crypto";
 import * as readline from "readline";
 import * as _ from "lodash";
 import {ListenerTracker} from "./listenerTracker";
-import {promisify1} from "./promisify";
 import {Directory} from "./directory";
 import {PathPart, reducePathParts} from "./pathHelpers";
 import { FailedResult, Result, SucceededResult } from "./result";
-
-
-const unlinkAsync = promisify1<void, string>(fs.unlink);
-const statAsync   = promisify1<fs.Stats, string>(fs.stat);
 
 
 /**
@@ -249,7 +245,7 @@ export class File {
                 return Promise.resolve();
             }
             else {
-                return unlinkAsync(this._filePath);
+                return fsp.unlink(this._filePath);
             }
         });
     }
@@ -807,7 +803,7 @@ function copyFile(sourceFilePath: string, destFilePath: string, options?: ICopyO
             // The caller wants to preserve the source file's timestamps.  Copy
             // them to the destination file now.
             //
-            return statAsync(sourceFilePath)
+            return fsp.stat(sourceFilePath)
             .then((srcStats: fs.Stats) => {
                 //
                 // Note:  Setting the timestamps on dest requires us to specify

@@ -1,19 +1,12 @@
 import * as fs from "fs";
+import * as fsp from "fs/promises";
 import * as path from "path";
 import * as _ from "lodash";
 import {File} from "./file";
-import {promisify1} from "./promisify";
 import {sequence, mapAsync} from "./promiseHelpers";
 import {PathPart, reducePathParts} from "./pathHelpers";
 import { StorageSize } from "./storageSize";
 import { matchesAny } from "./regexpHelpers";
-
-
-const unlinkAsync = promisify1<void, string>(fs.unlink);
-const rmdirAsync = promisify1<void, string>(fs.rmdir);
-const readdirAsync = promisify1<Array<string>, string>(fs.readdir);
-const mkdirAsync = promisify1<void, string>(fs.mkdir);
-const lstatAsync  = promisify1<fs.Stats, string>(fs.lstat);
 
 
 export interface IDirectoryContents {
@@ -194,7 +187,7 @@ export class Directory {
 
 
     public isEmpty(): Promise<boolean> {
-        return readdirAsync(this._dirPath)
+        return fsp.readdir(this._dirPath)
         .then((fsEntries) => {
             return fsEntries.length === 0;
         });
@@ -254,7 +247,7 @@ export class Directory {
                 // it.
                 const createFuncs = dirsToCreate.map((dirToCreate: string) => {
                     return (): Promise<void> => {
-                        return mkdirAsync(dirToCreate)
+                        return fsp.mkdir(dirToCreate)
                         .catch((err) => {
                             // If the directory already exists, just keep going.
                             if (err.code !== "EEXIST") {
@@ -368,7 +361,7 @@ export class Directory {
             }
             else {
                 // First, delete the contents of the specified directory.
-                return readdirAsync(this._dirPath)
+                return fsp.readdir(this._dirPath)
                 .then((items: Array<string>) => {
                     const absPaths = items.map((curItem) => {
                         return path.join(this._dirPath, curItem);
@@ -380,7 +373,7 @@ export class Directory {
                             return subdir.delete();
                         }
                         else {
-                            return unlinkAsync(curAbsPath);
+                            return fsp.unlink(curAbsPath);
                         }
                     });
 
@@ -389,7 +382,7 @@ export class Directory {
                 .then(() => {
                     // Now that all of the items in the directory have been deleted, delete
                     // the directory itself.
-                    return rmdirAsync(this._dirPath);
+                    return fsp.rmdir(this._dirPath);
                 });
             }
         });
@@ -452,7 +445,7 @@ export class Directory {
     public contents(recursive = false): Promise<IDirectoryContents> {
         const parentDirPath = this.toString();
 
-        return readdirAsync(this._dirPath)
+        return fsp.readdir(this._dirPath)
         .then((fsEntries) => {
             const fsEntryPaths = fsEntries.map((curEntry) => {
                 return path.join(parentDirPath, curEntry);
@@ -461,7 +454,7 @@ export class Directory {
             const contents: IDirectoryContents = {subdirs: [], files: []};
 
             return mapAsync(fsEntryPaths, (curPath) => {
-                return lstatAsync(curPath)
+                return fsp.lstat(curPath)
                 .then((stats) => {
                     if (stats.isFile()) {
                         contents.files.push(new File(curPath));

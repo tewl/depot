@@ -18,7 +18,7 @@ export interface IFindResult<TCollectionItem, TPredicateReturn> {
 export function find<TCollectionItem, TPredicateReturn>(
     collection: Array<TCollectionItem>,
     predicate: (item: TCollectionItem, index: number, collection: Array<TCollectionItem>) => TPredicateReturn
-): undefined | IFindResult<TCollectionItem, Exclude<TPredicateReturn, null | undefined>> {
+): undefined | IFindResult<TCollectionItem, NonNullable<TPredicateReturn>> {
     let index = 0;
     for (const curItem of collection) {
         const result = predicate(curItem, index, collection);

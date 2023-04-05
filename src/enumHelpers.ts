@@ -6,7 +6,7 @@ import * as _ from "lodash";
  * @param enumObject - The enumeration to choose a key from
  * @return A key from the specified enumeration
  */
-export function numericEnumRandomKey<T>(enumObject: T): keyof T {
+export function numericEnumRandomKey<T extends Record<string, unknown>>(enumObject: T): keyof T {
     const allKeys: Array<keyof T> = Object.keys(enumObject) as Array<keyof T>;
 
     // Numeric enumerations contain "reverse mappings" where the key is the
@@ -24,7 +24,7 @@ export function numericEnumRandomKey<T>(enumObject: T): keyof T {
  * @param enumObject - The enumeration to choose a value from
  * @return A value from the specified enumeration
  */
-export function numericEnumRandomValue<T>(enumObject: T): T[keyof T] {
+export function numericEnumRandomValue<T extends Record<string, unknown>>(enumObject: T): T[keyof T] {
     return enumObject[numericEnumRandomKey(enumObject)];
 }
 
@@ -34,7 +34,7 @@ export function numericEnumRandomValue<T>(enumObject: T): T[keyof T] {
  * @param enumObject - The enumeration to choose a key from
  * @return A key from the specified enumeration
  */
-export function stringEnumRandomKey<T>(enumObject: T): keyof T {
+export function stringEnumRandomKey<T extends Record<string, unknown>>(enumObject: T): keyof T {
     const allKeys: Array<keyof T> = Object.keys(enumObject) as Array<keyof T>;
     return allKeys[_.random(allKeys.length - 1)];
 }
@@ -45,7 +45,7 @@ export function stringEnumRandomKey<T>(enumObject: T): keyof T {
  * @param enumObject - The enumeration to choose a value from
  * @return A value from the specified enumeration
  */
-export function stringEnumRandomValue<T>(enumObject: T): T[keyof T] {
+export function stringEnumRandomValue<T extends Record<string, unknown>>(enumObject: T): T[keyof T] {
     return enumObject[stringEnumRandomKey(enumObject)];
 }
 

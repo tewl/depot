@@ -1,9 +1,9 @@
 {
-  "extends": "./tsconfig_base",
-  "include": [
-      "src/**/*",
-      "test/**/*"
-  ],
-  "exclude": [
-  ]
+    "extends": "./tsconfig_base",
+    "include": [
+        "src/**/*",
+        "test/**/*"
+    ],
+    "exclude": [
+    ]
 }

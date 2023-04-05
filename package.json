@@ -64,7 +64,7 @@
     "@types/inquirer": "6.0.3",
     "@types/jasmine": "3.10.1",
     "@types/lodash": "4.14.172",
-    "@types/node": "14.14.31",
+    "@types/node": "16.18.23",
     "@types/node-fetch": "^2.6.2",
     "@types/semver": "5.5.0",
     "@types/sprintf-js": "1.1.2",

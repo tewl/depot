@@ -78,7 +78,7 @@
     "gulp": "4.0.2",
     "jasmine": "3.10.0",
     "publishtogit": "git+https://github.com/kwpeters/publishtogit.git#v2.1.0",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "ts-node": "10.9.1",
     "typescript": "5.0.3"
   },
